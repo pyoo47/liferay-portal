@@ -63,10 +63,11 @@
 		</sequential>
 	</macrodef>
 
-	<target name="all">
+	<target name="all" depends="stop-gradle-daemons">
 		<antcall target="clean" />
 		<antcall target="compile" />
 		<antcall target="deploy" />
+		<antcall target="stop-gradle-daemons"/>
 	</target>
 
 	<target name="clean">
