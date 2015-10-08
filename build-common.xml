@@ -9,6 +9,7 @@
 	xmlns:sonar="antlib:org.sonar.ant"
 	xmlns:unless="ant:unless"
 >
+
 	<dirname file="${ant.file.build-common}" property="project.dir.native" />
 
 	<pathconvert property="project.dir" targetos="unix">
@@ -853,6 +854,21 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		</sequential>
 	</macrodef>
 
+	<macrodef name="find-gradle-executable">
+		<attribute name="returnProperty" />
+		<sequential>
+			<if>
+				<os family="unix" />
+				<then>
+					<property name="@{returnProperty}" value="${project.dir}/gradlew" />
+				</then>
+				<else>
+					<property name="@{returnProperty}" value="${project.dir}/gradlew.bat" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="gradle-execute">
 		<attribute default="${basedir}" name="dir" />
 		<attribute default="true" name="failonerror" />
@@ -861,19 +877,9 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		<element implicit="true" name="args" optional="true" />
 
 		<sequential>
-			<if>
-				<os family="unix" />
-				<then>
-					<property name="gradlew.suffix" value="" />
+			<find-gradle-executable returnProperty="gradle.executable" />
 
-					<chmod file="${project.dir}/gradlew${gradlew.suffix}" perm="a+x" />
-				</then>
-				<else>
-					<property name="gradlew.suffix" value=".bat" />
-				</else>
-			</if>
-
-			<exec dir="@{dir}" executable="${project.dir}/gradlew${gradlew.suffix}" failonerror="@{failonerror}">
+			<exec dir="@{dir}" executable="${gradle.executable}" failonerror="@{failonerror}">
 				<args />
 				<arg value="--no-daemon" />
 				<arg value="--project-cache-dir=${project.dir}/.gradle" />
@@ -881,8 +887,11 @@ Please set the environment variable ANT_OPTS to the recommended value of
 				<arg value="-Dapp.server.parent.dir=${app.server.parent.dir}" />
 				<arg value="-Dforced.cache.enabled=@{forcedcacheenabled}" />
 				<arg value="-Dliferay.home=${liferay.home}" />
-				<arg value="@{task}" />
+				<!--<arg value="-Dorg.gradle.daemon=true" />
+				<arg value="-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+CMSClassUnloadingEnabled"/>
+				<arg value="-Dorg.gradle.jvmargs=-server -verbose:gc -Xloggc:/tmp/ant-gc.log -Xms1024m -Xmx2048m -Xss2m -Xverify:none -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGCCause -XX:+PrintGCDetails -XX:+UseParallelOldGC -XX:HeapDumpPath=/tmp/gradle-oom-heap-dump.bin -XX:MaxNewSize=512m -XX:MaxPermSize=512m -XX:MaxTenuringThreshold=0 -XX:NewSize=256m -XX:PermSize=100m -XX:SurvivorRatio=65536 -XX:TargetSurvivorRatio=0"/>-->
 				<env key="GRADLE_OPTS" value="${env.ANT_OPTS}" />
+				<arg value="@{task}" />
 			</exec>
 		</sequential>
 	</macrodef>
@@ -1787,6 +1796,15 @@ rerun your task.
 				<delete dir="@{sonar.module}/${sonar.junit.reportsPath}" />
 			</sequential>
 		</for>
+	</target>
+
+	<target name="stop-gradle-daemons">
+		<!--
+		<find-gradle-executable returnProperty="gradle.executable" />
+		<exec dir="${project.dir}" executable="${gradle.executable}">
+			<arg value="-stop" />
+		</exec>
+		-->
 	</target>
 
 	<target name="test">
