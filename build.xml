@@ -956,4 +956,20 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 			<xmlcatalog refid="dtd.catalog" />
 		</xmlvalidate>
 	</target>
+
+	<target name="pyoo" depends="pyoo1, pyoo2">
+	</target>
+
+	<target name="pyoo1">
+		<beanshell mapId="pyoo">
+			beanShellMap.put("hello", "Hello World");
+		</beanshell>
+	</target>
+
+	<target name="pyoo2">
+		<beanshell mapId="pyoo">
+			Object x = beanShellMap.get("hello");
+			System.out.println(x.toString());
+		</beanshell>
+	</target>	
 </project>
