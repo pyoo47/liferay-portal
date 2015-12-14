@@ -130,21 +130,16 @@ public class JenkinsPerformanceTableUtil {
 		String tag, String axis, String batch, String className,
 		String duration, String name, String status, String url) {
 
-		Element row = new DefaultElement("tr");
+		Element rowElement = new DefaultElement("tr");
 
-		row.add(createBatchCell(batch, tag, "16%"));
+		rowElement.add(createBatchCell(batch, tag, "16%"));
+		rowElement.add(createAxisCell(axis, tag, "12%"));
+		rowElement.add(createCell(className, tag, "30%"));
+		rowElement.add(createNameCell(name, tag, url, "30%"));
+		rowElement.add(createCell(status, tag, "8%"));
+		rowElement.add(createCell(duration, tag, "4%"));
 
-		row.add(createAxisCell(axis, tag, "12%"));
-
-		row.add(createCell(className, tag, "30%"));
-
-		row.add(createNameCell(name, tag, url, "30%"));
-
-		row.add(createCell(status, tag, "8%"));
-
-		row.add(createCell(duration, tag, "4%"));
-
-		return row;
+		return rowElement;
 	}
 
 	private static Element createTableHeader() {
