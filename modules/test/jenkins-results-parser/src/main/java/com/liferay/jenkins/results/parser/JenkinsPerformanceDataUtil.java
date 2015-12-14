@@ -90,6 +90,7 @@ public class JenkinsPerformanceDataUtil {
 			setUrl(childJSONObject);
 		}
 
+		@Override
 		public int compareTo(Result result) {
 			return -1 * Float.compare(getDuration(), result.getDuration());
 		}
