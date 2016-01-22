@@ -164,15 +164,16 @@ public final class XMLLoggerHandler {
 
 		List<Element> childElements = element.elements();
 
-		if ((!childElements.isEmpty() && !_isExecutingFunction(element)) ||
-			_isExecutingMacro(element) || _isExecutingTestCase(element)) {
+		if ((!childElements.isEmpty() && !_isExecutingFunction(element) &&
+			!_isExecutingMethod(element)) || _isExecutingMacro(element) ||
+			_isExecutingTestCase(element)) {
 
 			sb.append(_getBtnItemText("btn-collapse"));
 		}
 
 		if (!childElements.isEmpty() &&
 			(_isExecutingFunction(element) || _isExecutingMacro(element) ||
-			 _isExecutingTestCase(element))) {
+			 _isExecutingTestCase(element) || _isExecutingMethod(element))) {
 
 			sb.append(_getBtnItemText("btn-var"));
 		}
@@ -256,6 +257,10 @@ public final class XMLLoggerHandler {
 						loggerElement.addChildLoggerElement(
 							_getMacroExecuteLoggerElement(
 								childElement, "macro"));
+					}
+					else if (childElement.attributeValue("method") != null) {
+						loggerElement.addChildLoggerElement(
+							_getMethodExecuteLoggerElement(childElement));
 					}
 					else if (Validator.isNotNull(
 								childElement.attributeValue("macro-desktop")) &&
@@ -611,6 +616,13 @@ public final class XMLLoggerHandler {
 		return loggerElement;
 	}
 
+	private static LoggerElement _getMethodExecuteLoggerElement(
+			Element executeElement)
+		throws Exception {
+
+		return _getLineGroupLoggerElement("method", executeElement);
+	}
+
 	private static LoggerElement _getParameterContainerLoggerElement(
 		Element element) {
 
@@ -714,6 +726,14 @@ public final class XMLLoggerHandler {
 			(element.attributeValue("macro-desktop") != null) ||
 			(element.attributeValue("macro-mobile") != null)) {
 
+			return true;
+		}
+
+		return false;
+	}
+
+	private static boolean _isExecutingMethod(Element element) {
+		if (element.attributeValue("method") != null) {
 			return true;
 		}
 
