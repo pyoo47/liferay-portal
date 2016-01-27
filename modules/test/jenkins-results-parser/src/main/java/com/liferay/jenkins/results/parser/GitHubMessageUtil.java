@@ -188,6 +188,10 @@ public class GitHubMessageUtil {
 			}
 
 			sb.append("</ol>");
+
+			sb.append("<h5>For more details click <a href=\\\"");
+			sb.append(project.getProperty("top.level.shared.dir.url"));
+			sb.append("/jenkins-report.html\\\">here</a>.</h5>");
 		}
 
 		project.setProperty("github.post.comment.body", sb.toString());
