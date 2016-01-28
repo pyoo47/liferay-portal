@@ -609,10 +609,10 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public String getElementText(String locator) throws Exception {
-		return getElementText(locator, null);
+		throw new UnsupportedOperationException();
 	}
 
-	public String getElementText(String locator, String timeout)
+	public String getText(String locator, String timeout)
 		throws Exception {
 
 		WebElement webElement = getWebElement(locator, timeout);
@@ -818,7 +818,7 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public String getText(String locator) throws Exception {
-		throw new UnsupportedOperationException();
+		return getText(locator, null);
 	}
 
 	@Override
