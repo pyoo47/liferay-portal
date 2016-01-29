@@ -852,11 +852,6 @@ public abstract class BaseWebDriverImpl
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public String getElementText(String locator) throws Exception {
-		throw new UnsupportedOperationException();
-	}
-
 	public String getText(String locator, String timeout)
 		throws Exception {
 
