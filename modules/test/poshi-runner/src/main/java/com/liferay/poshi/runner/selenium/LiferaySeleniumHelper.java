@@ -500,7 +500,7 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.assertElementPresent(locator);
 
 		if (liferaySelenium.isPartialText(locator, pattern)) {
-			String text = liferaySelenium.getElementText(locator);
+			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
 				"\"" + text + "\" contains \"" + pattern + "\" at \"" +
@@ -531,7 +531,7 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.assertElementPresent(locator);
 
 		if (liferaySelenium.isText(locator, pattern)) {
-			String text = liferaySelenium.getElementText(locator);
+			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
 				"Pattern \"" + pattern + "\" matches \"" + text + "\" at \"" +
@@ -585,7 +585,7 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.assertElementPresent(locator);
 
 		if (liferaySelenium.isNotPartialText(locator, pattern)) {
-			String text = liferaySelenium.getElementText(locator);
+			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
 				"\"" + text + "\" does not contain \"" + pattern + "\" at \"" +
@@ -616,7 +616,7 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.assertElementPresent(locator);
 
 		if (liferaySelenium.isNotText(locator, pattern)) {
-			String text = liferaySelenium.getElementText(locator);
+			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
 				"Pattern \"" + pattern + "\" does not match \"" + text +
