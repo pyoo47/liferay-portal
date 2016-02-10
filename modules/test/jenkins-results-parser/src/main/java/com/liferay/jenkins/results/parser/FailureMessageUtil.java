@@ -48,7 +48,7 @@ public class FailureMessageUtil {
 			sb.append(project.getProperty("github.pull.request.head.username"));
 			sb.append("/");
 			sb.append(project.getProperty("github.pull.request.head.branch"));
-			sb.append("</a></strong>");
+			sb.append("</a></strong>";
 
 			sb.append(".</p>");
 		}
