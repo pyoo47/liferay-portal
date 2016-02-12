@@ -14,9 +14,7 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -146,16 +144,6 @@ public class WaitForInvokedJobs {
 						(build.get("result") != null)) {
 
 						downstreamJob.setCompleted(true);
-
-						sb = new StringBuilder();
-
-						sb.append("Build '");
-						sb.append(downstreamJob.getJobName());
-						sb.append("' completed at ");
-						sb.append(possibleBuildURL);
-						sb.append(".");
-
-						System.out.println(sb.toString());
 					}
 				}
 			}
