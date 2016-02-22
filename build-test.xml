@@ -7052,6 +7052,18 @@ jdbc.default.password=${database.mysql.password}</echo>
 						<copy todir="${jenkins.shared.results.dir}/${job.name}/builds/${env.BUILD_NUMBER}/screenshots">
 							<fileset dir="portal-web/test-results/${poshi.runner.results.dir}/screenshots" erroronmissingdir="false" />
 						</copy>
+
+						<if>
+							<equals arg1="${test.compress.log.files}" arg2="true" />
+							<then>
+								<replaceregexp
+									file="portal-web/test-results/${poshi.runner.results.dir}/index.html"
+									flags="g"
+									match="\.jpg"
+									replace=".jpg.gz"
+								/>
+							</then>
+						</if>
 					</then>
 				</if>
 
