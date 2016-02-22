@@ -6775,6 +6775,15 @@ if (ppstate.equals("normal")) {
 
 		<antcall target="record-testray-logs-poshi-report" />
 
+		<if>
+			<equals arg1="${test.compress.log.files}" arg2="true" />
+			<then>
+				<execute>
+					gzip -r testray-logs/
+				</execute>
+			</then>
+		</if>
+
 		<for list="production,uat" param="testray.base.dir.name">
 			<sequential>
 				<rsync rsync.dest="testray-results/@{testray.base.dir.name}/logs" rsync.src="testray-logs/." />
