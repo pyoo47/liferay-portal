@@ -41,6 +41,8 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import org.openqa.selenium.StaleElementReferenceException;
+
 /**
  * @author Karen Dang
  * @author Michael Hashimoto
@@ -353,26 +355,25 @@ public class PoshiRunnerGetterUtil {
 				if (methodName.equals(commandName)) {
 					Class<?>[] parameterTypes = method.getParameterTypes();
 
-					if (parameterTypes.length > 1) {
-						Object returnObject = method.invoke(
-							null, (Object[])integers);
+					Object returnObject = "";
 
-						if (returnObject == null) {
-							returnObject = "";
+					try {
+						if (parameterTypes.length > 1) {
+							returnObject = method.invoke(
+								null, (Object[])integers);
 						}
-
-						return returnObject.toString();
-					}
-					else {
-						Object returnObject = method.invoke(
-							null, new Object[] {integers});
-
-						if (returnObject == null) {
-							returnObject = "";
+						else {
+							returnObject = method.invoke(
+								null, new Object[] {integers});
 						}
-
-						return returnObject.toString();
 					}
+					catch (Exception e) {
+						Throwable throwable = e.getCause();
+
+						throw new Exception(throwable.getMessage(), e);
+					}
+
+					return returnObject.toString();
 				}
 			}
 		}
@@ -408,7 +409,35 @@ public class PoshiRunnerGetterUtil {
 				commandName,
 				parameterClasses.toArray(new Class[parameterClasses.size()]));
 
-			Object returnObject = method.invoke(object, (Object[])parameters);
+			Object returnObject = null;
+
+			try {
+				returnObject = method.invoke(object, (Object[])parameters);
+			}
+			catch (Exception e1) {
+				Throwable throwable = e1.getCause();
+
+				if (throwable instanceof StaleElementReferenceException) {
+					System.out.println(
+						"\nElement turned stale while running " + commandName +
+							". Retrying in " +
+								PropsValues.TEST_RETRY_COMMAND_WAIT_TIME +
+									"seconds\n");
+
+					try {
+						returnObject = method.invoke(
+							object, (Object[])parameters);
+					}
+					catch (Exception e2) {
+						throwable = e2.getCause();
+
+						throw new Exception(throwable.getMessage(), e2);
+					}
+				}
+				else {
+					throw new Exception(throwable.getMessage(), e1);
+				}
+			}
 
 			if (returnObject == null) {
 				returnObject = "";
