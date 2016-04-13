@@ -1062,7 +1062,7 @@ public class WebDriverHelper {
 		}
 	}
 
-	protected static void scrollWebElementIntoView(
+	protected static boolean isObscured(
 		WebDriver webDriver, WebElement webElement) {
 
 		WrapsDriver wrapsDriver = (WrapsDriver)webElement;
@@ -1070,10 +1070,41 @@ public class WebDriverHelper {
 		WebDriver wrappedWebDriver = wrapsDriver.getWrappedDriver();
 
 		JavascriptExecutor javascriptExecutor =
-			(JavascriptExecutor)wrappedWebDriver;
+			(JavascriptExecutor)wrapsDriver.getWrappedDriver();
 
-		javascriptExecutor.executeScript(
-			"arguments[0].scrollIntoView(false);", webElement);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("var element = arguments[0];");
+		sb.append("console.log(element);");
+		sb.append("var rect = element.getBoundingClientRect();");
+		sb.append("elementX = (rect.right + rect.left) / 2;");
+		sb.append("elementY = (rect.top + rect.bottom) / 2;");
+		sb.append("var newElement = ");
+		sb.append("document.elementFromPoint(elementX, elementY);");
+		sb.append("if (element == newElement) {");
+		sb.append("return false;}");
+		sb.append("return true;");
+
+		Boolean isObscured = (Boolean)javascriptExecutor.executeScript(
+			sb.toString(), webElement);
+
+		return isObscured.booleanValue();
+	}
+
+	protected static void scrollWebElementIntoView(
+		WebDriver webDriver, WebElement webElement) {
+
+		if (!webElement.isDisplayed() || isObscured(webDriver, webElement)) {
+			WrapsDriver wrapsDriver = (WrapsDriver)webElement;
+
+			WebDriver wrappedWebDriver = wrapsDriver.getWrappedDriver();
+
+			JavascriptExecutor javascriptExecutor =
+				(JavascriptExecutor)wrappedWebDriver;
+
+			javascriptExecutor.executeScript(
+				"arguments[0].scrollIntoView(false);", webElement);
+		}
 	}
 
 	protected static void selectByRegexpText(
