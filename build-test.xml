@@ -4115,6 +4115,15 @@ go]]></replacevalue>
 			</then>
 		</if>
 
+		<get-testcase-property property.name="include.content.targeting.plugins" />
+
+		<if>
+			<equals arg1="${include.content.targeting.plugins}" arg2="true" />
+			<then>
+				<ant antfile="build-test-plugins.xml" target="deploy-content-targeting-plugins" />
+			</then>
+		</if>
+
 		<get-testcase-property property.name="layouttpl.plugins.includes" />
 
 		<if>
