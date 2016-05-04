@@ -3,6 +3,17 @@
 <project basedir="." default="test" name="portal-test-plugins" xmlns:antelope="antlib:ise.antelope.tasks">
 	<import file="build-test.xml" />
 
+	<target name="deploy-content-targeting-plugins">
+		<fail message="Please set the property ${content.targeting.zip.url}" unless="content.targeting.zip.url" />
+
+		<get-auto-deploy-dir />
+
+		<mirrors-get
+			dest="${auto.deploy.dir}"
+			src="${content.targeting.zip.url}"
+		/>
+	</target>
+
 	<target name="deploy-extra-apps">
 		<fail message="Please set the property ${extra.apps.zip.file.name}" unless="extra.apps.zip.file.name" />
 
