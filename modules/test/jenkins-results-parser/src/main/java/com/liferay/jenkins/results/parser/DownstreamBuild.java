@@ -58,11 +58,11 @@ public class DownstreamBuild extends BaseBuild {
 
 		for (String parameterName : parameterNames) {
 			if (invokedParameters.containsKey(parameterName)) {
-				parameters.put(
-					parameterName, invokedParameters.get(parameterName));
-			}
-			else {
-				parameters.put(parameterName, "");
+				String parameterValue = invokedParameters.get(parameterName);
+
+				if (!parameterValue.isEmpty()) {
+					parameters.put(parameterName, parameterValue);
+				}
 			}
 		}
 
@@ -199,7 +199,9 @@ public class DownstreamBuild extends BaseBuild {
 				String name = jsonObject.getString("name");
 				String value = jsonObject.getString("value");
 
-				parameters.put(name, value);
+				if (!value.isEmpty()) {
+					parameters.put(name, value);
+				}
 			}
 		}
 
@@ -243,7 +245,9 @@ public class DownstreamBuild extends BaseBuild {
 				String name = URLDecoder.decode(parameterParts[0], "UTF-8");
 				String value = URLDecoder.decode(parameterParts[1], "UTF-8");
 
-				parameters.put(name, value);
+				if (!value.isEmpty()) {
+					parameters.put(name, value);
+				}
 			}
 		}
 
