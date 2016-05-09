@@ -161,8 +161,9 @@ public class LiferaySeleniumHelper {
 
 		if (!pattern.equals(confirmation)) {
 			throw new Exception(
-				"Pattern \"" + pattern + "\" does not match \"" + confirmation +
-					"\"");
+				"Expected text \"" + pattern +
+					"\" does not match actual text\"" + confirmation +
+						"\" at \"" + locator + "\"");
 		}
 	}
 
@@ -606,8 +607,9 @@ public class LiferaySeleniumHelper {
 			String text = liferaySelenium.getSelectedLabel(selectLocator);
 
 			throw new Exception(
-				"Pattern \"" + pattern + "\" does not match \"" + text +
-					"\" at \"" + selectLocator + "\"");
+				"Expected text \"" + pattern +
+					"\" does not match actual text\"" + text + "\" at \"" +
+						locator + "\"");
 		}
 	}
 
@@ -621,8 +623,9 @@ public class LiferaySeleniumHelper {
 			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
-				"Pattern \"" + pattern + "\" does not match \"" + text +
-					"\" at \"" + locator + "\"");
+				"Expected text \"" + pattern +
+					"\" does not match actual text\"" + text + "\" at \"" +
+						locator + "\"");
 		}
 	}
 
@@ -654,8 +657,9 @@ public class LiferaySeleniumHelper {
 			String value = liferaySelenium.getElementValue(locator);
 
 			throw new Exception(
-				"Pattern \"" + pattern + "\" does not match \"" + value +
-					"\" at \"" + locator + "\"");
+				"Expected text \"" + pattern +
+					"\" does not match actual text\"" + value + "\" at \"" +
+						locator + "\"");
 		}
 	}
 
