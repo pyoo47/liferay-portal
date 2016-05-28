@@ -18,6 +18,7 @@ gradle.beforeProject {
 
 		pluginManager.withPlugin("com.liferay.ant.plugin") {
 			task buildLang(dependsOn: "build-lang")
+			task compileJSP(dependsOn: "compile-jsp")
 
 			if (FileUtil.exists(project, "docroot/WEB-INF/service.xml")) {
 				task buildService(dependsOn: "build-service")

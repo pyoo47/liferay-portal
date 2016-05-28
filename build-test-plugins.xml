@@ -242,6 +242,43 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.42</echo>
 		<mkdir dir="${lp.plugins.dir}/dist" />
 	</target>
 
+	<target name="test-modules-plugin">
+		<echo>Compiling ${test.modules.plugin}.</echo>
+
+		<pathconvert property="test.modules.plugin.file" setonempty="false">
+			<path>
+				<fileset
+					dir="${project.dir}/modules/apps"
+					includes="**/${test.modules.plugin}/build.xml"
+				/>
+			</path>
+		</pathconvert>
+
+		<dirname file="${test.modules.plugin.file}" property="test.modules.plugin.dir" />
+
+		<propertyregex
+			input="${test.modules.plugin.dir}"
+			override="true"
+			property="modules.base.dir.name"
+			regexp="(.*/modules)(/.*)"
+			replace="\1"
+		/>
+
+		<propertyregex
+			input="${test.modules.plugin.dir}"
+			override="true"
+			property="modules.compile.task.name"
+			regexp="(.*/modules)(/.*)"
+			replace="\2:compile"
+		/>
+
+		<antelope:stringutil property="modules.compile.task.name" string="${modules.compile.task.name}">
+			<antelope:replace regex="/" replacement=":" />
+		</antelope:stringutil>
+
+		<gradle-execute dir="${modules.base.dir.name}" task="${modules.compile.task.name}" />
+	</target>
+
 	<target name="test-plugin">
 		<echo>Compiling ${test.plugin}.</echo>
 
@@ -308,7 +345,15 @@ plugins.includes=${test.plugin}</echo>
 			</then>
 		</if>
 
-		<property file="${project.dir}/test.plugin.names.properties" />
+		<if>
+			<equals arg1="${test.modules.plugins}" arg2="true" />
+			<then>
+				<property file="${project.dir}/test.modules.plugin.names.properties" />
+			</then>
+			<else>
+				<property file="${project.dir}/test.plugin.names.properties" />
+			</else>
+		</if>
 
 		<propertycopy from="TEST_PLUGIN_GROUP_${test.plugin.group.index}" name="test.plugins" />
 
@@ -316,9 +361,19 @@ plugins.includes=${test.plugin}</echo>
 			<sequential>
 				<trycatch>
 					<try>
-						<antcall target="test-plugin">
-							<param name="test.plugin" value="@{test.plugin}" />
-						</antcall>
+						<if>
+							<equals arg1="${test.modules.plugins}" arg2="true" />
+							<then>
+								<antcall target="test-modules-plugin">
+									<param name="test.modules.plugin" value="@{test.plugin}" />
+								</antcall>
+							</then>
+							<else>
+								<antcall target="test-plugin">
+									<param name="test.plugin" value="@{test.plugin}" />
+								</antcall>
+							</else>
+						</if>
 					</try>
 					<catch>
 						<echo append="true" file="plugins-compile-failure">@{test.plugin},</echo>

@@ -2227,6 +2227,120 @@ ${tomcat-gc-log}
 		</sequential>
 	</macrodef>
 
+	<macrodef name="record-test-plugin-names">
+		<attribute name="file.name" />
+		<attribute name="plugins.base.dir" />
+		<attribute name="plugins.includes" />
+
+		<sequential>
+			<local name="plugins.base.dir" />
+			<local name="plugins.includes" />
+
+			<property name="plugins.base.dir" value="@{plugins.base.dir}" />
+			<property name="plugins.includes" value="@{plugins.includes}" />
+
+			<beanshell>
+				<![CDATA[
+					import org.apache.tools.ant.DirectoryScanner;
+
+					List getPluginGroups(List pluginNames, int groupsSize) {
+						List pluginNameGroups = new ArrayList(groupsSize);
+
+						for (int i = 0; i < groupsSize; i++) {
+							pluginNameGroups.add(new ArrayList());
+						}
+
+						int i = 0;
+
+						for (String pluginName : pluginNames) {
+							List pluginNameGroup = pluginNameGroups.get(i++ % groupsSize);
+
+							pluginNameGroup.add(pluginName);
+						}
+
+						return pluginNameGroups;
+					}
+
+					List getPluginNames() {
+						DirectoryScanner directoryScanner = new DirectoryScanner();
+
+						directoryScanner.setBasedir(project.getProperty("plugins.base.dir"));
+
+						String pluginsIncludes = project.getProperty("plugins.includes");
+
+						directoryScanner.setIncludes(pluginsIncludes.split(","));
+
+						directoryScanner.scan();
+
+						String[] fileNames = directoryScanner.getIncludedFiles();
+
+						List pluginNames = new ArrayList();
+
+						String pluginsExcludes = project.getProperty("plugins.excludes");
+
+						for (String fileName : fileNames) {
+							int x = fileName.indexOf("/");
+							int y = fileName.lastIndexOf("/");
+
+							if (File.separator.equals("\\")) {
+								x = fileName.indexOf("\\");
+								y = fileName.lastIndexOf("\\");
+							}
+
+							String pluginName = fileName.substring(x + 1, y);
+
+							if ((pluginsExcludes == null) || !pluginsExcludes.contains(pluginName)) {
+								pluginNames.add(pluginName);
+							}
+						}
+
+						Collections.sort(pluginNames);
+
+						return pluginNames;
+					}
+
+					StringBuilder sb = new StringBuilder();
+
+					int allTestPluginGroupsSize = Integer.parseInt(project.getProperty("test.plugin.groups.size"));
+
+					List pluginNames = getPluginNames();
+
+					List testPluginGroups = getPluginGroups(pluginNames, allTestPluginGroupsSize);
+
+					for (i = 0; i < allTestPluginGroupsSize; i++) {
+						List testPluginGroup = testPluginGroups.get(i);
+
+						sb.append("TEST_PLUGIN_GROUP_");
+						sb.append(i);
+						sb.append("=");
+
+						for (String testPlugin : testPluginGroup) {
+							sb.append(testPlugin);
+							sb.append(",");
+						}
+
+						sb.append("\n\n");
+					}
+
+					sb.append("TEST_PLUGIN_GROUPS=");
+
+					for (int i = 0; i < allTestPluginGroupsSize; i++) {
+						sb.append(i);
+						sb.append(" ");
+					}
+
+					if (allTestPluginGroupsSize > 0) {
+						sb.setLength(sb.length() - 1);
+					}
+
+					project.setProperty("test.plugin.names.properties.content", sb.toString());
+				]]>
+			</beanshell>
+
+			<echo file="@{file.name}">${test.plugin.names.properties.content}</echo>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="record-test-class-file-names">
 		<sequential>
 			<beanshell>
@@ -6547,6 +6661,8 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 
 		<record-test-class-file-names />
 
+		<antcall inheritAll="false" target="record-test-modules-plugin-names" />
+
 		<antcall inheritAll="false" target="record-test-plugin-names" />
 
 		<echo if:set="env.JENKINS_HOME">
@@ -7363,6 +7479,14 @@ if (ppstate.equals("normal")) {
 		</if>
 	</target>
 
+	<target name="record-test-modules-plugin-names">
+		<record-test-plugin-names
+			file.name="test.modules.plugin.names.properties"
+			plugins.base.dir="${project.dir}/modules/apps"
+			plugins.includes="**/build.xml"
+		/>
+	</target>
+
 	<target name="record-test-plugin-names">
 		<loadproperties srcFile="${lp.plugins.dir}/build.properties">
 			<filterchain>
@@ -7372,102 +7496,11 @@ if (ppstate.equals("normal")) {
 			</filterchain>
 		</loadproperties>
 
-		<beanshell>
-			<![CDATA[
-				import org.apache.tools.ant.DirectoryScanner;
-
-				List getPluginGroups(List pluginNames, int groupsSize) {
-					List pluginNameGroups = new ArrayList(groupsSize);
-
-					for (int i = 0; i < groupsSize; i++) {
-						pluginNameGroups.add(new ArrayList());
-					}
-
-					int i = 0;
-
-					for (String pluginName : pluginNames) {
-						List pluginNameGroup = pluginNameGroups.get(i++ % groupsSize);
-
-						pluginNameGroup.add(pluginName);
-					}
-
-					return pluginNameGroups;
-				}
-
-				List getPluginNames() {
-					DirectoryScanner directoryScanner = new DirectoryScanner();
-
-					directoryScanner.setBasedir(project.getProperty("lp.plugins.dir"));
-					directoryScanner.setIncludes(new String[] {"**/hooks/*/build.xml", "**/layoutpl/*/build.xml", "**/portlets/*/build.xml", "**/shared/*/build.xml", "**/themes/*/build.xml", "**/webs/*/build.xml"});
-
-					directoryScanner.scan();
-
-					String[] fileNames = directoryScanner.getIncludedFiles();
-
-					List pluginNames = new ArrayList();
-
-					for (String fileName : fileNames) {
-						int x = fileName.indexOf("/");
-						int y = fileName.lastIndexOf("/");
-
-						if (File.separator.equals("\\")) {
-							x = fileName.indexOf("\\");
-							y = fileName.lastIndexOf("\\");
-						}
-
-						String pluginName = fileName.substring(x + 1, y);
-
-						String pluginsExcludes = project.getProperty("plugins.excludes");
-
-						if (!pluginsExcludes.contains(pluginName)) {
-							pluginNames.add(pluginName);
-						}
-					}
-
-					Collections.sort(pluginNames);
-
-					return pluginNames;
-				}
-
-				StringBuilder sb = new StringBuilder();
-
-				int allTestPluginGroupsSize = Integer.parseInt(project.getProperty("test.plugin.groups.size"));
-
-				List pluginNames = getPluginNames();
-
-				List testPluginGroups = getPluginGroups(pluginNames, allTestPluginGroupsSize);
-
-				for (i = 0; i < allTestPluginGroupsSize; i++) {
-					List testPluginGroup = testPluginGroups.get(i);
-
-					sb.append("TEST_PLUGIN_GROUP_");
-					sb.append(i);
-					sb.append("=");
-
-					for (String testPlugin : testPluginGroup) {
-						sb.append(testPlugin);
-						sb.append(",");
-					}
-
-					sb.append("\n\n");
-				}
-
-				sb.append("TEST_PLUGIN_GROUPS=");
-
-				for (int i = 0; i < allTestPluginGroupsSize; i++) {
-					sb.append(i);
-					sb.append(" ");
-				}
-
-				if (allTestPluginGroupsSize > 0) {
-					sb.setLength(sb.length() - 1);
-				}
-
-				project.setProperty("test.plugin.names.properties.content", sb.toString());
-			]]>
-		</beanshell>
-
-		<echo file="test.plugin.names.properties">${test.plugin.names.properties.content}</echo>
+		<record-test-plugin-names
+			file.name="test.plugin.names.properties"
+			plugins.base.dir="${lp.plugins.dir}"
+			plugins.includes="**/hooks/*/build.xml,**/layoutpl/*/build.xml,**/portlets/*/build.xml,**/shared/*/build.xml,**/themes/*/build.xml,**/webs/*/build.xml"
+		/>
 	</target>
 
 	<target name="record-testray-logs">
