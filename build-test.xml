@@ -6622,6 +6622,10 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 
 		<record-test-class-file-names />
 
+		<antcall inheritAll="false" target="record-test-module-names" />
+
+		<antcall inheritAll="false" target="record-test-module-plugin-names" />
+
 		<antcall inheritAll="false" target="record-test-plugin-names" />
 
 		<echo if:set="env.JENKINS_HOME">
