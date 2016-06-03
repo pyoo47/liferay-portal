@@ -7074,11 +7074,13 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 		<if>
 			<not>
 				<resourceexists>
-					<file file="${liferay.home}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip" />
+					<file file="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip" />
 				</resourceexists>
 			</not>
 			<then>
-				<exec dir="${liferay.home}/${portal.version}/data-archive/" executable="curl"  outputproperty="curl.output">
+				<echo>${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip was not found. Downloading from http://172.16.18.243/legacy-database-dumps/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip</echo>
+
+				<exec dir="${portal.legacy.dir}/${portal.version}/data-archive" executable="curl"  outputproperty="curl.output">
 					<arg line="-o ${data.archive.type}-${database.type}.zip" />
 					<arg value="http://172.16.18.243/legacy-database-dumps/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip" />
 				</exec>
