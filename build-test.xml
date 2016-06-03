@@ -7071,6 +7071,22 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 		<get-testcase-property property.name="data.archive.type" />
 		<get-testcase-property property.name="portal.version" />
 
+		<if>
+			<not>
+				<resourceexists>
+					<file file="${liferay.home}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip" />
+				</resourceexists>
+			</not>
+			<then>
+				<exec dir="${liferay.home}/${portal.version}/data-archive/" executable="curl"  outputproperty="curl.output">
+					<arg line="-o ${data.archive.type}-${database.type}.zip" />
+					<arg value="http://172.16.18.243/legacy-database-dumps/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip" />
+				</exec>
+
+				<echo>${curl.output}</echo>
+			</then>
+		</if>
+
 		<unzip
 			dest="${liferay.home}"
 			src="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip"
@@ -7089,7 +7105,7 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 				</exec>
 
 				<echo>${db2.executable.output}</echo>
-			</then>
+				</then>
 			<elseif>
 				<equals arg1="${database.type}" arg2="mariadb" />
 				<then>
