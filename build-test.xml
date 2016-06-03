@@ -7127,7 +7127,7 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 
 					<exec executable="mysql_upgrade" />
 				</then>
-			</elsif>
+			</elseif>
 			<elseif>
 				<equals arg1="${database.type}" arg2="mysql" />
 				<then>
