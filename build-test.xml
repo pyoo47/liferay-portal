@@ -286,6 +286,73 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 		</sequential>
 	</macrodef>
 
+	<macrodef name="get-dependency-group">
+		<attribute name="dependency.string" />
+
+		<sequential>
+			<var name="dependency.group" unset="true" />
+
+			<local name="dependency.string.entry" />
+
+			<get-dependency-string-entry dependency.string="@{dependency.string}" index="0" />
+
+			<property name="dependency.group" value="${dependency.string.entry}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="get-dependency-name">
+		<attribute name="dependency.string" />
+
+		<sequential>
+			<var name="dependency.name" unset="true" />
+
+			<local name="dependency.string.entry" />
+
+			<get-dependency-string-entry dependency.string="@{dependency.string}" index="1" />
+
+			<property name="dependency.name" value="${dependency.string.entry}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="get-dependency-string-entry">
+		<attribute name="dependency.string" />
+		<attribute name="index" />
+
+		<sequential>
+			<local name="dependency.string" />
+			<local name="index" />
+
+			<property name="dependency.string" value="@{dependency.string}" />
+			<property name="index" value="@{index}" />
+
+			<beanshell>
+				<![CDATA[
+					int index = Integer.parseInt(project.getProperty("index"));
+
+					String dependencyString = project.getProperty("dependency.string");
+
+					String[] dependencyInfo = dependencyString.split(":", 3);
+
+					project.setProperty("dependency.string.entry", dependencyInfo[index]);
+				]]>
+			</beanshell>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="get-dependency-version">
+		<attribute name="dependency.string" />
+
+		<sequential>
+			<var name="dependency.version" unset="true" />
+
+			<local name="dependency.string.entry" />
+
+			<get-dependency-string-entry dependency.string="@{dependency.string}" index="2" />
+
+			<property name="dependency.version" value="${dependency.string.entry}" />
+		</sequential>
+	</macrodef>
+
 	<macrodef name="get-env-app-server">
 		<sequential>
 			<propertyregex
@@ -1311,6 +1378,47 @@ counter.jdbc.prefix=jdbc.counter.]]></echo>
 					<var name="database.index" unset="true" />
 				</then>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare-additional-osgi-jars">
+		<attribute name="osgi.dir" />
+		<attribute name="additional.dependencies" />
+		<attribute name="repository.url" />
+
+		<sequential>
+			<for list="@{additional.dependencies}" param="additional.dependency">
+				<sequential>
+					<get-dependency-group dependency.string="@{additional.dependency}" />
+					<get-dependency-name dependency.string="@{additional.dependency}" />
+					<get-dependency-version dependency.string="@{additional.dependency}" />
+
+					<local name="group.path" />
+
+					<propertyregex
+						input="${dependency.group}"
+						global="true"
+						property="group.path"
+						regexp="\."
+						replace="/"
+					/>
+
+					<first id="dependency.jar">
+						<fileset dir="@{osgi.dir}" includes="**/${dependency.name}*.jar" />
+					</first>
+
+					<local name="dependency.jar" />
+
+					<condition else="${toString:dependency.jar}" property="dependency.jar" value="@{osgi.dir}/modules/${dependency.name}.jar">
+						<equals arg1="${toString:dependency.jar}" arg2="" />
+					</condition>
+
+					<mirrors-get
+						dest="${dependency.jar}"
+						src="@{repository.url}/${group.path}/${dependency.name}/${dependency.version}/${dependency.name}-${dependency.version}.jar"
+					/>
+				</sequential>
+			</for>
 		</sequential>
 	</macrodef>
 
@@ -6682,14 +6790,7 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 	</target>
 
 	<target name="prepare-test-bundle">
-		<if>
-			<not>
-				<isset property="app.server.name" />
-			</not>
-			<then>
-				<property name="app.server.name" value="${app.server.type}" />
-			</then>
-		</if>
+		<property name="app.server.name" value="${app.server.type}" />
 
 		<if>
 			<matches pattern="http" string="${test.build.bundle.zip.url}" />
@@ -6700,79 +6801,31 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 					<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
 				</tstamp>
 
-				<mirrors-get
-					dest="${tstamp.value}.zip"
-					src="${test.build.bundle.zip.url}"
-				/>
+				<mirrors-get dest="${tstamp.value}.zip" src="${test.build.bundle.zip.url}" />
 
-				<unzip
-					dest="${app.server.parent.dir}"
-					src="${tstamp.value}.zip"
-				>
-					<patternset
-						includes="liferay-*/${app.server.name}-*/**"
-					/>
-					<mapper
-						from="[^/]+/(.*)"
-						to="\1"
-						type="regexp"
-					/>
+				<unzip dest="${app.server.parent.dir}" src="${tstamp.value}.zip">
+					<patternset includes="liferay-*/${app.server.name}-*/**" />
+					<mapper from="[^/]+/(.*)" to="\1" type="regexp" />
 				</unzip>
 
-				<unzip
-					dest="${app.server.parent.dir}"
-					src="${tstamp.value}.zip"
-				>
-					<patternset
-						includes="liferay-*/deploy/**"
-					/>
-					<mapper
-						from="[^/]+/(.*)"
-						to="${app.server.parent.dir}//\1"
-						type="regexp"
-					/>
+				<unzip dest="${app.server.parent.dir}" src="${tstamp.value}.zip">
+					<patternset	includes="liferay-*/deploy/**" />
+					<mapper	from="[^/]+/(.*)" to="${app.server.parent.dir}//\1" type="regexp" />
 				</unzip>
 
-				<unzip
-					dest="${app.server.parent.dir}"
-					src="${tstamp.value}.zip"
-				>
-					<patternset
-						includes="liferay-*/osgi/**"
-					/>
-					<mapper
-						from="[^/]+/(.*)"
-						to="${app.server.parent.dir}//\1"
-						type="regexp"
-					/>
+				<unzip dest="${app.server.parent.dir}" src="${tstamp.value}.zip">
+					<patternset	includes="liferay-*/osgi/**" />
+					<mapper	from="[^/]+/(.*)" to="${app.server.parent.dir}//\1" type="regexp" />
 				</unzip>
 
-				<unzip
-					dest="${app.server.parent.dir}"
-					src="${tstamp.value}.zip"
-				>
-					<patternset
-						includes="liferay-*/patching-tool/patches/**"
-					/>
-					<mapper
-						from="[^/]+/(.*)"
-						to="${app.server.dir}//\1"
-						type="regexp"
-					/>
+				<unzip dest="${app.server.parent.dir}" src="${tstamp.value}.zip">
+					<patternset	includes="liferay-*/patching-tool/patches/**" />
+					<mapper	from="[^/]+/(.*)" to="${app.server.dir}//\1" type="regexp" />
 				</unzip>
 
-				<unzip
-					dest="${app.server.parent.dir}"
-					src="${tstamp.value}.zip"
-				>
-					<patternset
-						includes="liferay-*/tools/**"
-					/>
-					<mapper
-						from="[^/]+/(.*)"
-						to="${app.server.parent.dir}//\1"
-						type="regexp"
-					/>
+				<unzip dest="${app.server.parent.dir}" src="${tstamp.value}.zip">
+					<patternset	includes="liferay-*/tools/**" />
+					<mapper from="[^/]+/(.*)" to="${app.server.parent.dir}//\1" type="regexp" />
 				</unzip>
 
 				<delete file="${tstamp.value}.zip" />
@@ -6782,6 +6835,14 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 						<include name="*.sh" />
 					</fileset>
 				</chmod>
+
+				<property name="test.build.additional.osgi.dependencies" value="" />
+
+				<prepare-additional-osgi-jars
+					additional.dependencies="${test.build.additional.osgi.dependencies}"
+					osgi.dir="${app.server.parent.dir}/osgi"
+					repository.url="${sonatype.release.url}"
+				/>
 
 				<prepare-fix-pack-bundle />
 			</then>
@@ -6810,15 +6871,9 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 
 				<mkdir dir="dist" />
 
-				<mirrors-get
-					dest="dist/liferay-portal-${lp.version}.war"
-					src="${test.build.portal.war.url}"
-				/>
+				<mirrors-get dest="dist/liferay-portal-${lp.version}.war" src="${test.build.portal.war.url}" />
 
-				<unzip
-					dest="${app.server.portal.dir}"
-					src="dist/liferay-portal-${lp.version}.war"
-				/>
+				<unzip dest="${app.server.portal.dir}" src="dist/liferay-portal-${lp.version}.war" />
 
 				<delete dir="dist" />
 
@@ -6826,20 +6881,10 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 
 				<ant antfile="build.xml" inheritAll="false" target="update-app-server-scripts" />
 
-				<mirrors-get
-					dest="liferay-portal-dependencies.zip"
-					src="${test.build.portal.dependencies.zip.url}"
-				/>
+				<mirrors-get dest="liferay-portal-dependencies.zip" src="${test.build.portal.dependencies.zip.url}" />
 
-				<unzip
-					dest="${app.server.lib.global.dir}"
-					src="liferay-portal-dependencies.zip"
-				>
-					<mapper
-						from="[^/]+/(.*)"
-						to="\1"
-						type="regexp"
-					/>
+				<unzip dest="${app.server.lib.global.dir}" src="liferay-portal-dependencies.zip">
+					<mapper from="[^/]+/(.*)" to="\1" type="regexp" />
 				</unzip>
 
 				<delete file="liferay-portal-dependencies.zip" />
