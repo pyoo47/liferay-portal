@@ -74,6 +74,10 @@ gradle.beforeProject {
 				xmltask rootProject.files("../lib/development/xmltask.jar")
 			}
 
+			javadoc {
+				options.encoding = "UTF-8"
+			}
+
 			pmd {
 				ruleSetFiles = rootProject.files("../tools/sdk/dependencies/net.sourceforge.pmd/rulesets/java/standard-rules.xml")
 				ruleSets = []

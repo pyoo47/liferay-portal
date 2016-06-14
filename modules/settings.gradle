@@ -21,9 +21,19 @@ else {
 	}
 }
 
+boolean noPortalBuild = Boolean.getBoolean("no.portal.build")
+
 URI rootURI = rootDir.toURI()
 
 modulesFileTree.each {
+	if (noPortalBuild) {
+		File portalBuildFile = new File(it.parentFile, ".lfrbuild-portal")
+
+		if (portalBuildFile.exists()) {
+			return
+		}
+	}
+
 	String dirName = rootURI.relativize(it.parentFile.toURI())
 
 	dirName = dirName[0 .. -2]
