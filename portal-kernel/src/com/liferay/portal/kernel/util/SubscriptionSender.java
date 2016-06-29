@@ -213,8 +213,7 @@ public class SubscriptionSender implements Serializable {
 					return null;
 				}
 
-			}
-		);
+			});
 	}
 
 	public Object getContextAttribute(String key) {
@@ -612,17 +611,6 @@ public class SubscriptionSender implements Serializable {
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #notifyPersistedSubscriber(Subscription)}
-	 */
-	@Deprecated
-	protected void notifySubscriber(Subscription subscription)
-		throws Exception {
-
-		notifyPersistedSubscriber(subscription, null, 0);
-	}
-
-	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
 	 *             #notifyPersistedSubscriber(Subscription)}
 	 */
@@ -634,6 +622,17 @@ public class SubscriptionSender implements Serializable {
 
 		notifyPersistedSubscriber(
 			subscription, inferredClassName, inferredClassPK);
+	}
+
+	protected void populateNotificationEventJSONObject(
+		JSONObject notificationEventJSONObject) {
+
+		notificationEventJSONObject.put("className", _className);
+		notificationEventJSONObject.put("classPK", _classPK);
+		notificationEventJSONObject.put("entryTitle", _entryTitle);
+		notificationEventJSONObject.put("entryURL", _entryURL);
+		notificationEventJSONObject.put("notificationType", _notificationType);
+		notificationEventJSONObject.put("userId", currentUserId);
 	}
 
 	protected void processMailMessage(MailMessage mailMessage, Locale locale)
@@ -874,12 +873,7 @@ public class SubscriptionSender implements Serializable {
 		JSONObject notificationEventJSONObject =
 			JSONFactoryUtil.createJSONObject();
 
-		notificationEventJSONObject.put("className", _className);
-		notificationEventJSONObject.put("classPK", _classPK);
-		notificationEventJSONObject.put("entryTitle", _entryTitle);
-		notificationEventJSONObject.put("entryURL", _entryURL);
-		notificationEventJSONObject.put("notificationType", _notificationType);
-		notificationEventJSONObject.put("userId", currentUserId);
+		populateNotificationEventJSONObject(notificationEventJSONObject);
 
 		if (UserNotificationManagerUtil.isDeliver(
 				user.getUserId(), portletId, _notificationClassNameId,

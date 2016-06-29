@@ -229,7 +229,7 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	public ActionableDynamicQuery getActionableDynamicQuery() {
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.kernel.service.PluginSettingLocalServiceUtil.getService());
+		actionableDynamicQuery.setBaseLocalService(pluginSettingLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(PluginSetting.class);
 
@@ -242,7 +242,7 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portal.kernel.service.PluginSettingLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setBaseLocalService(pluginSettingLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(PluginSetting.class);
 
@@ -254,7 +254,7 @@ public abstract class PluginSettingLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.kernel.service.PluginSettingLocalServiceUtil.getService());
+		actionableDynamicQuery.setBaseLocalService(pluginSettingLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(PluginSetting.class);
 
@@ -562,7 +562,7 @@ public abstract class PluginSettingLocalServiceBaseImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -571,7 +571,7 @@ public abstract class PluginSettingLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portal.kernel.service.PluginSettingLocalService.class)
+	@BeanReference(type = PluginSettingLocalService.class)
 	protected PluginSettingLocalService pluginSettingLocalService;
 	@BeanReference(type = PluginSettingPersistence.class)
 	protected PluginSettingPersistence pluginSettingPersistence;

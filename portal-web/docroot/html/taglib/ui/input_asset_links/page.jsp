@@ -24,11 +24,9 @@
 	/>
 </liferay-util:buffer>
 
-<p class="text-muted <%= (inputAssetLinksDisplayContext.getAssetLinksCount() <= 0) ? StringPool.BLANK : "hide" %>" id="<%= inputAssetLinksDisplayContext.getRandomNamespace() + "emptyResultMessage" %>">
-	<%= StringUtil.toLowerCase(LanguageUtil.get(resourceBundle, "none")) %>
-</p>
-
 <liferay-ui:search-container
+	compactEmptyResultsMessage="<%= true %>"
+	emptyResultsMessage="none"
 	headerNames="type,title,scope,null"
 	total="<%= inputAssetLinksDisplayContext.getAssetLinksCount() %>"
 >
@@ -47,22 +45,26 @@
 		%>
 
 		<liferay-ui:search-container-column-text
+			cssClass="text-column type-column"
 			name="type"
 			value="<%= inputAssetLinksDisplayContext.getAssetType(assetLinkEntry) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
+			cssClass="content-column title-column"
 			name="title"
+			truncate="<%= true %>"
 			value="<%= HtmlUtil.escape(assetLinkEntry.getTitle(locale)) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
+			cssClass="scope-column text-column"
 			name="scope"
 			value="<%= HtmlUtil.escape(inputAssetLinksDisplayContext.getGroupDescriptiveName(assetLinkEntry)) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
-			cssClass="list-group-item-field"
+			cssClass="entry-action-column"
 		>
 			<a class="modify-link" data-rowId="<%= assetLinkEntry.getEntryId() %>" href="javascript:;"><%= removeLinkIcon %></a>
 		</liferay-ui:search-container-column-text>
@@ -88,7 +90,7 @@
 			cssClass="asset-selector"
 			data='<%= (Map<String, Object>)selectorEntry.get("data") %>'
 			id='<%= (String)selectorEntry.get("id") %>'
-			message='<%= (String)selectorEntry.get("message") %>'
+			message='<%= HtmlUtil.escape((String)selectorEntry.get("message")) %>'
 			url="javascript:;"
 		/>
 
@@ -101,7 +103,7 @@
 <aui:input name="assetLinkEntryIds" type="hidden" />
 
 <aui:script use="aui-base,escape,liferay-search-container">
-	A.getBody().delegate(
+	var assetSelectorHandle = A.getBody().delegate(
 		'click',
 		function(event) {
 			event.preventDefault();
@@ -137,13 +139,21 @@
 					searchContainer.addRow([event.assettype, A.Escape.html(event.assettitle), A.Escape.html(event.groupdescriptivename), entryLink], event.assetentryid);
 
 					searchContainer.updateDataStore();
-
-					A.one('#<%= inputAssetLinksDisplayContext.getRandomNamespace() %>emptyResultMessage').hide();
 				}
 			);
 		},
 		'.asset-selector a'
 	);
+
+	var clearAssetSelectorHandle = function(event) {
+		if (event.portletId === '<%= portletDisplay.getId() %>') {
+			assetSelectorHandle.detach();
+
+			Liferay.detach('destroyPortlet', clearAssetSelectorHandle);
+		}
+	};
+
+	Liferay.on('destroyPortlet', clearAssetSelectorHandle);
 </aui:script>
 
 <aui:script use="liferay-search-container">
@@ -157,10 +167,6 @@
 			var tr = link.ancestor('tr');
 
 			searchContainer.deleteRow(tr, link.getAttribute('data-rowId'));
-
-			if (searchContainer.getSize()) {
-				A.one('#<%= inputAssetLinksDisplayContext.getRandomNamespace() %>emptyResultMessage').show();
-			}
 		},
 		'.modify-link'
 	);

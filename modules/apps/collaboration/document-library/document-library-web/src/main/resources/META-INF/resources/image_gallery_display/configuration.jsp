@@ -44,7 +44,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 				<liferay-ui:input-move-boxes
 					leftBoxName="currentMimeTypes"
 					leftList="<%= dlPortletInstanceSettingsHelper.getCurrentMimeTypes() %>"
-					leftReorder="true"
+					leftReorder="<%= Boolean.TRUE.toString() %>"
 					leftTitle="current"
 					rightBoxName="availableMimeTypes"
 					rightList="<%= dlPortletInstanceSettingsHelper.getAvailableMimeTypes() %>"
@@ -111,7 +111,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 						<portlet:param name="ignoreRootFolder" value="<%= Boolean.TRUE.toString() %>" />
 					</liferay-portlet:renderURL>
 
-					uri: '<%= selectFolderURL.toString() %>'
+					uri: '<%= HtmlUtil.escapeJS(selectFolderURL.toString()) %>'
 				},
 				function(event) {
 					var folderData = {

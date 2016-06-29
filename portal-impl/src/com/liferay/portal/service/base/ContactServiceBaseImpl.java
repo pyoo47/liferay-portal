@@ -544,7 +544,7 @@ public abstract class ContactServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -555,7 +555,7 @@ public abstract class ContactServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.kernel.service.ContactLocalService.class)
 	protected com.liferay.portal.kernel.service.ContactLocalService contactLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.ContactService.class)
+	@BeanReference(type = ContactService.class)
 	protected ContactService contactService;
 	@BeanReference(type = ContactPersistence.class)
 	protected ContactPersistence contactPersistence;

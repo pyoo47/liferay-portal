@@ -529,7 +529,7 @@ public abstract class PortletServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -540,7 +540,7 @@ public abstract class PortletServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.kernel.service.PortletLocalService.class)
 	protected com.liferay.portal.kernel.service.PortletLocalService portletLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.PortletService.class)
+	@BeanReference(type = PortletService.class)
 	protected PortletService portletService;
 	@BeanReference(type = PortletPersistence.class)
 	protected PortletPersistence portletPersistence;

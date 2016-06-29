@@ -97,6 +97,7 @@ public class ActionUtil {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
 		long groupId = themeDisplay.getScopeGroupId();
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -153,7 +154,7 @@ public class ActionUtil {
 
 			serviceContext.setAddGroupPermissions(true);
 
-			if (layout.isPublicLayout()) {
+			if (layout.isPublicLayout() || layout.isTypeControlPanel()) {
 				serviceContext.setAddGuestPermissions(true);
 			}
 			else {
@@ -196,16 +197,8 @@ public class ActionUtil {
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				WikiPage.class.getName(), portletRequest);
 
-			Layout layout = themeDisplay.getLayout();
-
+			serviceContext.setAddGuestPermissions(true);
 			serviceContext.setAddGroupPermissions(true);
-
-			if (layout.isPublicLayout()) {
-				serviceContext.setAddGuestPermissions(true);
-			}
-			else {
-				serviceContext.setAddGuestPermissions(false);
-			}
 
 			boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
 

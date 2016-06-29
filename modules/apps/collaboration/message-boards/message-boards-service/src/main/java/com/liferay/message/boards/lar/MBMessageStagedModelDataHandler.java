@@ -193,8 +193,11 @@ public class MBMessageStagedModelDataHandler
 			"question", String.valueOf(thread.isQuestion()));
 		messageElement.addAttribute("threadUuid", thread.getUuid());
 
-		boolean hasAttachmentsFileEntries =
-			message.getAttachmentsFileEntriesCount() > 0;
+		boolean hasAttachmentsFileEntries = false;
+
+		if (message.getAttachmentsFileEntriesCount() > 0) {
+			hasAttachmentsFileEntries = true;
+		}
 
 		messageElement.addAttribute(
 			"hasAttachmentsFileEntries",
@@ -340,7 +343,7 @@ public class MBMessageStagedModelDataHandler
 				}
 			}
 
-			importedMessage = updateAnswer(message, importedMessage);
+			importedMessage = _updateAnswer(message, importedMessage);
 
 			if (importedMessage.isRoot() && !importedMessage.isDiscussion()) {
 				_mbThreadLocalService.updateQuestion(
@@ -512,7 +515,8 @@ public class MBMessageStagedModelDataHandler
 		_ratingsEntryLocalService = ratingsEntryLocalService;
 	}
 
-	private MBMessage updateAnswer(MBMessage message, MBMessage importedMessage)
+	private MBMessage _updateAnswer(
+			MBMessage message, MBMessage importedMessage)
 		throws PortalException {
 
 		if (importedMessage.isAnswer() == message.isAnswer()) {

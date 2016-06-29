@@ -137,14 +137,12 @@ if (portletTitleBasedNavigation) {
 
 <c:if test="<%= portletTitleBasedNavigation %>">
 	<liferay-frontend:info-bar>
-		<aui:workflow-status markupView="lexicon" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= wikiPage.getStatus() %>" version="<%= String.valueOf(wikiPage.getVersion()) %>" />
+		<aui:workflow-status markupView="lexicon" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= wikiPage.getStatus() %>" version="<%= String.valueOf(wikiPage.getVersion()) %>" />
 
 		<liferay-frontend:info-bar-buttons>
 			<liferay-frontend:info-bar-sidenav-toggler-button
-				href="javascript:;"
 				icon="info-circle"
 				label="info"
-				sidenavId='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
 			/>
 		</liferay-frontend:info-bar-buttons>
 	</liferay-frontend:info-bar>
@@ -233,8 +231,18 @@ if (portletTitleBasedNavigation) {
 
 						<c:if test="<%= !print && !portletTitleBasedNavigation %>">
 							<div class="page-actions top-actions">
-								<c:if test="<%= WikiPagePermissionChecker.contains(permissionChecker, wikiPage, ActionKeys.UPDATE) %>">
-									<c:if test="<%= followRedirect || (redirectPage == null) %>">
+								<c:if test="<%= followRedirect || (redirectPage == null) %>">
+									<c:if test="<%= (wikiPage != null) && Validator.isNotNull(formattedContent) && WikiNodePermissionChecker.contains(permissionChecker, node, ActionKeys.ADD_PAGE) %>">
+										<liferay-ui:icon
+											iconCssClass="icon-plus"
+											label="<%= true %>"
+											message="add-child-page"
+											method="get"
+											url="<%= addPageURL.toString() %>"
+										/>
+									</c:if>
+
+									<c:if test="<%= WikiPagePermissionChecker.contains(permissionChecker, wikiPage, ActionKeys.UPDATE) %>">
 										<liferay-ui:icon
 											iconCssClass="icon-edit"
 											label="<%= true %>"
@@ -303,18 +311,6 @@ if (portletTitleBasedNavigation) {
 
 						<c:if test="<%= (wikiPage != null) && Validator.isNotNull(formattedContent) && (followRedirect || (redirectPage == null)) %>">
 							<div class="page-actions">
-								<div class="article-actions">
-									<c:if test="<%= WikiNodePermissionChecker.contains(permissionChecker, node, ActionKeys.ADD_PAGE) && !portletTitleBasedNavigation %>">
-										<liferay-ui:icon
-											iconCssClass="icon-plus"
-											label="<%= true %>"
-											message="add-child-page"
-											method="get"
-											url="<%= addPageURL.toString() %>"
-										/>
-									</c:if>
-								</div>
-
 								<div class="stats">
 
 									<%
@@ -380,7 +376,7 @@ if (portletTitleBasedNavigation) {
 														url="<%= rowURL %>"
 													>
 														<liferay-frontend:horizontal-card-col>
-															<span class="icon-monospaced <%= (dlMimeTypeDisplayContext != null) ? dlMimeTypeDisplayContext.getCssClassFileMimeType(fileEntry.getMimeType()) : "file-icon-color-0" %>"><%= StringUtil.shorten(StringUtil.upperCase(fileEntry.getExtension()), 3, StringPool.BLANK) %></span>
+															<span class="icon-monospaced sticker-lg <%= (dlMimeTypeDisplayContext != null) ? dlMimeTypeDisplayContext.getCssClassFileMimeType(fileEntry.getMimeType()) : "file-icon-color-0" %>"><%= StringUtil.shorten(StringUtil.upperCase(fileEntry.getExtension()), 3, StringPool.BLANK) %></span>
 														</liferay-frontend:horizontal-card-col>
 													</liferay-frontend:horizontal-card>
 												</div>
@@ -410,7 +406,6 @@ if (portletTitleBasedNavigation) {
 											id="childPages"
 											total="<%= childPages.size() %>"
 										>
-
 											<liferay-ui:search-container-results
 												results="<%= childPages %>"
 											/>
@@ -440,9 +435,8 @@ if (portletTitleBasedNavigation) {
 							</div>
 
 							<c:if test="<%= wikiPortletInstanceSettingsHelper.isEnableComments() %>">
-								<liferay-ui:panel-container extended="<%= false %>" id="wikiCommentsPanelContainer" markupView="lexicon" persistState="<%= true %>">
-									<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="wikiCommentsPanel" markupView="lexicon" persistState="<%= true %>" title="comments">
-
+								<liferay-ui:panel-container extended="<%= false %>" markupView="lexicon" persistState="<%= true %>">
+									<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id='<%= liferayPortletResponse.getNamespace() + "wikiCommentsPanel" %>' markupView="lexicon" persistState="<%= true %>" title="comments">
 										<liferay-ui:discussion
 											className="<%= WikiPage.class.getName() %>"
 											classPK="<%= wikiPage.getResourcePrimKey() %>"

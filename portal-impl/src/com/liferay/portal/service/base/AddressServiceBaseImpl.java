@@ -391,7 +391,7 @@ public abstract class AddressServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -402,7 +402,7 @@ public abstract class AddressServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.kernel.service.AddressLocalService.class)
 	protected com.liferay.portal.kernel.service.AddressLocalService addressLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.AddressService.class)
+	@BeanReference(type = AddressService.class)
 	protected AddressService addressService;
 	@BeanReference(type = AddressPersistence.class)
 	protected AddressPersistence addressPersistence;

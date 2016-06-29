@@ -107,7 +107,7 @@ public class BlogsEntryLocalServiceTest {
 		int maxLength = ModelHintsUtil.getMaxLength(
 			BlogsEntry.class.getName(), "content");
 
-		String content = repeat("0", maxLength + 1);
+		String content = _repeat("0", maxLength + 1);
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group, _user.getUserId());
@@ -122,7 +122,7 @@ public class BlogsEntryLocalServiceTest {
 		int maxLength = ModelHintsUtil.getMaxLength(
 			BlogsEntry.class.getName(), "title");
 
-		String title = repeat("0", maxLength + 1);
+		String title = _repeat("0", maxLength + 1);
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group, _user.getUserId());
@@ -229,8 +229,8 @@ public class BlogsEntryLocalServiceTest {
 				" should be " + nextEntry.getEntryId() + " but is null",
 			entries[2]);
 		Assert.assertEquals(
-			"The previous entry relative to entry" +
-				currentEntry.getEntryId() + " should be " +
+			"The previous entry relative to entry" + currentEntry.getEntryId() +
+				" should be " +
 					previousEntry.getEntryId(),
 			entries[0].getEntryId(), previousEntry.getEntryId());
 		Assert.assertEquals(
@@ -816,7 +816,7 @@ public class BlogsEntryLocalServiceTest {
 		Assert.assertEquals(initialCount + 1, actualCount);
 	}
 
-	private static String repeat(String string, int times) {
+	private static String _repeat(String string, int times) {
 		StringBundler sb = new StringBundler(times);
 
 		for (int i = 0; i < times; i++) {

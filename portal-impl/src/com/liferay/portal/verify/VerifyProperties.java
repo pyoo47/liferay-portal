@@ -38,74 +38,11 @@ public class VerifyProperties extends VerifyProcess {
 
 	@Override
 	protected void doVerify() throws Exception {
+		verifySystemProperties();
 
-		// system.properties
+		verifyPortalProperties();
 
-		for (String[] keys : _MIGRATED_SYSTEM_KEYS) {
-			String oldKey = keys[0];
-			String newKey = keys[1];
-
-			verifyMigratedSystemProperty(oldKey, newKey);
-		}
-
-		for (String[] keys : _RENAMED_SYSTEM_KEYS) {
-			String oldKey = keys[0];
-			String newKey = keys[1];
-
-			verifyRenamedSystemProperty(oldKey, newKey);
-		}
-
-		for (String key : _OBSOLETE_SYSTEM_KEYS) {
-			verifyObsoleteSystemProperty(key);
-		}
-
-		Properties systemProperties = SystemProperties.getProperties();
-
-		for (String[] keys : _MODULARIZED_SYSTEM_KEYS) {
-			String oldKey = keys[0];
-			String newKey = keys[1];
-			String moduleName = keys[2];
-
-			verifyModularizedSystemProperty(
-				systemProperties, oldKey, newKey, moduleName);
-		}
-
-		// portal.properties
-
-		Properties portalProperties = loadPortalProperties();
-
-		for (String[] keys : _MIGRATED_PORTAL_KEYS) {
-			String oldKey = keys[0];
-			String newKey = keys[1];
-
-			verifyMigratedPortalProperty(portalProperties, oldKey, newKey);
-		}
-
-		for (String[] keys : _RENAMED_PORTAL_KEYS) {
-			String oldKey = keys[0];
-			String newKey = keys[1];
-
-			verifyRenamedPortalProperty(portalProperties, oldKey, newKey);
-		}
-
-		for (String key : _OBSOLETE_PORTAL_KEYS) {
-			verifyObsoletePortalProperty(portalProperties, key);
-		}
-
-		for (String[] keys : _MODULARIZED_PORTAL_KEYS) {
-			String oldKey = keys[0];
-			String newKey = keys[1];
-			String moduleName = keys[2];
-
-			verifyModularizedPortalProperty(
-				portalProperties, oldKey, newKey, moduleName);
-		}
-
-		// Document library
-
-		StoreFactory storeFactory = StoreFactory.getInstance();
-
-		storeFactory.checkProperties();
+		verifyDocumentLibrary();
 	}
 
 	protected InputStream getPropertiesResourceAsStream(String resourceName)
@@ -147,32 +84,36 @@ public class VerifyProperties extends VerifyProcess {
 		return properties;
 	}
 
+	protected void verifyDocumentLibrary() {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			StoreFactory storeFactory = StoreFactory.getInstance();
+
+			storeFactory.checkProperties();
+		}
+	}
+
 	protected void verifyMigratedPortalProperty(
 			Properties portalProperties, String oldKey, String newKey)
 		throws Exception {
 
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			if (portalProperties.containsKey(oldKey)) {
-				_log.error(
-					"Portal property \"" + oldKey +
-						"\" was migrated to the system property \"" + newKey +
-							"\"");
-			}
+		if (portalProperties.containsKey(oldKey)) {
+			_log.error(
+				"Portal property \"" + oldKey +
+					"\" was migrated to the system property \"" + newKey +
+						"\"");
 		}
 	}
 
 	protected void verifyMigratedSystemProperty(String oldKey, String newKey)
 		throws Exception {
 
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			String value = SystemProperties.get(oldKey);
+		String value = SystemProperties.get(oldKey);
 
-			if (value != null) {
-				_log.error(
-					"System property \"" + oldKey +
-						"\" was migrated to the portal property \"" + newKey +
-							"\"");
-			}
+		if (value != null) {
+			_log.error(
+				"System property \"" + oldKey +
+					"\" was migrated to the portal property \"" + newKey +
+						"\"");
 		}
 	}
 
@@ -181,12 +122,10 @@ public class VerifyProperties extends VerifyProcess {
 			String moduleName)
 		throws Exception {
 
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			if (portalProperties.containsKey(oldKey)) {
-				_log.error(
-					"Portal property \"" + oldKey + "\" was modularized to " +
-						moduleName + " as \"" + newKey + "\"");
-			}
+		if (portalProperties.containsKey(oldKey)) {
+			_log.error(
+				"Portal property \"" + oldKey + "\" was modularized to " +
+					moduleName + " as \"" + newKey + "\"");
 		}
 	}
 
@@ -195,12 +134,10 @@ public class VerifyProperties extends VerifyProcess {
 			String moduleName)
 		throws Exception {
 
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			if (systemProperties.containsKey(oldKey)) {
-				_log.error(
-					"System property \"" + oldKey + "\" was modularized to " +
-						moduleName + " as \"" + newKey + "\"");
-			}
+		if (systemProperties.containsKey(oldKey)) {
+			_log.error(
+				"System property \"" + oldKey + "\" was modularized to " +
+					moduleName + " as \"" + newKey + "\"");
 		}
 	}
 
@@ -208,19 +145,48 @@ public class VerifyProperties extends VerifyProcess {
 			Properties portalProperties, String key)
 		throws Exception {
 
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			if (portalProperties.containsKey(key)) {
-				_log.error("Portal property \"" + key + "\" is obsolete");
-			}
+		if (portalProperties.containsKey(key)) {
+			_log.error("Portal property \"" + key + "\" is obsolete");
 		}
 	}
 
 	protected void verifyObsoleteSystemProperty(String key) throws Exception {
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			String value = SystemProperties.get(key);
+		String value = SystemProperties.get(key);
 
-			if (value != null) {
-				_log.error("System property \"" + key + "\" is obsolete");
+		if (value != null) {
+			_log.error("System property \"" + key + "\" is obsolete");
+		}
+	}
+
+	protected void verifyPortalProperties() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			Properties portalProperties = loadPortalProperties();
+
+			for (String[] keys : _MIGRATED_PORTAL_KEYS) {
+				String oldKey = keys[0];
+				String newKey = keys[1];
+
+				verifyMigratedPortalProperty(portalProperties, oldKey, newKey);
+			}
+
+			for (String[] keys : _RENAMED_PORTAL_KEYS) {
+				String oldKey = keys[0];
+				String newKey = keys[1];
+
+				verifyRenamedPortalProperty(portalProperties, oldKey, newKey);
+			}
+
+			for (String key : _OBSOLETE_PORTAL_KEYS) {
+				verifyObsoletePortalProperty(portalProperties, key);
+			}
+
+			for (String[] keys : _MODULARIZED_PORTAL_KEYS) {
+				String oldKey = keys[0];
+				String newKey = keys[1];
+				String moduleName = keys[2];
+
+				verifyModularizedPortalProperty(
+					portalProperties, oldKey, newKey, moduleName);
 			}
 		}
 	}
@@ -229,25 +195,54 @@ public class VerifyProperties extends VerifyProcess {
 			Properties portalProperties, String oldKey, String newKey)
 		throws Exception {
 
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			if (portalProperties.containsKey(oldKey)) {
-				_log.error(
-					"Portal property \"" + oldKey + "\" was renamed to \"" +
-						newKey + "\"");
-			}
+		if (portalProperties.containsKey(oldKey)) {
+			_log.error(
+				"Portal property \"" + oldKey + "\" was renamed to \"" +
+					newKey + "\"");
 		}
 	}
 
 	protected void verifyRenamedSystemProperty(String oldKey, String newKey)
 		throws Exception {
 
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			String value = SystemProperties.get(oldKey);
+		String value = SystemProperties.get(oldKey);
 
-			if (value != null) {
-				_log.error(
-					"System property \"" + oldKey + "\" was renamed to \"" +
-						newKey + "\"");
+		if (value != null) {
+			_log.error(
+				"System property \"" + oldKey + "\" was renamed to \"" +
+					newKey + "\"");
+		}
+	}
+
+	protected void verifySystemProperties() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			for (String[] keys : _MIGRATED_SYSTEM_KEYS) {
+				String oldKey = keys[0];
+				String newKey = keys[1];
+
+				verifyMigratedSystemProperty(oldKey, newKey);
+			}
+
+			for (String[] keys : _RENAMED_SYSTEM_KEYS) {
+				String oldKey = keys[0];
+				String newKey = keys[1];
+
+				verifyRenamedSystemProperty(oldKey, newKey);
+			}
+
+			for (String key : _OBSOLETE_SYSTEM_KEYS) {
+				verifyObsoleteSystemProperty(key);
+			}
+
+			Properties systemProperties = SystemProperties.getProperties();
+
+			for (String[] keys : _MODULARIZED_SYSTEM_KEYS) {
+				String oldKey = keys[0];
+				String newKey = keys[1];
+				String moduleName = keys[2];
+
+				verifyModularizedSystemProperty(
+					systemProperties, oldKey, newKey, moduleName);
 			}
 		}
 	}
@@ -952,18 +947,6 @@ public class VerifyProperties extends VerifyProcess {
 		new String[] {
 			"journal.article.force.autogenerate.id",
 			"journal.article.force.autogenerate.id", "com.liferay.journal.web"
-		},
-		new String[] {
-			"journal.article.form.add", "journal.article.form.add",
-			"com.liferay.journal.web"
-		},
-		new String[] {
-			"journal.article.form.default.values",
-			"journal.article.form.default.values", "com.liferay.journal.web"
-		},
-		new String[] {
-			"journal.article.form.update", "journal.article.form.update",
-			"com.liferay.journal.web"
 		},
 		new String[] {
 			"journal.articles.search.with.index",
@@ -1726,7 +1709,7 @@ public class VerifyProperties extends VerifyProcess {
 	private static final String[] _OBSOLETE_PORTAL_KEYS = new String[] {
 		"aim.login", "aim.login", "amazon.access.key.id",
 		"amazon.associate.tag", "amazon.secret.access.key",
-		"asset.entry.increment.view.counter.enabled",
+		"asset.entry.increment.view.counter.enabled", "asset.entry.validator",
 		"asset.publisher.asset.entry.query.processors",
 		"asset.publisher.filter.unlistable.entries",
 		"asset.publisher.query.form.configuration",
@@ -1801,8 +1784,10 @@ public class VerifyProperties extends VerifyProcess {
 		"invitation.email.max.recipients", "invitation.email.message.body",
 		"invitation.email.message.subject", "javax.persistence.validation.mode",
 		"jbi.workflow.url", "json.deserializer.strict.mode",
-		"journal.article.form.translate", "journal.article.types",
-		"journal.articles.page.delta.values",
+		"journal.article.form.add", "journal.article.form.default.values",
+		"journal.article.form.update", "journal.article.form.translate",
+		"journal.article.types", "journal.articles.page.delta.values",
+		"journal.browse.by.structures.sorted.by.name",
 		"journal.template.language.parser[css]",
 		"journal.template.language.parser[ftl]",
 		"journal.template.language.parser[vm]",
@@ -1817,7 +1802,8 @@ public class VerifyProperties extends VerifyProcess {
 		"layout.form.update", "layout.parentable[control_panel]",
 		"layout.reset.portlet.ids", "layout.set.form.update", "layout.types",
 		"layout.url[control_panel]", "layout.url.friendliable[control_panel]",
-		"layout.view.page[control_panel]", "lucene.analyzer",
+		"layout.view.page[control_panel]", "library.download.url.resin.jar",
+		"library.download.url.script-10.jar", "lucene.analyzer",
 		"lucene.cluster.index.loading.sync.timeout", "lucene.file.extractor",
 		"lucene.file.extractor.regexp.strip", "lucene.replicate.write",
 		"lucene.store.jdbc.auto.clean.up",
@@ -1835,8 +1821,8 @@ public class VerifyProperties extends VerifyProcess {
 		"message.boards.thread.locking.enabled",
 		"message.boards.thread.previous.and.next.navigation.enabled",
 		"message.boards.thread.views", "message.boards.thread.views.default",
-		"mobile.device.styling.wap.enabled", "msn.login", "msn.password",
-		"multicast.group.address[\"hibernate\"]",
+		"mobile.device.styling.wap.enabled", "module.framework.initial.bundles",
+		"msn.login", "msn.password", "multicast.group.address[\"hibernate\"]",
 		"multicast.group.port[\"hibernate\"]",
 		"net.sf.ehcache.configurationResourceName",
 		"net.sf.ehcache.configurationResourceName.peerProviderProperties",
@@ -1863,12 +1849,12 @@ public class VerifyProperties extends VerifyProcess {
 		"sites.form.add.miscellaneous", "sites.form.add.seo",
 		"sites.form.update.advanced", "sites.form.update.main",
 		"sites.form.update.miscellaneous", "sites.form.update.seo",
-		"staging.lock.enabled", "table.mapper.cacheless.mapping.table.names",
-		"tck.url", "user.groups.indexer.enabled",
-		"users.form.add.identification", "users.indexer.enabled",
-		"users.form.add.main", "users.form.add.miscellaneous",
-		"users.form.my.account.identification", "users.form.my.account.main",
-		"users.form.my.account.miscellaneous",
+		"staging.lock.enabled", "social.activity.sets.bundling.enabled",
+		"table.mapper.cache.mapping.table.names", "tck.url",
+		"user.groups.indexer.enabled", "users.form.add.identification",
+		"users.indexer.enabled", "users.form.add.main",
+		"users.form.add.miscellaneous", "users.form.my.account.identification",
+		"users.form.my.account.main", "users.form.my.account.miscellaneous",
 		"users.form.update.identification", "users.form.update.main",
 		"users.form.update.miscellaneous", "vaadin.resources.path",
 		"vaadin.theme", "vaadin.widgetset", "webdav.storage.class",

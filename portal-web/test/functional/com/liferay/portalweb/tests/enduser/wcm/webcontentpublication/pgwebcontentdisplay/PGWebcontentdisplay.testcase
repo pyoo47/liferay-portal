@@ -1,4 +1,5 @@
 <definition component-name="portal-wcd">
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Web Content Display" />
 
 	<var name="pageName" value="Web Content Display Page" />
@@ -98,15 +99,13 @@
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="page" value="Public Pages" />
 			<var name="pageName" value="Site Page" />
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Site Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -379,6 +378,7 @@
 		</execute>
 
 		<execute macro="WebContent#addPGViaPanel">
+			<var name="templateName" value="Second Basic Template" />
 			<var name="webContentContent" value="WC WebContent Content" />
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>

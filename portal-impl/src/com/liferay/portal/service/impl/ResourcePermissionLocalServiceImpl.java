@@ -122,8 +122,7 @@ public class ResourcePermissionLocalServiceImpl
 		properties = {
 			@Property(
 				name = ExceptionRetryAcceptor.EXCEPTION_NAME,
-				value =
-					"org.springframework.dao.DataIntegrityViolationException"
+				value = "org.springframework.dao.DataIntegrityViolationException"
 			)
 		}
 	)
@@ -363,6 +362,10 @@ public class ResourcePermissionLocalServiceImpl
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
 			if (resourcePermission.getActionIds() == 0) {
+				roleIdsToActionIds.put(
+					resourcePermission.getRoleId(),
+					Collections.<String>emptySet());
+
 				continue;
 			}
 
@@ -1102,8 +1105,7 @@ public class ResourcePermissionLocalServiceImpl
 		properties = {
 			@Property(
 				name = ExceptionRetryAcceptor.EXCEPTION_NAME,
-				value =
-					"org.springframework.dao.DataIntegrityViolationException"
+				value = "org.springframework.dao.DataIntegrityViolationException"
 			)
 		}
 	)
@@ -1147,8 +1149,7 @@ public class ResourcePermissionLocalServiceImpl
 		properties = {
 			@Property(
 				name = ExceptionRetryAcceptor.EXCEPTION_NAME,
-				value =
-					"org.springframework.dao.DataIntegrityViolationException"
+				value = "org.springframework.dao.DataIntegrityViolationException"
 			)
 		}
 	)
@@ -1191,8 +1192,7 @@ public class ResourcePermissionLocalServiceImpl
 		properties = {
 			@Property(
 				name = ExceptionRetryAcceptor.EXCEPTION_NAME,
-				value =
-					"org.springframework.dao.DataIntegrityViolationException"
+				value = "org.springframework.dao.DataIntegrityViolationException"
 			)
 		}
 	)

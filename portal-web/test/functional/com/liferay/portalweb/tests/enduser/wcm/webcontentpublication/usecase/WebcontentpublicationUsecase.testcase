@@ -1,4 +1,5 @@
 <definition component-name="portal-wcm">
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Asset Publisher" />
 
 	<var name="globalSiteName" value="Global" />
@@ -149,9 +150,8 @@
 			<execute function="AssertElementNotPresent" locator1="Home#PAGE" value1="Asset Publisher Page" />
 		</for>
 
-		<execute macro="Page#openURL">
-			<var name="siteURL" value="true" />
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+		<execute macro="Navigator#openSpecificURL">
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<for list="Documents and Media,News" param="pageName">
@@ -166,17 +166,18 @@
 			<var name="virtualHostsURL" value="http://www.able.com:8080" />
 		</execute>
 
+		<execute macro="ProductMenu#gotoControlPanelSites">
+			<var name="portlet" value="Sites" />
+		</execute>
+
 		<execute macro="Page#add">
 			<var name="pageName" value="Web Content Page" />
-			<var name="siteName" value="http://www.able.com:8080" />
 			<var name="virtualHostsURL" value="http://www.able.com:8080" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSpecificURLPage">
 			<var name="pageName" value="Web Content Page" />
-			<var name="siteName" value="http://www.able.com:8080" />
-			<var name="siteURL" value="true" />
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -194,11 +195,9 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSpecificURLPage">
 			<var name="pageName" value="Web Content Page" />
-			<var name="siteName" value="http://www.able.com:8080" />
-			<var name="siteURL" value="true" />
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaAP">
@@ -206,26 +205,26 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSpecificURLPage">
 			<var name="pageName" value="Web Content Page" />
-			<var name="siteName" value="http://www.able.com:8080" />
-			<var name="siteURL" value="true" />
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaWCD">
 			<var name="webContentContent" value="WC WebContent Content" />
 		</execute>
 
-		<execute function="Click" locator1="Icon#EDIT" />
+		<var name="key_assetTitle" value="WC WebContent Title" />
+
+		<execute function="MouseOver" locator1="AP#BODY" />
+
+		<execute function="Click#mouseOverClick" locator1="Icon#EDIT" />
 
 		<execute function="AssertElementNotPresent" locator1="PGSignin#PORTLET_TITLE" value1="Sign" />
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSpecificURLPage">
 			<var name="pageName" value="Web Content Page" />
-			<var name="siteName" value="http://www.able.com:8080" />
-			<var name="siteURL" value="true" />
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<execute macro="WebContent#editPGViaAP">
@@ -234,11 +233,9 @@
 			<var name="webContentTitleEdit" value="WC WebContent Title Edit" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSpecificURLPage">
 			<var name="pageName" value="Web Content Page" />
-			<var name="siteName" value="http://www.able.com:8080" />
-			<var name="siteURL" value="true" />
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaAP">
@@ -248,8 +245,9 @@
 
 		<execute macro="User#firstLoginPG" />
 
-		<execute macro="Navigator#gotoPage">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Web Content Page" />
+			<var name="siteName" value="Organization Name" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaAP">
@@ -427,9 +425,12 @@
 		</execute>
 
 		<execute macro="AssetPublisherPortlet#viewAssetPG">
-			<var name="addMetadata" value="true" />
 			<var name="assetContent" value="Web Content1 Content" />
 			<var name="assetTitle" value="Web Content1 Title" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewAssetMetadataPG">
+			<var name="addMetadata" value="true" />
 			<var name="categoryName" value="Vocabulary1 Category" />
 			<var name="vocabularyName" value="Vocabulary Name" />
 		</execute>
@@ -443,9 +444,12 @@
 		</execute>
 
 		<execute macro="AssetPublisherPortlet#viewAssetPG">
-			<var name="addMetadata" value="true" />
 			<var name="assetContent" value="Netz Content1 Inhalt" />
 			<var name="assetTitle" value="Netz Content1 Titel" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewAssetMetadataPG">
+			<var name="addMetadata" value="true" />
 			<var name="categoryName" value="Kategorienamen" />
 			<var name="vocabularyName" value="Vokabular Namen" />
 		</execute>
@@ -459,9 +463,12 @@
 		</execute>
 
 		<execute macro="AssetPublisherPortlet#viewAssetPG">
-			<var name="addMetadata" value="true" />
 			<var name="assetContent" value="Contenu de Contenu Web1" />
 			<var name="assetTitle" value="Titre de Contenu Web1" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewAssetMetadataPG">
+			<var name="addMetadata" value="true" />
 			<var name="categoryName" value="Nom de la Catégorie" />
 			<var name="vocabularyName" value="Nom Vocabulaire" />
 		</execute>
@@ -1118,6 +1125,7 @@
 
 	<command name="AssetPublisherSiteAndGlobalScopeAccessibility" priority="5">
 		<property name="portal.acceptance" value="true" />
+		<property name="test.name.skip.portal.instance" value="WebcontentpublicationUsecase#AssetPublisherSiteAndGlobalScopeAccessibility" />
 
 		<execute macro="ProductMenu#gotoControlPanelSites">
 			<var name="portlet" value="Sites" />
@@ -1132,7 +1140,6 @@
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="page" value="Public Pages" />
 			<var name="pageName" value="Site Page" />
 			<var name="siteName" value="Site Name" />
 		</execute>
@@ -1184,15 +1191,6 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="AssetPublisherPortlet#configureAddSiteScopes">
-			<var name="otherSite" value="${siteName}" />
-		</execute>
-
-		<execute macro="Navigator#gotoSitePage">
-			<var name="pageName" value="Site Page" />
-			<var name="siteName" value="Site Name" />
-		</execute>
-
 		<for list="${siteName},Site Name,Global" param="siteName">
 			<execute macro="AssetPublisherPortlet#viewAssetPG">
 				<var name="assetContent" value="${siteName} WC Content" />
@@ -1215,7 +1213,6 @@
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="page" value="Public Pages" />
 			<var name="pageName" value="Site Page" />
 			<var name="siteName" value="Site Name" />
 		</execute>
@@ -1319,7 +1316,6 @@
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="page" value="Public Pages" />
 			<var name="pageName" value="Asset Publisher Page" />
 			<var name="siteName" value="Site Name" />
 		</execute>
@@ -1369,10 +1365,9 @@
 			<var name="userEmailAddress" value="userea@liferay.com" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Asset Publisher Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -1381,10 +1376,16 @@
 
 		<execute macro="AssetPublisherPortlet#viewDynamicAssetSelectionConfigurationPG" />
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Asset Publisher Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#configureManualAssetSelectionPG" />
+
+		<execute macro="Navigator#gotoSitePage">
+			<var name="pageName" value="Asset Publisher Page" />
+			<var name="siteName" value="Site Name" />
 		</execute>
 
 		<execute macro="AssetPublisherPortlet#viewManualAssetSelectionConfigurationPG">
@@ -1403,6 +1404,10 @@
 		<execute macro="AssetPublisherPortlet#configureShowMetadataFieldsPG">
 			<var name="addMetadata" value="true" />
 			<var name="metadataField" value="Author" />
+		</execute>
+
+		<execute macro="Navigator#gotoPage">
+			<var name="pageName" value="Asset Publisher Page" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1562,7 +1567,9 @@
 			<var name="entryTitle" value="Blogs Entry2 Title" />
 		</execute>
 
-		<execute macro="BlogsNavigator#gotoSettings" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Related Assets" />
+		</execute>
 
 		<execute macro="BlogsEntry#addRelatedAsset">
 			<var name="assetTitle" value="Blogs Entry1 Title" />
@@ -1750,7 +1757,9 @@
 			<var name="entryTitle" value="Blogs Entry Title" />
 		</execute>
 
-		<execute macro="BlogsNavigator#gotoSettings" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Related Assets" />
+		</execute>
 
 		<execute macro="BlogsEntry#addRelatedAsset">
 			<var name="assetTitle" value="WC WebContent Title" />
@@ -1897,6 +1906,10 @@
 	</command>
 
 	<command name="ViewWebContentWithConfiguredDisplayPageViaAP" priority="4">
+		<execute macro="ProductMenu#gotoSite">
+			<var name="site" value="Liferay" />
+		</execute>
+
 		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Asset Publisher Page" />
 		</execute>

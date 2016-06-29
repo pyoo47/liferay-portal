@@ -20,6 +20,7 @@ import com.liferay.microblogs.model.MicroblogsEntry;
 import com.liferay.microblogs.service.MicroblogsEntryLocalService;
 import com.liferay.microblogs.service.MicroblogsEntryService;
 import com.liferay.microblogs.util.MicroblogsUtil;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
@@ -53,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.view-template=/microblogs/view.jsp",
 		"javax.portlet.name=" + MicroblogsPortletKeys.MICROBLOGS,
-		"javax.portlet.portlet-info.keyworkds=Microblogs",
+		"javax.portlet.portlet-info.keywords=Microblogs",
 		"javax.portlet.portlet-info.short-title=Microblogs",
 		"javax.portlet.portlet-info.title=Microblogs",
 		"javax.portlet.resource-bundle=content.Language",
@@ -156,6 +157,13 @@ public class MicroblogsPortlet extends MVCPortlet {
 		MicroblogsEntryService microblogsEntryService) {
 
 		this.microblogsEntryService = microblogsEntryService;
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.microblogs.web)(release.schema.version=1.0.1))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	protected AssetEntryLocalService assetEntryLocalService;

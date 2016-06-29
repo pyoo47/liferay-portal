@@ -269,7 +269,7 @@ public class AddDefaultDocumentLibraryStructuresPortalInstanceLifecycleListener
 	}
 
 	protected String buildDLRawMetadataElementXML(Field field, Locale locale) {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(14);
 
 		sb.append("<dynamic-element dataType=\"string\" indexType=\"text\" ");
 		sb.append("name=\"");
@@ -282,8 +282,7 @@ public class AddDefaultDocumentLibraryStructuresPortalInstanceLifecycleListener
 		sb.append("\" localizable=\"false\" required=\"false\" ");
 		sb.append("showLabel=\"true\" type=\"text\"><meta-data locale=\"");
 		sb.append(locale);
-		sb.append("\">");
-		sb.append("<entry name=\"label\"><![CDATA[metadata.");
+		sb.append("\"><entry name=\"label\"><![CDATA[metadata.");
 		sb.append(fieldClass.getSimpleName());
 		sb.append(StringPool.PERIOD);
 		sb.append(field.getName());
@@ -300,11 +299,9 @@ public class AddDefaultDocumentLibraryStructuresPortalInstanceLifecycleListener
 
 		sb.append("<structure><name><![CDATA[");
 		sb.append(name);
-		sb.append("]]></name>");
-		sb.append("<description><![CDATA[");
+		sb.append("]]></name><description><![CDATA[");
 		sb.append(name);
-		sb.append("]]></description>");
-		sb.append("<root available-locales=\"");
+		sb.append("]]></description><root available-locales=\"");
 		sb.append(locale);
 		sb.append("\" default-locale=\"");
 		sb.append(locale);
@@ -326,9 +323,10 @@ public class AddDefaultDocumentLibraryStructuresPortalInstanceLifecycleListener
 
 		sb.append("<?xml version=\"1.0\"?><root>");
 
-		for (String key : fields.keySet()) {
+		for (Map.Entry<String, Field[]> entry : fields.entrySet()) {
 			sb.append(
-				buildDLRawMetadataStructureXML(key, fields.get(key), locale));
+				buildDLRawMetadataStructureXML(
+					entry.getKey(), entry.getValue(), locale));
 		}
 
 		sb.append("</root>");

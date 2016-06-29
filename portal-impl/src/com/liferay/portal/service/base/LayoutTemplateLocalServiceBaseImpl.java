@@ -160,7 +160,7 @@ public abstract class LayoutTemplateLocalServiceBaseImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -169,7 +169,7 @@ public abstract class LayoutTemplateLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portal.kernel.service.LayoutTemplateLocalService.class)
+	@BeanReference(type = LayoutTemplateLocalService.class)
 	protected LayoutTemplateLocalService layoutTemplateLocalService;
 	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;

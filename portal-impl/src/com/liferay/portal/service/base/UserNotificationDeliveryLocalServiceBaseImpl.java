@@ -231,7 +231,7 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	public ActionableDynamicQuery getActionableDynamicQuery() {
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.kernel.service.UserNotificationDeliveryLocalServiceUtil.getService());
+		actionableDynamicQuery.setBaseLocalService(userNotificationDeliveryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(UserNotificationDelivery.class);
 
@@ -245,7 +245,7 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portal.kernel.service.UserNotificationDeliveryLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setBaseLocalService(userNotificationDeliveryLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(UserNotificationDelivery.class);
 
@@ -257,7 +257,7 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.kernel.service.UserNotificationDeliveryLocalServiceUtil.getService());
+		actionableDynamicQuery.setBaseLocalService(userNotificationDeliveryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(UserNotificationDelivery.class);
 
@@ -475,7 +475,7 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -484,7 +484,7 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portal.kernel.service.UserNotificationDeliveryLocalService.class)
+	@BeanReference(type = UserNotificationDeliveryLocalService.class)
 	protected UserNotificationDeliveryLocalService userNotificationDeliveryLocalService;
 	@BeanReference(type = UserNotificationDeliveryPersistence.class)
 	protected UserNotificationDeliveryPersistence userNotificationDeliveryPersistence;

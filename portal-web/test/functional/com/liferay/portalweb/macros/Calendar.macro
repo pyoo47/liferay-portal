@@ -3,6 +3,23 @@
 	<var name="calendarDescription" value="" />
 	<var name="siteName" value="Liferay" />
 
+	<command name="_checkForRSSTitle">
+		<if>
+			<condition function="IsElementNotPresent" locator1="CalendarRSS#FEED_TITLE"  />
+			<then>
+				<execute macro="Navigator#gotoPage">
+					<var name="pageName" value="${pageName}" />
+				</execute>
+
+				<execute macro="Calendar#chooseSiteCalendarMenulistOption">
+					<var name="menuListOption" value="RSS" />
+					<var name="siteCalendarName" value="${siteCalendarName}" />
+					<var name="siteName" value="${siteName}" />
+				</execute>
+			</then>
+		</if>
+	</command>
+
 	<command name="_deleteCalendar">
 		<var name="key_menuListOption" value="Delete" />
 
@@ -890,7 +907,11 @@
 	<command name="viewNoRSS">
 		<execute function="Open" locator1="${rssURL}" />
 
-		<execute function="AssertElementPresent" locator1="CalendarConfiguration#ERROR_HEADER" />
+		<var name="pageName" value="Welcome" />
+
+		<execute function="AssertVisible" locator1="Home#PAGE_ACTIVE">
+			<var name="key_pageName" value="${pageName}" />
+		</execute>
 	</command>
 
 	<command name="viewOtherCalendarMenulist">
@@ -905,12 +926,8 @@
 
 		<execute function="SelectFrameTop" value1="relative=top" />
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#chooseOtherCalendarMenulistOption">
@@ -924,12 +941,8 @@
 			<var name="calendarName" value="${calendarName}" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#chooseOtherCalendarMenulistOption">
@@ -939,12 +952,8 @@
 
 		<execute macro="CalendarNavigator#_selectPermissionsIframe" />
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#chooseOtherCalendarMenulistOption">
@@ -952,12 +961,8 @@
 			<var name="menuListOption" value="RSS" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#viewCalendarColorPicker">
@@ -965,12 +970,8 @@
 			<var name="color" value="${color}" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#chooseOtherCalendarMenulistOption">
@@ -996,12 +997,11 @@
 	</command>
 
 	<command name="viewRSSFeedEventNotPresent">
-		<if>
-			<condition function="IsElementNotPresent" locator1="CalendarRSS#FEED_TITLE"  />
-			<then>
-				<execute function="Refresh" />
-			</then>
-		</if>
+		<execute macro="Calendar#_checkForRSSTitle">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteCalendarName" value="${siteCalendarName}" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
 
 		<execute function="AssertTextEquals" locator1="CalendarRSS#FEED_TITLE"  value1="${calendarName}" />
 
@@ -1012,12 +1012,11 @@
 	</command>
 
 	<command name="viewRSSFeedEventPresent">
-		<if>
-			<condition function="IsElementNotPresent" locator1="CalendarRSS#FEED_TITLE"  />
-			<then>
-				<execute function="Refresh" />
-			</then>
-		</if>
+		<execute macro="Calendar#_checkForRSSTitle">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteCalendarName" value="${siteCalendarName}" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
 
 		<execute function="AssertTextEquals" locator1="CalendarRSS#FEED_TITLE"  value1="${calendarName}" />
 

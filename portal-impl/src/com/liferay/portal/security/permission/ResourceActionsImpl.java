@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.service.GroupServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -61,7 +62,9 @@ import com.liferay.util.JS;
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -94,7 +97,9 @@ public class ResourceActionsImpl implements ResourceActions {
 		_modelResourceActionsBags = new HashMap<>();
 
 		try {
-			ClassLoader classLoader = getClass().getClassLoader();
+			Class<?> clazz = getClass();
+
+			ClassLoader classLoader = clazz.getClassLoader();
 
 			for (String config : PropsValues.RESOURCE_ACTIONS_CONFIGS) {
 				read(null, classLoader, config);
@@ -206,6 +211,26 @@ public class ResourceActionsImpl implements ResourceActions {
 
 			return Collections.emptyList();
 		}
+	}
+
+	@Override
+	public String getCompositeModelName(String... classNames) {
+		if (ArrayUtil.isEmpty(classNames)) {
+			return StringPool.BLANK;
+		}
+
+		Arrays.sort(classNames);
+
+		StringBundler sb = new StringBundler(classNames.length * 2);
+
+		for (String className : classNames) {
+			sb.append(className);
+			sb.append(getCompositeModelNameSeparator());
+		}
+
+		sb.setIndex(sb.index() - 1);
+
+		return sb.toString();
 	}
 
 	@Override
@@ -562,18 +587,6 @@ public class ResourceActionsImpl implements ResourceActions {
 		return actions;
 	}
 
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getRoles(long, Group,
-	 *             String, int[])}
-	 */
-	@Deprecated
-	@Override
-	public List<Role> getRoles(
-		long companyId, Group group, String modelResource) {
-
-		return getRoles(companyId, group, modelResource, null);
-	}
-
 	@Override
 	public List<Role> getRoles(
 		long companyId, Group group, String modelResource, int[] roleTypes) {
@@ -583,6 +596,12 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 
 		return roleLocalService.getRoles(companyId, roleTypes);
+	}
+
+	@Override
+	public String[] getRootModelResources() {
+		return _rootModelResources.toArray(
+			new String[_rootModelResources.size()]);
 	}
 
 	@Override
@@ -613,6 +632,16 @@ public class ResourceActionsImpl implements ResourceActions {
 	@Override
 	public boolean isPortalModelResource(String modelResource) {
 		if (_portalModelResources.contains(modelResource)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean isRootModelResource(String modelResource) {
+		if (_rootModelResources.contains(modelResource)) {
 			return true;
 		}
 		else {
@@ -762,8 +791,26 @@ public class ResourceActionsImpl implements ResourceActions {
 	protected String getCompositeModelName(Element compositeModelNameElement) {
 		StringBundler sb = new StringBundler();
 
-		Iterator<Element> itr = compositeModelNameElement.elementIterator(
-			"model-name");
+		List<Element> elements = new ArrayList<>(
+			compositeModelNameElement.elements("model-name"));
+
+		Collections.sort(
+			elements,
+			new Comparator<Element>() {
+
+				@Override
+				public int compare(Element element1, Element element2) {
+					String textTrim1 = GetterUtil.getString(
+						element1.getTextTrim());
+					String textTrim2 = GetterUtil.getString(
+						element2.getTextTrim());
+
+					return textTrim1.compareTo(textTrim2);
+				}
+
+			});
+
+		Iterator<Element> itr = elements.iterator();
 
 		while (itr.hasNext()) {
 			Element modelNameElement = itr.next();
@@ -1109,6 +1156,8 @@ public class ResourceActionsImpl implements ResourceActions {
 				modelResourceElement.elementText("root"));
 
 			if (root) {
+				_rootModelResources.add(name);
+
 				Map<String, String> portletRootModelResource =
 					portletResourceActionsBag.getPortletRootModelResources();
 
@@ -1270,5 +1319,6 @@ public class ResourceActionsImpl implements ResourceActions {
 	private Map<String, PortletResourceActionsBag> _portletResourceActionsBags;
 	private final ServiceTrackerList<ResourceBundleLoader>
 		_resourceBundleLoaders;
+	private final Set<String> _rootModelResources = new HashSet<>();
 
 }

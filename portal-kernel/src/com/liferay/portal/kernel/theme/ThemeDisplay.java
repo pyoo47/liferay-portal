@@ -855,8 +855,9 @@ public class ThemeDisplay
 
 		Map<String, ThemeSetting> themeSettings = theme.getSettings();
 
-		for (String key : themeSettings.keySet()) {
-			ThemeSetting themeSetting = themeSettings.get(key);
+		for (Map.Entry<String, ThemeSetting> entry : themeSettings.entrySet()) {
+			String key = entry.getKey();
+			ThemeSetting themeSetting = entry.getValue();
 
 			String value = null;
 
@@ -1108,15 +1109,6 @@ public class ThemeDisplay
 		return _showLayoutTemplatesIcon;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #isShowSiteAdministrationIcon()}
-	 */
-	@Deprecated
-	public boolean isShowManageSiteMembershipsIcon() {
-		return _showManageSiteMembershipsIcon;
-	}
-
 	public boolean isShowMyAccountIcon() {
 		return _showMyAccountIcon;
 	}
@@ -1143,33 +1135,6 @@ public class ThemeDisplay
 
 	public boolean isShowSiteAdministrationIcon() {
 		return _showSiteAdministrationIcon;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #isShowSiteAdministrationIcon()}
-	 */
-	@Deprecated
-	public boolean isShowSiteContentIcon() {
-		return isShowSiteAdministrationIcon();
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #isShowSiteAdministrationIcon()}
-	 */
-	@Deprecated
-	public boolean isShowSiteMapSettingsIcon() {
-		return _showSiteMapSettingsIcon;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #isShowSiteAdministrationIcon()}
-	 */
-	@Deprecated
-	public boolean isShowSiteSettingsIcon() {
-		return _showSiteSettingsIcon;
 	}
 
 	public boolean isShowStagingIcon() {
@@ -1632,12 +1597,6 @@ public class ThemeDisplay
 		_showLayoutTemplatesIcon = showLayoutTemplatesIcon;
 	}
 
-	public void setShowManageSiteMembershipsIcon(
-		boolean showManageSiteMembershipsIcon) {
-
-		_showManageSiteMembershipsIcon = showManageSiteMembershipsIcon;
-	}
-
 	public void setShowMyAccountIcon(boolean showMyAccountIcon) {
 		_showMyAccountIcon = showMyAccountIcon;
 	}
@@ -1668,14 +1627,6 @@ public class ThemeDisplay
 		boolean showSiteAdministrationIcon) {
 
 		_showSiteAdministrationIcon = showSiteAdministrationIcon;
-	}
-
-	public void setShowSiteMapSettingsIcon(boolean showSiteMapSettingsIcon) {
-		_showSiteMapSettingsIcon = showSiteMapSettingsIcon;
-	}
-
-	public void setShowSiteSettingsIcon(boolean showSiteSettingsIcon) {
-		_showSiteSettingsIcon = showSiteSettingsIcon;
 	}
 
 	public void setShowStagingIcon(boolean showStagingIcon) {
@@ -1828,6 +1779,16 @@ public class ThemeDisplay
 		_widget = widget;
 	}
 
+	@Override
+	public ThemeDisplay split() {
+		try {
+			return (ThemeDisplay)clone();
+		}
+		catch (CloneNotSupportedException cnse) {
+			throw new RuntimeException(cnse);
+		}
+	}
+
 	public String translate(String key) {
 		return LanguageUtil.get(getLocale(), key);
 	}
@@ -1853,7 +1814,7 @@ public class ThemeDisplay
 	private Contact _contact;
 	private User _defaultUser;
 	private Device _device;
-	private long _doAsGroupId = 0;
+	private long _doAsGroupId;
 	private String _doAsUserId = StringPool.BLANK;
 	private String _doAsUserLanguageId = StringPool.BLANK;
 	private boolean _facebook;
@@ -1917,7 +1878,6 @@ public class ThemeDisplay
 	private boolean _showControlPanelIcon;
 	private boolean _showHomeIcon;
 	private boolean _showLayoutTemplatesIcon;
-	private boolean _showManageSiteMembershipsIcon;
 	private boolean _showMyAccountIcon;
 	private boolean _showPageCustomizationIcon;
 	private boolean _showPageSettingsIcon;
@@ -1925,8 +1885,6 @@ public class ThemeDisplay
 	private boolean _showSignInIcon;
 	private boolean _showSignOutIcon;
 	private boolean _showSiteAdministrationIcon;
-	private boolean _showSiteMapSettingsIcon;
-	private boolean _showSiteSettingsIcon;
 	private boolean _showStagingIcon;
 	private boolean _signedIn;
 	private Locale _siteDefaultLocale;
@@ -1949,13 +1907,13 @@ public class ThemeDisplay
 	private String _urlCurrent = StringPool.BLANK;
 	private String _urlHome = StringPool.BLANK;
 	private String _urlLayoutTemplates = StringPool.BLANK;
-	private transient PortletURL _urlMyAccount = null;
-	private transient PortletURL _urlPageSettings = null;
+	private transient PortletURL _urlMyAccount;
+	private transient PortletURL _urlPageSettings;
 	private String _urlPortal = StringPool.BLANK;
-	private transient PortletURL _urlPublishToLive = null;
+	private transient PortletURL _urlPublishToLive;
 	private String _urlSignIn = StringPool.BLANK;
 	private String _urlSignOut = StringPool.BLANK;
-	private transient PortletURL _urlUpdateManager = null;
+	private transient PortletURL _urlUpdateManager;
 	private User _user;
 	private boolean _widget;
 

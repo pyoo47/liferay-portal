@@ -944,7 +944,7 @@ public abstract class BookmarksEntryServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -955,7 +955,7 @@ public abstract class BookmarksEntryServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.bookmarks.service.BookmarksEntryLocalService.class)
 	protected com.liferay.bookmarks.service.BookmarksEntryLocalService bookmarksEntryLocalService;
-	@BeanReference(type = com.liferay.bookmarks.service.BookmarksEntryService.class)
+	@BeanReference(type = BookmarksEntryService.class)
 	protected BookmarksEntryService bookmarksEntryService;
 	@BeanReference(type = BookmarksEntryPersistence.class)
 	protected BookmarksEntryPersistence bookmarksEntryPersistence;

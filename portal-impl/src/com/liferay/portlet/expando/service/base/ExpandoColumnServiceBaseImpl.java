@@ -454,7 +454,7 @@ public abstract class ExpandoColumnServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -465,7 +465,7 @@ public abstract class ExpandoColumnServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.expando.kernel.service.ExpandoColumnLocalService.class)
 	protected com.liferay.expando.kernel.service.ExpandoColumnLocalService expandoColumnLocalService;
-	@BeanReference(type = com.liferay.expando.kernel.service.ExpandoColumnService.class)
+	@BeanReference(type = ExpandoColumnService.class)
 	protected ExpandoColumnService expandoColumnService;
 	@BeanReference(type = ExpandoColumnPersistence.class)
 	protected ExpandoColumnPersistence expandoColumnPersistence;

@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.PortletPreferences;
 
@@ -221,8 +222,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			configurationControls.add(
 				new PortletDataHandlerBoolean(
 					null, PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS,
-					"archived-setups", true, false, null, null, null)
-			);
+					"configuration-templates", true, false, null, null, null));
 		}
 
 		// User preferences
@@ -300,7 +300,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			configurationControls.add(
 				new PortletDataHandlerBoolean(
 					null, PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS,
-					"archived-setups", true, false, null, null, null));
+					"configuration-templates", true, false, null, null, null));
 		}
 
 		// User preferences
@@ -670,7 +670,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		Version currentVersion = Version.getInstance(getSchemaVersion());
 		Version importedVersion = Version.getInstance(schemaVersion);
 
-		if (!Validator.equals(
+		if (!Objects.equals(
 				currentVersion.getMajor(), importedVersion.getMajor())) {
 
 			return false;
@@ -764,20 +764,6 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 
 		return totalModelCount;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	protected void setAlwaysExportable(boolean alwaysExportable) {
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	protected void setAlwaysStaged(boolean alwaysStaged) {
 	}
 
 	protected void setDataAlwaysStaged(boolean dataAlwaysStaged) {

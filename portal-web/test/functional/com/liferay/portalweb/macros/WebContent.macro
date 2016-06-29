@@ -2,15 +2,7 @@
 	<command name="_gotoAddPGViaAP">
 		<execute function="Click#makeVisibleClickAt" locator1="AP#ADD_ASSET_PLUS_ICON" />
 
-		<if>
-			<equals arg1="${assetTypeConfigured}" arg2="true" />
-			<then>
-				<execute function="AssertClick" locator1="AP#ADD_BASIC_WEB_CONTENT_LINK" value1="Add Basic Web Content" />
-			</then>
-			<else>
-				<execute function="AssertClick" locator1="MenuItem#BASIC_WEB_CONTENT" value1="Basic Web Content" />
-			</else>
-		</if>
+		<execute function="AssertClick" locator1="MenuItem#BASIC_WEB_CONTENT" value1="Basic Web Content" />
 
 		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
 	</command>
@@ -69,9 +61,7 @@
 	</command>
 
 	<command name="addDraftPGViaAP">
-		<execute macro="WebContent#_gotoAddPGViaAP">
-			<var name="assetTypeConfigured" value="${assetTypeConfigured}" />
-		</execute>
+		<execute macro="WebContent#_gotoAddPGViaAP" />
 
 		<execute macro="WebContent#addCP">
 			<var name="webContentContent" value="${webContentContent}" />
@@ -108,7 +98,7 @@
 
 		<execute function="AssertTextEquals" locator1="AssetRelatedAssets#RELATED_ASSETS_TABLE_TYPE" value1="${assetType}" />
 		<execute function="AssertTextEquals" locator1="AssetRelatedAssets#RELATED_ASSETS_TABLE_TITLE" value1="${assetTitle}" />
-		<execute function="AssertTextEquals" locator1="AssetRelatedAssets#RELATED_ASSETS_TABLE_SCOPE" value1="${siteName}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="AssetRelatedAssets#RELATED_ASSETS_TABLE_SCOPE" value1="${siteName}" />
 		<execute function="AssertElementPresent" locator1="AssetRelatedAssets#RELATED_ASSETS_TABLE_REMOVE_LINK" />
 
 		<execute macro="PortletEntry#publish" />
@@ -176,9 +166,7 @@
 	</command>
 
 	<command name="addPGViaAP">
-		<execute macro="WebContent#_gotoAddPGViaAP">
-			<var name="assetTypeConfigured" value="${assetTypeConfigured}" />
-		</execute>
+		<execute macro="WebContent#_gotoAddPGViaAP" />
 
 		<execute macro="WebContent#addCP">
 			<var name="webContentContent" value="${webContentContent}" />
@@ -199,6 +187,29 @@
 	<command name="addPGViaPanel">
 		<execute function="SelectFrame" locator1="IFrame#EDIT_ASSET" />
 
+		<if>
+			<isset var="templateName" />
+			<then>
+				<execute macro="Panel#expandPanel">
+					<var name="panelHeading" value="Structure and Template" />
+				</execute>
+
+				<execute function="AssertClick" locator1="WCEditWebContent#SELECT_TEMPLATE" value1="Select" />
+
+				<execute function="SelectFrame" value1="relative=top" />
+				<execute function="SelectFrame" locator1="IFrame#TEMPLATES" />
+
+				<var name="key_rowEntry" value="${templateName}" />
+
+				<execute function="AssertClickNoError" locator1="ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK" value1="${templateName}" />
+
+				<execute function="Confirm#assertConfirmationNoWait" value1="Selecting a new template deletes all unsaved content. Do you want to proceed?" />
+
+				<execute function="SelectFrame" value1="relative=top" />
+				<execute function="SelectFrame" locator1="IFrame#EDIT_ASSET" />
+			</then>
+		</if>
+
 		<execute macro="WebContent#addCP">
 			<var name="webContentContent" value="${webContentContent}" />
 			<var name="webContentTitle" value="${webContentTitle}" />
@@ -206,6 +217,8 @@
 
 		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
 		<execute function="SelectFrameTop" />
+
+		<execute function="AssertVisible" locator1="WCD#WEB_CONTENT_CONTENT" />
 	</command>
 
 	<command name="addPGViaWCD">
@@ -289,9 +302,17 @@
 		<execute function="AssertClick" locator1="MenuItem#WEB_CONTENT_LANGUAGE" value1="${localizedLanguage}" />
 
 		<if>
+			<not>
+				<condition function="IsElementPresent" locator1="Translation#SELECTED_LOCALE" value1="${localizedLanguage}" />
+			</not>
+			<then>
+				<execute function="Click" locator1="Translation#CURRENT_LOCALE" />
+			</then>
+		</if>
+
+		<if>
 			<isset var="localizedTitle" />
 			<then>
-				<execute function="Click" locator1="Translation#TITLE" />
 				<execute function="Type#mouseOverFocusType" locator1="TextInput#TITLE" value1="${localizedTitle}" />
 			</then>
 		</if>
@@ -412,8 +433,36 @@
 		<execute macro="WebContent#selectCategory">
 			<var name="categoryName" value="${categoryName}" />
 			<var name="userSegmentDetailTitle" value="${userSegmentDetailTitle}" />
+			<var name="userSegmentSelectChildSite" value="${userSegmentSelectChildSite}" />
 			<var name="vocabularyName" value="${vocabularyName}" />
 		</execute>
+
+		<execute macro="PortletEntry#publish" />
+	</command>
+
+	<command name="addWithDocumentCP">
+		<execute macro="WebContent#addCP">
+			<var name="webContentContent" value="${webContentContent}" />
+			<var name="webContentTitle" value="${webContentTitle}" />
+		</execute>
+
+		<execute function="Click" locator1="AlloyEditor#CONTENT_FIELD" />
+
+		<execute function="Click" locator1="AlloyEditor#CONTENT_ADD_BUTTON" />
+
+		<execute function="Click" locator1="AlloyEditor#CONTENT_ADD_MENUBAR_IMAGE" />
+
+		<execute function="SelectFrame" locator1="IFrame#METADATA_SETS_IFRAME" />
+
+		<var name="key_imageFileName" value="${dmDocumentTitle}" />
+
+		<var method="StringUtil#replace('${dmDocumentTitle}', ' ', '+')" name="key_imageFileName" />
+
+		<execute function="Click" locator1="ItemSelector#SELECT_FILE_IMAGE_PREVIEW" />
+
+		<execute function="SelectFrameTop" value1="relative=top" />
+
+		<execute function="AssertClick" locator1="ItemSelector#ADD_BUTTON" value1="Add" />
 
 		<execute macro="PortletEntry#publish" />
 	</command>
@@ -434,7 +483,8 @@
 
 		<var name="key_ddlDataDefinitionName" value="${structureName}" />
 
-		<execute function="AssertClickNoError" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_CHOOSE_BUTTON" value1="Choose" />
+		<execute function="AssertClickNoError" locator1="DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME_LINK" value1="${structureName}" />
+
 		<execute function="Confirm#assertConfirmationNoWait" value1="Selecting a new structure changes the available input fields and available templates. Do you want to proceed?" />
 		<execute function="SelectFrame" value1="relative=top" />
 
@@ -548,7 +598,12 @@
 			<then>
 				<var name="key_fieldName" value="Image" />
 
-				<execute function="UploadCommonFile" locator1="DDMField#IMAGE" value1="${webContentImage}" />
+				<execute function="Click" locator1="Button#SELECT" />
+
+				<execute macro="ItemSelector#uploadFile">
+					<var name="navTab" value="Web Content Images" />
+					<var name="uploadFileName" value="${webContentImage}" />
+				</execute>
 			</then>
 		</if>
 
@@ -840,7 +895,9 @@
 	<command name="editDisplayPagePGViaAP">
 		<var name="key_assetTitle" value="${assetTitle}" />
 
-		<execute function="Click#makeVisibleClickAt" locator1="Icon#EDIT" />
+		<execute function="MouseOver" locator1="AP#BODY" />
+
+		<execute function="Click#mouseOverClick" locator1="Icon#EDIT" />
 
 		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
 
@@ -897,7 +954,9 @@
 	<command name="editPGViaAP">
 		<var name="key_assetTitle" value="${assetTitle}" />
 
-		<execute function="Click#makeVisibleClickAt" locator1="AP#ASSET_ABSTRACT_EDIT" />
+		<execute function="MouseOver" locator1="AP#BODY" />
+
+		<execute function="Click#mouseOverClick" locator1="Icon#EDIT" />
 
 		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
 		<execute function="Type#mouseOverFocusType" locator1="TextInput#TITLE" value1="${webContentTitleEdit}" />
@@ -1129,10 +1188,28 @@
 			</then>
 		</if>
 
-		<execute macro="AssetCategorization#addCategory">
-			<var name="categoryName" value="${categoryName}" />
-			<var name="vocabularyName" value="${vocabularyName}" />
-		</execute>
+		<if>
+			<equals arg1="${userSegmentSelectChildSite}" arg2="true" />
+			<then>
+				<var name="key_vocabularyName" value="${vocabularyName}" />
+
+				<execute function="AssertClick" locator1="AssetCategorization#CATEGORY_SELECT_CHILD_SITE" value1="Select" />
+
+				<var name="key_categoryName" value="${categoryName}" />
+
+				<execute function="Click" locator1="AssetCategorization#CATEGORIES_CATEGORY_CHECKBOX" />
+
+				<execute function="AssertVisible" locator1="AssetCategorization#CATEGORIES_CATEGORY_CHECKBOX_CHECKED" />
+
+				<execute function="Click" locator1="Icon#CLOSE" />
+			</then>
+			<else>
+				<execute macro="AssetCategorization#addCategory">
+					<var name="categoryName" value="${categoryName}" />
+					<var name="vocabularyName" value="${vocabularyName}" />
+				</execute>
+			</else>
+		</if>
 	</command>
 
 	<command name="selectTemplateCP">
@@ -1142,13 +1219,15 @@
 
 		<execute function="AssertClick" locator1="WCEditWebContent#SELECT_TEMPLATE" value1="Select" />
 
-		<var name="key_ddlTemplateName" value="${templateName}" />
-
 		<execute function="SelectFrame" locator1="IFrame#TEMPLATES" />
-		<execute function="AssertClickNoError" locator1="DDMSelectTemplate#TEMPLATE_TABLE_CHOOSE_BUTTON" value1="Choose" />
+
+		<var name="key_rowEntry" value="${templateName}" />
+
+		<execute function="AssertClickNoError" locator1="ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK" value1="${templateName}" />
+
 		<execute function="Confirm#assertConfirmationNoWait" value1="Selecting a new template deletes all unsaved content. Do you want to proceed?" />
 
-		<execute macro="PortletEntry#publish" />
+		<execute macro="IFrame#selectTopFrame" />
 	</command>
 
 	<command name="subscribeCP">
@@ -1360,7 +1439,9 @@
 	<command name="viewDisplayPagePGViaAP">
 		<var name="key_assetTitle" value="${assetTitle}" />
 
-		<execute function="Click" locator1="Icon#EDIT" />
+		<execute function="MouseOver" locator1="AP#BODY" />
+
+		<execute function="Click#mouseOverClick" locator1="Icon#EDIT" />
 
 		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
 
@@ -1431,7 +1512,7 @@
 		<var name="key_assetContent" value="${webContentContent}" />
 		<var name="key_assetTitle" value="${webContentTitle}" />
 
-		<execute function="AssertClick#assertPartialTextClickAtAndWait" locator1="AP#ASSET_ABSTRACT_VIEW" value1="${webContentTitle}" />
+		<execute function="AssertClick#assertPartialTextClickAt" locator1="AP#ASSET_ABSTRACT_VIEW" value1="${webContentTitle}" />
 
 		<execute function="AssertTextEquals" locator1="APAsset#ASSET_TITLE_HEADER" value1="${webContentTitle}" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="APAsset#ASSET_CONTENT" value1="${webContentContent}" />
@@ -1552,6 +1633,12 @@
 					<execute function="AssertElementPresent" locator1="WCD#WEB_CONTENT_CONTENT_IMAGE" />
 				</then>
 			</elseif>
+			<elseif>
+				<equals arg1="${imageOnLive}" arg2="true" />
+				<then>
+					<execute function="AssertElementPresent" locator1="WCD#WEB_CONTENT_CONTENT_IMAGE_ON_LIVE" />
+				</then>
+			</elseif>
 			<else>
 				<execute function="AssertTextEquals" locator1="WCD#WEB_CONTENT_CONTENT" value1="${webContentContent}" />
 			</else>
@@ -1652,7 +1739,7 @@
 	</command>
 
 	<command name="viewTranslationPGViaWCD">
-		<execute function="SelectFrame" locator1="IFrame#EDIT_ASSET" />
+		<execute function="SelectFrame" locator1="IFrame#MODAL_IFRAME" />
 
 		<if>
 			<isset var="structureLocalizationName" />
@@ -1681,7 +1768,7 @@
 			<then>
 				<var name="key_localizedLanguage" value="${webContentTranslationLanguage}" />
 
-				<execute function="AssertClick" locator1="Translation#AVAILABLE_TRANSLATION" value1="${webContentTranslationLanguage}" />
+				<execute function="Click" locator1="Translation#AVAILABLE_TRANSLATION" />
 
 				<if>
 					<isset var="localizedTitle" />
@@ -1728,7 +1815,7 @@
 
 		<execute function="AssertTextEquals" locator1="DDMField#TEXT_BOX" value1="${webContentTextBox}" />
 
-		<var name="key_translationLocale" value="es_ES" />
+		<var name="key_localizedLanguage" value="Spanish (Spain)" />
 
 		<execute function="Click" locator1="Translation#CURRENT_LOCALE" />
 

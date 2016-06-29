@@ -43,6 +43,8 @@ public interface WebKeys {
 
 	public static final String ASSET_RENDERER_FACTORY_CLASS_TYPE_ID = "ASSET_RENDERER_FACTORY_CLASS_TYPE_ID";
 
+	public static final String ASSET_RENDERER_FACTORY_GROUP = "ASSET_RENDERER_FACTORY_GROUP";
+
 	public static final String ASSET_TAG = "ASSET_TAG";
 
 	public static final String ASSET_VOCABULARIES = "ASSET_VOCABULARIES";
@@ -270,17 +272,7 @@ public interface WebKeys {
 
 	public static final String LAYOUTS = "LAYOUTS";
 
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #VISITED_GROUP_ID_PREVIOUS}
-	 */
-	@Deprecated
-	public static final String LIFERAY_SHARED_VISITED_GROUP_ID_PREVIOUS = "LIFERAY_SHARED_VISITED_GROUP_ID_PREVIOUS";
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #VISITED_GROUP_ID_RECENT}
-	 */
-	@Deprecated
-	public static final String LIFERAY_SHARED_VISITED_GROUP_ID_RECENT = "LIFERAY_SHARED_VISITED_GROUP_ID_RECENT";
+	public static final String LOCALE = "LOCALE";
 
 	public static final String LOGOUT = "LOGOUT";
 

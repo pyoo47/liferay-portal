@@ -55,7 +55,7 @@ public class WikiSocialActivityHelper {
 
 		long fileEntryId = extraDataJSONObject.getLong("fileEntryId");
 
-		FileEntry fileEntry = fetchFileEntry(fileEntryId);
+		FileEntry fileEntry = _fetchFileEntry(fileEntryId);
 
 		if (((type == SocialActivityConstants.TYPE_ADD_ATTACHMENT) ||
 			 (type == SocialActivityConstants.TYPE_MOVE_ATTACHMENT_TO_TRASH) ||
@@ -132,11 +132,19 @@ public class WikiSocialActivityHelper {
 				false);
 		}
 		else if (type == SocialActivityConstants.TYPE_ADD_COMMENT) {
-			String url = getPageURL(page) + "#wikiCommentsPanel";
+			LiferayPortletResponse liferayPortletResponse =
+				_wikiRequestHelper.getLiferayPortletResponse();
+
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(getPageURL(page));
+			sb.append("#");
+			sb.append(liferayPortletResponse.getNamespace());
+			sb.append("wikiCommentsPanel");
 
 			return LanguageUtil.format(
 				resourceBundle, "x-added-a-comment",
-				new Object[] {userName, url}, false);
+				new Object[] {userName, sb.toString()}, false);
 		}
 		else if ((type == SocialActivityConstants.TYPE_MOVE_TO_TRASH) ||
 				 (type == SocialActivityConstants.TYPE_RESTORE_FROM_TRASH) ||
@@ -247,7 +255,7 @@ public class WikiSocialActivityHelper {
 	}
 
 	protected String getDownloadURL(long fileEntryId) throws PortalException {
-		FileEntry fileEntry = fetchFileEntry(fileEntryId);
+		FileEntry fileEntry = _fetchFileEntry(fileEntryId);
 
 		if (fileEntry != null) {
 			return PortletFileRepositoryUtil.getDownloadPortletFileEntryURL(
@@ -313,7 +321,7 @@ public class WikiSocialActivityHelper {
 		return portletURL.toString();
 	}
 
-	private FileEntry fetchFileEntry(long fileEntryId) throws PortalException {
+	private FileEntry _fetchFileEntry(long fileEntryId) throws PortalException {
 		try {
 			return PortletFileRepositoryUtil.getPortletFileEntry(fileEntryId);
 		}

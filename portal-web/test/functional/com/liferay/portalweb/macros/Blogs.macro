@@ -44,12 +44,42 @@
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
-		<execute macro="BlogsNavigator#gotoSettings" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Categorization" />
+		</execute>
 
 		<execute macro="AssetCategorization#addCategory">
 			<var name="categoryName" value="${categoryName}" />
 			<var name="vocabularyName" value="${vocabularyName}" />
 		</execute>
+
+		<execute macro="PortletEntry#publish" />
+	</command>
+
+	<command name="addEntryWithCoverImageFromDMFolders">
+		<execute macro="BlogsNavigator#gotoAddEntry" />
+
+		<execute macro="BlogsEntry#addTitle">
+			<var name="entryTitle" value="${entryTitle}" />
+		</execute>
+
+		<execute macro="BlogsEntry#addEntryContent">
+			<var name="entryContent" value="${entryContent}" />
+			<var name="entrySubtitle" value="${entrySubtitle}" />
+			<var name="entryTitle" value="${entryTitle}" />
+		</execute>
+
+		<execute function="Click" locator1="BlogsEditEntry#COVER_IMAGE" />
+
+		<execute function="AssertClick" locator1="BlogsEntry#ENTRY_COVER_IMAGE_SELECT_FILE" value1="Select File" />
+
+		<execute macro="ItemSelector#selectDMImage">
+			<var name="dmFolderName" value="${dmFolderName}" />
+			<var name="dmSubFolderName" value="${dmSubFolderName}" />
+			<var name="imageFileName" value="${imageFileName}" />
+		</execute>
+
+		<execute function="Pause" locator1="1000" />
 
 		<execute macro="PortletEntry#publish" />
 	</command>
@@ -83,7 +113,9 @@
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
-		<execute macro="BlogsNavigator#gotoSettings" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Permissions" />
+		</execute>
 
 		<execute macro="BlogsEntry#entryAddPermissions">
 			<var name="viewableBy" value="${viewableBy}" />
@@ -101,7 +133,9 @@
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
-		<execute macro="BlogsNavigator#gotoSettings" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Categorization" />
+		</execute>
 
 		<execute macro="AssetCategorization#addTag">
 			<var name="tagName" value="${tagName}" />
@@ -119,7 +153,9 @@
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
-		<execute macro="BlogsNavigator#gotoSettings" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Categorization" />
+		</execute>
 
 		<for list="${tagNameList}" param="tagName">
 			<execute macro="AssetCategorization#addTag">
@@ -186,7 +222,9 @@
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
-		<execute function="Click" locator1="Button#COG" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Configuration" />
+		</execute>
 
 		<execute function="Click" locator1="Radio#CUSTOM_ABSTRACT" />
 
@@ -195,8 +233,6 @@
 		<execute function="Type#typeEditor" locator1="AlloyEditor#DESCRIPTION_FIELD" value1="${entryAbstractDescription}" />
 
 		<execute macro="PortletEntry#publish" />
-
-		<execute macro="Alert#viewSuccessMessage" />
 	</command>
 
 	<command name="addWithCustomAbstractImage">
@@ -208,7 +244,9 @@
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
-		<execute function="Click" locator1="Button#COG" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Configuration" />
+		</execute>
 
 		<execute function="Click" locator1="Radio#CUSTOM_ABSTRACT" />
 
@@ -233,7 +271,9 @@
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
-		<execute function="Click" locator1="Button#COG" />
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Configuration" />
+		</execute>
 
 		<execute function="AssertChecked" locator1="Radio#FIRST_400_ABSTRACT" value1="Use the first 400 characters of the entry content." />
 
@@ -306,9 +346,7 @@
 	</command>
 
 	<command name="disableSocialBookmarkSites">
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Blogs Page" />
 		</execute>
 
@@ -361,9 +399,7 @@
 	</command>
 
 	<command name="enableSocialBookmarkSites">
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Blogs Page" />
 		</execute>
 
@@ -407,9 +443,7 @@
 	</command>
 
 	<command name="tearDownConfigurationDisplaySettingsPG">
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
@@ -423,9 +457,7 @@
 	</command>
 
 	<command name="tearDownConfigurationScopePG">
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
@@ -466,9 +498,7 @@
 	</command>
 
 	<command name="tearDownSubscribePG">
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
@@ -501,7 +531,7 @@
 	<command name="viewNoPermissionPG">
 		<execute function="AssertTextEquals" locator1="BasePortlet#CONTROL_PANEL_TITLE" value1="Blogs" />
 		<execute function="AssertElementNotPresent" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
-		<execute function="AssertElementNotPresent" locator1="Button#PERMISSIONS" value1="Permissions" />
+		<execute function="AssertElementNotPresent" locator1="MenuItem#PERMISSIONS" value1="Permissions" />
 		<execute function="AssertElementNotPresent" locator1="Link#SUBSCRIBE" />
 		<execute function="AssertTextEquals" locator1="Link#RSS" value1="RSS" />
 	</command>

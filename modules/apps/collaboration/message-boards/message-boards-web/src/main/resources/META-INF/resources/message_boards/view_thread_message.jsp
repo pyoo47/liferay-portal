@@ -55,7 +55,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 				String userDisplayText = LanguageUtil.format(request, "x-modified-x-ago", new Object[] {messageUserName, modifiedDateDescription});
 				%>
 
-				<h5 class="text-default" title="<%= userDisplayText %>">
+				<h5 class="message-user-display text-default" title="<%= userDisplayText %>">
 					<%= userDisplayText %>
 				</h5>
 
@@ -366,7 +366,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 		}
 		%>
 
-		<div class="message-content">
+		<div class="card-row card-row-padded message-content">
 			<%= msgBody %>
 		</div>
 

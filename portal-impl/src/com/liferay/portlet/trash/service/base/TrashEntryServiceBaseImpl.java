@@ -471,7 +471,7 @@ public abstract class TrashEntryServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -482,7 +482,7 @@ public abstract class TrashEntryServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.trash.kernel.service.TrashEntryLocalService.class)
 	protected com.liferay.trash.kernel.service.TrashEntryLocalService trashEntryLocalService;
-	@BeanReference(type = com.liferay.trash.kernel.service.TrashEntryService.class)
+	@BeanReference(type = TrashEntryService.class)
 	protected TrashEntryService trashEntryService;
 	@BeanReference(type = TrashEntryPersistence.class)
 	protected TrashEntryPersistence trashEntryPersistence;

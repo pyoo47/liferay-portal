@@ -220,7 +220,7 @@ public abstract class ListTypeServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -231,7 +231,7 @@ public abstract class ListTypeServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.kernel.service.ListTypeLocalService.class)
 	protected com.liferay.portal.kernel.service.ListTypeLocalService listTypeLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.ListTypeService.class)
+	@BeanReference(type = ListTypeService.class)
 	protected ListTypeService listTypeService;
 	@BeanReference(type = ListTypePersistence.class)
 	protected ListTypePersistence listTypePersistence;

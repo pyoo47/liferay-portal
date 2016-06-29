@@ -300,7 +300,7 @@ public abstract class SocialActivitySettingServiceBaseImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -311,7 +311,7 @@ public abstract class SocialActivitySettingServiceBaseImpl
 
 	@BeanReference(type = com.liferay.social.kernel.service.SocialActivitySettingLocalService.class)
 	protected com.liferay.social.kernel.service.SocialActivitySettingLocalService socialActivitySettingLocalService;
-	@BeanReference(type = com.liferay.social.kernel.service.SocialActivitySettingService.class)
+	@BeanReference(type = SocialActivitySettingService.class)
 	protected SocialActivitySettingService socialActivitySettingService;
 	@BeanReference(type = SocialActivitySettingPersistence.class)
 	protected SocialActivitySettingPersistence socialActivitySettingPersistence;

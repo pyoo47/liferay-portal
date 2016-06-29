@@ -1,4 +1,5 @@
 <definition component-name="portal-collaboration">
+	<property name="portal.release" value="true" />
 	<property name="custom.properties" value="default.layout.template.id=1_column" />
 	<property name="testray.main.component.name" value="Message Boards" />
 
@@ -19,7 +20,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -61,7 +62,7 @@
 		<var name="categoryNameList" value="MB Category1 Name,MB Category2 Name,MB Category3 Name" />
 
 		<for list="${categoryNameList}" param="categoryName" >
-			<execute macro="Page#gotoPG">
+			<execute macro="Navigator#gotoPage">
 				<var name="pageName" value="${pageName}" />
 			</execute>
 
@@ -925,30 +926,15 @@
 	</command>
 
 	<command name="ViewDefaultEmailFromConfigurationAndSubscriptionEmail" priority="4">
-		<execute macro="ProductMenu#gotoControlPanelConfiguration">
-			<var name="portlet" value="Server Administration" />
-		</execute>
-
-		<execute macro="ServerAdministration#configureMailServerSettings">
-			<var method="TestPropsUtil#get('email.address.1')" name="userName" />
-			<var method="TestPropsUtil#get('email.password.1')" name="userPassword" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoControlPanelConfiguration">
-			<var name="portlet" value="Virtual Instances" />
-		</execute>
-
-		<execute macro="PortalInstances#editCP">
-			<var name="mailDomain" value="gmail.com" />
-			<var name="virtualHost" value="localhost" />
-		</execute>
+		<property name="custom.properties" value="message.boards.email.bulk=false" />
+		<property name="test.smtp.server.enabled" value="true" />
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
 			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
 		<execute macro="User#addCP">
-			<var method="TestPropsUtil#get('email.address.2')" name="userEmailAddress" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
 			<var name="userFirstName" value="userfn" />
 			<var name="userLastName" value="userln" />
 			<var name="userScreenName" value="usersn" />
@@ -959,7 +945,7 @@
 		</execute>
 
 		<execute macro="User#editPasswordCP">
-			<var method="TestPropsUtil#get('email.address.2')" name="userEmailAddress" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -986,7 +972,7 @@
 
 		<execute macro="User#loginPG">
 			<var name="password" value="test" />
-			<var method="TestPropsUtil#get('email.address.2')" name="userEmailAddress" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1019,43 +1005,38 @@
 			<var name="threadSubject" value="MB Thread Message Subject" />
 		</execute>
 
-		<execute function="Pause" locator1="30000" />
-
-		<execute macro="Gmail#login">
-			<var method="TestPropsUtil#get('email.address.2')" name="userEmailAddress" />
-			<var method="TestPropsUtil#get('email.password.2')" name="userPassword" />
+		<execute macro="MockMock#viewMail">
+			<var name="asset" value="MB Category Name" />
+			<var name="content" value="MB Category Name" />
+			<var name="recipient" value="Test Test" />
+			<var name="sender" value="Test Test" />
+			<var name="subject" value="MB Category Name" />
 		</execute>
 
-		<execute macro="Gmail#gotoHtmlMode" />
-
-		<execute macro="Gmail#viewMail">
-			<var name="emailFromUserName" value="Test Test" />
-			<var name="gmailAssetType" value="MB Category Name New Message" />
-			<var name="gmailMailTableMessageTitle" value="MB Thread Message Subject" />
-			<var name="gmailMessageBody" value="MB Thread Message Body Liferay Message Boards" />
-			<var name="gmailMessageBodyClosing" value="MB Thread Message Body Liferay Message Boards" />
-			<var name="gmailMessageBodyGreeting" value="MB Thread Message Body Liferay Message Boards" />
-			<var name="gmailMessageTitle" value="MB Category Name New Message: MB Thread Message Subject" />
+		<execute macro="MockMock#viewMail">
+			<var name="asset" value="MB Category Name" />
+			<var name="content" value="MB Category Name" />
+			<var name="recipient" value="userfn userln" />
+			<var name="sender" value="Test Test" />
+			<var name="subject" value="MB Category Name" />
 		</execute>
-
-		<execute macro="Gmail#tearDown">
-			<var method="TestPropsUtil#get('email.address.2')" name="userEmailAddress" />
-			<var method="TestPropsUtil#get('email.password.2')" name="userPassword" />
-		</execute>
-
-		<execute function="Open" locator1="http://localhost:8080" />
 	</command>
 
 	<command name="ViewMBThreadAndReplyThreadInGmail" priority="4">
-		<property name="custom.properties" value="pop.server.notifications.enabled=true{line.separator}pop.server.subdomain=" />
+		<property name="custom.properties" value="message.boards.message.formats.default=html${line.separator}pop.server.notifications.enabled=true${line.separator}pop.server.subdomain=${line.separator}mail.session.mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory${line.separator}mail.session.mail.pop3.socketFactory.class=javax.net.ssl.SSLSocketFactory" />
 
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
 			<var name="portlet" value="Server Administration" />
 		</execute>
 
 		<execute macro="ServerAdministration#configureMailServerSettings">
+			<var name="needsReply" value="true" />
 			<var method="TestPropsUtil#get('email.address.1')" name="userName" />
 			<var method="TestPropsUtil#get('email.password.1')" name="userPassword" />
+		</execute>
+
+		<execute macro="Navigator#gotoPage">
+			<var name="pageName" value="Message Boards Page" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
@@ -1172,6 +1153,10 @@
 
 		<execute function="Pause" locator1="60000" />
 
+		<execute function="Refresh" />
+
+		<execute function="AssertVisible" locator1="Notifications#PROFILE_BADGE_COUNT" />
+
 		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
 		</execute>
@@ -1180,24 +1165,13 @@
 			<var name="categoryName" value="MB Category Name" />
 		</execute>
 
-		<var name="key_threadSubject" value="MB Thread Message Subject" />
-
-		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_LIST_THREAD" value1="MB Thread Message Subject" />
-		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_LIST_LAST_POST" value1="Test Test" />
-		<execute function="AssertTextEquals" locator1="MessageBoards#THREAD_TABLE_POSTS" value1="2 Posts" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="MessageBoards#THREAD_TABLE_LAST_POST" value1="userfn userln" />
-		<execute function="Click" locator1="MessageBoards#THREAD_LIST_THREAD" value1="MB Thread Message Subject" />
-
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#THREAD_TABLE_SUBJECT_1" value1="MB Thread Message Subject" />
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#THREAD_TABLE_SUBJECT_2" value1="RE: MB Thread Message Subject" />
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#MESSAGE_SUBJECT_1" value1="MB Thread Message Subject" />
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#MESSAGE_BODY_1" value1="MB Thread Message Body" />
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#MESSAGE_USERNAME_1" value1="Test Test" />
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#MESSAGE_RATING_1" value1="0 (0 Votes)" />
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#MESSAGE_SUBJECT_2" value1="RE: MB Thread Message Subject" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="MessageBoardsThread#MESSAGE_BODY_2" value1="MB Thread Message Subject Reply" />
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#MESSAGE_USERNAME_2" value1="userfn userln" />
-		<execute function="AssertTextEquals" locator1="MessageBoardsThread#MESSAGE_RATING_2" value1="0 (0 Votes)" />
+		<execute macro="MessageboardsThread#viewReplyPG">
+			<var name="postCount" value="2" />
+			<var name="threadBody" value="MB Thread Message Body" />
+			<var name="threadReplyBody" value="MB Thread Message Subject Reply" />
+			<var name="threadSubject" value="MB Thread Message Subject" />
+			<var name="userName" value="userfn userln" />
+		</execute>
 
 		<execute macro="Gmail#tearDown">
 			<var method="TestPropsUtil#get('email.address.2')" name="userEmailAddress" />
@@ -1210,7 +1184,7 @@
 	<command name="ViewMBThreadReplyViaMoreMessages" priority="4">
 		<property name="custom.properties" value="discussion.comments.delta.value=5" />
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
@@ -1219,7 +1193,7 @@
 			<var name="threadSubject" value="Message Boards Thread Subject" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
@@ -1231,7 +1205,7 @@
 				<var name="threadSubject" value="Message Boards Thread Subject" />
 			</execute>
 
-			<execute macro="Page#gotoPG">
+			<execute macro="Navigator#gotoPage">
 				<var name="pageName" value="${pageName}" />
 			</execute>
 		</for>

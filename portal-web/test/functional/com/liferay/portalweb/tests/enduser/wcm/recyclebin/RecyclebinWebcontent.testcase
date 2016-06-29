@@ -1,4 +1,5 @@
 <definition component-name="portal-wcm">
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Recycle Bin" />
 
 	<set-up>
@@ -556,7 +557,6 @@
 		</execute>
 
 		<execute macro="RecycleBin#viewEntry">
-			<var name="assetContent" value="WC Web Content Content" />
 			<var name="assetName" value="WC WebContent Title" />
 		</execute>
 	</command>

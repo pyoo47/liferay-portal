@@ -1,4 +1,5 @@
 <definition component-name="portal-user-management-and-portal-configuration">
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Portal Instances" />
 
 	<set-up>
@@ -58,7 +59,6 @@
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="page" value="Public Pages" />
 			<var name="pageName" value="landing" />
 			<var name="siteName" value="${siteName}" />
 		</execute>
@@ -146,8 +146,8 @@
 			<var name="virtualHostsURL" value="http://www.baker.com:8080" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="virtualHostsURL" value="${otherInstanceAccessAttempt}" />
+		<execute macro="Navigator#openSpecificURL">
+			<var name="url" value="${otherInstanceAccessAttempt}" />
 		</execute>
 
 		<execute macro="Alert#viewRequestFailedToComplete" />
@@ -232,18 +232,18 @@
 			<var name="pageName" value="Web Content Page" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSpecificURLPage">
 			<var name="pageName" value="Web Content Page" />
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Web Content Display" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSpecificURLPage">
 			<var name="pageName" value="Web Content Page" />
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -262,8 +262,8 @@
 			<var name="virtualHost" value="www.able.com" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="virtualHostsURL" value="http://www.able.com:8080" />
+		<execute macro="Navigator#openSpecificURL">
+			<var name="url" value="http://www.able.com:8080" />
 		</execute>
 
 		<execute function="AssertTextEquals" locator1="Home#STATUS_MESSAGE" value1="This instance is inactive. Please contact the administrator." />
@@ -307,7 +307,6 @@
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="page" value="Public Pages" />
 			<var name="pageName" value="Public Page" />
 		</execute>
 
@@ -320,18 +319,18 @@
 			<var name="sitePagePrivacy" value="Private Pages" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="virtualHostsURL" value="http://www.charlie.com:8080" />
+		<execute macro="Navigator#openSpecificURL">
+			<var name="url" value="http://www.charlie.com:8080" />
 		</execute>
 
 		<var name="key_pageName" value="Welcome" />
 
 		<execute function="AssertElementPresent" locator1="Home#PAGE" value1="Welcome" />
 
-		<execute macro="User#loginUserPG">
+		<execute macro="User#loginPG">
 			<var name="password" value="test" />
+			<var name="specificURL" value="http://www.charlie.com:8080/group/guest" />
 			<var name="userEmailAddress" value="test@liferay.com" />
-			<var name="virtualHostsURL" value="http://www.charlie.com:8080/group/guest" />
 		</execute>
 
 		<var name="key_pageName" value="Private Page" />

@@ -14,21 +14,24 @@
 
 package com.liferay.portal.kernel.util;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.util.regex.Pattern;
 
 /**
  * @author Julio Camarero
  */
+@ProviderType
 public interface FriendlyURLNormalizer {
 
 	public String normalize(String friendlyURL);
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #normalize(String, Pattern)}
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
-	public String normalize(String friendlyURL, char[] replaceChars);
-
 	public String normalize(String friendlyURL, Pattern friendlyURLPattern);
+
+	public String normalizeWithPeriodsAndSlashes(String friendlyURL);
 
 }

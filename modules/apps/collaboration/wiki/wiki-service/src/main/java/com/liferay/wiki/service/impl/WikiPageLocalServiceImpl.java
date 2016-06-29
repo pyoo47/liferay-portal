@@ -69,12 +69,15 @@ import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.util.LayoutURLUtil;
 import com.liferay.social.kernel.model.SocialActivityConstants;
+import com.liferay.trash.kernel.exception.RestoreEntryException;
+import com.liferay.trash.kernel.exception.TrashEntryException;
 import com.liferay.trash.kernel.model.TrashEntry;
 import com.liferay.trash.kernel.model.TrashVersion;
 import com.liferay.trash.kernel.util.TrashUtil;
@@ -98,8 +101,8 @@ import com.liferay.wiki.model.impl.WikiPageDisplayImpl;
 import com.liferay.wiki.model.impl.WikiPageImpl;
 import com.liferay.wiki.service.base.WikiPageLocalServiceBaseImpl;
 import com.liferay.wiki.social.WikiActivityKeys;
+import com.liferay.wiki.util.WikiCacheHelper;
 import com.liferay.wiki.util.WikiCacheThreadLocal;
-import com.liferay.wiki.util.WikiCacheUtil;
 import com.liferay.wiki.util.WikiUtil;
 import com.liferay.wiki.util.comparator.PageCreateDateComparator;
 import com.liferay.wiki.util.comparator.PageVersionComparator;
@@ -119,6 +122,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.portlet.PortletRequest;
@@ -1111,7 +1115,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		Map<String, WikiPage> pages = new LinkedHashMap<>();
 
-		Map<String, Boolean> links = WikiCacheUtil.getOutgoingLinks(
+		Map<String, Boolean> links = wikiCacheHelper.getOutgoingLinks(
 			page, wikiEngineRenderer);
 
 		for (Map.Entry<String, Boolean> entry : links.entrySet()) {
@@ -1253,6 +1257,31 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			page.getUserId(), page.getNodeId(), page.getTitle(),
 			page.getVersion(), page.getContent(), formattedContent,
 			page.getFormat(), page.getHead(), page.getAttachmentsFileEntries());
+	}
+
+	@Override
+	public WikiPageDisplay getPageDisplay(
+			WikiPage page, PortletURL viewPageURL, PortletURL editPageURL,
+			String attachmentURLPrefix, ServiceContext serviceContext)
+		throws PortalException {
+
+		HttpServletRequest request = serviceContext.getRequest();
+
+		boolean workflowAssetPreview = false;
+
+		if (request != null) {
+			workflowAssetPreview = (Boolean)request.getAttribute(
+				WebKeys.WORKFLOW_ASSET_PREVIEW);
+		}
+
+		if (!workflowAssetPreview && page.isApproved()) {
+			return wikiCacheHelper.getDisplay(
+				page.getNodeId(), page.getTitle(), viewPageURL, editPageURL,
+				attachmentURLPrefix);
+		}
+
+		return getPageDisplay(
+			page, viewPageURL, editPageURL, attachmentURLPrefix);
 	}
 
 	@Override
@@ -1541,6 +1570,11 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		WikiPage page = getPage(nodeId, title);
 
+		if (!page.isInTrash()) {
+			throw new RestoreEntryException(
+				RestoreEntryException.INVALID_STATUS);
+		}
+
 		if (page.isInTrashExplicitly()) {
 			movePageFromTrash(userId, page, newNodeId, newParentTitle);
 		}
@@ -1592,6 +1626,10 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	@Override
 	public WikiPage movePageToTrash(long userId, WikiPage page)
 		throws PortalException {
+
+		if (page.isInTrash()) {
+			throw new TrashEntryException();
+		}
 
 		// Page
 
@@ -1800,6 +1838,11 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	public void restorePageFromTrash(long userId, WikiPage page)
 		throws PortalException {
 
+		if (!page.isInTrash()) {
+			throw new RestoreEntryException(
+				RestoreEntryException.INVALID_STATUS);
+		}
+
 		if (page.isInTrashExplicitly()) {
 			movePageFromTrash(
 				userId, page, page.getNodeId(), page.getParentTitle());
@@ -1870,23 +1913,29 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		AssetEntry assetEntry = null;
 
+		Date publishDate = null;
+
 		if (addDraftAssetEntry) {
 			assetEntry = assetEntryLocalService.updateEntry(
 				userId, page.getGroupId(), page.getCreateDate(),
 				page.getModifiedDate(), WikiPage.class.getName(),
 				page.getPrimaryKey(), page.getUuid(), 0, assetCategoryIds,
-				assetTagNames, true, false, null, null, null,
+				assetTagNames, true, false, null, null, publishDate, null,
 				ContentTypes.TEXT_HTML, page.getTitle(), null, null, null, null,
 				0, 0, priority);
 		}
 		else {
+			if (page.isApproved()) {
+				publishDate = page.getCreateDate();
+			}
+
 			assetEntry = assetEntryLocalService.updateEntry(
 				userId, page.getGroupId(), page.getCreateDate(),
 				page.getModifiedDate(), WikiPage.class.getName(),
 				page.getResourcePrimKey(), page.getUuid(), 0, assetCategoryIds,
-				assetTagNames, true, page.isApproved(), null, null, null,
-				ContentTypes.TEXT_HTML, page.getTitle(), null, null, null, null,
-				0, 0, priority);
+				assetTagNames, true, page.isApproved(), null, null, publishDate,
+				null, ContentTypes.TEXT_HTML, page.getTitle(), null, null, null,
+				null, 0, 0, priority);
 		}
 
 		assetLinkLocalService.updateLinks(
@@ -2018,7 +2067,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 					List<AssetLink> assetLinks =
 						assetLinkLocalService.getDirectLinks(
 							draftAssetEntry.getEntryId(),
-							AssetLinkConstants.TYPE_RELATED);
+							AssetLinkConstants.TYPE_RELATED, false);
 
 					long[] assetLinkEntryIds = ListUtil.toLongArray(
 						assetLinks, AssetLink.ENTRY_ID2_ACCESSOR);
@@ -2028,8 +2077,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 						page.getModifiedDate(), WikiPage.class.getName(),
 						page.getResourcePrimKey(), page.getUuid(), 0,
 						assetCategoryIds, assetTagNames, true, true, null, null,
-						null, ContentTypes.TEXT_HTML, page.getTitle(), null,
-						null, null, null, 0, 0, null);
+						page.getCreateDate(), null, ContentTypes.TEXT_HTML,
+						page.getTitle(), null, null, null, null, 0, 0, null);
 
 					// Asset Links
 
@@ -2160,7 +2209,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			return;
 		}
 
-		WikiCacheUtil.clearCache(page.getNodeId());
+		wikiCacheHelper.clearCache(page.getNodeId());
 	}
 
 	protected void deletePageAttachment(long fileEntryId)
@@ -2383,7 +2432,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	protected boolean isLinkedTo(WikiPage page, String targetTitle)
 		throws PortalException {
 
-		Map<String, Boolean> links = WikiCacheUtil.getOutgoingLinks(
+		Map<String, Boolean> links = wikiCacheHelper.getOutgoingLinks(
 			page, wikiEngineRenderer);
 
 		Boolean link = links.get(StringUtil.toLowerCase(targetTitle));
@@ -2707,7 +2756,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		// Cache
 
 		if (WikiCacheThreadLocal.isClearCache()) {
-			WikiCacheUtil.clearCache(page.getNodeId());
+			wikiCacheHelper.clearCache(page.getNodeId());
 		}
 
 		// Workflow
@@ -2911,7 +2960,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		String pageContent = null;
 
-		if (Validator.equals(page.getFormat(), "creole")) {
+		if (Objects.equals(page.getFormat(), "creole")) {
 			pageContent = wikiEngineRenderer.convert(
 				page, null, null, attachmentURLPrefix);
 		}
@@ -2988,7 +3037,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		int notificationType =
 			UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY;
 
-		if (serviceContext.isCommandUpdate()) {
+		if (update) {
 			notificationType =
 				UserNotificationDefinition.NOTIFICATION_TYPE_UPDATE_ENTRY;
 		}
@@ -3197,6 +3246,9 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 	@ServiceReference(type = ConfigurationProvider.class)
 	protected ConfigurationProvider configurationProvider;
+
+	@ServiceReference(type = WikiCacheHelper.class)
+	protected WikiCacheHelper wikiCacheHelper;
 
 	@ServiceReference(type = WikiEngineRenderer.class)
 	protected WikiEngineRenderer wikiEngineRenderer;

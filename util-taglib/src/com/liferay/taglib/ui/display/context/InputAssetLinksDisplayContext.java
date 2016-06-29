@@ -163,9 +163,10 @@ public class InputAssetLinksDisplayContext {
 			return _randomNamespace;
 		}
 
-		_randomNamespace = PortalUtil.generateRandomKey(
-			_request, "taglib_ui_input_asset_links_page") +
-				StringPool.UNDERLINE;
+		String randomKey = PortalUtil.generateRandomKey(
+			_request, "taglib_ui_input_asset_links_page");
+
+		_randomNamespace = randomKey + StringPool.UNDERLINE;
 
 		return _randomNamespace;
 	}
@@ -210,7 +211,7 @@ public class InputAssetLinksDisplayContext {
 			SessionErrors.isEmpty(_portletRequest) && (_assetEntryId > 0)) {
 
 			List<AssetLink> directAssetLinks =
-				AssetLinkLocalServiceUtil.getDirectLinks(_assetEntryId);
+				AssetLinkLocalServiceUtil.getDirectLinks(_assetEntryId, false);
 
 			for (AssetLink assetLink : directAssetLinks) {
 				AssetEntry assetLinkEntry = getAssetLinkEntry(assetLink);
@@ -263,9 +264,12 @@ public class InputAssetLinksDisplayContext {
 
 		Map<String, Object> selectorEntryData = new HashMap<>();
 
-		selectorEntryData.put(
-			"href",
-			_getAssetBrowserPortletURL(assetRendererFactory).toString());
+		PortletURL assetBrowserPortletURL = _getAssetBrowserPortletURL(
+			assetRendererFactory);
+
+		if (assetBrowserPortletURL != null) {
+			selectorEntryData.put("href", assetBrowserPortletURL.toString());
+		}
 
 		ResourceBundle resourceBundle = TagResourceBundleUtil.getResourceBundle(
 			_pageContext);
@@ -308,6 +312,10 @@ public class InputAssetLinksDisplayContext {
 		PortletURL portletURL = PortletProviderUtil.getPortletURL(
 			_request, assetRendererFactory.getClassName(),
 			PortletProvider.Action.BROWSE);
+
+		if (portletURL == null) {
+			return portletURL;
+		}
 
 		long groupId = _getAssetBrowserGroupId(assetRendererFactory);
 
@@ -381,10 +389,13 @@ public class InputAssetLinksDisplayContext {
 		PortletURL portletURL = _getAssetBrowserPortletURL(
 			assetRendererFactory);
 
-		portletURL.setParameter(
-			"subtypeSelectionId", String.valueOf(classType.getClassTypeId()));
+		if (portletURL != null) {
+			portletURL.setParameter(
+				"subtypeSelectionId",
+				String.valueOf(classType.getClassTypeId()));
 
-		selectorEntryData.put("href", portletURL.toString());
+			selectorEntryData.put("href", portletURL.toString());
+		}
 
 		ResourceBundle resourceBundle = TagResourceBundleUtil.getResourceBundle(
 			_pageContext);

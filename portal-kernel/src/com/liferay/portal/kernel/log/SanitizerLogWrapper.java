@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.log;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 
@@ -234,7 +233,7 @@ public class SanitizerLogWrapper extends LogWrapper {
 
 			if (escapeHTML) {
 				sanitizedMessage = StringUtil.replace(
-					sanitizedMessage, StringPool.LESS_THAN, _LESS_THAN_ESCAPED);
+					sanitizedMessage, CharPool.LESS_THAN, _LESS_THAN_ESCAPED);
 			}
 
 			if (sanitized) {
@@ -302,7 +301,7 @@ public class SanitizerLogWrapper extends LogWrapper {
 	private static final boolean _LOG_SANITIZER_ENABLED = GetterUtil.getBoolean(
 		SystemProperties.get(PropsKeys.LOG_SANITIZER_ENABLED));
 
-	private static boolean _LOG_SANITIZER_ESCAPE_HTML_ENABLED = false;
+	private static boolean _LOG_SANITIZER_ESCAPE_HTML_ENABLED;
 
 	private static char _LOG_SANITIZER_REPLACEMENT_CHARACTER =
 		CharPool.UNDERLINE;

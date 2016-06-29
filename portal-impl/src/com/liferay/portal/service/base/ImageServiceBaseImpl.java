@@ -240,7 +240,7 @@ public abstract class ImageServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -251,7 +251,7 @@ public abstract class ImageServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.kernel.service.ImageLocalService.class)
 	protected com.liferay.portal.kernel.service.ImageLocalService imageLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.ImageService.class)
+	@BeanReference(type = ImageService.class)
 	protected ImageService imageService;
 	@BeanReference(type = ImagePersistence.class)
 	protected ImagePersistence imagePersistence;

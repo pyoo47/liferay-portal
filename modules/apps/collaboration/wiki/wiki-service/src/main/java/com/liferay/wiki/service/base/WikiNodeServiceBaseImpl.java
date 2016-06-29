@@ -647,7 +647,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -658,7 +658,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.wiki.service.WikiNodeLocalService.class)
 	protected com.liferay.wiki.service.WikiNodeLocalService wikiNodeLocalService;
-	@BeanReference(type = com.liferay.wiki.service.WikiNodeService.class)
+	@BeanReference(type = WikiNodeService.class)
 	protected WikiNodeService wikiNodeService;
 	@BeanReference(type = WikiNodePersistence.class)
 	protected WikiNodePersistence wikiNodePersistence;

@@ -91,7 +91,7 @@ public class PagesChecker extends EmptyOnClickRowChecker {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(5);
 
 		sb.append("['");
 		sb.append(_liferayPortletResponse.getNamespace());
@@ -103,8 +103,8 @@ public class PagesChecker extends EmptyOnClickRowChecker {
 
 		return getRowCheckBox(
 			request, checked, disabled,
-			_liferayPortletResponse.getNamespace() + RowChecker.ROW_IDS +
-				name + "",
+			_liferayPortletResponse.getNamespace() + RowChecker.ROW_IDS + name +
+				"",
 			page.getTitle(), checkBoxRowIds, "'#" + getAllRowIds() + "'",
 			StringPool.BLANK);
 	}

@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.mobile.device;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.util.StringBundler;
 
 /**
@@ -22,20 +24,12 @@ import com.liferay.portal.kernel.util.StringBundler;
  * @author Milen Dyankov
  * @author Michael C. Han
  */
+@ProviderType
 public abstract class AbstractDevice implements Device {
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getScreenResolution()}
-	 */
-	@Deprecated
-	@Override
-	public Dimensions getScreenSize() {
-		return getScreenResolution();
-	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{brand=");
 		sb.append(getBrand());
@@ -43,8 +37,6 @@ public abstract class AbstractDevice implements Device {
 		sb.append(getBrowser());
 		sb.append(", browserVersion=");
 		sb.append(getBrowserVersion());
-		sb.append(", capabilities=");
-		sb.append(getCapabilities());
 		sb.append(", model=");
 		sb.append(getModel());
 		sb.append(", os=");

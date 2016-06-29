@@ -336,7 +336,7 @@ public abstract class AppServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -347,7 +347,7 @@ public abstract class AppServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.marketplace.service.AppLocalService.class)
 	protected com.liferay.marketplace.service.AppLocalService appLocalService;
-	@BeanReference(type = com.liferay.marketplace.service.AppService.class)
+	@BeanReference(type = AppService.class)
 	protected AppService appService;
 	@BeanReference(type = AppPersistence.class)
 	protected AppPersistence appPersistence;
