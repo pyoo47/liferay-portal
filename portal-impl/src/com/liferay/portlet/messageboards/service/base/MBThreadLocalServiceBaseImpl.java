@@ -271,7 +271,7 @@ public abstract class MBThreadLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public ActionableDynamicQuery getActionableDynamicQuery() {
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(com.liferay.message.boards.kernel.service.MBThreadLocalServiceUtil.getService());
+		actionableDynamicQuery.setBaseLocalService(mbThreadLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(MBThread.class);
 
@@ -284,7 +284,7 @@ public abstract class MBThreadLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.message.boards.kernel.service.MBThreadLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setBaseLocalService(mbThreadLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(MBThread.class);
 
@@ -295,7 +295,7 @@ public abstract class MBThreadLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(com.liferay.message.boards.kernel.service.MBThreadLocalServiceUtil.getService());
+		actionableDynamicQuery.setBaseLocalService(mbThreadLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(MBThread.class);
 
@@ -1177,7 +1177,7 @@ public abstract class MBThreadLocalServiceBaseImpl extends BaseLocalServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -1186,7 +1186,7 @@ public abstract class MBThreadLocalServiceBaseImpl extends BaseLocalServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.message.boards.kernel.service.MBThreadLocalService.class)
+	@BeanReference(type = MBThreadLocalService.class)
 	protected MBThreadLocalService mbThreadLocalService;
 	@BeanReference(type = MBThreadPersistence.class)
 	protected MBThreadPersistence mbThreadPersistence;

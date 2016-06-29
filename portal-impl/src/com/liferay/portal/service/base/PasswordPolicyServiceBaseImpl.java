@@ -376,7 +376,7 @@ public abstract class PasswordPolicyServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -387,7 +387,7 @@ public abstract class PasswordPolicyServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.kernel.service.PasswordPolicyLocalService.class)
 	protected com.liferay.portal.kernel.service.PasswordPolicyLocalService passwordPolicyLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.PasswordPolicyService.class)
+	@BeanReference(type = PasswordPolicyService.class)
 	protected PasswordPolicyService passwordPolicyService;
 	@BeanReference(type = PasswordPolicyPersistence.class)
 	protected PasswordPolicyPersistence passwordPolicyPersistence;

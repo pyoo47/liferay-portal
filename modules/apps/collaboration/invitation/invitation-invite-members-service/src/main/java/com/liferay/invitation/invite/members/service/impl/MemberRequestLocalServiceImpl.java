@@ -16,11 +16,11 @@ package com.liferay.invitation.invite.members.service.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.invitation.invite.members.constants.InviteMembersConstants;
 import com.liferay.invitation.invite.members.exception.MemberRequestAlreadyUsedException;
 import com.liferay.invitation.invite.members.exception.MemberRequestInvalidUserException;
 import com.liferay.invitation.invite.members.model.MemberRequest;
 import com.liferay.invitation.invite.members.service.base.MemberRequestLocalServiceBaseImpl;
-import com.liferay.invitation.invite.members.util.InviteMembersConstants;
 import com.liferay.mail.kernel.model.MailMessage;
 import com.liferay.mail.kernel.service.MailService;
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -433,7 +433,6 @@ public class MemberRequestLocalServiceImpl
 			JSONObject notificationEventJSONObject =
 				JSONFactoryUtil.createJSONObject();
 
-			notificationEventJSONObject.put("actionRequired", true);
 			notificationEventJSONObject.put(
 				"classPK", memberRequest.getMemberRequestId());
 			notificationEventJSONObject.put(
@@ -445,9 +444,11 @@ public class MemberRequestLocalServiceImpl
 					notificationEventJSONObject);
 
 			notificationEvent.setDeliveryRequired(0);
+			notificationEvent.setDeliveryType(
+				UserNotificationDeliveryConstants.TYPE_WEBSITE);
 
 			userNotificationEventLocalService.addUserNotificationEvent(
-				memberRequest.getReceiverUserId(), notificationEvent);
+				memberRequest.getReceiverUserId(), true, notificationEvent);
 		}
 	}
 

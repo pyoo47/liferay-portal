@@ -1035,7 +1035,7 @@ public abstract class BlogsEntryServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -1046,7 +1046,7 @@ public abstract class BlogsEntryServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.blogs.kernel.service.BlogsEntryLocalService.class)
 	protected com.liferay.blogs.kernel.service.BlogsEntryLocalService blogsEntryLocalService;
-	@BeanReference(type = com.liferay.blogs.kernel.service.BlogsEntryService.class)
+	@BeanReference(type = BlogsEntryService.class)
 	protected BlogsEntryService blogsEntryService;
 	@BeanReference(type = BlogsEntryPersistence.class)
 	protected BlogsEntryPersistence blogsEntryPersistence;

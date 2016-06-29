@@ -47,22 +47,6 @@ import java.util.List;
 public class UserPermissionImpl
 	implements BaseModelPermissionChecker, UserPermission {
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #check(PermissionChecker,
-	 *             long, long[], String)}
-	 */
-	@Deprecated
-	@Override
-	public void check(
-			PermissionChecker permissionChecker, long userId,
-			long organizationId, long locationId, String actionId)
-		throws PrincipalException {
-
-		check(
-			permissionChecker, userId, new long[] {organizationId, locationId},
-			actionId);
-	}
-
 	@Override
 	public void check(
 			PermissionChecker permissionChecker, long userId,
@@ -106,21 +90,6 @@ public class UserPermissionImpl
 		check(permissionChecker, primaryKey, organizationsIds, actionId);
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #contains(PermissionChecker,
-	 *             long, long[], String)}
-	 */
-	@Deprecated
-	@Override
-	public boolean contains(
-		PermissionChecker permissionChecker, long userId, long organizationId,
-		long locationId, String actionId) {
-
-		return contains(
-			permissionChecker, userId, new long[] {organizationId, locationId},
-			actionId);
-	}
-
 	@Override
 	public boolean contains(
 		PermissionChecker permissionChecker, long userId,
@@ -154,12 +123,20 @@ public class UserPermissionImpl
 
 					return true;
 				}
+
+				if (permissionChecker.hasPermission(
+						0, User.class.getName(), userId, actionId)) {
+
+					return true;
+				}
 			}
+			else {
+				if (permissionChecker.hasPermission(
+						0, User.class.getName(), User.class.getName(),
+						actionId)) {
 
-			if (permissionChecker.hasPermission(
-					0, User.class.getName(), userId, actionId)) {
-
-				return true;
+					return true;
+				}
 			}
 
 			if (user == null) {

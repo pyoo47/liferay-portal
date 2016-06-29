@@ -491,7 +491,7 @@ public abstract class AssetVocabularyServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -502,7 +502,7 @@ public abstract class AssetVocabularyServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.asset.kernel.service.AssetVocabularyLocalService.class)
 	protected com.liferay.asset.kernel.service.AssetVocabularyLocalService assetVocabularyLocalService;
-	@BeanReference(type = com.liferay.asset.kernel.service.AssetVocabularyService.class)
+	@BeanReference(type = AssetVocabularyService.class)
 	protected AssetVocabularyService assetVocabularyService;
 	@BeanReference(type = AssetVocabularyPersistence.class)
 	protected AssetVocabularyPersistence assetVocabularyPersistence;

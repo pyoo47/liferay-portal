@@ -354,7 +354,7 @@ public abstract class EmailAddressServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -365,7 +365,7 @@ public abstract class EmailAddressServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.kernel.service.EmailAddressLocalService.class)
 	protected com.liferay.portal.kernel.service.EmailAddressLocalService emailAddressLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.EmailAddressService.class)
+	@BeanReference(type = EmailAddressService.class)
 	protected EmailAddressService emailAddressService;
 	@BeanReference(type = EmailAddressPersistence.class)
 	protected EmailAddressPersistence emailAddressPersistence;

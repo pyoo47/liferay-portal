@@ -14,13 +14,12 @@
 
 package com.liferay.document.library.repository.cmis.internal;
 
-import aQute.bnd.annotation.metatype.Configurable;
-
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.document.library.kernel.service.DLAppHelperLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.repository.cmis.configuration.CMISRepositoryConfiguration;
 import com.liferay.document.library.repository.cmis.internal.constants.CMISRepositoryConstants;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -40,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"repository.targetClassName=" + CMISRepositoryConstants.CMIS_ATOMPUB_REPOSITORY_CLASSNAME
+		"repository.target.class.name=" + CMISRepositoryConstants.CMIS_ATOMPUB_REPOSITORY_CLASSNAME
 	},
 	service = RepositoryFactory.class
 )
@@ -50,7 +49,7 @@ public class CMISAtomPubRepositoryFactory
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		CMISRepositoryConfiguration cmisRepositoryConfiguration =
-			Configurable.createConfigurable(
+			ConfigurableUtil.createConfigurable(
 				CMISRepositoryConfiguration.class, properties);
 
 		super.setCMISRepositoryConfiguration(cmisRepositoryConfiguration);
@@ -67,6 +66,12 @@ public class CMISAtomPubRepositoryFactory
 		AssetEntryLocalService assetEntryLocalService) {
 
 		super.setAssetEntryLocalService(assetEntryLocalService);
+	}
+
+	@Override
+	@Reference(unbind = "-")
+	protected void setCMISSessionCache(CMISSessionCache cmisSessionCache) {
+		super.setCMISSessionCache(cmisSessionCache);
 	}
 
 	@Override

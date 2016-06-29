@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.nio.charset.CharsetEncoderUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -204,66 +205,6 @@ public class ServletResponseUtil {
 		sendFile(request, response, fileName, inputStream, 0, contentType);
 	}
 
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public static void sendFile(
-			HttpServletResponse response, String fileName, byte[] bytes)
-		throws IOException {
-
-		sendFile(null, response, fileName, bytes);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public static void sendFile(
-			HttpServletResponse response, String fileName, byte[] bytes,
-			String contentType)
-		throws IOException {
-
-		sendFile(null, response, fileName, bytes, contentType);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public static void sendFile(
-			HttpServletResponse response, String fileName,
-			InputStream inputStream)
-		throws IOException {
-
-		sendFile(null, response, fileName, inputStream);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public static void sendFile(
-			HttpServletResponse response, String fileName,
-			InputStream inputStream, int contentLength, String contentType)
-		throws IOException {
-
-		sendFile(
-			null, response, fileName, inputStream, contentLength, contentType);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public static void sendFile(
-			HttpServletResponse response, String fileName,
-			InputStream inputStream, String contentType)
-		throws IOException {
-
-		sendFile(null, response, fileName, inputStream, contentType);
-	}
-
 	public static void sendFileWithRangeHeader(
 			HttpServletRequest request, HttpServletResponse response,
 			String fileName, InputStream inputStream, long contentLength,
@@ -283,9 +224,7 @@ public class ServletResponseUtil {
 			ranges = getRanges(request, response, contentLength);
 		}
 		catch (IOException ioe) {
-			if (_log.isErrorEnabled()) {
-				_log.error(ioe);
-			}
+			_log.error(ioe);
 
 			response.setHeader(
 				HttpHeaders.CONTENT_RANGE, "bytes */" + contentLength);
@@ -703,6 +642,12 @@ public class ServletResponseUtil {
 		// LEP-2201
 
 		if (Validator.isNotNull(contentType)) {
+			if (contentType.equals(ContentTypes.IMAGE_X_MS_BMP) &&
+				BrowserSnifferUtil.isIe(request)) {
+
+				contentType = ContentTypes.IMAGE_BMP;
+			}
+
 			response.setContentType(contentType);
 		}
 

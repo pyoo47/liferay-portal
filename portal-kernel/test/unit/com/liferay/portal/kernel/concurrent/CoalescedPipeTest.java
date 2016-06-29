@@ -48,8 +48,7 @@ public class CoalescedPipeTest {
 				}
 
 			},
-			500, TimeUnit.MILLISECONDS
-		);
+			500, TimeUnit.MILLISECONDS);
 
 		long startTime = System.currentTimeMillis();
 
@@ -129,8 +128,7 @@ public class CoalescedPipeTest {
 					return o1.length() - o2.length();
 				}
 
-			}
-		);
+			});
 
 		// Null
 

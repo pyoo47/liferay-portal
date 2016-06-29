@@ -975,7 +975,7 @@ public abstract class MBCategoryServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -986,7 +986,7 @@ public abstract class MBCategoryServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.message.boards.kernel.service.MBCategoryLocalService.class)
 	protected com.liferay.message.boards.kernel.service.MBCategoryLocalService mbCategoryLocalService;
-	@BeanReference(type = com.liferay.message.boards.kernel.service.MBCategoryService.class)
+	@BeanReference(type = MBCategoryService.class)
 	protected MBCategoryService mbCategoryService;
 	@BeanReference(type = MBCategoryPersistence.class)
 	protected MBCategoryPersistence mbCategoryPersistence;

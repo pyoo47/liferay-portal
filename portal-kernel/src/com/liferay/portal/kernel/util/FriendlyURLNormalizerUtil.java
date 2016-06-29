@@ -36,18 +36,19 @@ public class FriendlyURLNormalizerUtil {
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #normalize(String, Pattern)}
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
-	public static String normalize(String friendlyURL, char[] replaceChars) {
-		return getFriendlyURLNormalizer().normalize(friendlyURL, replaceChars);
-	}
-
 	public static String normalize(
 		String friendlyURL, Pattern friendlyURLPattern) {
 
 		return getFriendlyURLNormalizer().normalize(
 			friendlyURL, friendlyURLPattern);
+	}
+
+	public static String normalizeWithPeriodsAndSlashes(String friendlyURL) {
+		return getFriendlyURLNormalizer().normalizeWithPeriodsAndSlashes(
+			friendlyURL);
 	}
 
 	public void setFriendlyURLNormalizer(

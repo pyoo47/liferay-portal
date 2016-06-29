@@ -2537,7 +2537,7 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -2548,7 +2548,7 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.portal.kernel.service.GroupLocalService.class)
 	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.GroupService.class)
+	@BeanReference(type = GroupService.class)
 	protected GroupService groupService;
 	@BeanReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;

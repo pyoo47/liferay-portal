@@ -46,6 +46,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -195,22 +196,6 @@ public class ServiceContext implements Cloneable, Serializable {
 	}
 
 	/**
-	 * Returns <code>true</code> if this service context is being passed as a
-	 * parameter to a method which manipulates a resource to which default group
-	 * permissions apply.
-	 *
-	 * @return     <code>true</code> if this service context is being passed as
-	 *             a parameter to a method which manipulates a resource to which
-	 *             default community permissions apply; <code>false</code>
-	 *             otherwise
-	 * @deprecated As of 6.1.0, renamed to {@link #isAddGroupPermissions()}
-	 */
-	@Deprecated
-	public boolean getAddCommunityPermissions() {
-		return isAddGroupPermissions();
-	}
-
-	/**
 	 * Returns the asset category IDs to be applied to an asset entry if the
 	 * service context is being passed as a parameter to a method which
 	 * manipulates the asset entry.
@@ -282,19 +267,6 @@ public class ServiceContext implements Cloneable, Serializable {
 	 */
 	public String getCommand() {
 		return _command;
-	}
-
-	/**
-	 * Returns the specific community permissions for a resource if the service
-	 * context is being passed as a parameter to a method which manipulates the
-	 * resource.
-	 *
-	 * @return     the community permissions
-	 * @deprecated As of 6.1.0, renamed to {@link #getGroupPermissions()}
-	 */
-	@Deprecated
-	public String[] getCommunityPermissions() {
-		return getGroupPermissions();
 	}
 
 	/**
@@ -800,10 +772,10 @@ public class ServiceContext implements Cloneable, Serializable {
 	 *         command; <code>false</code> otherwise
 	 */
 	public boolean isCommandAdd() {
-		if (Validator.equals(_command, Constants.ADD) ||
-			Validator.equals(_command, Constants.ADD_DYNAMIC) ||
-			Validator.equals(_command, Constants.ADD_MULTIPLE) ||
-			Validator.equals(_command, Constants.ADD_WEBDAV)) {
+		if (Objects.equals(_command, Constants.ADD) ||
+			Objects.equals(_command, Constants.ADD_DYNAMIC) ||
+			Objects.equals(_command, Constants.ADD_MULTIPLE) ||
+			Objects.equals(_command, Constants.ADD_WEBDAV)) {
 
 			return true;
 		}
@@ -820,9 +792,9 @@ public class ServiceContext implements Cloneable, Serializable {
 	 *         command; <code>false</code> otherwise
 	 */
 	public boolean isCommandUpdate() {
-		if (Validator.equals(_command, Constants.UPDATE) ||
-			Validator.equals(_command, Constants.UPDATE_AND_CHECKIN) ||
-			Validator.equals(_command, Constants.UPDATE_WEBDAV)) {
+		if (Objects.equals(_command, Constants.UPDATE) ||
+			Objects.equals(_command, Constants.UPDATE_AND_CHECKIN) ||
+			Objects.equals(_command, Constants.UPDATE_WEBDAV)) {
 
 			return true;
 		}
@@ -1060,21 +1032,6 @@ public class ServiceContext implements Cloneable, Serializable {
 	}
 
 	/**
-	 * Sets whether or not default community permissions should apply to a
-	 * resource being manipulated by a method to which this service context is
-	 * passed as a parameter.
-	 *
-	 * @param      addCommunityPermissions indicates whether or not to apply
-	 *             default community permissions
-	 * @deprecated As of 6.1.0, renamed to {@link
-	 *             #setAddGroupPermissions(boolean)}
-	 */
-	@Deprecated
-	public void setAddCommunityPermissions(boolean addCommunityPermissions) {
-		setAddGroupPermissions(addCommunityPermissions);
-	}
-
-	/**
 	 * Sets whether or not default group permissions should apply to a resource
 	 * being manipulated by a method to which this service context is passed as
 	 * a parameter.
@@ -1178,21 +1135,6 @@ public class ServiceContext implements Cloneable, Serializable {
 	}
 
 	/**
-	 * Sets an array containing specific community permissions for a resource if
-	 * this service context is being passed as a parameter to a method which
-	 * manipulates the resource.
-	 *
-	 * @param      communityPermissions the community permissions (optionally
-	 *             <code>null</code>)
-	 * @deprecated As of 6.1.0, renamed to {@link
-	 *             #setGroupPermissions(String[])}
-	 */
-	@Deprecated
-	public void setCommunityPermissions(String[] communityPermissions) {
-		setGroupPermissions(communityPermissions);
-	}
-
-	/**
 	 * Sets the company ID of this service context's current portal instance.
 	 *
 	 * @param companyId the primary key of this service context's current portal
@@ -1230,7 +1172,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 *
 	 * <p>
 	 * These attributes should only include fields that {@link
-	 * com.liferay.portal.kernel.service.ServiceContext} does not possess by default.
+	 * ServiceContext} does not possess by default.
 	 * </p>
 	 *
 	 * @param expandoBridgeAttributes the expando bridge attributes (optionally

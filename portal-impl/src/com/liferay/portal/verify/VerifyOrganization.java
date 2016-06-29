@@ -16,6 +16,7 @@ package com.liferay.portal.verify;
 
 import com.liferay.portal.kernel.concurrent.ThrowableAwareRunnable;
 import com.liferay.portal.kernel.concurrent.ThrowableAwareRunnablesExecutorUtil;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
@@ -23,7 +24,6 @@ import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.upgrade.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.util.PortalInstances;
 
 import java.sql.PreparedStatement;
@@ -87,41 +87,46 @@ public class VerifyOrganization extends VerifyProcess {
 	}
 
 	protected void updateOrganizationAssetEntries() throws Exception {
-		StringBundler sb = new StringBundler();
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			StringBundler sb = new StringBundler();
 
-		sb.append("select AssetEntry.entryId, Organization_.uuid_ from ");
-		sb.append("AssetEntry, Organization_ where AssetEntry.classNameId = ");
+			sb.append("select distinct AssetEntry.classPK as classPK, ");
+			sb.append("Organization_.uuid_ as uuid from ");
+			sb.append(
+				"AssetEntry, Organization_ where AssetEntry.classNameId = ");
 
-		long classNameId = ClassNameLocalServiceUtil.getClassNameId(
-			Organization.class.getName());
+			long classNameId = ClassNameLocalServiceUtil.getClassNameId(
+				Organization.class.getName());
 
-		sb.append(classNameId);
+			sb.append(classNameId);
 
-		sb.append(" and AssetEntry.classPK = Organization_.organizationId ");
-		sb.append("and AssetEntry.classUuid is null");
+			sb.append(
+				" and AssetEntry.classPK = Organization_.organizationId ");
+			sb.append("and AssetEntry.classUuid is null");
 
-		try (LoggingTimer loggingTimer = new LoggingTimer();
+			try (PreparedStatement ps1 = connection.prepareStatement(
+					sb.toString());
+				ResultSet rs = ps1.executeQuery()) {
 
-			PreparedStatement ps1 = connection.prepareStatement(sb.toString());
-			ResultSet rs = ps1.executeQuery()) {
+				try (PreparedStatement ps2 =
+						AutoBatchPreparedStatementUtil.autoBatch(
+							connection.prepareStatement(
+								"update AssetEntry set classUuid = ? where " +
+									"classPK = ? and classNameId = ?"))) {
 
-			try (PreparedStatement ps2 =
-					AutoBatchPreparedStatementUtil.autoBatch(
-						connection.prepareStatement(
-							"update AssetEntry set classUuid = ? where " +
-								"entryId = ?"))) {
+					while (rs.next()) {
+						long classPK = rs.getLong("classPK");
+						String uuid = rs.getString("uuid");
 
-				while (rs.next()) {
-					long entryId = rs.getLong("AssetEntry.entryId");
-					String uuid = rs.getString("Organization_.uuid_");
+						ps2.setString(1, uuid);
+						ps2.setLong(2, classPK);
+						ps2.setLong(3, classNameId);
 
-					ps2.setString(1, uuid);
-					ps2.setLong(2, entryId);
+						ps2.addBatch();
+					}
 
-					ps2.addBatch();
+					ps2.executeBatch();
 				}
-
-				ps2.executeBatch();
 			}
 		}
 	}

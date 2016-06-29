@@ -21,8 +21,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
-import com.liferay.portal.kernel.model.CacheField;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
+import com.liferay.portal.kernel.model.cache.CacheField;
 import com.liferay.portal.kernel.plugin.Version;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -93,10 +93,12 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -556,19 +558,19 @@ public class ServiceBuilder {
 			_apiPackagePath = GetterUtil.getString(
 				rootElement.attributeValue("api-package-path"), packagePath);
 			_oldServiceOutputPath =
-				_apiDirName + "/" + StringUtil.replace(packagePath, ".", "/");
+				_apiDirName + "/" + StringUtil.replace(packagePath, '.', '/');
 			_outputPath =
-				_implDirName + "/" + StringUtil.replace(packagePath, ".", "/");
+				_implDirName + "/" + StringUtil.replace(packagePath, '.', '/');
 
 			if (Validator.isNotNull(_testDirName)) {
 				_testOutputPath =
 					_testDirName + "/" +
-						StringUtil.replace(packagePath, ".", "/");
+						StringUtil.replace(packagePath, '.', '/');
 			}
 
 			_serviceOutputPath =
 				_apiDirName + "/" +
-					StringUtil.replace(_apiPackagePath, ".", "/");
+					StringUtil.replace(_apiPackagePath, '.', '/');
 
 			_packagePath = packagePath;
 
@@ -971,9 +973,9 @@ public class ServiceBuilder {
 		String createMappingTableSQL = _getCreateMappingTableSQL(entityMapping);
 
 		createMappingTableSQL = StringUtil.replace(
-			createMappingTableSQL, "\n", "");
+			createMappingTableSQL, '\n', "");
 		createMappingTableSQL = StringUtil.replace(
-			createMappingTableSQL, "\t", "");
+			createMappingTableSQL, '\t', "");
 		createMappingTableSQL = createMappingTableSQL.substring(
 			0, createMappingTableSQL.length() - 1);
 
@@ -983,8 +985,8 @@ public class ServiceBuilder {
 	public String getCreateTableSQL(Entity entity) {
 		String createTableSQL = _getCreateTableSQL(entity);
 
-		createTableSQL = StringUtil.replace(createTableSQL, "\n", "");
-		createTableSQL = StringUtil.replace(createTableSQL, "\t", "");
+		createTableSQL = StringUtil.replace(createTableSQL, '\n', "");
+		createTableSQL = StringUtil.replace(createTableSQL, '\t', "");
 		createTableSQL = createTableSQL.substring(
 			0, createTableSQL.length() - 1);
 
@@ -1061,7 +1063,7 @@ public class ServiceBuilder {
 			}
 		}
 
-		String refPackageDirName = StringUtil.replace(refPackage, ".", "/");
+		String refPackageDirName = StringUtil.replace(refPackage, '.', '/');
 
 		String refFileName =
 			_implDirName + "/" + refPackageDirName + "/service.xml";
@@ -1074,7 +1076,9 @@ public class ServiceBuilder {
 			refFileName = String.valueOf(System.currentTimeMillis());
 			refFile = new File(_TMP_DIR, refFileName);
 
-			ClassLoader classLoader = getClass().getClassLoader();
+			Class<?> clazz = getClass();
+
+			ClassLoader classLoader = clazz.getClassLoader();
 
 			String refContent = null;
 
@@ -2017,13 +2021,23 @@ public class ServiceBuilder {
 		JavaClass modelImplJavaClass = _getJavaClass(
 			_outputPath + "/model/impl/" + entity.getName() + "Impl.java");
 
-		List<JavaMethod> methods = ListUtil.fromArray(
-			_getMethods(modelImplJavaClass));
+		Map<String, JavaMethod> methods = new LinkedHashMap<>();
 
-		Iterator<JavaMethod> itr = methods.iterator();
+		for (JavaMethod method : _getMethods(modelImplJavaClass)) {
+			String methodSignature = _getMethodSignature(
+				method, modelImplJavaClass.getPackageName());
+
+			methods.put(methodSignature, method);
+		}
+
+		Set<Map.Entry<String, JavaMethod>> entrySet = methods.entrySet();
+
+		Iterator<Map.Entry<String, JavaMethod>> itr = entrySet.iterator();
 
 		while (itr.hasNext()) {
-			JavaMethod method = itr.next();
+			Map.Entry<String, JavaMethod> entry = itr.next();
+
+			JavaMethod method = entry.getValue();
 
 			String methodName = method.getName();
 
@@ -2036,13 +2050,16 @@ public class ServiceBuilder {
 			_serviceOutputPath + "/model/" + entity.getName() + "Model.java");
 
 		for (JavaMethod method : _getMethods(modelJavaClass)) {
-			methods.remove(method);
+			String methodSignature = _getMethodSignature(
+				method, modelJavaClass.getPackageName());
+
+			methods.remove(methodSignature);
 		}
 
 		Map<String, Object> context = _getContext();
 
 		context.put("entity", entity);
-		context.put("methods", methods.toArray(new Object[methods.size()]));
+		context.put("methods", methods.values());
 
 		context = _putDeprecatedKeys(context, modelJavaClass);
 
@@ -2311,10 +2328,51 @@ public class ServiceBuilder {
 					newContent.substring(lastImport);
 		}
 
-		int firstClass = newContent.indexOf(
+		int firstClass = -1;
+
+		int firstClass1 = newContent.indexOf(
+			"<class dynamic-update=\"true\" name=\"" + _packagePath +
+				".model.");
+		int firstClass2 = newContent.indexOf(
 			"<class name=\"" + _packagePath + ".model.");
-		int lastClass = newContent.lastIndexOf(
+
+		if ((firstClass1 != -1) && (firstClass2 != -1)) {
+			if (firstClass2 < firstClass1) {
+				firstClass = firstClass2;
+			}
+			else {
+				firstClass = firstClass1;
+			}
+		}
+		else if (firstClass1 != -1) {
+			firstClass = firstClass1;
+		}
+		else if (firstClass2 != -1) {
+			firstClass = firstClass2;
+		}
+
+		int lastClass = -1;
+
+		int lastClass1 = newContent.lastIndexOf(
+			"<class dynamic-update=\"true\" name=\"" + _packagePath +
+				".model.");
+		int lastClass2 = newContent.lastIndexOf(
 			"<class name=\"" + _packagePath + ".model.");
+
+		if ((lastClass1 != -1) && (lastClass2 != -1)) {
+			if (lastClass2 > lastClass1) {
+				lastClass = lastClass2;
+			}
+			else {
+				lastClass = lastClass1;
+			}
+		}
+		else if (lastClass1 != -1) {
+			lastClass = lastClass1;
+		}
+		else if (lastClass2 != -1) {
+			lastClass = lastClass2;
+		}
 
 		if (firstClass == -1) {
 			int x = newContent.indexOf("</hibernate-mapping>");
@@ -2392,7 +2450,7 @@ public class ServiceBuilder {
 		JavaClass modelImplJavaClass = _getJavaClass(
 			_outputPath + "/model/impl/" + entity.getName() + "Impl.java");
 
-		Map<String, JavaMethod> methods = new HashMap<>();
+		Map<String, JavaMethod> methods = new LinkedHashMap<>();
 
 		for (JavaMethod method : modelImplJavaClass.getMethods()) {
 			methods.put(method.getDeclarationSignature(false), method);
@@ -3056,7 +3114,7 @@ public class ServiceBuilder {
 		}
 
 		File file = new File(
-			_implDirName + "/" + StringUtil.replace(_propsUtil, ".", "/") +
+			_implDirName + "/" + StringUtil.replace(_propsUtil, '.', '/') +
 				".java");
 
 		Map<String, Object> context = _getContext();
@@ -3198,17 +3256,17 @@ public class ServiceBuilder {
 		int y = oldContent.lastIndexOf("</beans>");
 
 		int firstSession = newContent.indexOf(
-			"<bean id=\"" + _packagePath + ".service.", x);
+			"<bean class=\"" + _packagePath + ".service.", x);
 
 		int lastSession = newContent.lastIndexOf(
-			"<bean id=\"" + _packagePath + ".service.", y);
+			"<bean class=\"" + _packagePath + ".service.", y);
 
 		if (firstSession == -1) {
 			firstSession = newContent.indexOf(
-				"<bean id=\"" + _apiPackagePath + ".service.", x);
+				"<bean class=\"" + _apiPackagePath + ".service.", x);
 
 			lastSession = newContent.lastIndexOf(
-				"<bean id=\"" + _apiPackagePath + ".service.", y);
+				"<bean class=\"" + _apiPackagePath + ".service.", y);
 		}
 
 		if ((firstSession == -1) || (firstSession > y)) {
@@ -3221,7 +3279,7 @@ public class ServiceBuilder {
 			firstSession = newContent.lastIndexOf("<bean", firstSession) - 1;
 
 			int tempLastSession = newContent.indexOf(
-				"<bean id=\"", lastSession + 1);
+				"<bean class=\"", lastSession + 1);
 
 			if (tempLastSession == -1) {
 				tempLastSession = newContent.indexOf("</beans>", lastSession);
@@ -3964,14 +4022,14 @@ public class ServiceBuilder {
 					String name1 = entity1.getName();
 					String name2 = entity2.getName();
 
-					if (Validator.equals(
+					if (Objects.equals(
 							entity1.getPackagePath(), "com.liferay.portal") &&
 						name1.equals("Company")) {
 
 						return -1;
 					}
 
-					if (Validator.equals(
+					if (Objects.equals(
 							entity2.getPackagePath(), "com.liferay.portal") &&
 						name2.equals("Company")) {
 
@@ -4268,7 +4326,9 @@ public class ServiceBuilder {
 		if (javaClass == null) {
 			ClassLibrary classLibrary = new ClassLibrary();
 
-			classLibrary.addClassLoader(getClass().getClassLoader());
+			Class<?> clazz = getClass();
+
+			classLibrary.addClassLoader(clazz.getClassLoader());
 
 			JavaDocBuilder builder = new JavaDocBuilder(classLibrary);
 
@@ -4323,13 +4383,86 @@ public class ServiceBuilder {
 	private JavaMethod[] _getMethods(
 		JavaClass javaClass, boolean superclasses) {
 
-		JavaMethod[] methods = javaClass.getMethods(superclasses);
+		List<String> cacheFieldMethods = new ArrayList<>();
+
+		for (JavaField javaField : javaClass.getFields()) {
+			Annotation[] annotations = javaField.getAnnotations();
+
+			for (Annotation annotation : annotations) {
+				Type type = annotation.getType();
+
+				String className = type.getFullyQualifiedName();
+
+				if (!className.equals(CacheField.class.getName())) {
+					continue;
+				}
+
+				if (!GetterUtil.getBoolean(
+						annotation.getNamedParameter("propagateToInterface"))) {
+
+					String methodName = null;
+
+					Object namedParameter = annotation.getNamedParameter(
+						"methodName");
+
+					if (namedParameter != null) {
+						methodName = StringUtil.unquote(
+							StringUtil.trim(namedParameter.toString()));
+					}
+
+					if (Validator.isNull(methodName)) {
+						methodName = TextFormatter.format(
+							getVariableName(javaField), TextFormatter.G);
+					}
+
+					cacheFieldMethods.add("get".concat(methodName));
+					cacheFieldMethods.add("set".concat(methodName));
+				}
+
+				break;
+			}
+		}
+
+		List<JavaMethod> methods = new ArrayList<>();
+
+		for (JavaMethod javaMethod : javaClass.getMethods(superclasses)) {
+			if (!cacheFieldMethods.contains(javaMethod.getName())) {
+				methods.add(javaMethod);
+			}
+		}
 
 		for (JavaMethod method : methods) {
 			Arrays.sort(method.getExceptions());
 		}
 
-		return methods;
+		return methods.toArray(new JavaMethod[methods.size()]);
+	}
+
+	private String _getMethodSignature(JavaMethod method, String packagePath) {
+		StringBundler sb = new StringBundler();
+
+		sb.append(method.getName());
+		sb.append(StringPool.OPEN_PARENTHESIS);
+
+		for (JavaParameter parameter : method.getParameters()) {
+			String parameterValue = parameter.getResolvedValue();
+
+			if (parameterValue.matches("[A-Z]\\w+")) {
+				parameterValue =
+					packagePath + StringPool.PERIOD + parameterValue;
+			}
+
+			sb.append(parameterValue);
+			sb.append(StringPool.COMMA);
+		}
+
+		if (sb.index() > 2) {
+			sb.setIndex(sb.index() - 1);
+		}
+
+		sb.append(StringPool.CLOSE_PARENTHESIS);
+
+		return sb.toString();
 	}
 
 	private String _getSessionTypeName(int sessionType) {
@@ -4463,7 +4596,7 @@ public class ServiceBuilder {
 			final List<Path> updateSQLFilePaths = new ArrayList<>();
 
 			try (DirectoryStream<Path> paths = Files.newDirectoryStream(
-					Paths.get(_sqlDirName), "update-6.2.0-7.0.0*.sql")) {
+					Paths.get(_sqlDirName), "update-7.0.0-7.0.1*.sql")) {
 
 				for (Path path : paths) {
 					updateSQLFilePaths.add(path);
@@ -4636,10 +4769,11 @@ public class ServiceBuilder {
 
 			@Override
 			public int compare(JavaMethod javaMethod1, JavaMethod javaMethod2) {
-				String callSignature1 = javaMethod1.getCallSignature();
-				String callSignature2 = javaMethod2.getCallSignature();
+				String declarationSignature =
+					javaMethod1.getDeclarationSignature(false);
 
-				return callSignature1.compareTo(callSignature2);
+				return declarationSignature.compareTo(
+					javaMethod2.getDeclarationSignature(false));
 			}
 
 		};
@@ -4713,14 +4847,21 @@ public class ServiceBuilder {
 
 			StringBundler sb = new StringBundler();
 
-			sb.append(
-				"package " + _packagePath + ".service.persistence.impl;\n\n");
-			sb.append(
-				"import " + _apiPackagePath + ".service.persistence." +
-					ejbName + "Finder;\n");
-			sb.append(
-				"import " + _apiPackagePath + ".service.persistence." + ejbName +
-					"Util;");
+			sb.append("package ");
+			sb.append(_packagePath);
+			sb.append(".service.persistence.impl;\n\n");
+
+			sb.append("import ");
+			sb.append(_apiPackagePath);
+			sb.append(".service.persistence.");
+			sb.append(ejbName);
+			sb.append("Finder;\n");
+
+			sb.append("import ");
+			sb.append(_apiPackagePath);
+			sb.append(".service.persistence.");
+			sb.append(ejbName);
+			sb.append("Util;");
 
 			content = StringUtil.replace(
 				content, "package " + _packagePath + ".service.persistence;",
@@ -4732,8 +4873,8 @@ public class ServiceBuilder {
 
 		if (newFinderImplFile.exists()) {
 			finderClass =
-				_packagePath +
-					".service.persistence.impl." + ejbName + "FinderImpl";
+				_packagePath + ".service.persistence.impl." + ejbName +
+					"FinderImpl";
 		}
 
 		String dataSource = entityElement.attributeValue("data-source");
@@ -5159,7 +5300,9 @@ public class ServiceBuilder {
 	}
 
 	private Set<String> _readLines(String fileName) throws Exception {
-		ClassLoader classLoader = getClass().getClassLoader();
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
 
 		Set<String> lines = new HashSet<>();
 
@@ -5170,14 +5313,14 @@ public class ServiceBuilder {
 
 	private void _removeActionableDynamicQuery(Entity entity) {
 		File ejbFile = new File(
-			_oldServiceOutputPath + "/service/persistence/" +
-				entity.getName() + "ActionableDynamicQuery.java");
+			_oldServiceOutputPath + "/service/persistence/" + entity.getName() +
+				"ActionableDynamicQuery.java");
 
 		ejbFile.delete();
 
 		ejbFile = new File(
-			_serviceOutputPath + "/service/persistence/" +
-				entity.getName() + "ActionableDynamicQuery.java");
+			_serviceOutputPath + "/service/persistence/" + entity.getName() +
+				"ActionableDynamicQuery.java");
 
 		ejbFile.delete();
 	}
@@ -5204,14 +5347,14 @@ public class ServiceBuilder {
 
 	private void _removeExportActionableDynamicQuery(Entity entity) {
 		File ejbFile = new File(
-			_oldServiceOutputPath + "/service/persistence/" +
-				entity.getName() + "ExportActionableDynamicQuery.java");
+			_oldServiceOutputPath + "/service/persistence/" + entity.getName() +
+				"ExportActionableDynamicQuery.java");
 
 		ejbFile.delete();
 
 		ejbFile = new File(
-			_serviceOutputPath + "/service/persistence/" +
-				entity.getName() + "ExportActionableDynamicQuery.java");
+			_serviceOutputPath + "/service/persistence/" + entity.getName() +
+				"ExportActionableDynamicQuery.java");
 
 		ejbFile.delete();
 	}

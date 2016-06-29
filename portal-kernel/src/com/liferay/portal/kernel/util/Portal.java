@@ -177,6 +177,18 @@ public interface Portal {
 		Map<String, Object> data);
 
 	/**
+	 * Adds an entry to the portlet breadcrumbs for the page.
+	 *
+	 * @param request the servlet request for the page
+	 * @param title the title of the new breakcrumb entry
+	 * @param url the URL of the new breadcrumb entry
+	 * @param data the HTML5 data parameters of the new breadcrumb entry
+	 */
+	public void addPortletBreadcrumbEntry(
+		HttpServletRequest request, String title, String url,
+		Map<String, Object> data, boolean portletBreadcrumbEntry);
+
+	/**
 	 * Adds the default resource permissions for the portlet to the page.
 	 *
 	 * @param request the servlet request for the page
@@ -647,6 +659,10 @@ public interface Portal {
 
 	public String getFirstPageLayoutTypes(HttpServletRequest request);
 
+	public String getForwardedHost(HttpServletRequest request);
+
+	public int getForwardedPort(HttpServletRequest request);
+
 	public String getFullName(
 		String firstName, String middleName, String lastName);
 
@@ -884,6 +900,8 @@ public interface Portal {
 
 	public String getPortalURL(Layout layout, ThemeDisplay themeDisplay)
 		throws PortalException;
+
+	public String getPortalURL(LayoutSet layoutSet, ThemeDisplay themeDisplay);
 
 	public String getPortalURL(PortletRequest portletRequest);
 
@@ -1211,6 +1229,8 @@ public interface Portal {
 
 	public boolean isControlPanelPortlet(
 		String portletId, ThemeDisplay themeDisplay);
+
+	public boolean isForwardedSecure(HttpServletRequest request);
 
 	public boolean isGroupAdmin(User user, long groupId) throws Exception;
 

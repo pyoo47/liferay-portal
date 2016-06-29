@@ -21,13 +21,14 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.social.kernel.service.SocialActivityAchievementLocalServiceUtil;
 import com.liferay.social.kernel.service.SocialActivityCounterLocalServiceUtil;
+
+import java.util.Objects;
 
 /**
  * @author Zsolt Berentey
@@ -35,7 +36,7 @@ import com.liferay.social.kernel.service.SocialActivityCounterLocalServiceUtil;
 public class BaseSocialAchievement implements SocialAchievement {
 
 	public boolean equals(SocialAchievement socialAchievement) {
-		if (Validator.equals(_name, socialAchievement.getName())) {
+		if (Objects.equals(_name, socialAchievement.getName())) {
 			return true;
 		}
 
@@ -159,7 +160,7 @@ public class BaseSocialAchievement implements SocialAchievement {
 
 	@Override
 	public void setName(String name) {
-		name = StringUtil.replace(name, StringPool.SPACE, StringPool.UNDERLINE);
+		name = StringUtil.replace(name, CharPool.SPACE, CharPool.UNDERLINE);
 		name = StringUtil.toLowerCase(name);
 
 		_name = StringUtil.extract(name, _NAME_SUPPORTED_CHARS);
@@ -172,7 +173,7 @@ public class BaseSocialAchievement implements SocialAchievement {
 			name.equals("counterThreshold")) {
 
 			BeanPropertiesUtil.setProperty(
-				this, name, GetterUtil.getInteger(value, 0));
+				this, name, GetterUtil.getInteger(value));
 		}
 		else {
 			BeanPropertiesUtil.setProperty(this, name, value);

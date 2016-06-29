@@ -318,7 +318,7 @@ public abstract class DLFileVersionServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -329,7 +329,7 @@ public abstract class DLFileVersionServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.document.library.kernel.service.DLFileVersionLocalService.class)
 	protected com.liferay.document.library.kernel.service.DLFileVersionLocalService dlFileVersionLocalService;
-	@BeanReference(type = com.liferay.document.library.kernel.service.DLFileVersionService.class)
+	@BeanReference(type = DLFileVersionService.class)
 	protected DLFileVersionService dlFileVersionService;
 	@BeanReference(type = DLFileVersionPersistence.class)
 	protected DLFileVersionPersistence dlFileVersionPersistence;

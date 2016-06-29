@@ -79,6 +79,7 @@ import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -489,9 +490,7 @@ public class ServicePreAction extends Action {
 
 		LayoutSet layoutSet = null;
 
-		boolean hasAddLayoutLayoutPermission = false;
 		boolean hasCustomizeLayoutPermission = false;
-		boolean hasDeleteLayoutPermission = false;
 		boolean hasUpdateLayoutPermission = false;
 
 		boolean customizedView = SessionParamUtil.getBoolean(
@@ -503,14 +502,8 @@ public class ServicePreAction extends Action {
 			LayoutTypeAccessPolicy layoutTypeAccessPolicy =
 				layoutType.getLayoutTypeAccessPolicy();
 
-			hasAddLayoutLayoutPermission =
-				layoutTypeAccessPolicy.isAddLayoutAllowed(
-					permissionChecker, layout);
 			hasCustomizeLayoutPermission =
 				layoutTypeAccessPolicy.isCustomizeLayoutAllowed(
-					permissionChecker, layout);
-			hasDeleteLayoutPermission =
-				layoutTypeAccessPolicy.isDeleteLayoutAllowed(
 					permissionChecker, layout);
 			hasUpdateLayoutPermission =
 				layoutTypeAccessPolicy.isUpdateLayoutAllowed(
@@ -686,8 +679,8 @@ public class ServicePreAction extends Action {
 			colorScheme = ThemeLocalServiceUtil.getColorScheme(
 				companyId, theme.getThemeId(), colorSchemeId);
 
-			request.setAttribute(WebKeys.THEME, theme);
 			request.setAttribute(WebKeys.COLOR_SCHEME, colorScheme);
+			request.setAttribute(WebKeys.THEME, theme);
 		}
 
 		boolean themeCssFastLoad = PropsValues.THEME_CSS_FAST_LOAD;
@@ -708,7 +701,9 @@ public class ServicePreAction extends Action {
 		boolean themeJsBarebone = PropsValues.JAVASCRIPT_BAREBONE_ENABLED;
 
 		if (themeJsBarebone) {
-			if (signedIn) {
+			if (signedIn ||
+				PropsValues.JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED) {
+
 				themeJsBarebone = false;
 			}
 		}
@@ -743,14 +738,16 @@ public class ServicePreAction extends Action {
 		// Set attributes first that other methods (getCDNBaseURL and
 		// setLookAndFeel) depend on
 
+		boolean secure = PortalUtil.isForwardedSecure(request);
+
 		themeDisplay.setCDNHost(cdnHost);
 		themeDisplay.setCDNDynamicResourcesHost(dynamicResourcesCDNHost);
 		themeDisplay.setFacebookCanvasPageURL(facebookCanvasPageURL);
 		themeDisplay.setPortalURL(portalURL);
 		themeDisplay.setRefererPlid(refererPlid);
-		themeDisplay.setSecure(request.isSecure());
-		themeDisplay.setServerName(request.getServerName());
-		themeDisplay.setServerPort(request.getServerPort());
+		themeDisplay.setSecure(secure);
+		themeDisplay.setServerName(PortalUtil.getForwardedHost(request));
+		themeDisplay.setServerPort(PortalUtil.getForwardedPort(request));
 		themeDisplay.setWidget(widget);
 
 		themeDisplay.setCompany(company);
@@ -829,7 +826,7 @@ public class ServicePreAction extends Action {
 
 		themeDisplay.setShowHomeIcon(true);
 		themeDisplay.setShowMyAccountIcon(signedIn);
-		themeDisplay.setShowPageSettingsIcon(hasDeleteLayoutPermission);
+		themeDisplay.setShowPageSettingsIcon(hasUpdateLayoutPermission);
 		themeDisplay.setShowPortalIcon(true);
 		themeDisplay.setShowSignInIcon(!signedIn);
 
@@ -933,55 +930,16 @@ public class ServicePreAction extends Action {
 
 			if (hasUpdateLayoutPermission) {
 				themeDisplay.setShowPageSettingsIcon(true);
-
-				boolean site = group.isSite();
-
-				if (!site && group.isStagingGroup()) {
-					Group liveGroup = group.getLiveGroup();
-
-					site = liveGroup.isSite();
-				}
-
-				if (site &&
-					GroupPermissionUtil.contains(
-						permissionChecker, scopeGroupId,
-						ActionKeys.ASSIGN_MEMBERS)) {
-
-					themeDisplay.setShowManageSiteMembershipsIcon(true);
-				}
-				else {
-					themeDisplay.setShowManageSiteMembershipsIcon(false);
-				}
 			}
 
 			Group scopeGroup = GroupLocalServiceUtil.getGroup(scopeGroupId);
 
-			boolean hasAddLayoutGroupPermission = GroupPermissionUtil.contains(
-				permissionChecker, scopeGroup, ActionKeys.ADD_LAYOUT);
-			boolean hasManageLayoutsGroupPermission =
-				GroupPermissionUtil.contains(
-					permissionChecker, scopeGroup, ActionKeys.MANAGE_LAYOUTS);
 			boolean hasManageStagingPermission = GroupPermissionUtil.contains(
 				permissionChecker, scopeGroup, ActionKeys.MANAGE_STAGING);
 			boolean hasPublishStagingPermission = GroupPermissionUtil.contains(
 				permissionChecker, scopeGroup, ActionKeys.PUBLISH_STAGING);
-			boolean hasUpdateGroupPermission = GroupPermissionUtil.contains(
-				permissionChecker, scopeGroup, ActionKeys.UPDATE);
 			boolean hasViewStagingPermission = GroupPermissionUtil.contains(
 				permissionChecker, scopeGroup, ActionKeys.VIEW_STAGING);
-
-			if (!group.isControlPanel() && !group.isUser() &&
-				!group.isUserGroup() && hasUpdateGroupPermission) {
-
-				themeDisplay.setShowSiteSettingsIcon(true);
-			}
-
-			if (!group.isLayoutPrototype() &&
-				(hasAddLayoutGroupPermission || hasAddLayoutLayoutPermission ||
-				 hasManageLayoutsGroupPermission || hasUpdateGroupPermission)) {
-
-				themeDisplay.setShowSiteMapSettingsIcon(true);
-			}
 
 			if (group.hasStagingGroup() && !group.isStagingGroup()) {
 				themeDisplay.setShowLayoutTemplatesIcon(false);
@@ -1045,7 +1003,6 @@ public class ServicePreAction extends Action {
 
 		if (group.isLayoutPrototype()) {
 			themeDisplay.setShowHomeIcon(false);
-			themeDisplay.setShowManageSiteMembershipsIcon(false);
 			themeDisplay.setShowMyAccountIcon(false);
 			themeDisplay.setShowPageCustomizationIcon(false);
 			themeDisplay.setShowPageSettingsIcon(true);
@@ -1053,29 +1010,21 @@ public class ServicePreAction extends Action {
 			themeDisplay.setShowSignInIcon(false);
 			themeDisplay.setShowSignOutIcon(false);
 			themeDisplay.setShowSiteAdministrationIcon(false);
-			themeDisplay.setShowSiteSettingsIcon(false);
 			themeDisplay.setShowStagingIcon(false);
 		}
 
 		if (group.isLayoutSetPrototype()) {
 			themeDisplay.setShowPageCustomizationIcon(false);
-			themeDisplay.setShowSiteSettingsIcon(false);
 		}
 
 		if (group.hasStagingGroup() && !group.isStagingGroup()) {
 			themeDisplay.setShowLayoutTemplatesIcon(false);
 			themeDisplay.setShowPageCustomizationIcon(false);
-			themeDisplay.setShowSiteMapSettingsIcon(false);
-			themeDisplay.setShowSiteSettingsIcon(false);
 		}
 
 		themeDisplay.setURLPortal(portalURL.concat(contextPath));
 
-		boolean secure = false;
-
-		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS ||
-			request.isSecure()) {
-
+		if (!secure && PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS) {
 			secure = true;
 		}
 
@@ -1446,7 +1395,7 @@ public class ServicePreAction extends Action {
 			request, user, permissionChecker, defaultLayoutComposite,
 			doAsGroupId);
 
-		if (defaultLayoutComposite.getLayouts() != null) {
+		if (ListUtil.isNotEmpty(defaultLayoutComposite.getLayouts())) {
 			return defaultLayoutComposite;
 		}
 
@@ -1463,7 +1412,7 @@ public class ServicePreAction extends Action {
 				request, user, permissionChecker, defaultLayoutComposite,
 				doAsGroupId);
 
-			if (defaultLayoutComposite.getLayouts() != null) {
+			if (ListUtil.isNotEmpty(defaultLayoutComposite.getLayouts())) {
 				return defaultLayoutComposite;
 			}
 		}
@@ -1730,33 +1679,6 @@ public class ServicePreAction extends Action {
 		else {
 			return false;
 		}
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	protected boolean isViewableCommunity(
-			User user, long groupId, boolean privateLayout,
-			PermissionChecker permissionChecker)
-		throws PortalException {
-
-		return LayoutPermissionUtil.contains(
-			permissionChecker, groupId, privateLayout, 0, ActionKeys.VIEW);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	protected boolean isViewableGroup(
-			User user, long groupId, boolean privateLayout, long layoutId,
-			String controlPanelCategory, PermissionChecker permissionChecker)
-		throws PortalException {
-
-		return LayoutPermissionUtil.contains(
-			permissionChecker, groupId, privateLayout, layoutId,
-			ActionKeys.VIEW);
 	}
 
 	protected List<Layout> mergeAdditionalLayouts(

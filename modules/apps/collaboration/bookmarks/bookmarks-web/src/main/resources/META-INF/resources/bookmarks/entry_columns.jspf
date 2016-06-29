@@ -31,8 +31,6 @@ for (int j = 0; j < entryColumns.length; j++) {
 			%>
 
 			<liferay-ui:search-container-column-jsp
-				align="<%= align %>"
-				cssClass="entry-action"
 				path="/bookmarks/entry_action.jsp"
 			/>
 		</c:when>
@@ -44,20 +42,17 @@ for (int j = 0; j < entryColumns.length; j++) {
 		</c:when>
 		<c:when test='<%= curEntryColumn.equals("name") %>'>
 			<liferay-ui:search-container-column-text
+				href="<%= entryHREF %>"
 				name="<%= curEntryColumn %>"
-			>
-				<liferay-ui:app-view-entry
-					displayStyle="list"
-					showCheckbox="<%= false %>"
-					title="<%= entry.getName() %>"
-					url="<%= entryHREF %>"
-				/>
-			</liferay-ui:search-container-column-text>
+				truncate="<%= true %>"
+				value="<%= HtmlUtil.escape(entry.getName()) %>"
+			/>
 		</c:when>
 		<c:when test='<%= curEntryColumn.equals("url") %>'>
 			<liferay-ui:search-container-column-text
 				cssClass="row-url"
 				name="<%= curEntryColumn %>"
+				truncate="<%= true %>"
 				value="<%= HtmlUtil.escape(entry.getUrl()) %>"
 			/>
 		</c:when>

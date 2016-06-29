@@ -7,7 +7,7 @@
 		<if>
 			<condition function="IsElementNotPresent#isNotVisible" locator1="DDMEditTemplate#DETAILS_LANGUAGE_SELECT" />
 			<then>
-				<execute function="AssertClick" locator1="DDMEditTemplate#DETAILS" value1="Details" />
+				<execute function="Click" locator1="DDMEditTemplate#DETAILS_TOGGLE" />
 			</then>
 		</if>
 
@@ -79,6 +79,8 @@
 
 		<execute function="Select" locator1="DDMEditTemplate#DETAILS_LANGUAGE_SELECT" value1="${ddlDisplayTemplateLanguage}" />
 
+		<execute function="Pause" locator1="5000" />
+
 		<execute function="Type#typeAceEditor" locator1="DDMEditTemplate#SCRIPT_CONTENT_FIELD_TEXT_AREA" value1="${ddlDisplayTemplateScript}" />
 
 		<execute macro="Button#clickSave" />
@@ -99,6 +101,18 @@
 		<var name="key_assetTitle" value="Templates" />
 
 		<execute function="AssertElementPresent#assertVisible" locator1="NavBar#ASSET_TITLE" value1="Templates" />
+
+		<execute function="Click" locator1="Button#PLUS" />
+
+		<execute function="AssertClick" locator1="MenuItem#ADD_FORM_TEMPLATE" value1="Add Form Template" />
+
+		<execute function="Type#clickAtSendKeys" locator1="TextInput#NAME" value1="${ddlFormTemplateName}" />
+	</command>
+
+	<command name="addFormTemplateViaBackButton">
+		<execute macro="DynamicDataMapping#selectDynamicDataMappingFrame" />
+
+		<execute function="Click" locator1="Icon#ANGLE_LEFT_BACK" />
 
 		<execute function="Click" locator1="Button#PLUS" />
 
@@ -137,7 +151,7 @@
 
 		<var name="key_ddlTemplateName" value="${dataDefinitionTemplateCopyName}" />
 
-		<execute function="AssertTextEquals" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME" value1="${dataDefinitionTemplateCopyName}" />
+		<execute function="AssertTextEquals" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME_LINK" value1="${dataDefinitionTemplateCopyName}" />
 
 		<execute function="SelectFrame" value1="relative=top" />
 	</command>
@@ -152,7 +166,7 @@
 
 		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${ddlTemplateName}" />
 		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
-		<execute function="Check#checkAll" locator1="DDMSelectTemplate#TEMPLATE_TABLE_ALL_CHECKBOX" />
+		<execute function="Check#checkAll" locator1="Checkbox#SELECT_ALL" />
 		<execute function="ClickNoError" locator1="Icon#DELETE" />
 		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
 		<execute macro="Alert#viewSuccessMessage" />
@@ -220,7 +234,7 @@
 		<if>
 			<condition function="IsElementNotPresent#isNotVisible" locator1="DDMEditStructure#DETAILS_MODE_SELECT" />
 			<then>
-				<execute function="AssertClick" locator1="DDMEditTemplate#DETAILS" value1="Details" />
+				<execute function="Click" locator1="DDMEditTemplate#DETAILS_TOGGLE" />
 			</then>
 		</if>
 
@@ -265,21 +279,28 @@
 	</command>
 
 	<command name="selectDisplayTemplateViaDDLDisplayPG">
-		<execute function="SelectFrame" locator1="DDLConfiguration#CONFIGURATION_IFRAME" />
+		<execute macro="DDLNavigator#gotoOptionalConfiguration" />
+
 		<execute function="Select" locator1="DDLConfiguration#TEMPLATES_DISPLAY_TEMPLATE_SELECT" value1="${ddlDisplayTemplateName}" />
-		<execute macro="Button#clickSave" />
-		<execute macro="Alert#viewSuccessMessage" />
+
+		<execute macro="PortletEntry#save" />
+
+		<execute function="AssertClick" locator1="DDLConfiguration#NAVIGATION_OPTIONAL_CONFIGURATION" value1="Optional Configuration" />
+
 		<execute function="AssertSelectedLabel" locator1="DDLConfiguration#TEMPLATES_DISPLAY_TEMPLATE_SELECT" value1="${ddlDisplayTemplateName}" />
 
 		<execute function="SelectFrameTop" />
 	</command>
 
 	<command name="selectFormTemplateViaDDLDisplayPG">
-		<execute function="SelectFrame" locator1="DDLConfiguration#CONFIGURATION_IFRAME" />
+		<execute macro="DDLNavigator#gotoOptionalConfiguration" />
 
 		<execute function="Select" locator1="DDLConfiguration#TEMPLATES_FORM_TEMPLATE_SELECT" value1="${ddlFormTemplateName}" />
 
 		<execute macro="PortletEntry#save" />
+
+		<execute function="AssertClick" locator1="DDLConfiguration#NAVIGATION_OPTIONAL_CONFIGURATION" value1="Optional Configuration" />
+
 		<execute function="AssertSelectedLabel" locator1="DDLConfiguration#TEMPLATES_FORM_TEMPLATE_SELECT" value1="${ddlFormTemplateName}" />
 
 		<execute function="SelectFrameTop" />
@@ -338,10 +359,13 @@
 
 		<var name="key_ddlTemplateName" value="${ddlTemplateName}" />
 
-		<execute function="AssertClick" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME" value1="${ddlTemplateName}" />
+		<execute function="ScrollWebElementIntoView" locator1="DDMSelectTemplate#TEMPLATE_TABLE_ELLIPSIS" />
+
+		<execute function="Click" locator1="DDMSelectTemplate#TEMPLATE_TABLE_ELLIPSIS" />
+
+		<execute function="AssertClick" locator1="MenuItem#EDIT" value1="Edit" />
 
 		<execute function="AssertTextEquals" locator1="Portlet#HEADER" value1="${ddlTemplateName} (${ddlDataDefinitionName})" />
-
 		<execute function="AssertTextEquals" locator1="CPDynamicdatalistsDatadefinitionsManagetemplatesEditdisplay#NAME_FIELD" value1="${ddlTemplateName}" />
 	</command>
 
@@ -352,7 +376,7 @@
 
 		<var name="key_ddlTemplateName" value="${ddlTemplateName}" />
 
-		<execute function="AssertClick" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME" value1="${ddlTemplateName}" />
+		<execute function="AssertClick" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME_LINK" value1="${ddlTemplateName}" />
 
 		<execute function="AssertTextEquals#assertPartialText" locator1="Portlet#HEADER" value1="${ddlTemplateName} (${ddlDataDefinitionName})" />
 
@@ -366,7 +390,7 @@
 
 		<var name="key_ddlTemplateName" value="${ddlTemplateName}" />
 
-		<execute function="AssertTextPresent" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME" value1="${ddlTemplateName}" />
+		<execute function="AssertTextPresent" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME_LINK" value1="${ddlTemplateName}" />
 		<execute function="AssertElementNotPresent" locator1="DDMSelectTemplate#TEMPLATE_TABLE_DUPLICATE_TEMPLATE_NAME" />
 	</command>
 
@@ -377,7 +401,7 @@
 
 		<var name="key_ddlTemplateName" value="${ddlTemplateName}" />
 
-		<execute function="AssertElementNotPresent" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME" />
+		<execute function="AssertElementNotPresent" locator1="DDMSelectTemplate#TEMPLATE_TABLE_NAME_LINK" />
 	</command>
 
 	<command name="viewWithNoPermissions">

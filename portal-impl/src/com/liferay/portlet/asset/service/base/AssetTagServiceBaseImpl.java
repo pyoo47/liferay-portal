@@ -527,7 +527,7 @@ public abstract class AssetTagServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -538,7 +538,7 @@ public abstract class AssetTagServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.asset.kernel.service.AssetTagLocalService.class)
 	protected com.liferay.asset.kernel.service.AssetTagLocalService assetTagLocalService;
-	@BeanReference(type = com.liferay.asset.kernel.service.AssetTagService.class)
+	@BeanReference(type = AssetTagService.class)
 	protected AssetTagService assetTagService;
 	@BeanReference(type = AssetTagPersistence.class)
 	protected AssetTagPersistence assetTagPersistence;

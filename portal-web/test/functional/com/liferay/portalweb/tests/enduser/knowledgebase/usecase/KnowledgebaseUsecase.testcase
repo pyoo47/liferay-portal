@@ -1,6 +1,5 @@
 <definition component-name="portal-knowledge-base">
 	<property name="custom.properties" value="default.layout.template.id=1_column" />
-	<property name="portlet.plugins.includes" value="knowledge-base-portlet" />
 	<property name="testray.main.component.name" value="Knowledge Base" />
 
 	<set-up>
@@ -42,7 +41,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -132,7 +131,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -209,7 +208,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -229,7 +228,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -249,7 +248,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -269,7 +268,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -429,7 +428,7 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 		</execute>
 
-		<execute macro="KBArticle#addChildPGViaKBAdmin">
+		<execute macro="KBArticle#addChildArticleViaKBAdmin">
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 			<var name="kbChildArticleContent" value="Knowledge Base Child Article Content" />
 			<var name="kbChildArticleTitle" value="Knowledge Base Child Article Title" />
@@ -464,7 +463,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -597,7 +596,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -667,7 +666,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -712,7 +711,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -787,7 +786,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -852,7 +851,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -925,7 +924,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -983,7 +982,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1076,7 +1075,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1110,7 +1109,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1182,7 +1181,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1213,7 +1212,7 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Folder 1 Title 1" />
 		</execute>
 
-		<execute macro="KBArticle#addChildPGViaKBAdmin">
+		<execute macro="KBArticle#addChildArticleViaKBAdmin">
 			<var name="kbArticleTitle" value="Knowledge Base Article Folder 1 Title 1" />
 			<var name="kbChildArticleContent" value="Knowledge Base Article Folder 1 Content 1 Child" />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Folder 1 Title 1 Child" />
@@ -1224,7 +1223,7 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Folder 1 Title 1" />
 		</execute>
 
-		<execute macro="KBArticle#addChildPGViaKBAdmin">
+		<execute macro="KBArticle#addChildArticleViaKBAdmin">
 			<var name="kbArticleTitle" value="Knowledge Base Article Folder 1 Title 1 Child" />
 			<var name="kbChildArticleContent" value="Knowledge Base Article Folder 1 Content 1 Grandchild" />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Folder 1 Title 1 Grandchild" />
@@ -1250,7 +1249,7 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Folder 2 Title 1" />
 		</execute>
 
-		<execute macro="KBArticle#addChildPGViaKBAdmin">
+		<execute macro="KBArticle#addChildArticleViaKBAdmin">
 			<var name="kbArticleTitle" value="Knowledge Base Article Folder 2 Title 1" />
 			<var name="kbChildArticleContent" value="Knowledge Base Article Folder 2 Content 1 Child" />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Folder 2 Title 1 Child" />
@@ -1261,7 +1260,7 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Folder 2 Title 1" />
 		</execute>
 
-		<execute macro="KBArticle#addChildPGViaKBAdmin">
+		<execute macro="KBArticle#addChildArticleViaKBAdmin">
 			<var name="kbArticleTitle" value="Knowledge Base Article Folder 2 Title 1" />
 			<var name="kbChildArticleContent" value="Knowledge Base Article Folder 2 Content 1 Grandchild" />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Folder 2 Title 1 Grandchild" />
@@ -1324,7 +1323,11 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
+		</execute>
+
+		<execute macro="Navigator#gotoPage">
+			<var name="pageName" value="Knowledge Base Display Page 1" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -1350,7 +1353,11 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
+		</execute>
+
+		<execute macro="Navigator#gotoPage">
+			<var name="pageName" value="Knowledge Base Display Page 2" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -1426,7 +1433,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1491,7 +1498,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1611,7 +1618,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -1752,16 +1759,21 @@
 		<execute macro="KBArticleSuggestion#viewDefaultResolved" />
 	</command>
 
-	<command name="ViewKBArticleSuggestionsWorkflowNotificationInGmail" priority="3">
+	<command name="ViewKBArticleSuggestionsWorkflowNotificationEmail" priority="3">
+		<property name="test.smtp.server.enabled" value="true" />
+
 		<var name="kbArticleContent" value="KB Article Content" />
 		<var name="kbArticleTitle" value="KB Article Title" />
 		<var name="kbSuggestionBody" value="KB Article Suggestion Content" />
 		<var name="pageName" value="Knowledge Base Display Page" />
-		<var method="TestPropsUtil#get('email.address.4')" name="userEmailAddress" />
-		<var method="TestPropsUtil#get('email.password.4')" name="userEmailPassword" />
+		<var name="userEmailAddress" value="userea@liferay.com" />
 		<var name="userName" value="Test Test" />
 		<var name="userScreenName" value="usersn" />
-		<var name="virtualHost" value="localhost" />
+
+		<execute macro="TestCase#getSiteName">
+			<return from="siteName" name="siteName" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
 
 		<execute macro="Page#add">
 			<var name="pageName" value="${pageName}" />
@@ -1772,25 +1784,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoControlPanelConfiguration">
-			<var name="portlet" value="Server Administration" />
-		</execute>
-
-		<execute macro="ServerAdministration#configureMailServerSettings">
-			<var method="TestPropsUtil#get('email.address.1')" name="userName" />
-			<var method="TestPropsUtil#get('email.password.1')" name="userPassword" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoControlPanelConfiguration">
-			<var name="portlet" value="Virtual Instances" />
-		</execute>
-
-		<execute macro="PortalInstances#editCP">
-			<var name="mailDomain" value="gmail.com" />
-			<var name="virtualHost" value="${virtualHost}" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1818,7 +1812,7 @@
 		</execute>
 
 		<execute macro="User#editUserSiteCP">
-			<var name="siteName" value="Liferay" />
+			<var name="siteName" value="${siteName}" />
 			<var name="userScreenName" value="${userScreenName}" />
 		</execute>
 
@@ -1842,7 +1836,7 @@
 			<var name="suggestionInProgress" value="true" />
 			<var name="suggestionReceived" value="true" />
 			<var name="suggestionResolved" value="true" />
-			<var name="userEmailAddress" value="${userEmailAddress}" />
+			<var name="userEmailAddress" value="test@liferay.com" />
 			<var name="userName" value="${userName}" />
 		</execute>
 
@@ -1899,6 +1893,13 @@
 			<var name="kbSuggestionBody" value="${kbSuggestionBody}" />
 		</execute>
 
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginUserPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+
 		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
 		</execute>
@@ -1935,16 +1936,12 @@
 			<var name="portlet" value="Knowledge Base" />
 		</execute>
 
-		<execute macro="KBArticle#viewKBSuggestionNotificationsInGmail">
-			<var name="folderName" value="Home" />
-			<var name="gmailKBArticleDate" value="true" />
-			<var name="gmailMessageKBArticleURL" value="true" />
-			<var name="kbArticleContent" value="${kbArticleContent}" />
-			<var name="kbArticleTitle" value="${kbArticleTitle}" />
-			<var name="pageName" value="${pageName}" />
-			<var name="userEmailAddress" value="${userEmailAddress}" />
-			<var name="userEmailPassword" value="${userEmailPassword}" />
-			<var name="userName" value="Test Test" />
+		<execute macro="MockMock#viewMail">
+			<var name="asset" value="suggestion" />
+			<var name="content" value="View your resolved suggestion here" />
+			<var name="recipient" value="Test 2" />
+			<var name="sender" value="Test Test" />
+			<var name="subject" value="We have resolved your suggestion for article ${kbArticleTitle}" />
 		</execute>
 	</command>
 
@@ -1960,7 +1957,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2134,7 +2131,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2258,7 +2255,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2387,8 +2384,8 @@
 
 		<execute macro="KBArticleSuggestion#viewPG">
 			<var name="kbSuggestionBody" value="Test Test Knowledge Base Article Suggestion" />
+			<var name="kbSuggestionUserName" value="Test Test" />
 			<var name="status" value="New" />
-			<var name="userName" value="Test Test" />
 		</execute>
 
 		<execute macro="User#logoutPG" />
@@ -2474,26 +2471,26 @@
 
 		<execute macro="KBArticleSuggestion#viewPG">
 			<var name="kbSuggestionBody" value="User 2 Knowledge Base Article Suggestion 1" />
+			<var name="kbSuggestionUserName" value="userfn2 userln2" />
 			<var name="status" value="New" />
-			<var name="userName" value="userfn2 userln2" />
 		</execute>
 
 		<execute macro="KBArticleSuggestion#viewPG">
 			<var name="kbSuggestionBody" value="User 1 Knowledge Base Article Suggestion 2" />
+			<var name="kbSuggestionUserName" value="userfn1 userln1" />
 			<var name="status" value="New" />
-			<var name="userName" value="userfn1 userln1" />
 		</execute>
 
 		<execute macro="KBArticleSuggestion#viewPG">
 			<var name="kbSuggestionBody" value="User 1 Knowledge Base Article Suggestion 1" />
+			<var name="kbSuggestionUserName" value="userfn1 userln1" />
 			<var name="status" value="New" />
-			<var name="userName" value="userfn1 userln1" />
 		</execute>
 
 		<execute macro="KBArticleSuggestion#viewPG">
 			<var name="kbSuggestionBody" value="Test Test Knowledge Base Article Suggestion" />
+			<var name="kbSuggestionUserName" value="Test Test" />
 			<var name="status" value="New" />
-			<var name="userName" value="Test Test" />
 		</execute>
 	</command>
 
@@ -2509,7 +2506,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -2532,7 +2529,7 @@
 		</execute>
 
 		<for list="${kbArticleCounterList}" param="kbCount">
-			<execute macro="KBArticle#addChildPGViaKBAdmin">
+			<execute macro="KBArticle#addChildArticleViaKBAdmin">
 				<var name="kbArticleTitle" value="Knowledge Base Article Parent Title 1" />
 				<var name="kbChildArticleContent" value="Knowledge Base Article Parent Content 1 Child ${kbCount}" />
 				<var name="kbChildArticleTitle" value="Knowledge Base Article Parent Title 1 Child ${kbCount}" />
@@ -2617,9 +2614,9 @@
 
 		<execute macro="Page#addChild">
 			<var name="page" value="Public Pages" />
+			<var name="pageName" value="Welcome" />
 			<var name="siteChildPageName" value="Knowledge Base Display Page" />
 			<var name="siteName" value="Liferay" />
-			<var name="sitePageName" value="Welcome" />
 		</execute>
 
 		<execute macro="SitePageNavigator#gotoEditPage">
@@ -2627,7 +2624,7 @@
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
-			<var name="columnName" value="1_column" />
+			<var name="columnName" value="1 Column" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -2640,6 +2637,8 @@
 			<var name="kbArticleContent" value="Knowledge Base Article Content" />
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 		</execute>
+
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="Page#gotoChildPagePG">
 			<var name="childPageName" value="Knowledge Base Display Page" />

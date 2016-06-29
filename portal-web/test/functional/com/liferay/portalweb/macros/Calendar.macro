@@ -3,6 +3,23 @@
 	<var name="calendarDescription" value="" />
 	<var name="siteName" value="Liferay" />
 
+	<command name="_checkForRSSTitle">
+		<if>
+			<condition function="IsElementNotPresent" locator1="CalendarRSS#FEED_TITLE"  />
+			<then>
+				<execute macro="Navigator#gotoPage">
+					<var name="pageName" value="${pageName}" />
+				</execute>
+
+				<execute macro="Calendar#chooseSiteCalendarMenulistOption">
+					<var name="menuListOption" value="RSS" />
+					<var name="siteCalendarName" value="${siteCalendarName}" />
+					<var name="siteName" value="${siteName}" />
+				</execute>
+			</then>
+		</if>
+	</command>
+
 	<command name="_deleteCalendar">
 		<var name="key_menuListOption" value="Delete" />
 
@@ -181,7 +198,7 @@
 				<var name="key_calendarName" value="${calendarName}" />
 				<var name="key_user" value="${user}" />
 
-				<execute function="AssertTextEquals" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL" value1="${user} - ${calendarName}" />
+				<execute function="AssertTextEquals" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL" value1="${calendarName}" />
 				<execute function="Click" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL_MENULIST_ARROW" />
 
 				<execute macro="Calendar#_deleteCalendar" />
@@ -192,7 +209,7 @@
 					<var name="key_calendarName" value="${calendarName}" />
 					<var name="key_site" value="${site}" />
 
-					<execute function="AssertTextEquals" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_ADDITIONAL" value1="${site} - ${calendarName}" />
+					<execute function="AssertTextEquals" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_ADDITIONAL" value1="${calendarName}" />
 					<execute function="Click" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_ADDITIONAL_MENULIST_ARROW" />
 
 					<execute macro="Calendar#_deleteCalendar" />
@@ -212,7 +229,7 @@
 				<var name="key_calendarName" value="${calendarName}" />
 				<var name="key_user" value="${user}" />
 
-				<execute function="AssertTextEquals" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL" value1="${user} - ${calendarName}" />
+				<execute function="AssertTextEquals" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL" value1="${calendarName}" />
 				<execute function="Click" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL_MENULIST_ARROW" />
 
 				<execute macro="Calendar#_gotoMenulistOption">
@@ -276,7 +293,7 @@
 				<var name="key_calendarName" value="${calendarName}" />
 				<var name="key_user" value="${user}" />
 
-				<execute function="AssertTextEquals" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL" value1="${user} - ${calendarName}" />
+				<execute function="AssertTextEquals" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL" value1="${calendarName}" />
 				<execute function="Click" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL_MENULIST_ARROW" />
 
 				<execute macro="Calendar#_gotoMenulistOption">
@@ -284,7 +301,7 @@
 				</execute>
 
 				<execute macro="Calendar#_viewEmailHeader">
-					<var name="header" value="${user} - ${calendarName}" />
+					<var name="header" value="${calendarName}" />
 				</execute>
 			</then>
 			<elseif>
@@ -293,7 +310,7 @@
 					<var name="key_calendarName" value="${calendarName}" />
 					<var name="key_site" value="${site}" />
 
-					<execute function="AssertTextEquals" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_ADDITIONAL" value1="${site} - ${calendarName}" />
+					<execute function="AssertTextEquals" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_ADDITIONAL" value1="${calendarName}" />
 					<execute function="Click" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_ADDITIONAL_MENULIST_ARROW" />
 
 					<execute macro="Calendar#_gotoMenulistOption">
@@ -301,7 +318,7 @@
 					</execute>
 
 					<execute macro="Calendar#_viewEmailHeader">
-						<var name="header" value="${site} - ${calendarName}" />
+						<var name="header" value="${calendarName}" />
 					</execute>
 				</then>
 			</elseif>
@@ -592,6 +609,8 @@
 	</command>
 
 	<command name="hideCurrentSiteCalendar">
+		<execute function="ScrollWebElementIntoView" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_PRIMARY_COLOR_DEFAULT" />
+
 		<execute function="Click" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_PRIMARY_COLOR_DEFAULT" />
 
 		<execute function="AssertElementPresent" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_PRIMARY_COLOR_HIDDEN" />
@@ -676,6 +695,8 @@
 	</command>
 
 	<command name="showCurrentSiteCalendar">
+		<execute function="ScrollWebElementIntoView" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_PRIMARY_COLOR_HIDDEN" />
+
 		<execute function="Click" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_PRIMARY_COLOR_HIDDEN" />
 
 		<execute function="AssertElementPresent" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_PRIMARY_COLOR_DEFAULT" />
@@ -752,14 +773,14 @@
 			<then>
 				<var name="key_user" value="${user}" />
 
-				<execute function="AssertTextEquals" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL" value1="${user} - ${calendarName}" />
+				<execute function="AssertTextEquals" locator1="Calendar#MY_CALENDARS_CALENDAR_ADDITIONAL" value1="${calendarName}" />
 			</then>
 			<elseif>
-				<equals arg1="${calendarType}" arg2="Site Calendars" />
+				<equals arg1="${calendarType}" arg2="Current Site Calendars" />
 				<then>
 					<var name="key_site" value="${site}" />
 
-					<execute function="AssertTextEquals" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_ADDITIONAL" value1="${site} - ${calendarName}" />
+					<execute function="AssertTextEquals" locator1="Calendar#CURRENT_SITE_CALENDARS_CALENDAR_ADDITIONAL" value1="${calendarName}" />
 				</then>
 			</elseif>
 			<elseif>
@@ -890,7 +911,11 @@
 	<command name="viewNoRSS">
 		<execute function="Open" locator1="${rssURL}" />
 
-		<execute function="AssertElementPresent" locator1="CalendarConfiguration#ERROR_HEADER" />
+		<var name="pageName" value="Welcome" />
+
+		<execute function="AssertVisible" locator1="Home#PAGE_ACTIVE">
+			<var name="key_pageName" value="${pageName}" />
+		</execute>
 	</command>
 
 	<command name="viewOtherCalendarMenulist">
@@ -905,12 +930,8 @@
 
 		<execute function="SelectFrameTop" value1="relative=top" />
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#chooseOtherCalendarMenulistOption">
@@ -924,12 +945,8 @@
 			<var name="calendarName" value="${calendarName}" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#chooseOtherCalendarMenulistOption">
@@ -939,12 +956,8 @@
 
 		<execute macro="CalendarNavigator#_selectPermissionsIframe" />
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#chooseOtherCalendarMenulistOption">
@@ -952,12 +965,8 @@
 			<var name="menuListOption" value="RSS" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#viewCalendarColorPicker">
@@ -965,12 +974,8 @@
 			<var name="color" value="${color}" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="Calendar#chooseOtherCalendarMenulistOption">
@@ -996,12 +1001,11 @@
 	</command>
 
 	<command name="viewRSSFeedEventNotPresent">
-		<if>
-			<condition function="IsElementNotPresent" locator1="CalendarRSS#FEED_TITLE"  />
-			<then>
-				<execute function="Refresh" />
-			</then>
-		</if>
+		<execute macro="Calendar#_checkForRSSTitle">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteCalendarName" value="${siteCalendarName}" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
 
 		<execute function="AssertTextEquals" locator1="CalendarRSS#FEED_TITLE"  value1="${calendarName}" />
 
@@ -1012,12 +1016,11 @@
 	</command>
 
 	<command name="viewRSSFeedEventPresent">
-		<if>
-			<condition function="IsElementNotPresent" locator1="CalendarRSS#FEED_TITLE"  />
-			<then>
-				<execute function="Refresh" />
-			</then>
-		</if>
+		<execute macro="Calendar#_checkForRSSTitle">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteCalendarName" value="${siteCalendarName}" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
 
 		<execute function="AssertTextEquals" locator1="CalendarRSS#FEED_TITLE"  value1="${calendarName}" />
 
@@ -1074,6 +1077,8 @@
 		<execute function="Click" locator1="CalendarEditEvent#START_DATE" />
 
 		<execute function="AssertTextEquals" locator1="PGCalendarAddevent#MINI_CALENDAR_WEEK_START_DAY_START_DATE" value1="${weekStartDay}" />
+
+		<execute function="Click" locator1="CalendarEditEvent#DATE_CONTAINER" />
 
 		<execute function="Click" locator1="CalendarEditEvent#END_DATE" />
 

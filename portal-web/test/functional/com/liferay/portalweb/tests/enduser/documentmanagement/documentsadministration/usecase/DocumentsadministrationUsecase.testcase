@@ -1,4 +1,5 @@
 <definition component-name="portal-document-management">
+	<property name="portal.release" value="true" />
 	<property name="custom.properties" value="default.layout.template.id=1_column" />
 	<property name="testray.main.component.name" value="Documents Management" />
 
@@ -94,39 +95,34 @@
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="page" value="Public Pages" />
 			<var name="pageName" value="Site Page 1" />
 		</execute>
 
 		<execute macro="Page#add">
-			<var name="page" value="Public Pages" />
 			<var name="pageName" value="Site Page 2" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Site Page 1" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Site Page 2" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Site Page 1" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="DMPortlet#configureDisplaySettingsPG">
@@ -135,10 +131,9 @@
 			<var name="entriesToDisplayCount" value="75" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Site Page 2" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="DMPortlet#viewDefaultConfigurationDisplaySettingsPG" />
@@ -265,14 +260,14 @@
 				<var name="dmDocumentTitle" value="Document_1.doc" />
 			</execute>
 
-			<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
+			<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
 
 			<execute macro="Navigator#gotoPage">
 				<var name="pageName" value="${pageName}" />
 			</execute>
 		</for>
 
-		<execute macro="DMDocument#editPublishPG">
+		<execute macro="DMDocument#editSavePG">
 			<var name="dmDocumentTitle" value="Document_1.doc" />
 			<var name="dmDocumentTitleEdit" value="Document1" />
 		</execute>
@@ -315,6 +310,7 @@
 
 		<execute macro="DMDocument#saveAndCheckinEditedDocumentPG">
 			<var name="dmDocumentTitle" value="Document1" />
+			<var name="revision" value="Minor" />
 		</execute>
 
 		<execute macro="DMNavigator#gotoDocumentPG">
@@ -352,7 +348,7 @@
 			</then>
 		</while>
 
-		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
+		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
 
 		<execute macro="DMDocument#viewDocumentVersionNumberCmdPG">
 			<var name="dmDocumentVersionNumber" value="PWC" />
@@ -364,6 +360,7 @@
 
 		<execute macro="DMDocument#checkinPG">
 			<var name="dmDocumentTitle" value="Document1" />
+			<var name="revision" value="Minor" />
 		</execute>
 
 		<execute macro="DMDocument#viewDocumentVersionNumberCmdPG">
@@ -474,7 +471,7 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="DMNavigator#gotoFolderPG">
+		<execute macro="DMNavigator#gotoFolder">
 			<var name="dmFolderName" value="Folder1" />
 		</execute>
 
@@ -487,7 +484,7 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="DMNavigator#gotoFolderPG">
+		<execute macro="DMNavigator#gotoFolder">
 			<var name="dmFolderName" value="Folder1" />
 		</execute>
 
@@ -500,7 +497,7 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="DMNavigator#gotoFolderPG">
+		<execute macro="DMNavigator#gotoFolder">
 			<var name="dmFolderName" value="Folder1" />
 		</execute>
 
@@ -513,7 +510,7 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="DMNavigator#gotoFolderPG">
+		<execute macro="DMNavigator#gotoFolder">
 			<var name="dmFolderName" value="Folder1" />
 		</execute>
 
@@ -816,6 +813,8 @@
 			<var name="roleType" value="Site" />
 		</execute>
 
+		<execute function="Refresh" />
+
 		<execute macro="Role#viewPermissionCP">
 			<var name="permissionDefinitionValue" value="Delete" />
 			<var name="permissionNavigationValue" value="Document" />
@@ -850,6 +849,8 @@
 			<var name="permissionDefinitionValue" value="Update" />
 			<var name="permissionNavigationValue" value="Documents Folder" />
 		</execute>
+
+		<execute function="Refresh" />
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
 			<var name="portlet" value="Users and Organizations" />
@@ -894,14 +895,7 @@
 			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
-		<execute macro="User#unassignRegularRoleCP">
-			<var name="roleName" value="Power User" />
-			<var name="userScreenName" value="usersn" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoControlPanelUsers">
-			<var name="portlet" value="Users and Organizations" />
-		</execute>
+		<execute function="Pause" locator1="3000" />
 
 		<execute macro="User#addCP">
 			<var name="userEmailAddress" value="userea2@liferay.com" />
@@ -1083,7 +1077,7 @@
 			<var name="pageName" value="Documents and Media Page - Global" />
 		</execute>
 
-		<execute macro="DMNavigator#gotoFolderPG">
+		<execute macro="DMNavigator#gotoFolder">
 			<var name="dmFolderName" value="DM SubFolder Name" />
 		</execute>
 
@@ -1113,7 +1107,7 @@
 		</execute>
 
 		<execute macro="SiteTemplates#addSitePageViaSiteTemplateCP">
-			<var name="sitePageName" value="DM Site Page Name - Global" />
+			<var name="pageName" value="DM Site Page Name - Global" />
 			<var name="siteTemplateName" value="Site Template Name" />
 		</execute>
 
@@ -1130,43 +1124,39 @@
 			<var name="site" value="DM Site Name" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="DM Site Page Name - Global" />
 			<var name="siteName" value="DM Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="DM Site Page Name - Global" />
 			<var name="siteName" value="DM Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="DMPortlet#configureScopetoGlobalPG">
 			<var name="currentScope" value="DM Site Name" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="DM Site Page Name - Global" />
 			<var name="siteName" value="DM Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="DMPortlet#configureRootFolderPG">
 			<var name="dmFolderName" value="DM Folder Name" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="DM Site Page Name - Global" />
 			<var name="siteName" value="DM Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="DMNavigator#gotoFolderPG">
+		<execute macro="DMNavigator#gotoFolder">
 			<var name="dmFolderName" value="DM SubFolder Name" />
 		</execute>
 
@@ -1235,9 +1225,11 @@
 
 		<execute function="AssertClick" locator1="MenuItem#EDIT" value1="Edit" />
 
-		<execute function="AssertClick" locator1="AssetCategorization#CATEGORIZATION_PANEL_COLLAPSED" value1="Categorization" />
-
 		<var name="key_categoryName" value="${categoryName}" />
+
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Categorization" />
+		</execute>
 
 		<execute function="AssertTextEquals" locator1="AssetCategorization#CATEGORY" value1="${categoryName}" />
 
@@ -1352,13 +1344,13 @@
 			<var name="dmDocumentTitle" value="DM Document1 Title" />
 		</execute>
 
-		<execute function="AssertNotChecked" locator1="DocumentsAndMedia#TOOLBAR_SELECT_ALL_CHECKBOX" />
+		<execute function="AssertElementPresent" locator1="Checkbox#SELECT_ALL_CHECKBOX_TICK" />
 
 		<execute macro="DMDocument#uncheckDocumentCheckboxCP">
 			<var name="dmDocumentTitle" value="DM Document1 Title" />
 		</execute>
 
-		<execute function="AssertNotChecked" locator1="DocumentsAndMedia#TOOLBAR_SELECT_ALL_CHECKBOX" />
+		<execute function="AssertElementNotPresent" locator1="Checkbox#SELECT_ALL_CHECKBOX_TICK" />
 
 		<execute macro="DMDocument#checkDocumentCheckboxCP">
 			<var name="dmDocumentTitle" value="DM Document1 Title" />
@@ -1368,6 +1360,6 @@
 			<var name="dmDocumentTitle" value="DM Document2 Title" />
 		</execute>
 
-		<execute function="AssertChecked" locator1="Checkbox#LEXICON_SELECT_ALL" />
+		<execute function="AssertChecked" locator1="DocumentsAndMedia#TOOLBAR_SELECT_ALL_CHECKBOX" />
 	</command>
 </definition>

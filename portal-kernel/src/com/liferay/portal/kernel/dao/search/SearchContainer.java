@@ -47,12 +47,6 @@ public class SearchContainer<R> {
 
 	public static final String DEFAULT_CUR_PARAM = "cur";
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #DEFAULT_CUR}.
-	 */
-	@Deprecated
-	public static final int DEFAULT_CUR_VALUE = DEFAULT_CUR;
-
 	public static final int DEFAULT_DELTA = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.SEARCH_CONTAINER_PAGE_DEFAULT_DELTA));
 
@@ -62,11 +56,7 @@ public class SearchContainer<R> {
 
 	public static final String DEFAULT_DEPRECATED_TOTAL_VAR = "deprecatedTotal";
 
-	/**
-	 * @deprecated As of 6.2.0, see LPS-6312
-	 */
-	@Deprecated
-	public static final int DEFAULT_MAX_PAGES = 25;
+	public static final boolean DEFAULT_FORCE_POST = false;
 
 	public static final String DEFAULT_ORDER_BY_COL_PARAM = "orderByCol";
 
@@ -206,14 +196,6 @@ public class SearchContainer<R> {
 		return _curParam;
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getCur}
-	 */
-	@Deprecated
-	public int getCurValue() {
-		return getCur();
-	}
-
 	public int getDelta() {
 		return _delta;
 	}
@@ -228,6 +210,10 @@ public class SearchContainer<R> {
 
 	public String getEmptyResultsMessage() {
 		return _emptyResultsMessage;
+	}
+
+	public String getEmptyResultsMessageCssClass() {
+		return _emptyResultsMessageCssClass;
 	}
 
 	public int getEnd() {
@@ -284,14 +270,6 @@ public class SearchContainer<R> {
 
 	public PortletURL getIteratorURL() {
 		return _iteratorURL;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, see LPS-6312
-	 */
-	@Deprecated
-	public int getMaxPages() {
-		return _maxPages;
 	}
 
 	public List<String> getNormalizedHeaderNames() {
@@ -374,6 +352,10 @@ public class SearchContainer<R> {
 		return _deltaConfigurable;
 	}
 
+	public boolean isForcePost() {
+		return _forcePost;
+	}
+
 	public boolean isHover() {
 		return _hover;
 	}
@@ -432,6 +414,16 @@ public class SearchContainer<R> {
 		_emptyResultsMessage = emptyResultsMessage;
 	}
 
+	public void setEmptyResultsMessageCssClass(
+		String emptyResultsMessageCssClass) {
+
+		_emptyResultsMessageCssClass = emptyResultsMessageCssClass;
+	}
+
+	public void setForcePost(boolean forcePost) {
+		_forcePost = forcePost;
+	}
+
 	public void setHeaderNames(List<String> headerNames) {
 		_headerNames = headerNames;
 
@@ -448,14 +440,6 @@ public class SearchContainer<R> {
 
 	public void setIteratorURL(PortletURL iteratorURL) {
 		_iteratorURL = iteratorURL;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, see LPS-6312
-	 */
-	@Deprecated
-	public void setMaxPages(int maxPages) {
-		_maxPages = maxPages;
 	}
 
 	public void setOrderableHeaders(Map<String, String> orderableHeaders) {
@@ -578,18 +562,13 @@ public class SearchContainer<R> {
 	private String _deltaParam = DEFAULT_DELTA_PARAM;
 	private final DisplayTerms _displayTerms;
 	private String _emptyResultsMessage;
+	private String _emptyResultsMessageCssClass;
 	private int _end;
+	private boolean _forcePost = DEFAULT_FORCE_POST;
 	private List<String> _headerNames;
 	private boolean _hover = true;
 	private String _id;
 	private PortletURL _iteratorURL;
-
-	/**
-	 * @deprecated As of 6.2.0, see LPS-6312
-	 */
-	@Deprecated
-	private int _maxPages = DEFAULT_MAX_PAGES;
-
 	private List<String> _normalizedHeaderNames;
 	private Map<String, String> _orderableHeaders;
 	private String _orderByCol;

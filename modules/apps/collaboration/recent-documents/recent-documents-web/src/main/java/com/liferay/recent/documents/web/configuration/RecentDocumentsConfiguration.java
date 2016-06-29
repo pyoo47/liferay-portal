@@ -24,12 +24,13 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 @ExtendedObjectClassDefinition(category = "collaboration")
 @Meta.OCD(
 	id = "com.liferay.recent.documents.web.configuration.RecentDocumentsConfiguration",
-	localization = "content/Language", name = "recent.documents.configuration.name"
+	localization = "content/Language",
+	name = "recent.documents.configuration.name"
 )
 public interface RecentDocumentsConfiguration {
 
 	@Meta.AD(
-		deflt = "1", description = "%check-file-ranks-interval-help",
+		deflt = "1", description = "check-file-ranks-interval-help",
 		required = false
 	)
 	public int checkFileRanksInterval();

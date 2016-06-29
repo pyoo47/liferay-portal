@@ -91,6 +91,8 @@ import com.liferay.portlet.blogs.social.BlogsActivityKeys;
 import com.liferay.portlet.blogs.util.BlogsUtil;
 import com.liferay.portlet.blogs.util.LinkbackProducerUtil;
 import com.liferay.social.kernel.model.SocialActivityConstants;
+import com.liferay.trash.kernel.exception.RestoreEntryException;
+import com.liferay.trash.kernel.exception.TrashEntryException;
 import com.liferay.trash.kernel.model.TrashEntry;
 
 import java.io.IOException;
@@ -215,9 +217,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 						MimeTypesUtil.getContentType(smallImageFileName), null);
 				}
 				catch (IOException ioe) {
-					if (_log.isErrorEnabled()) {
-						_log.error("Unable to create image selector", ioe);
-					}
+					_log.error("Unable to create image selector", ioe);
 				}
 			}
 			else if (Validator.isNotNull(smallImageURL)) {
@@ -860,6 +860,10 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		// Entry
 
+		if (entry.isInTrash()) {
+			throw new TrashEntryException();
+		}
+
 		int oldStatus = entry.getStatus();
 
 		if (oldStatus == WorkflowConstants.STATUS_PENDING) {
@@ -924,10 +928,17 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		// Entry
 
+		BlogsEntry entry = blogsEntryPersistence.findByPrimaryKey(entryId);
+
+		if (!entry.isInTrash()) {
+			throw new RestoreEntryException(
+				RestoreEntryException.INVALID_STATUS);
+		}
+
 		TrashEntry trashEntry = trashEntryLocalService.getEntry(
 			BlogsEntry.class.getName(), entryId);
 
-		BlogsEntry entry = updateStatus(
+		entry = updateStatus(
 			userId, entryId, trashEntry.getStatus(), new ServiceContext());
 
 		// Social
@@ -974,7 +985,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			userId, entry.getGroupId(), entry.getCreateDate(),
 			entry.getModifiedDate(), BlogsEntry.class.getName(),
 			entry.getEntryId(), entry.getUuid(), 0, assetCategoryIds,
-			assetTagNames, true, visible, null, null, null,
+			assetTagNames, true, visible, null, null, null, null,
 			ContentTypes.TEXT_HTML, entry.getTitle(), entry.getDescription(),
 			summary, null, null, 0, 0, priority);
 
@@ -1031,9 +1042,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 						MimeTypesUtil.getContentType(smallImageFileName), null);
 				}
 				catch (IOException ioe) {
-					if (_log.isErrorEnabled()) {
-						_log.error("Unable to create image selector", ioe);
-					}
+					_log.error("Unable to create image selector", ioe);
 				}
 			}
 			else if (Validator.isNotNull(smallImageURL)) {

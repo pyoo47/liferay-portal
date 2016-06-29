@@ -1,0 +1,10 @@
+;
+; Do not manually edit this file. See
+; https://github.com/git-commands/git-subrepo#readme for more information.
+;
+[subrepo]
+	cmdver = liferay
+	commit = f190c896e1373db164892f2898a36cac250b3dba
+	mode = push
+	parent = b5e528456cba655ae8c8aa3d969b70868c972092
+	remote = git@github.com:liferay/com-liferay-password-policies-admin.git

@@ -89,7 +89,6 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 
 			<c:if test="<%= folderId != rootFolderId %>">
 				<span class="change-search-folder">
-
 					<portlet:renderURL var="changeSearchFolderURL">
 						<portlet:param name="mvcRenderCommandName" value="/document_library/search" />
 						<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
@@ -240,7 +239,7 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 
 							request.setAttribute("info_panel.jsp-folder", curFolder);
 
-							request.setAttribute("view_entries.jsp-repositoryId", String.valueOf(curFolder.getRepositoryId()));
+							request.setAttribute("view.jsp-repositoryId", String.valueOf(curFolder.getRepositoryId()));
 							%>
 
 							<liferay-ui:app-view-search-entry
@@ -368,7 +367,7 @@ SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, por
 		</div>
 	</c:when>
 	<c:otherwise>
-		<div class="repository-search-results" data-repositoryId="<%= searchRepositoryId %>" id='<%= liferayPortletResponse.getNamespace() + "searchResultsContainer" + searchRepositoryId %>'>
+		<div class="repository-search-results" data-repositoryId="<%= searchRepositoryId %>" id="<%= liferayPortletResponse.getNamespace() + "searchResultsContainer" + searchRepositoryId %>">
 			<%= searchResults %>
 		</div>
 	</c:otherwise>

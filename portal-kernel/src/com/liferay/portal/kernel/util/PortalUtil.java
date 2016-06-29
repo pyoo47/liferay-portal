@@ -188,6 +188,22 @@ public class PortalUtil {
 	}
 
 	/**
+	 * Adds an entry to the portlet breadcrumbs for the page in the request.
+	 *
+	 * @param request the servlet request for the page
+	 * @param title the title of the new breadcrumb entry
+	 * @param url the URL of the new breadcrumb entry
+	 * @param data the HTML5 data parameters of the new breadcrumb entry
+	 */
+	public static void addPortletBreadcrumbEntry(
+		HttpServletRequest request, String title, String url,
+		Map<String, Object> data, boolean portletBreadcrumbEntry) {
+
+		getPortal().addPortletBreadcrumbEntry(
+			request, title, url, data, portletBreadcrumbEntry);
+	}
+
+	/**
 	 * Adds the default resource permissions for the portlet to the page in the
 	 * request.
 	 *
@@ -912,6 +928,14 @@ public class PortalUtil {
 		return getPortal().getFirstPageLayoutTypes(request);
 	}
 
+	public static String getForwardedHost(HttpServletRequest request) {
+		return getPortal().getForwardedHost(request);
+	}
+
+	public static int getForwardedPort(HttpServletRequest request) {
+		return getPortal().getForwardedPort(request);
+	}
+
 	public static String getFullName(
 		String firstName, String middleName, String lastName) {
 
@@ -1378,6 +1402,12 @@ public class PortalUtil {
 		throws PortalException {
 
 		return getPortal().getPortalURL(layout, themeDisplay);
+	}
+
+	public static String getPortalURL(
+		LayoutSet layoutSet, ThemeDisplay themeDisplay) {
+
+		return getPortal().getPortalURL(layoutSet, themeDisplay);
 	}
 
 	public static String getPortalURL(PortletRequest portletRequest) {
@@ -1997,6 +2027,10 @@ public class PortalUtil {
 		String portletId, ThemeDisplay themeDisplay) {
 
 		return getPortal().isControlPanelPortlet(portletId, themeDisplay);
+	}
+
+	public static boolean isForwardedSecure(HttpServletRequest request) {
+		return getPortal().isForwardedSecure(request);
 	}
 
 	public static boolean isGroupAdmin(User user, long groupId)

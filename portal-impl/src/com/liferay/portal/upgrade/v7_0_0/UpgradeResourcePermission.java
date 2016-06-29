@@ -14,9 +14,10 @@
 
 package com.liferay.portal.upgrade.v7_0_0;
 
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.upgrade.AutoBatchPreparedStatementUtil;
+import com.liferay.portal.kernel.util.LoggingTimer;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,40 +27,64 @@ import java.sql.ResultSet;
  */
 public class UpgradeResourcePermission extends UpgradeProcess {
 
+	protected void createIndex() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			runSQLTemplateString(
+				"create index IX_D5F1E2A2 on ResourcePermission " +
+					"(name[$COLUMN_LENGTH:255$])",
+				false, false);
+		}
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
-		String selectSQL =
-			"select resourcePermissionId, primKey, actionIds from " +
-				"ResourcePermission";
-		String updateSQL =
-			"update ResourcePermission set primKeyId = ?, viewActionId = ? " +
-				"where resourcePermissionId = ?";
+		createIndex();
 
-		try (PreparedStatement ps1 = connection.prepareStatement(selectSQL);
-			ResultSet rs = ps1.executeQuery();
-			PreparedStatement ps2 =
-				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-					connection, updateSQL)) {
+		upgradeResourcePermissions();
+	}
 
-			while (rs.next()) {
-				long resourcePermissionId = rs.getLong("resourcePermissionId");
-				long actionIds = rs.getLong("actionIds");
+	protected void upgradeResourcePermissions() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			String selectSQL =
+				"select resourcePermissionId, primKey, actionIds from " +
+					"ResourcePermission";
+			String updateSQL =
+				"update ResourcePermission set primKeyId = ?, viewActionId = " +
+					"? where resourcePermissionId = ?";
 
-				long newPrimKeyId = GetterUtil.getLong(rs.getString("primKey"));
-				boolean newViewActionId = (actionIds % 2 == 1);
+			try (PreparedStatement ps1 = connection.prepareStatement(selectSQL);
+				ResultSet rs = ps1.executeQuery();
+				PreparedStatement ps2 =
+					AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+						connection, updateSQL)) {
 
-				if ((newPrimKeyId == 0) && !newViewActionId) {
-					continue;
+				while (rs.next()) {
+					long resourcePermissionId = rs.getLong(
+						"resourcePermissionId");
+					long actionIds = rs.getLong("actionIds");
+
+					long newPrimKeyId = GetterUtil.getLong(
+						rs.getString("primKey"));
+
+					boolean newViewActionId = false;
+
+					if ((actionIds % 2) == 1) {
+						newViewActionId = true;
+					}
+
+					if ((newPrimKeyId == 0) && !newViewActionId) {
+						continue;
+					}
+
+					ps2.setLong(1, newPrimKeyId);
+					ps2.setBoolean(2, newViewActionId);
+					ps2.setLong(3, resourcePermissionId);
+
+					ps2.addBatch();
 				}
 
-				ps2.setLong(1, newPrimKeyId);
-				ps2.setBoolean(2, newViewActionId);
-				ps2.setLong(3, resourcePermissionId);
-
-				ps2.addBatch();
+				ps2.executeBatch();
 			}
-
-			ps2.executeBatch();
 		}
 	}
 

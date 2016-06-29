@@ -110,20 +110,12 @@
 				<var method="TestPropsUtil#get('browser.type')" name="browserType" />
 
 				<if>
-					<equals arg1="${browserType}" arg2="internetexplorer" />
+					<equals arg1="${browserType}" arg2="safari" />
 					<then>
-						<execute function="MouseDown#javaScriptMouseDown" locator1="ControlMenu#ADD" />
+						<execute function="Pause" locator1="10000" />
 
-						<execute function="MouseUp#javaScriptMouseUp" locator1="ControlMenu#ADD" />
+						<execute function="Click#clickAt" locator1="ControlMenu#ADD" />
 					</then>
-					<elseif>
-						<equals arg1="${browserType}" arg2="safari" />
-						<then>
-							<execute function="Pause" locator1="10000" />
-
-							<execute function="Click#clickAt" locator1="ControlMenu#ADD" />
-						</then>
-					</elseif>
 					<else>
 						<execute function="Click#clickAt" locator1="ControlMenu#ADD" />
 					</else>
@@ -136,9 +128,7 @@
 
 		<execute function="Pause" locator1="5000" />
 
-		<execute macro="Panel#expandSidebarPanel">
-			<var name="panelHeading" value="Applications" />
-		</execute>
+		<execute macro="Panel#expandSidebarApplicationsPanel" />
 
 		<execute function="Type#sendKeysApplicationSearch" locator1="NavBar#APPLICATION_SEARCH_FIELD" value1="${portletName}" />
 
@@ -155,14 +145,13 @@
 		<var method="StringUtil#upperCase('${displayStyle}')" name="displayStyle" />
 
 		<if>
-			<and>
-				<condition function="IsElementPresent" locator1="Icon#DISPLAY_STYLE_${displayStyle}" />
-				<condition function="IsVisible" locator1="Icon#DISPLAY_STYLE_${displayStyle}" />
-			</and>
+			<condition function="IsElementNotPresent" locator1="Icon#DISPLAY_STYLE_${displayStyle}_ACTIVE" />
 			<then>
 				<execute function="Click" locator1="Icon#DISPLAY_STYLE_${displayStyle}" />
 			</then>
 		</if>
+
+		<execute function="AssertElementPresent" locator1="Icon#DISPLAY_STYLE_${displayStyle}_ACTIVE" />
 	</command>
 
 	<command name="configureCustomStylesViaLookandfeelPG">
@@ -241,6 +230,10 @@
 		<execute function="AssertClick" locator1="BasePortlet#MAXIMIZE" value1="Maximize" />
 	</command>
 
+	<command name="openAdminURL">
+		<execute function="Open" locator1="${adminURL}" />
+	</command>
+
 	<command name="shutdownServer">
 		<description message="This will shutdown the server at ${base_branch}-bundles\tomcat." />
 
@@ -313,15 +306,25 @@
 
 		<execute function="Click#clickAtSidebarClickAtWaitForScript" locator1="ControlMenu#ADD" value1="Add" />
 
-		<execute macro="Panel#expandSidebarPanel">
-			<var name="panelHeading" value="Applications" />
-		</execute>
+		<execute macro="Panel#expandSidebarApplicationsPanel" />
 
 		<execute function="Type#sendKeysApplicationSearch" locator1="NavBar#APPLICATION_SEARCH_FIELD" value1="${portletName}" />
 
 		<var name="portletLocator" value="//span[@data-title=&quot;${portletName}&quot; and contains(@class,'add-content-item')]" />
 
 		<execute function="AssertElementNotPresent" locator1="${portletLocator}" />
+	</command>
+
+	<command name="viewCannotEdit">
+		<execute function="AssertElementNotPresent" locator1="Button#EDIT" />
+	</command>
+
+	<command name="viewCannotPublish">
+		<execute function="AssertElementNotPresent" locator1="Button#PUBLISH" value1="Publish" />
+	</command>
+
+	<command name="viewCannotSaveAsDraft">
+		<execute function="AssertElementNotPresent" locator1="Button#SAVE_AS_DRAFT" value1="Save as Draft" />
 	</command>
 
 	<command name="viewCustomStylesViaLookandfeelPG">
@@ -402,11 +405,12 @@
 	<command name="viewPortletOptionsMenulist">
 		<execute function="Click#makeVisibleClickAt" locator1="BasePortlet#OPTIONS_ICON" />
 
-		<execute function="AssertTextEquals" locator1="BasePortlet#OPTIONS_MENULIST_LOOK_AND_FEEL" value1="Look and Feel Configuration" />
-		<execute function="AssertTextEquals" locator1="BasePortlet#OPTIONS_MENULIST_CONFIGURATION" value1="Configuration" />
-		<execute function="AssertTextEquals" locator1="BasePortlet#OPTIONS_MENULIST_CONFIGURATION_TEMPLATES" value1="Configuration Templates" />
-		<execute function="AssertTextEquals" locator1="BasePortlet#OPTIONS_MENULIST_EXPORT_IMPORT" value1="Export / Import" />
-		<execute function="AssertTextEquals" locator1="BasePortlet#OPTION_MENULIST_REMOVE" value1="Remove" />
+		<execute function="AssertTextEquals" locator1="MenuItem#LOOK_AND_FEEL" value1="Look and Feel Configuration" />
+		<execute function="AssertTextEquals" locator1="MenuItem#CONFIGURATION_PORTLET_OPTION" value1="Configuration" />
+		<execute function="AssertTextEquals" locator1="MenuItem#TEMPLATES" value1="Configuration Templates" />
+		<execute function="AssertTextEquals" locator1="MenuItem#EXPORT_IMPORT" value1="Export / Import" />
+		<execute function="AssertTextEquals" locator1="MenuItem#PERMISSIONS" value1="Permissions" />
+		<execute function="AssertTextEquals" locator1="MenuItem#REMOVE" value1="Remove" />
 	</command>
 
 	<command name="viewSpecificPG">

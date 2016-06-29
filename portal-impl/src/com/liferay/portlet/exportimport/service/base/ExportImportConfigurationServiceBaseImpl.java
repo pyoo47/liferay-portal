@@ -474,7 +474,7 @@ public abstract class ExportImportConfigurationServiceBaseImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -489,7 +489,7 @@ public abstract class ExportImportConfigurationServiceBaseImpl
 	protected com.liferay.exportimport.kernel.service.ExportImportService exportImportService;
 	@BeanReference(type = com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService.class)
 	protected com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService exportImportConfigurationLocalService;
-	@BeanReference(type = com.liferay.exportimport.kernel.service.ExportImportConfigurationService.class)
+	@BeanReference(type = ExportImportConfigurationService.class)
 	protected ExportImportConfigurationService exportImportConfigurationService;
 	@BeanReference(type = ExportImportConfigurationPersistence.class)
 	protected ExportImportConfigurationPersistence exportImportConfigurationPersistence;

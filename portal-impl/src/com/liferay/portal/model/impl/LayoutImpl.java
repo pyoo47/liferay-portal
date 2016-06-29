@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LayoutTypePortletFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -74,10 +75,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
@@ -410,7 +414,9 @@ public class LayoutImpl extends LayoutBaseImpl {
 			return Collections.emptyList();
 		}
 
-		List<Portlet> portlets = new ArrayList<>(portletPreferences.size());
+		List<Portlet> portlets = new ArrayList<>();
+
+		Set<String> layoutPortletIds = _getLayoutPortletIds();
 
 		for (PortletPreferences portletPreference : portletPreferences) {
 			String portletId = portletPreference.getPortletId();
@@ -419,7 +425,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 				getCompanyId(), portletId);
 
 			if ((portlet == null) || !portlet.isReady() ||
-				portlet.isUndeployedPortlet() || !portlet.isActive()) {
+				portlet.isUndeployedPortlet() || !portlet.isActive() ||
+				!layoutPortletIds.contains(portletId)) {
 
 				continue;
 			}
@@ -675,7 +682,13 @@ public class LayoutImpl extends LayoutBaseImpl {
 	public String getRegularURL(HttpServletRequest request)
 		throws PortalException {
 
-		return _getURL(request, false, false);
+		String url = _getURL(request, false, false);
+
+		if (!url.startsWith(Http.HTTP) && !url.startsWith(StringPool.SLASH)) {
+			return StringPool.SLASH + url;
+		}
+
+		return url;
 	}
 
 	@Override
@@ -1103,8 +1116,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypeControlPanel() {
-		if (Validator.equals(getType(), LayoutConstants.TYPE_CONTROL_PANEL) ||
-			Validator.equals(
+		if (Objects.equals(getType(), LayoutConstants.TYPE_CONTROL_PANEL) ||
+			Objects.equals(
 				_getLayoutTypeControllerType(),
 				LayoutConstants.TYPE_CONTROL_PANEL)) {
 
@@ -1116,8 +1129,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypeEmbedded() {
-		if (Validator.equals(getType(), LayoutConstants.TYPE_EMBEDDED) ||
-			Validator.equals(
+		if (Objects.equals(getType(), LayoutConstants.TYPE_EMBEDDED) ||
+			Objects.equals(
 				_getLayoutTypeControllerType(),
 				LayoutConstants.TYPE_EMBEDDED)) {
 
@@ -1129,8 +1142,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypeLinkToLayout() {
-		if (Validator.equals(getType(), LayoutConstants.TYPE_LINK_TO_LAYOUT) ||
-			Validator.equals(
+		if (Objects.equals(getType(), LayoutConstants.TYPE_LINK_TO_LAYOUT) ||
+			Objects.equals(
 				_getLayoutTypeControllerType(),
 				LayoutConstants.TYPE_LINK_TO_LAYOUT)) {
 
@@ -1142,8 +1155,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypePanel() {
-		if (Validator.equals(getType(), LayoutConstants.TYPE_PANEL) ||
-			Validator.equals(
+		if (Objects.equals(getType(), LayoutConstants.TYPE_PANEL) ||
+			Objects.equals(
 				_getLayoutTypeControllerType(), LayoutConstants.TYPE_PANEL)) {
 
 			return true;
@@ -1154,8 +1167,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypePortlet() {
-		if (Validator.equals(getType(), LayoutConstants.TYPE_PORTLET) ||
-			Validator.equals(
+		if (Objects.equals(getType(), LayoutConstants.TYPE_PORTLET) ||
+			Objects.equals(
 				_getLayoutTypeControllerType(), LayoutConstants.TYPE_PORTLET)) {
 
 			return true;
@@ -1166,7 +1179,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypeSharedPortlet() {
-		if (Validator.equals(getType(), LayoutConstants.TYPE_SHARED_PORTLET)) {
+		if (Objects.equals(getType(), LayoutConstants.TYPE_SHARED_PORTLET)) {
 			return true;
 		}
 
@@ -1175,7 +1188,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public boolean isTypeURL() {
-		if (Validator.equals(getType(), LayoutConstants.TYPE_URL)) {
+		if (Objects.equals(getType(), LayoutConstants.TYPE_URL)) {
 			return true;
 		}
 
@@ -1265,6 +1278,21 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 			_friendlyURLKeywords[i] = StringUtil.toLowerCase(keyword);
 		}
+	}
+
+	private Set<String> _getLayoutPortletIds() {
+		Set<String> layoutPortletIds = new HashSet<>();
+
+		List<PortletPreferences> portletPreferences =
+			PortletPreferencesLocalServiceUtil.getPortletPreferences(
+				PortletKeys.PREFS_OWNER_ID_DEFAULT,
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, getPlid());
+
+		for (PortletPreferences portletPreference : portletPreferences) {
+			layoutPortletIds.add(portletPreference.getPortletId());
+		}
+
+		return layoutPortletIds;
 	}
 
 	private String _getLayoutTypeControllerType() {

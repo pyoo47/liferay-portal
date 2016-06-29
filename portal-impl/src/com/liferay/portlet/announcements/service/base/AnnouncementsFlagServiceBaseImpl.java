@@ -165,7 +165,7 @@ public abstract class AnnouncementsFlagServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -176,7 +176,7 @@ public abstract class AnnouncementsFlagServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService.class)
 	protected com.liferay.announcements.kernel.service.AnnouncementsFlagLocalService announcementsFlagLocalService;
-	@BeanReference(type = com.liferay.announcements.kernel.service.AnnouncementsFlagService.class)
+	@BeanReference(type = AnnouncementsFlagService.class)
 	protected AnnouncementsFlagService announcementsFlagService;
 	@BeanReference(type = AnnouncementsFlagPersistence.class)
 	protected AnnouncementsFlagPersistence announcementsFlagPersistence;

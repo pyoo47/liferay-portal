@@ -543,7 +543,7 @@ public abstract class DLAppServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -554,7 +554,7 @@ public abstract class DLAppServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.document.library.kernel.service.DLAppLocalService.class)
 	protected com.liferay.document.library.kernel.service.DLAppLocalService dlAppLocalService;
-	@BeanReference(type = com.liferay.document.library.kernel.service.DLAppService.class)
+	@BeanReference(type = DLAppService.class)
 	protected DLAppService dlAppService;
 	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;

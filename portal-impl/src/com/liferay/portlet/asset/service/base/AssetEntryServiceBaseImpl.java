@@ -819,7 +819,7 @@ public abstract class AssetEntryServiceBaseImpl extends BaseServiceImpl
 			sql = PortalUtil.transformSQL(sql);
 
 			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql, new int[0]);
+					sql);
 
 			sqlUpdate.update();
 		}
@@ -830,7 +830,7 @@ public abstract class AssetEntryServiceBaseImpl extends BaseServiceImpl
 
 	@BeanReference(type = com.liferay.asset.kernel.service.AssetEntryLocalService.class)
 	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
-	@BeanReference(type = com.liferay.asset.kernel.service.AssetEntryService.class)
+	@BeanReference(type = AssetEntryService.class)
 	protected AssetEntryService assetEntryService;
 	@BeanReference(type = AssetEntryPersistence.class)
 	protected AssetEntryPersistence assetEntryPersistence;

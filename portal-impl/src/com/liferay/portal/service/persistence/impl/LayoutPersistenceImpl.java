@@ -30,9 +30,7 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -59,6 +57,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -203,7 +202,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Layout layout : list) {
-					if (!Validator.equals(uuid, layout.getUuid())) {
+					if (!Objects.equals(uuid, layout.getUuid())) {
 						list = null;
 
 						break;
@@ -686,8 +685,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchLayoutException(msg.toString());
@@ -734,7 +733,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		if (result instanceof Layout) {
 			Layout layout = (Layout)result;
 
-			if (!Validator.equals(uuid, layout.getUuid()) ||
+			if (!Objects.equals(uuid, layout.getUuid()) ||
 					(groupId != layout.getGroupId()) ||
 					(privateLayout != layout.getPrivateLayout())) {
 				result = null;
@@ -1041,7 +1040,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Layout layout : list) {
-					if (!Validator.equals(uuid, layout.getUuid()) ||
+					if (!Objects.equals(uuid, layout.getUuid()) ||
 							(companyId != layout.getCompanyId())) {
 						list = null;
 
@@ -2897,8 +2896,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchLayoutException(msg.toString());
@@ -3196,7 +3195,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Layout layout : list) {
-					if (!Validator.equals(layoutPrototypeUuid,
+					if (!Objects.equals(layoutPrototypeUuid,
 								layout.getLayoutPrototypeUuid())) {
 						list = null;
 
@@ -3764,7 +3763,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Layout layout : list) {
-					if (!Validator.equals(sourcePrototypeLayoutUuid,
+					if (!Objects.equals(sourcePrototypeLayoutUuid,
 								layout.getSourcePrototypeLayoutUuid())) {
 						list = null;
 
@@ -5182,8 +5181,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchLayoutException(msg.toString());
@@ -6509,7 +6508,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				for (Layout layout : list) {
 					if ((groupId != layout.getGroupId()) ||
 							(privateLayout != layout.getPrivateLayout()) ||
-							!Validator.equals(type, layout.getType())) {
+							!Objects.equals(type, layout.getType())) {
 						list = null;
 
 						break;
@@ -7491,8 +7490,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchLayoutException(msg.toString());
@@ -7541,7 +7540,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if ((groupId != layout.getGroupId()) ||
 					(privateLayout != layout.getPrivateLayout()) ||
-					!Validator.equals(friendlyURL, layout.getFriendlyURL())) {
+					!Objects.equals(friendlyURL, layout.getFriendlyURL())) {
 				result = null;
 			}
 		}
@@ -7774,8 +7773,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchLayoutException(msg.toString());
@@ -7827,7 +7826,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if ((groupId != layout.getGroupId()) ||
 					(privateLayout != layout.getPrivateLayout()) ||
-					!Validator.equals(sourcePrototypeLayoutUuid,
+					!Objects.equals(sourcePrototypeLayoutUuid,
 						layout.getSourcePrototypeLayoutUuid())) {
 				result = null;
 			}
@@ -8403,8 +8402,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			Layout layout = (Layout)session.get(LayoutImpl.class, primaryKey);
 
 			if (layout == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchLayoutException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -8766,8 +8765,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		Layout layout = fetchByPrimaryKey(primaryKey);
 
 		if (layout == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchLayoutException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -8797,12 +8796,14 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	 */
 	@Override
 	public Layout fetchByPrimaryKey(Serializable primaryKey) {
-		Layout layout = (Layout)entityCache.getResult(LayoutModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(LayoutModelImpl.ENTITY_CACHE_ENABLED,
 				LayoutImpl.class, primaryKey);
 
-		if (layout == _nullLayout) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		Layout layout = (Layout)serializable;
 
 		if (layout == null) {
 			Session session = null;
@@ -8817,7 +8818,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				}
 				else {
 					entityCache.putResult(LayoutModelImpl.ENTITY_CACHE_ENABLED,
-						LayoutImpl.class, primaryKey, _nullLayout);
+						LayoutImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -8871,18 +8872,20 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Layout layout = (Layout)entityCache.getResult(LayoutModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(LayoutModelImpl.ENTITY_CACHE_ENABLED,
 					LayoutImpl.class, primaryKey);
 
-			if (layout == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, layout);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (Layout)serializable);
+				}
 			}
 		}
 
@@ -8924,7 +8927,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(LayoutModelImpl.ENTITY_CACHE_ENABLED,
-					LayoutImpl.class, primaryKey, _nullLayout);
+					LayoutImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -9176,34 +9179,4 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "type", "hidden"
 			});
-	private static final Layout _nullLayout = new LayoutImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<Layout> toCacheModel() {
-				return _nullLayoutCacheModel;
-			}
-		};
-
-	private static final CacheModel<Layout> _nullLayoutCacheModel = new NullCacheModel();
-
-	private static class NullCacheModel implements CacheModel<Layout>,
-		MVCCModel {
-		@Override
-		public long getMvccVersion() {
-			return -1;
-		}
-
-		@Override
-		public void setMvccVersion(long mvccVersion) {
-		}
-
-		@Override
-		public Layout toEntityModel() {
-			return _nullLayout;
-		}
-	}
 }

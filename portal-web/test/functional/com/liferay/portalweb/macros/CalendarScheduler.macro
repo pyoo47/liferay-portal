@@ -115,7 +115,7 @@
 		<if>
 			<condition function="IsElementPresent" locator1="CalendarEditEvent#RECURRING_EVENT_DIALOG_BOX_HEADER" />
 			<then>
-				<execute function="AssertClick" locator1="CalendarEditEvent#ALL_EVENTS_IN_THE_SERIES_BUTTON" value1="All Events in the Series" />
+				<execute function="AssertClick" locator1="CalendarEditEvent#ENTIRE_SERIES_BUTTON" value1="Entire Series" />
 			</then>
 		</if>
 
@@ -199,6 +199,22 @@
 		<execute function="AssertClick" locator1="Calendar#SCHEDULER_EVENT_DIALOG_BOX_SAVE_BUTTON" value1="Save" />
 	</command>
 
+	<command name="saveRepeatingEvent">
+		<execute macro="Button#clickSave" />
+
+		<execute function="AssertElementPresent" locator1="CalendarEditEvent#RECURRING_EVENT_DIALOG_BOX_HEADER" />
+
+		<var method="StringUtil#replace('${saveOption}', ' ', '_')" name="saveOptionPath" />
+
+		<var method="StringUtil#upperCase('${saveOptionPath}')" name="saveOptionPath" />
+
+		<execute function="AssertClick" locator1="CalendarEditEvent#${saveOptionPath}_BUTTON" value1="${saveOption}" />
+
+		<execute function="Refresh" />
+
+		<execute macro="Alert#viewSuccessMessage" />
+	</command>
+
 	<command name="selectCalendar">
 		<execute function="Select" locator1="Calendar#SCHEDULER_EVENT_DIALOG_BOX_CALENDAR" value1="${calendarName}" />
 	</command>
@@ -206,9 +222,25 @@
 	<command name="selectSpecificEvent">
 		<var name="key_eventTitle" value="${eventTitle}" />
 
-		<execute function="ScrollWebElementIntoView" locator1="Calendar#SCHEDULER_EVENT_SPECIFIC" />
+		<if>
+			<contains string="${eventTitle}" substring="All Day" />
+			<then>
+				<execute function="AssertClick#assertTextClickNoMouseOver" locator1="Calendar#SCHEDULER_EVENT_SPECIFIC_ALL_DAY" value1="${eventTitle}" />
+			</then>
+			<elseif>
+				<equals arg1="${eventToday}" arg2="false" />
+				<then>
+					<execute function="ScrollWebElementIntoView" locator1="Calendar#SCHEDULER_VIEW_EVENT_NOT_TODAY" />
 
-		<execute function="AssertClick#assertTextClickNoMouseOver" locator1="Calendar#SCHEDULER_EVENT_SPECIFIC" value1="${eventTitle}" />
+					<execute function="AssertClick" locator1="Calendar#SCHEDULER_VIEW_EVENT_NOT_TODAY" value1="${eventTitle}" />
+				</then>
+			</elseif>
+			<else>
+				<execute function="ScrollWebElementIntoView" locator1="Calendar#SCHEDULER_VIEW_EVENT_DAY_AND_WEEK_VIEW" />
+
+				<execute function="AssertClick#assertPartialTextClickAt" locator1="Calendar#SCHEDULER_VIEW_EVENT_DAY_AND_WEEK_VIEW" value1="${eventTitle}" />
+			</else>
+		</if>
 	</command>
 
 	<command name="viewAgenda">
@@ -237,9 +269,20 @@
 
 		<execute function="Pause" value1="1000" />
 
+		<var method="selenium#getCurrentHour()" name="currentHour" />
 		<var name="key_eventTitle" value="${eventTitle}" />
 
-		<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_DAY_AND_WEEK_VIEW" value1="${eventTitle}" />
+		<if>
+			<equals arg1="${currentHour}" arg2="23" />
+			<then>
+				<execute macro="CalendarNavigator#gotoNextDay" />
+
+				<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_EVENT_SPECIFIC" value1="${eventTitle}" />
+			</then>
+			<else>
+				<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_DAY_AND_WEEK_VIEW" value1="${eventTitle}" />
+			</else>
+		</if>
 	</command>
 
 	<command name="viewDefault">
@@ -267,12 +310,8 @@
 			<var name="viewType" value="Month" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="defaultURL" value="${defaultURL}" />
-			<var name="nodePort" value="${nodePort}" />
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${pageName}" />
-			<var name="soDashboard" value="${soDashboard}" />
-			<var name="soPage" value="${soPage}" />
 		</execute>
 
 		<execute macro="CalendarScheduler#viewSpecificEventNotPresent">
@@ -496,6 +535,7 @@
 	<command name="viewNoRSVP">
 		<execute macro="CalendarScheduler#selectSpecificEvent">
 			<var name="eventTitle" value="${eventTitle}" />
+			<var name="eventToday" value="${eventToday}" />
 		</execute>
 
 		<var name="key_rsvp" value="Yes" />
@@ -517,6 +557,7 @@
 	<command name="viewRSVP">
 		<execute macro="CalendarScheduler#selectSpecificEvent">
 			<var name="eventTitle" value="${eventTitle}" />
+			<var name="eventToday" value="${eventToday}" />
 		</execute>
 
 		<var name="key_rsvp" value="${rsvp}" />
@@ -573,9 +614,18 @@
 			<var name="viewType" value="Week" />
 		</execute>
 
+		<var method="selenium#getCurrentHour()" name="currentHour" />
 		<var name="key_eventTitle" value="${eventTitle}" />
 
-		<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_DAY_AND_WEEK_VIEW" value1="${eventTitle}" />
+		<if>
+			<equals arg1="${currentHour}" arg2="23" />
+			<then>
+				<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_EVENT_SPECIFIC" value1="${eventTitle}" />
+			</then>
+			<else>
+				<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_DAY_AND_WEEK_VIEW" value1="${eventTitle}" />
+			</else>
+		</if>
 
 		<if>
 			<and>
