@@ -7129,10 +7129,24 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 		<get-testcase-property property.name="data.archive.type" />
 		<get-testcase-property property.name="portal.version" />
 
-		<unzip
-			dest="${liferay.home}"
-			src="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip"
-		/>
+		<if>
+			<resourceexists>
+				<file file="data-dumps/${portal.version}/${data.archive.type}-${database.type}.zip" />
+			</resourceexists>
+			<then>
+				<unzip
+					dest="${liferay.home}"
+					src="data-dumps/${portal.version}/${data.archive.type}-${database.type}.zip"
+				/>
+			</then>
+			<else>
+				<unzip
+					dest="${liferay.home}"
+					src="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip"
+				/>
+			</else>
+		</if>
+
 
 		<if>
 			<equals arg1="${database.type}" arg2="db2" />
