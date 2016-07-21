@@ -55,13 +55,11 @@ public class ListUtil {
 		return list;
 	}
 
-	public static String toString(List<?> list, String param) {
-		return toString(list, param, StringPool.COMMA);
+	public static String toString(List<?> list) {
+		return toString(list, StringPool.COMMA);
 	}
 
-	public static String toString(
-		List<?> list, String param, String delimiter) {
-
+	public static String toString(List<?> list, String delimiter) {
 		if (isEmpty(list)) {
 			return StringPool.BLANK;
 		}
