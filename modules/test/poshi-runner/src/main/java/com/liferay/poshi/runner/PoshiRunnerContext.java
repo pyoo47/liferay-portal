@@ -431,21 +431,29 @@ public class PoshiRunnerContext {
 	}
 
 	private static String _getTestBatchGroups() throws Exception {
-		String[] propertyNames = PropsValues.TEST_BATCH_PROPERTY_NAMES;
-		String[] propertyValues = PropsValues.TEST_BATCH_PROPERTY_VALUES;
-
 		List<String> classCommandNames = new ArrayList<>();
 
-		if (propertyNames.length != propertyValues.length) {
-			throw new Exception(
-				"'test.batch.property.names'/'test.batch.property.values' " +
-					"must have matching amounts of entries!");
-		}
+		if ((PropsValues.TEST_BATCH_PROPERTY_NAMES != null) &&
+			(PropsValues.TEST_BATCH_PROPERTY_VALUES != null)) {
 
-		for (int i = 0; i < propertyNames.length; i++) {
-			classCommandNames.addAll(
-				_getRunTestCaseCommandNames(
+			String[] propertyNames = PropsValues.TEST_BATCH_PROPERTY_NAMES;
+			String[] propertyValues = PropsValues.TEST_BATCH_PROPERTY_VALUES;
+
+			if (propertyNames.length != propertyValues.length) {
+				throw new Exception(
+					"'test.batch.property.names'/'test.batch.property.values' " +
+						"must have matching amounts of entries!");
+			}
+
+			for (int i = 0; i < propertyNames.length; i++) {
+				classCommandNames.addAll(_getRunTestCaseCommandNames(
 					propertyNames[i], propertyValues[i]));
+			}
+		}
+		else {
+			String testBatchPropertyPQL = PropsValues.TEST_BATCH_PROPERTY_PQL;
+
+			System.out.println(testBatchPropertyPQL);
 		}
 
 		if (PropsValues.TEST_BATCH_RUN_TYPE.equals("sequential")) {
@@ -1022,43 +1030,46 @@ public class PoshiRunnerContext {
 	private static void _writeTestCaseMethodNamesProperties() throws Exception {
 		StringBuilder sb = new StringBuilder();
 
-		for (String componentName : _componentNames) {
-			String componentNameKey = componentName + "_TEST_CASE_METHOD_NAMES";
-
-			componentNameKey = StringUtil.upperCase(
-				componentNameKey.replace("-", "_"));
-
-			sb.append(componentNameKey);
-			sb.append("=");
-
-			Set<String> classCommandNames = _componentClassCommandNames.get(
-				componentName);
-
-			if (Validator.isNotNull(classCommandNames) &&
-				!classCommandNames.isEmpty()) {
-
-				Iterator<String> iterator = classCommandNames.iterator();
-
-				while (iterator.hasNext()) {
-					sb.append(iterator.next());
-
-					if (iterator.hasNext()) {
-						sb.append(" ");
-					}
-				}
-			}
-			else {
-				sb.append(PropsValues.TEST_NAME);
-			}
-
-			sb.append("\n");
-		}
-
 		if ((PropsValues.TEST_BATCH_MAX_GROUP_SIZE > 0) &&
-			(PropsValues.TEST_BATCH_PROPERTY_NAMES != null) &&
-			(PropsValues.TEST_BATCH_PROPERTY_VALUES != null)) {
+			((PropsValues.TEST_BATCH_PROPERTY_NAMES != null) &&
+			 (PropsValues.TEST_BATCH_PROPERTY_VALUES != null)) ||
+			PropsValues.TEST_BATCH_PROPERTY_PQL != null) {
 
 			sb.append(_getTestBatchGroups());
+		}
+		else {
+			for (String componentName : _componentNames) {
+				String componentNameKey =
+					componentName + "_TEST_CASE_METHOD_NAMES";
+
+				componentNameKey = StringUtil.upperCase(
+					componentNameKey.replace("-", "_"));
+
+				sb.append(componentNameKey);
+				sb.append("=");
+
+				Set<String> classCommandNames = _componentClassCommandNames.get(
+					componentName);
+
+				if (Validator.isNotNull(classCommandNames) &&
+					!classCommandNames.isEmpty()) {
+
+					Iterator<String> iterator = classCommandNames.iterator();
+
+					while (iterator.hasNext()) {
+						sb.append(iterator.next());
+
+						if (iterator.hasNext()) {
+							sb.append(" ");
+						}
+					}
+				}
+				else {
+					sb.append(PropsValues.TEST_NAME);
+				}
+
+				sb.append("\n");
+			}
 		}
 
 		FileUtil.write("test.case.method.names.properties", sb.toString());
