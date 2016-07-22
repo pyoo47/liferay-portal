@@ -21,22 +21,29 @@ import java.util.Properties;
  */
 public class PQLField {
 
-	public PQLField(String field) {
+	public PQLField(String field, Properties properties) throws Exception {
 		_field = field;
+		_properties = properties;
+
+		if (_properties.containsKey(_field)) {
+			_pqlFieldValue = PQLValueFactory.build(
+				_properties.getProperty(_field));
+		}
+		else {
+			_pqlFieldValue = PQLValueFactory.build();
+		}
 	}
 
 	public String getPQLField() {
 		return _field;
 	}
 
-	public PQLValue getPQLValue(Properties properties) throws Exception {
-		if (properties.containsKey(_field)) {
-			return PQLValueFactory.build(properties.getProperty(_field));
-		}
-
-		return PQLValueFactory.build(null);
+	public PQLValue getPQLFieldValue(Properties properties) {
+		return _pqlFieldValue;
 	}
 
 	private final String _field;
+	private final PQLValue _pqlFieldValue;
+	private final Properties _properties;
 
 }

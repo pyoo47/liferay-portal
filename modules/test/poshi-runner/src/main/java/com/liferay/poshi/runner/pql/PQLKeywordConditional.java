@@ -17,7 +17,14 @@ package com.liferay.poshi.runner.pql;
 /**
  * @author Michael Hashimoto
  */
-public enum PQLValueType {
+public abstract class PQLKeywordConditional
+	extends PQLKeyword implements PQLQueryEntity {
 
-	BOOLEAN, NULL, STRING
+	public PQLKeywordConditional(String keyword) {
+		super(keyword);
+	}
+
+	public abstract Boolean applyConditionalKeyword(
+		Boolean result1, Boolean result2);
+
 }

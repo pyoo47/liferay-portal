@@ -23,11 +23,7 @@ public abstract class PQLValue {
 		_value = value;
 	}
 
-	public String getPQLValue() {
-		return _value;
-	}
-
-	public String toString() {
+	public String getValue() {
 		return _value;
 	}
 

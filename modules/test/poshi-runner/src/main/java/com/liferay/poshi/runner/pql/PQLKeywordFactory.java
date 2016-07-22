@@ -18,59 +18,93 @@ import com.liferay.poshi.runner.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * @author Michael Hashimoto
  */
-public class PQLKeywordFactory {
+public class PQLKeywordFactory implements PQLQueryEntityFactory {
 
-	public static PQLKeyword build(String keyword) throws Exception {
-		PQLKeyword pqlKeyword = null;
+	public static PQLKeywordFactory getInstance() {
+		return _instance;
+	}
+
+	public PQLQueryEntity build(String query, Properties properties)
+		throws Exception {
+
+		Matcher matcher = _pattern.matcher(query);
+
+		matcher.find();
+
+		String keyword = matcher.group(1);
 
 		if (keyword.equals(_AND)) {
-			pqlKeyword = new PQLKeywordAnd();
+			return new PQLKeywordAnd();
+		}
+		else if (keyword.equals(_NOT)) {
+			return new PQLKeywordNot();
 		}
 		else if (keyword.equals(_OR)) {
-			pqlKeyword = new PQLKeywordOr();
-		}
-		else {
-			throw new Exception("Invalid keyword!");
+			return new PQLKeywordOr();
 		}
 
-		return pqlKeyword;
+		throw new Exception("Invalid keyword!");
 	}
 
-	public static List<String> getKeywords() {
-		return _keywords;
+	public int getEnd(String query) {
+		Matcher matcher = _pattern.matcher(query);
+
+		if (matcher.find()) {
+			return matcher.end();
+		}
+
+		return -1;
 	}
 
-	public static Pattern getPattern() {
-		return _keywordPattern;
+	public int getStart(String query) {
+		Matcher matcher = _pattern.matcher(query);
+
+		if (matcher.find()) {
+			return matcher.start();
+		}
+
+		return -1;
 	}
 
-	public static boolean isValidKeyword(String keyword) {
-		return _keywords.contains(keyword);
+	public String removeFromQuery(String query) {
+		Matcher matcher = _pattern.matcher(query);
+
+		matcher.find();
+
+		return query.substring(matcher.end());
 	}
 
 	private static final String _AND = "AND";
 
+	private static final String _NOT = "NOT";
+
 	private static final String _OR = "OR";
 
-	private static final Pattern _keywordPattern;
-	private static final List<String> _keywords = new ArrayList<>();
+	private static final PQLKeywordFactory _instance = new PQLKeywordFactory();
+
+	private static final Pattern _pattern;
 
 	static {
-		_keywords.add(_AND);
-		_keywords.add(_OR);
+		List<String> keywords = new ArrayList<>();
+
+		keywords.add(_AND);
+		keywords.add(_NOT);
+		keywords.add(_OR);
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("\\s*(");
-		sb.append(ListUtil.toString(_keywords, "|"));
+		sb.append(ListUtil.toString(keywords, "|"));
 		sb.append(")\\s*");
 
-		_keywordPattern = Pattern.compile(sb.toString());
+		_pattern = Pattern.compile(sb.toString());
 	}
 
 }

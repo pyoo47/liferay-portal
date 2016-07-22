@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * @author Michael Hashimoto
  */
-public class PQLConditional implements PQLQueryEntity {
+public class PQLConditional implements PQLQueryEntity, PQLQueryEntityResult {
 
 	public PQLConditional(String conditional, Properties properties)
 		throws Exception {
@@ -29,39 +29,25 @@ public class PQLConditional implements PQLQueryEntity {
 		_conditional = conditional;
 		_properties = properties;
 
-		Pattern conditionalPattern = PQLConditionalFactory.getPattern();
+		Pattern pattern = PQLConditionalFactory.getPattern();
 
-		Matcher conditionalMatcher = conditionalPattern.matcher(_conditional);
+		Matcher matcher = pattern.matcher(_conditional);
 
-		conditionalMatcher.find();
+		matcher.find();
 
-		_pqlField = new PQLField(conditionalMatcher.group(1));
-
-		_pqlFieldValue = _pqlField.getPQLValue(_properties);
-
-		_pqlOperator = PQLOperatorFactory.build(
-			conditionalMatcher.group(2), properties);
-
-		String value = conditionalMatcher.group(3);
-
-		if (value.startsWith("\"") && value.endsWith("\"")) {
-			value = value.substring(1, value.length() - 1);
-		}
-
-		_pqlValue = PQLValueFactory.build(value);
+		_pqlField = new PQLField(matcher.group(1), _properties);
+		_pqlOperator = PQLOperatorFactory.build(matcher.group(2), _properties);
+		_pqlValue = PQLValueFactory.build(matcher.group(3));
 	}
 
 	public boolean getResult() throws Exception {
-		return _pqlOperator.evaluate(_pqlFieldValue, _pqlValue);
-	}
+		PQLValue pqlFieldValue = _pqlField.getPQLFieldValue(_properties);
 
-	public String toString() {
-		return _conditional;
+		return _pqlOperator.compare(pqlFieldValue, _pqlValue);
 	}
 
 	private final String _conditional;
 	private final PQLField _pqlField;
-	private final PQLValue _pqlFieldValue;
 	private final PQLOperator _pqlOperator;
 	private final PQLValue _pqlValue;
 	private final Properties _properties;

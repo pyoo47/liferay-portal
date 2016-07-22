@@ -25,9 +25,9 @@ public class PQLOperatorNotEquals extends PQLOperator {
 		super(properties);
 	}
 
-	public boolean evaluate(PQLValue pqlFieldValue, PQLValue pqlValue) {
-		String fieldValue = pqlFieldValue.toString();
-		String value = pqlValue.toString();
+	public boolean compare(PQLValue pqlFieldValue, PQLValue pqlValue) {
+		String fieldValue = pqlFieldValue.getValue();
+		String value = pqlValue.getValue();
 
 		if (fieldValue == null || value == null) {
 			return false;

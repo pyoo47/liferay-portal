@@ -23,8 +23,4 @@ public class PQLValueString extends PQLValue {
 		super(value);
 	}
 
-	public boolean compare() {
-		return true;
-	}
-
 }

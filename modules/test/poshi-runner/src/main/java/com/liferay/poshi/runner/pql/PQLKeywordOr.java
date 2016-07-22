@@ -17,18 +17,18 @@ package com.liferay.poshi.runner.pql;
 /**
  * @author Michael Hashimoto
  */
-public class PQLKeywordOr extends PQLKeyword {
+public class PQLKeywordOr extends PQLKeywordConditional {
 
 	public PQLKeywordOr() {
 		super("OR");
 	}
 
-	public boolean addResult(boolean result, boolean newResult) {
-		if (result || newResult) {
-			return true;
+	public Boolean applyConditionalKeyword(Boolean result1, Boolean result2) {
+		if (result1 == null) {
+			return result2;
 		}
 
-		return false;
+		return (result1 || result2);
 	}
 
 }

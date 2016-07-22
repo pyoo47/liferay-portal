@@ -17,174 +17,121 @@ package com.liferay.poshi.runner.pql;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Michael Hashimoto
  */
-public class PQLQuery implements PQLQueryEntity {
+public class PQLQuery implements PQLQueryEntityResult {
 
 	public PQLQuery(String query, Properties properties) throws Exception {
 		_properties = properties;
 		_query = query;
 
-		_findAll();
-	}
-
-	public void _findAll() throws Exception {
-		String query = _query;
-
-		for (PQLFactory pqlFactory : _factories) {
-			System.out.println(pqlFactory.getStart(query));
-		}
-
-		Pattern conditionalPattern = PQLConditionalFactory.getPattern();
-		Pattern keywordPattern = PQLKeywordFactory.getPattern();
-
-		Matcher conditionalMatcher = conditionalPattern.matcher(query);
-		Matcher keywordMatcher = keywordPattern.matcher(query);
-		Matcher subqueryMatcher = _subqueryPattern.matcher(query);
-
-		while (true) {
-			PQLEntity pqlEntity = null;
-
-			int x = -1;
-
-			if (conditionalMatcher.find()) {
-				x = conditionalMatcher.start();
-
-				pqlEntity = PQLEntity.CONDITONAL;
-			}
-
-			if (keywordMatcher.find()) {
-				int y = keywordMatcher.start();
-
-				if (y < x) {
-					x = y;
-
-					pqlEntity = PQLEntity.KEYWORD;
-				}
-			}
-
-			if (subqueryMatcher.find()) {
-				int y = subqueryMatcher.start();
-
-				if (y < x) {
-					x = y;
-
-					pqlEntity = PQLEntity.SUBQUERY;
-				}
-			}
-
-			if (pqlEntity == null) {
-				break;
-			}
-
-			switch (pqlEntity) {
-				case CONDITONAL:
-					PQLConditional pqlConditional = new PQLConditional(
-						conditionalMatcher.group(), _properties);
-
-					PQLQueryEntity pqlQueryEntity = pqlConditional;
-
-					_pqlEntities.add(pqlConditional);
-
-					query = query.substring(conditionalMatcher.end());
-				break;
-
-				case KEYWORD:
-					PQLKeyword pqlKeyword = PQLKeywordFactory.build(
-						keywordMatcher.group(1));
-
-					_pqlEntities.add(pqlKeyword);
-
-					query = query.substring(keywordMatcher.end());
-				break;
-
-				case SUBQUERY:
-					String subquery = subqueryMatcher.group();
-
-					subquery = subquery.substring(1, subquery.length() - 1);
-
-					PQLQuery pqlSubquery = new PQLQuery(subquery, _properties);
-
-					_pqlEntities.add(pqlSubquery);
-
-					query = query.substring(subqueryMatcher.end());
-				break;
-
-				default:
-					throw new Exception("Invalid PQL Entity!");
-			}
-
-			conditionalMatcher = conditionalPattern.matcher(query);
-			keywordMatcher = keywordPattern.matcher(query);
-			subqueryMatcher = _subqueryPattern.matcher(query);
-		}
+		_processQuery(_query);
 	}
 
 	public boolean getResult() throws Exception {
-		boolean result = false;
+		return _result;
+	}
 
-		PQLKeyword pqlKeywordFinal = null;
+	private void _processQuery(String query) throws Exception {
+		query = query.trim();
 
-		for (Object pqlEntity : _pqlEntities) {
-			if (pqlEntity instanceof PQLQuery) {
-				PQLQuery pqlQuery = (PQLQuery)pqlEntity;
+		while (true) {
+			boolean queryEntityFound = false;
+			PQLQueryEntityFactory targetPQLQueryEntityFactory = null;
 
-				if (pqlKeywordFinal == null) {
-					result = pqlQuery.getResult();
-				}
-				else {
-					result = pqlKeywordFinal.addResult(
-						result, pqlQuery.getResult());
-				}
-			}
-			else if (pqlEntity instanceof PQLConditional) {
-				PQLConditional pqlConditional = (PQLConditional)pqlEntity;
+			for (PQLQueryEntityFactory pqlQueryEntityFactory :
+					_pqlQueryEntityFactories) {
 
-				if (pqlKeywordFinal == null) {
-					result = pqlConditional.getResult();
-				}
-				else {
-					result = pqlKeywordFinal.addResult(
-						result, pqlConditional.getResult());
+				if (pqlQueryEntityFactory.getStart(query) == 0) {
+					queryEntityFound = true;
+
+					targetPQLQueryEntityFactory = pqlQueryEntityFactory;
+
+					break;
 				}
 			}
-			else if (pqlEntity instanceof PQLKeyword) {
-				PQLKeyword pqlKeyword = (PQLKeyword)pqlEntity;
 
-				if (pqlKeywordFinal == null) {
-					pqlKeywordFinal = pqlKeyword;
-				}
+			if (targetPQLQueryEntityFactory != null) {
+				PQLQueryEntity pqlQueryEntity =
+					targetPQLQueryEntityFactory.build(query, _properties);
 
-				if (!pqlKeywordFinal.equals(pqlKeyword)) {
-					throw new Exception("Invalid syntax!");
+				_processResult(pqlQueryEntity);
+
+				query = targetPQLQueryEntityFactory.removeFromQuery(query);
+
+				query = query.trim();
+
+				if (query.equals("")) {
+					break;
 				}
 			}
-			else {
-				throw new Exception("Bad entity!");
+			else if (!queryEntityFound) {
+				throw new Exception("Invalid query!");
 			}
 		}
-
-		return result;
 	}
 
-	private static List<PQLFactory> _factories = new ArrayList<PQLFactory>();
-	private static final Pattern _subqueryPattern = Pattern.compile(
-		"\\((.*?)\\)+");
+	private void _processResult(PQLQueryEntity pqlQueryEntity)
+		throws Exception {
 
-	private final List _pqlEntities = new ArrayList();
-	private final Properties _properties;
-	private final String _query;
+		if (pqlQueryEntity instanceof PQLKeywordConditional) {
+			if (_result == null) {
+				throw new Exception(
+					"Do not start query with conditional keyword!");
+			}
 
-	private enum PQLEntity {
-		CONDITONAL, KEYWORD, SUBQUERY
+			if (_pqlKeywordConditional != null &&
+				!_pqlKeywordConditional.equals(pqlQueryEntity)) {
+
+				throw new Exception("Do not change the conditional keyword!");
+			}
+
+			if (_pqlKeywordNot != null) {
+				throw new Exception(
+					"'NOT' can not come before a conditional keyword!");
+			}
+
+			_pqlKeywordConditional = (PQLKeywordConditional)pqlQueryEntity;
+		}
+		else if (pqlQueryEntity instanceof PQLKeywordNot) {
+			_pqlKeywordNot = (PQLKeywordNot)pqlQueryEntity;
+		}
+		else if (pqlQueryEntity instanceof PQLQueryEntityResult) {
+			PQLQueryEntityResult pqlQueryEntityResult =
+				(PQLQueryEntityResult)pqlQueryEntity;
+
+			Boolean result = pqlQueryEntityResult.getResult();
+
+			if (_pqlKeywordConditional != null) {
+				result = _pqlKeywordConditional.applyConditionalKeyword(
+					_result, result);
+			}
+
+			if (_pqlKeywordNot != null) {
+				result = _pqlKeywordNot.applyKeyword(result);
+
+				_pqlKeywordNot = null;
+			}
+
+			_result = result;
+		}
 	}
+
+	private static final List<PQLQueryEntityFactory> _pqlQueryEntityFactories =
+		new ArrayList<>();
 
 	static {
-		_factories.add(PQLQueryFactory.getInstance());
+		_pqlQueryEntityFactories.add(PQLConditionalFactory.getInstance());
+		_pqlQueryEntityFactories.add(PQLKeywordFactory.getInstance());
+		_pqlQueryEntityFactories.add(PQLSubqueryFactory.getInstance());
 	}
+
+	private PQLKeywordConditional _pqlKeywordConditional;
+	private PQLKeywordNot _pqlKeywordNot;
+	private final Properties _properties;
+	private final String _query;
+	private Boolean _result;
 
 }
