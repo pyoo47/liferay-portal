@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * @author Michael Hashimoto
  */
-public class PQLConditional implements PQLQueryEntity, PQLQueryEntityResult {
+public class PQLConditional implements PQLQueryEntityResult {
 
 	public PQLConditional(String conditional, Properties properties)
 		throws Exception {
@@ -33,11 +33,15 @@ public class PQLConditional implements PQLQueryEntity, PQLQueryEntityResult {
 
 		Matcher matcher = pattern.matcher(_conditional);
 
-		matcher.find();
-
-		_pqlField = new PQLField(matcher.group(1), _properties);
-		_pqlOperator = PQLOperatorFactory.build(matcher.group(2), _properties);
-		_pqlValue = PQLValueFactory.build(matcher.group(3));
+		if (matcher.find()) {
+			_pqlField = new PQLField(matcher.group(1), _properties);
+			_pqlOperator = PQLOperatorFactory.build(
+				matcher.group(2), _properties);
+			_pqlValue = PQLValueFactory.build(matcher.group(3));
+		}
+		else {
+			throw new Exception("Invalid condtional!");
+		}
 	}
 
 	public boolean getResult() throws Exception {

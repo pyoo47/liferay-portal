@@ -19,7 +19,7 @@ import java.util.Properties;
 /**
  * @author Michael Hashimoto
  */
-public class PQLSubquery extends PQLQuery implements PQLQueryEntity {
+public class PQLSubquery extends PQLQuery implements PQLQueryEntityResult {
 
 	public PQLSubquery(String query, Properties properties) throws Exception {
 		super(query, properties);

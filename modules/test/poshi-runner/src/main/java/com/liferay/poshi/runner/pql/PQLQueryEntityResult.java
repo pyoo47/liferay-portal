@@ -17,7 +17,7 @@ package com.liferay.poshi.runner.pql;
 /**
  * @author Michael Hashimoto
  */
-public interface PQLQueryEntityResult {
+public interface PQLQueryEntityResult extends PQLQueryEntity {
 
 	public boolean getResult() throws Exception;
 

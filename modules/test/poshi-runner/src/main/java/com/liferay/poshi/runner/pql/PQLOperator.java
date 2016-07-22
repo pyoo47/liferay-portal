@@ -25,7 +25,7 @@ public abstract class PQLOperator {
 		_properties = properties;
 	}
 
-	public abstract boolean compare(PQLValue pqlFieldValue, PQLValue pqlValue);
+	public abstract boolean compare(PQLValue pqlValue1, PQLValue pqlValue2);
 
 	private final Properties _properties;
 

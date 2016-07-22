@@ -14,6 +14,8 @@
 
 package com.liferay.poshi.runner.pql;
 
+import com.liferay.poshi.runner.util.StringUtil;
+
 /**
  * @author Michael Hashimoto
  */
@@ -21,16 +23,16 @@ public abstract class PQLKeyword implements PQLQueryEntity {
 
 	public PQLKeyword(String keyword) {
 		keyword = keyword.trim();
-		keyword = keyword.toUpperCase();
+		keyword = StringUtil.toUpperCase(keyword);
 
 		_keyword = keyword;
 	}
 
 	public boolean equals(PQLKeyword pqlKeyword) {
-		return _keyword.equals(pqlKeyword.getPQLKeyword());
+		return _keyword.equals(pqlKeyword.getKeyword());
 	}
 
-	public String getPQLKeyword() {
+	public String getKeyword() {
 		return _keyword;
 	}
 

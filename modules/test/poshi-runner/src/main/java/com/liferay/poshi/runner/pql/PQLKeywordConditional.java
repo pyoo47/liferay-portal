@@ -17,8 +17,7 @@ package com.liferay.poshi.runner.pql;
 /**
  * @author Michael Hashimoto
  */
-public abstract class PQLKeywordConditional
-	extends PQLKeyword implements PQLQueryEntity {
+public abstract class PQLKeywordConditional extends PQLKeyword {
 
 	public PQLKeywordConditional(String keyword) {
 		super(keyword);

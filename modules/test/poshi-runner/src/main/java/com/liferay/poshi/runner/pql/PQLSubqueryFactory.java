@@ -32,7 +32,7 @@ public class PQLSubqueryFactory implements PQLQueryEntityFactory {
 		int start = getStart(query);
 		int end = getEnd(query);
 
-		if (start == -1 || end == -1) {
+		if ((start == -1) || (end == -1)) {
 			throw new Exception("Invalid subquery!");
 		}
 
@@ -46,8 +46,6 @@ public class PQLSubqueryFactory implements PQLQueryEntityFactory {
 	}
 
 	public int getEnd(String query) {
-		int end = -1;
-
 		Stack stack = new Stack();
 
 		for (int i = 0; i < query.length(); i++) {
@@ -63,16 +61,14 @@ public class PQLSubqueryFactory implements PQLQueryEntityFactory {
 				}
 
 				if (stack.size() == 1) {
-					end = i + 1;
-
-					break;
+					return (i + 1);
 				}
 
 				stack.pop();
 			}
 		}
 
-		return end;
+		return -1;
 	}
 
 	public int getStart(String query) {
