@@ -24,26 +24,58 @@ import java.util.regex.Pattern;
 /**
  * @author Michael Hashimoto
  */
-public class PQLConditionalFactory {
+public class PQLConditionalFactory implements PQLQueryEntityFactory {
 
-	public static PQLConditional build(
-			String conditional, Properties properties)
-		throws Exception {
-
-		return new PQLConditional(conditional, properties);
+	public static PQLConditionalFactory getInstance() {
+		return _instance;
 	}
 
 	public static Pattern getPattern() {
-		return _conditionalPattern;
+		return _pattern;
 	}
 
-	public static boolean isValidConditional(String conditional) {
-		Matcher conditionalMatcher = _conditionalPattern.matcher(conditional);
+	public PQLQueryEntity build(String query, Properties properties)
+		throws Exception {
 
-		return conditionalMatcher.find();
+		Matcher matcher = _pattern.matcher(query);
+
+		matcher.find();
+
+		return new PQLConditional(matcher.group(), properties);
 	}
 
-	private static final Pattern _conditionalPattern;
+	public int getEnd(String query) {
+		Matcher matcher = _pattern.matcher(query);
+
+		if (matcher.find()) {
+			return matcher.end();
+		}
+
+		return -1;
+	}
+
+	public int getStart(String query) {
+		Matcher matcher = _pattern.matcher(query);
+
+		if (matcher.find()) {
+			return matcher.start();
+		}
+
+		return -1;
+	}
+
+	public String removeFromQuery(String query) {
+		Matcher matcher = _pattern.matcher(query);
+
+		matcher.find();
+
+		return query.substring(matcher.end());
+	}
+
+	private static final PQLConditionalFactory _instance =
+		new PQLConditionalFactory();
+
+	private static final Pattern _pattern;
 
 	static {
 		List<String> operators = PQLOperatorFactory.getOperators();
@@ -54,7 +86,7 @@ public class PQLConditionalFactory {
 		sb.append(ListUtil.toString(operators, "|"));
 		sb.append(")\\s*(\"(.*?)\"|[\\w]+)");
 
-		_conditionalPattern = Pattern.compile(sb.toString());
+		_pattern = Pattern.compile(sb.toString());
 	}
 
 }

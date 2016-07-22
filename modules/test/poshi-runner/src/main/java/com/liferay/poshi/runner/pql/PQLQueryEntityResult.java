@@ -14,16 +14,11 @@
 
 package com.liferay.poshi.runner.pql;
 
-import java.util.Properties;
-
 /**
  * @author Michael Hashimoto
  */
-public interface PQLFactory {
+public interface PQLQueryEntityResult {
 
-	public PQLQueryEntity _build(String query, Properties properties)
-		throws Exception;
-
-	public int getStart(String query);
+	public boolean getResult() throws Exception;
 
 }

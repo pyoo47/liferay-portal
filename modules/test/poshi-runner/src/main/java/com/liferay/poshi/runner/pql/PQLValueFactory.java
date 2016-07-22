@@ -19,20 +19,24 @@ package com.liferay.poshi.runner.pql;
  */
 public class PQLValueFactory {
 
+	public static PQLValue build() throws Exception {
+		return build(null);
+	}
+
 	public static PQLValue build(String value) throws Exception {
-		PQLValue pqlValue = null;
-
 		if (value == null) {
-			pqlValue = new PQLValueNull();
-		}
-		else if (value.equals("true") || value.equals("false")) {
-			pqlValue = new PQLValueBoolean(value);
-		}
-		else {
-			pqlValue = new PQLValueString(value);
+			return new PQLValueNull();
 		}
 
-		return pqlValue;
+		if (value.startsWith("\"") && value.endsWith("\"")) {
+			value = value.substring(1, value.length() - 1);
+		}
+
+		if (value.equals("true") || value.equals("false")) {
+			return new PQLValueBoolean(value);
+		}
+
+		return new PQLValueString(value);
 	}
 
 }

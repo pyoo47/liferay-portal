@@ -14,32 +14,16 @@
 
 package com.liferay.poshi.runner.pql;
 
-import com.liferay.poshi.runner.util.PropsValues;
-
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Michael Hashimoto
  */
 public class PQLObjectValueTest extends TestCase {
-
-	@Before
-	@Override
-	public void setUp() throws Exception {
-		System.out.println("##\n## setup\n##");
-	}
-
-	@After
-	@Override
-	public void tearDown() throws Exception {
-		System.out.println("##\n## teardown\n##");
-	}
 
 	@Test
 	public void testQuery() throws Exception {
@@ -49,7 +33,8 @@ public class PQLObjectValueTest extends TestCase {
 		properties.setProperty("portal.acceptance.tomcat.mysql", "true");
 		properties.setProperty("testray.component.names", "Blogs Search,WCM");
 
-		String query = "(portal.acceptance=\"true\" OR (portal.acceptance.tomcat.mysql=\"false\" OR portal = \"true\")) AND (testray.component.names~\"Blogs Search\" OR testray.component.names!~Blah)";
+		String query =
+			"NOT ((portal.acceptance=\"true\" OR (portal.acceptance.tomcat.mysql=\"false\" OR portal = \"true\"))\t AND (testray.component.names~\"Blogs Search\" OR testray.component.names!~Blah))";
 
 		PQLQuery pqlQuery = new PQLQuery(query, properties);
 
@@ -65,7 +50,7 @@ public class PQLObjectValueTest extends TestCase {
 		properties.setProperty("portal", "true");
 
 		String query =
-			"portal.acceptance ~ \"true\" OR portal.acceptance !~ true";
+			"portal.acceptance ~ \"true\" OR NOT (((portal ~ true))  )";
 
 		PQLQuery pqlQuery = new PQLQuery(query, properties);
 

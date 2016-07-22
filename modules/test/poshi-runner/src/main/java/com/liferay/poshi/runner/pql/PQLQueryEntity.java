@@ -18,5 +18,4 @@ package com.liferay.poshi.runner.pql;
  * @author Michael Hashimoto
  */
 public interface PQLQueryEntity {
-
 }

@@ -17,7 +17,18 @@ package com.liferay.poshi.runner.pql;
 /**
  * @author Michael Hashimoto
  */
-public enum PQLKeywordType {
+public class PQLKeywordNot extends PQLKeyword {
 
-	AND, OR
+	public PQLKeywordNot() {
+		super("NOT");
+	}
+
+	public Boolean applyKeyword(Boolean result) {
+		if (result == null) {
+			return result;
+		}
+
+		return !result;
+	}
+
 }

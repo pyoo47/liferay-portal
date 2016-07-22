@@ -26,8 +26,6 @@ public abstract class PQLKeyword implements PQLQueryEntity {
 		_keyword = keyword;
 	}
 
-	public abstract boolean addResult(boolean result, boolean newResult);
-
 	public boolean equals(PQLKeyword pqlKeyword) {
 		return _keyword.equals(pqlKeyword.getPQLKeyword());
 	}
