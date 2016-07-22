@@ -33,19 +33,23 @@ public class PQLOperatorFactory {
 		switch (operator) {
 			case _CONTAINS:
 				pqlOperator = new PQLOperatorContains(properties);
-			break;
+
+				break;
 
 			case _EQUALS:
 				pqlOperator = new PQLOperatorEquals(properties);
-			break;
+
+				break;
 
 			case _NOT_CONTAINS:
 				pqlOperator = new PQLOperatorNotEquals(properties);
-			break;
+
+				break;
 
 			case _NOT_EQUALS:
 				pqlOperator = new PQLOperatorNotEquals(properties);
-			break;
+
+				break;
 
 			default:
 				throw new Exception("Invalid operator!");
@@ -58,13 +62,9 @@ public class PQLOperatorFactory {
 		return _operators;
 	}
 
-	public static boolean isValidOperator(String operator) {
-		return _operators.contains(operator);
-	}
-
 	private static final String _CONTAINS = StringPool.TILDE;
 
-	private static final String _EQUALS = StringPool.EQUAL;
+	private static final String _EQUALS = StringPool.EQUAL + StringPool.EQUAL;
 
 	private static final String _NOT_CONTAINS = "!~";
 

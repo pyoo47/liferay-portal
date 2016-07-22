@@ -26,16 +26,13 @@ public class PQLField {
 		_properties = properties;
 
 		if (_properties.containsKey(_field)) {
-			_pqlFieldValue = PQLValueFactory.build(
-				_properties.getProperty(_field));
+			String fieldValue = _properties.getProperty(_field);
+
+			_pqlFieldValue = PQLValueFactory.build(fieldValue);
 		}
 		else {
 			_pqlFieldValue = PQLValueFactory.build();
 		}
-	}
-
-	public String getPQLField() {
-		return _field;
 	}
 
 	public PQLValue getPQLFieldValue(Properties properties) {

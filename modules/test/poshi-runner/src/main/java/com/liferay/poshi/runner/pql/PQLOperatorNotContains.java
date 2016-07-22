@@ -25,15 +25,15 @@ public class PQLOperatorNotContains extends PQLOperator {
 		super(properties);
 	}
 
-	public boolean compare(PQLValue pqlFieldValue, PQLValue pqlValue) {
-		String fieldValue = pqlFieldValue.getValue();
-		String value = pqlValue.getValue();
+	public boolean compare(PQLValue pqlValue1, PQLValue pqlValue2) {
+		String value1 = pqlValue1.getValue();
+		String value2 = pqlValue2.getValue();
 
-		if (fieldValue == null || value == null) {
+		if ((value1 == null) || (value2 == null)) {
 			return false;
 		}
 
-		return !fieldValue.contains(value);
+		return !value1.contains(value2);
 	}
 
 }

@@ -21,11 +21,11 @@ import java.util.Properties;
 /**
  * @author Michael Hashimoto
  */
-public class PQLQuery implements PQLQueryEntityResult {
+public class PQLQuery {
 
 	public PQLQuery(String query, Properties properties) throws Exception {
-		_properties = properties;
 		_query = query;
+		_properties = properties;
 
 		_processQuery(_query);
 	}
@@ -82,7 +82,7 @@ public class PQLQuery implements PQLQueryEntityResult {
 					"Do not start query with conditional keyword!");
 			}
 
-			if (_pqlKeywordConditional != null &&
+			if ((_pqlKeywordConditional != null) &&
 				!_pqlKeywordConditional.equals(pqlQueryEntity)) {
 
 				throw new Exception("Do not change the conditional keyword!");
