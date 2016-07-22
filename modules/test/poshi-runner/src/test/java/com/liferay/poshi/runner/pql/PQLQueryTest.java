@@ -18,7 +18,6 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -27,12 +26,12 @@ import org.junit.Test;
 public class PQLQueryTest extends TestCase {
 
 	@Test
-	public void testEquals() throws Exception {
+	public void testContains() throws Exception {
 		Properties properties = new Properties();
 
 		properties.setProperty("portal.acceptance", "true");
 
-		String query = "portal.acceptance == true";
+		String query = "portal.acceptance ~ true";
 
 		PQLQuery pqlQuery = new PQLQuery(query, properties);
 
@@ -42,12 +41,12 @@ public class PQLQueryTest extends TestCase {
 	}
 
 	@Test
-	public void testContains() throws Exception {
+	public void testEquals() throws Exception {
 		Properties properties = new Properties();
 
 		properties.setProperty("portal.acceptance", "true");
 
-		String query = "portal.acceptance ~ true";
+		String query = "portal.acceptance == true";
 
 		PQLQuery pqlQuery = new PQLQuery(query, properties);
 
