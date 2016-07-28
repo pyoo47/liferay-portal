@@ -478,8 +478,11 @@ app.server.type=@{app.server.type}]]></echo>
 		<attribute default="tomcat" name="app.server.type" />
 
 		<sequential>
+			<echo>git apply 1</echo>
 			<execute>
 				<![CDATA[
+					set -x
+
 					git apply --whitespace=nowarn liferay-portal-bundle-@{app.server.type}.diff
 					git apply --exclude=.gitignore --whitespace=nowarn liferay-portal-source.diff
 				]]>
@@ -640,8 +643,11 @@ app.server.type=@{app.server.type}]]></echo>
 								<available file="liferay-portal-source.diff" />
 							</and>
 							<then>
+								<echo>git apply 2</echo>
 								<execute>
 									<![CDATA[
+										set -x
+
 										git apply --whitespace=nowarn liferay-portal-bundle-${app.server.type}.diff
 										git apply --exclude=.gitignore --whitespace=nowarn liferay-portal-source.diff
 									]]>
