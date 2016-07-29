@@ -38,8 +38,6 @@ public class FilePropagator {
 		}
 
 		_targetSlaves.addAll(targetSlaves);
-
-		_copyFromSource();
 	}
 
 	public long getAverageThreadDuration() {
@@ -50,7 +48,17 @@ public class FilePropagator {
 		return _threadsDurationTotal / _threadsCompletedCount;
 	}
 
+	public String getCleanupCommand() {
+		return _cleanupCommand;
+	}
+
+	public void setCleanupCommand(String cleanupCommand) {
+		_cleanupCommand = cleanupCommand;
+	}
+
 	public void start(int threadCount) {
+		_copyFromSource();
+
 		ExecutorService executorService = Executors.newFixedThreadPool(
 			threadCount);
 
@@ -177,12 +185,16 @@ public class FilePropagator {
 		sb.append(targetSlave);
 		sb.append(" '");
 
+		String cleanupCommand = getCleanupCommand();
+
+		if (cleanupCommand != null && !cleanupCommand.isEmpty()) {
+			sb.append(cleanupCommand);
+			sb.append("; ");
+		}
+
 		for (int i = 0; i < commands.size(); i++) {
 			sb.append(commands.get(i));
-
-			if (i < (commands.size() -1)) {
-				sb.append(" && ");
-			}
+			sb.append(" && ");
 		}
 
 		sb.append("'");
@@ -200,6 +212,7 @@ public class FilePropagator {
 	}
 
 	private final List<String> _busySlaves = new ArrayList<>();
+	private String _cleanupCommand;
 	private final List<String> _errorSlaves = new ArrayList<>();
 	private final List<FilePropagatorTask> _filePropagatorTasks =
 		new ArrayList<>();
@@ -236,12 +249,11 @@ public class FilePropagator {
 		public void run() {
 			long start = System.currentTimeMillis();
 
-			List<String> commands = new ArrayList<>(
-				_filePropagator._filePropagatorTasks.size());
+			List <String> commands = new ArrayList<> (
+				_filePropagator._filePropagatorTasks.size() + 1);
 
 			for (FilePropagatorTask filePropagatorTask :
 					_filePropagator._filePropagatorTasks) {
-
 				commands.add(
 					_filePropagator._getMkdirCommand(
 						filePropagatorTask._targetFileName));
