@@ -14,124 +14,273 @@
 
 package com.liferay.poshi.runner.pql;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * @author Michael Hashimoto
  */
-public class PQLQuery {
+public class PQLQuery extends PQLEntity {
 
-	public PQLQuery(String query, Properties properties) throws Exception {
+	public static boolean isQuery(String query) {
+		if (_isSimpleQuery(query)) {
+			return true;
+		}
+		else if (_isModifiedQuery(query)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static void validateQuery(String query) throws Exception {
+		if (!isQuery(query)) {
+			throw new Exception("Invalid query: " + query);
+		}
+	}
+
+	public PQLQuery(String query) throws Exception {
 		_query = query;
-		_properties = properties;
 
-		_processQuery(_query);
+		validateQuery(query);
+
+		query = _fixQuery(query);
+
+		if (_isModifiedQuery(query)) {
+			String modifier = _getLeadingModifier(query);
+
+			_pqlModifier = PQLModifierFactory.newInstance(modifier);
+
+			query = query.substring(modifier.length());
+		}
+		else {
+			_pqlModifier = null;
+		}
+
+		String[] parameters = _getParameters(query);
+
+		String value1 = parameters[0];
+		String operator = parameters[1];
+		String value2 = parameters[2];
+
+		_pqlEntity1 = PQLEntityFactory.newInstance(value1);
+		_pqlOperator = PQLOperatorFactory.newInstance(operator);
+		_pqlEntity2 = PQLEntityFactory.newInstance(value2);
 	}
 
-	public boolean getResult() throws Exception {
-		return _result;
+	public Boolean getValue(Properties properties) throws Exception {
+		Boolean booleanValue = _pqlOperator.getValue(
+			_pqlEntity1, _pqlEntity2, properties);
+
+		if (_pqlModifier != null) {
+			booleanValue = _pqlModifier.modify(booleanValue);
+		}
+
+		return booleanValue;
 	}
 
-	private void _processQuery(String query) throws Exception {
+	private static String _fixQuery(String query) {
 		query = query.trim();
 
-		while (true) {
-			boolean queryEntityFound = false;
-			PQLQueryEntityFactory targetPQLQueryEntityFactory = null;
+		while (_isSubquery(query)) {
+			query = query.substring(1, query.length() - 1);
 
-			for (PQLQueryEntityFactory pqlQueryEntityFactory :
-					_pqlQueryEntityFactories) {
+			query.trim();
+		}
 
-				if (pqlQueryEntityFactory.getStart(query) == 0) {
-					queryEntityFound = true;
+		return query;
+	}
 
-					targetPQLQueryEntityFactory = pqlQueryEntityFactory;
+	private static String _getLeadingModifier(String query) {
+		Set<String> availableModifiers = PQLModifier.getAvailableModifiers();
+
+		for (String modifier : availableModifiers) {
+			if (query.startsWith(modifier)) {
+				return modifier;
+			}
+		}
+
+		return null;
+	}
+
+	private static int _getOperatorIndex(String query, String operator) {
+		Stack<Integer> stack = new Stack<>();
+
+		for (int i = 0; i < query.length(); i++) {
+			char c = query.charAt(i);
+
+			if (c == '(') {
+				stack.push(i);
+			}
+
+			if (c == ')') {
+				stack.pop();
+			}
+
+			if (stack.size() == 0) {
+				boolean found = true;
+
+				for (int j = 0; j < operator.length(); j++) {
+					if ((i + j) > (query.length() - 1)) {
+						found = false;
+
+						break;
+					}
+
+					if (!(operator.charAt(j) == query.charAt(i + j))) {
+						found = false;
+
+						break;
+					}
+				}
+
+				if (found) {
+					return i;
+				}
+			}
+		}
+
+		return -1;
+	}
+
+	private static String[] _getParameters(String query) {
+		query = _fixQuery(query);
+
+		String targetOperator = null;
+		int targetOperatorIndex = query.length();
+
+		List<List<String>> prioritizedOperatorList =
+			PQLOperator.getPrioritizedOperatorList();
+
+		for (int i = (prioritizedOperatorList.size() - 1); i >= 0; i--) {
+			List<String> operators = prioritizedOperatorList.get(i);
+
+			for (String operator : operators) {
+				int operatorIndex = _getOperatorIndex(query, operator);
+
+				if ((operatorIndex > -1) &&
+					(operatorIndex < targetOperatorIndex)) {
+
+					targetOperator = operator;
+					targetOperatorIndex = operatorIndex;
 
 					break;
 				}
 			}
 
-			if (targetPQLQueryEntityFactory != null) {
-				PQLQueryEntity pqlQueryEntity =
-					targetPQLQueryEntityFactory.build(query, _properties);
+			if (targetOperator != null) {
+				break;
+			}
+		}
 
-				_processResult(pqlQueryEntity);
+		if (targetOperator != null) {
+			int x = targetOperatorIndex;
+			int y = targetOperatorIndex + targetOperator.length();
 
-				query = targetPQLQueryEntityFactory.removeFromQuery(query);
+			String value1 = _fixQuery(query.substring(0, x));
+			String operator = _fixQuery(query.substring(x, y));
+			String value2 = _fixQuery(query.substring(y));
 
-				query = query.trim();
+			return new String[] {value1, operator, value2};
+		}
 
-				if (query.equals("")) {
-					break;
+		return null;
+	}
+
+	private static boolean _isModifiedQuery(String query) {
+		if (query == null) {
+			return false;
+		}
+
+		query = _fixQuery(query);
+
+		String modifier = _getLeadingModifier(query);
+
+		if (modifier == null) {
+			return false;
+		}
+
+		query = query.substring(modifier.length());
+
+		return _isSimpleQuery(query);
+	}
+
+	private static boolean _isSimpleQuery(String query) {
+		if (query == null) {
+			return false;
+		}
+
+		query = _fixQuery(query);
+
+		Stack<Integer> stack = new Stack<>();
+
+		for (int i = 0; i < query.length(); i++) {
+			char c = query.charAt(i);
+
+			if (c == '(') {
+				stack.push(i);
+			}
+
+			if (c == ')') {
+				if (stack.size() == 0) {
+					return false;
 				}
-			}
-			else if (!queryEntityFound) {
-				throw new Exception("Invalid query!");
+
+				stack.pop();
 			}
 		}
+
+		if (stack.size() != 0) {
+			return false;
+		}
+
+		String[] parameters = _getParameters(query);
+
+		if (parameters == null) {
+			return false;
+		}
+
+		return true;
 	}
 
-	private void _processResult(PQLQueryEntity pqlQueryEntity)
-		throws Exception {
-
-		if (pqlQueryEntity instanceof PQLKeywordConditional) {
-			if (_result == null) {
-				throw new Exception(
-					"Do not start query with conditional keyword!");
-			}
-
-			if ((_pqlKeywordConditional != null) &&
-				!_pqlKeywordConditional.equals(pqlQueryEntity)) {
-
-				throw new Exception("Do not change the conditional keyword!");
-			}
-
-			if (_pqlKeywordNot != null) {
-				throw new Exception(
-					"'NOT' can not come before a conditional keyword!");
-			}
-
-			_pqlKeywordConditional = (PQLKeywordConditional)pqlQueryEntity;
+	private static boolean _isSubquery(String query) {
+		if (!query.startsWith("(") || !query.endsWith(")")) {
+			return false;
 		}
-		else if (pqlQueryEntity instanceof PQLKeywordNot) {
-			_pqlKeywordNot = (PQLKeywordNot)pqlQueryEntity;
-		}
-		else if (pqlQueryEntity instanceof PQLQueryEntityResult) {
-			PQLQueryEntityResult pqlQueryEntityResult =
-				(PQLQueryEntityResult)pqlQueryEntity;
 
-			Boolean result = pqlQueryEntityResult.getResult();
+		String subquery = query.substring(1, query.length() - 1);
 
-			if (_pqlKeywordConditional != null) {
-				result = _pqlKeywordConditional.applyConditionalKeyword(
-					_result, result);
+		Stack<Integer> stack = new Stack<>();
+
+		for (int i = 0; i < subquery.length(); i++) {
+			char c = subquery.charAt(i);
+
+			if (c == '(') {
+				stack.push(i);
 			}
 
-			if (_pqlKeywordNot != null) {
-				result = _pqlKeywordNot.applyKeyword(result);
+			if (c == ')') {
+				if (stack.size() < 1) {
+					return false;
+				}
 
-				_pqlKeywordNot = null;
+				stack.pop();
 			}
-
-			_result = result;
 		}
+
+		if (stack.size() == 0) {
+			return true;
+		}
+
+		return false;
 	}
 
-	private static final List<PQLQueryEntityFactory> _pqlQueryEntityFactories =
-		new ArrayList<>();
-
-	static {
-		_pqlQueryEntityFactories.add(PQLConditionalFactory.getInstance());
-		_pqlQueryEntityFactories.add(PQLKeywordFactory.getInstance());
-		_pqlQueryEntityFactories.add(PQLSubqueryFactory.getInstance());
-	}
-
-	private PQLKeywordConditional _pqlKeywordConditional;
-	private PQLKeywordNot _pqlKeywordNot;
-	private final Properties _properties;
+	private final PQLEntity _pqlEntity1;
+	private final PQLEntity _pqlEntity2;
+	private final PQLModifier _pqlModifier;
+	private final PQLOperator _pqlOperator;
 	private final String _query;
-	private Boolean _result;
 
 }

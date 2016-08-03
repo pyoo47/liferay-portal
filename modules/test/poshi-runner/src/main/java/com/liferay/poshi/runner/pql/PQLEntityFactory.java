@@ -17,10 +17,17 @@ package com.liferay.poshi.runner.pql;
 /**
  * @author Michael Hashimoto
  */
-public class PQLValueNull extends PQLValue {
+public class PQLEntityFactory {
 
-	public PQLValueNull() {
-		super(null);
+	public static PQLEntity newInstance(String value) throws Exception {
+		if (value == null) {
+			return new PQLEntity(null);
+		}
+		else if (PQLQuery.isQuery(value)) {
+			return new PQLQuery(value);
+		}
+
+		return new PQLEntity(value);
 	}
 
 }

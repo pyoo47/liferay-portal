@@ -14,26 +14,15 @@
 
 package com.liferay.poshi.runner.pql;
 
-import java.util.Properties;
-
 /**
  * @author Michael Hashimoto
  */
-public class PQLOperatorContains extends PQLOperator {
+public class PQLQueryFactory {
 
-	public PQLOperatorContains(Properties properties) {
-		super(properties);
-	}
+	public static PQLQuery newInstance(String query) throws Exception {
+		PQLQuery.validateQuery(query);
 
-	public boolean compare(PQLValue pqlValue1, PQLValue pqlValue2) {
-		String value1 = pqlValue1.getValue();
-		String value2 = pqlValue2.getValue();
-
-		if ((value1 == null) || (value2 == null)) {
-			return false;
-		}
-
-		return value1.contains(value2);
+		return new PQLQuery(query);
 	}
 
 }

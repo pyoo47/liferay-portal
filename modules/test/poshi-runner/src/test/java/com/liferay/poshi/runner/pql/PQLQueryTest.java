@@ -15,6 +15,8 @@
 package com.liferay.poshi.runner.pql;
 
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
@@ -25,18 +27,76 @@ import org.junit.Test;
  */
 public class PQLQueryTest extends TestCase {
 
+	public static void validateQueryError(
+			String query, Properties properties, String expectedError)
+		throws Exception {
+
+		String actualError = null;
+
+		try {
+			PQLQuery pqlQuery = PQLQueryFactory.newInstance(query);
+
+			Boolean actualResult = pqlQuery.getValue(properties);
+		}
+		catch (Exception e) {
+			actualError = e.getMessage();
+
+			if (!actualError.equals(expectedError)) {
+				StringBuilder sb = new StringBuilder();
+
+				sb.append("Mismatched error within the following query:\n");
+				sb.append(query);
+				sb.append("\n\n* Actual:   \"");
+				sb.append(actualError);
+				sb.append("\"\n* Expected: \"");
+				sb.append(expectedError);
+				sb.append("\"");
+
+				throw new Exception(sb.toString(), e);
+			}
+		}
+		finally {
+			if (actualError == null) {
+				throw new Exception(
+					"No error thrown for the following query:\n" + query);
+			}
+		}
+	}
+
+	public static void validateQueryResult(
+			String query, Properties properties, Boolean expectedResult)
+		throws Exception {
+
+		PQLQuery pqlQuery = PQLQueryFactory.newInstance(query);
+
+		Boolean actualResult = pqlQuery.getValue(properties);
+
+		if (!actualResult.equals(expectedResult)) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Expected '");
+			sb.append(expectedResult);
+			sb.append("' given the following query:\n");
+			sb.append(query);
+
+			throw new Exception(sb.toString());
+		}
+	}
+
 	@Test
 	public void testContains() throws Exception {
 		Properties properties = new Properties();
 
-		properties.setProperty("portal.acceptance", "true");
+		properties.setProperty("component", "Blogs,Message Boards,WEM");
+		properties.setProperty("portal", "true");
 
-		String query = "portal.acceptance ~ true";
+		Set<String> queries = new TreeSet<>();
 
-		PQLQuery pqlQuery = new PQLQuery(query, properties);
+		queries.add("component ~ 'Blogs'");
+		queries.add("(NOT (component !~ 'Message Boards'))");
 
-		if (!pqlQuery.getResult()) {
-			throw new Exception("Wrong result!");
+		for (String query : queries) {
+			validateQueryResult(query, properties, true);
 		}
 	}
 
@@ -44,14 +104,25 @@ public class PQLQueryTest extends TestCase {
 	public void testEquals() throws Exception {
 		Properties properties = new Properties();
 
-		properties.setProperty("portal.acceptance", "true");
+		properties.setProperty("component", "Blogs,Search,WEM");
+		properties.setProperty("portal", "true");
 
-		String query = "portal.acceptance == true";
+		Set<String> queries = new TreeSet<>();
 
-		PQLQuery pqlQuery = new PQLQuery(query, properties);
+		queries.add("portal == true");
+		queries.add("portal != false");
 
-		if (!pqlQuery.getResult()) {
-			throw new Exception("Wrong result!");
+		for (String query : queries) {
+			validateQueryResult(query, properties, true);
+		}
+
+		queries = new TreeSet<>();
+
+		queries.add("fake != false");
+		queries.add("fake == false");
+
+		for (String query : queries) {
+			validateQueryResult(query, properties, false);
 		}
 	}
 
@@ -59,27 +130,86 @@ public class PQLQueryTest extends TestCase {
 	public void testInvalidQuery() throws Exception {
 		Properties properties = new Properties();
 
-		properties.setProperty("portal.acceptance", "true");
+		properties.setProperty("aaa", "true");
+		properties.setProperty("bbb", "true");
+		properties.setProperty("ccc", "true");
 
-		String query = "blah portal.acceptance == true";
+		Set<String> queries = new TreeSet<>();
 
-		String actualError = null;
-		String expectedError = "Invalid query!";
+		queries.add("(aaa == true");
+		queries.add("aaa == true)");
+		queries.add(")aaa == true(");
 
-		try {
-			PQLQuery pqlQuery = new PQLQuery(query, properties);
+		for (String query : queries) {
+			validateQueryError(query, properties, "Invalid query: " + query);
 		}
-		catch (Exception e) {
-			actualError = e.getMessage();
+	}
 
-			if (!actualError.equals(expectedError)) {
-				throw new Exception("Wrong error!");
-			}
+	@Test
+	public void testInvalidQueryKeywords() throws Exception {
+		Properties properties = new Properties();
+
+		properties.setProperty("aaa", "true");
+		properties.setProperty("bbb", "true");
+		properties.setProperty("ccc", "true");
+
+		validateQueryError(
+			"AND aaa == true", properties,
+			"'AND' operators must be surrounded by 2 boolean values.");
+
+		validateQueryError(
+			"OR aaa == true", properties,
+			"'OR' operators must be surrounded by 2 boolean values.");
+
+		validateQueryError(
+			"aaa == true AND", properties,
+			"'AND' operators must be surrounded by 2 boolean values.");
+
+		validateQueryError(
+			"aaa == true NOT", properties, "Invalid usage of 'NOT' modifier.");
+
+		validateQueryError(
+			"aaa == true OR", properties,
+			"'OR' operators must be surrounded by 2 boolean values.");
+
+		validateQueryError(
+			"aaa == true NOT AND bbb == false", properties,
+			"Invalid usage of 'NOT' modifier.");
+
+		validateQueryError(
+			"bbb == true AND AND bbb == false", properties,
+			"'AND' operators must be surrounded by 2 boolean values.");
+
+		validateQueryError("NOT NOT", properties, "Invalid query: NOT NOT");
+	}
+
+	@Test
+	public void testNotKeyword() throws Exception {
+		Properties properties = new Properties();
+
+		properties.setProperty("aaa", "true");
+		properties.setProperty("bbb", "true");
+		properties.setProperty("ccc", "true");
+
+		Set<String> queries = new TreeSet<>();
+
+		queries.add("aaa != false");
+		queries.add("NOT (aaa != true)");
+		queries.add("((aaa == true) AND NOT (bbb == false))");
+
+		for (String query : queries) {
+			validateQueryResult(query, properties, true);
 		}
-		finally {
-			if (actualError == null) {
-				throw new Exception("No error thrown!");
-			}
+
+		queries = new TreeSet<>();
+
+		queries.add("aaa != true");
+		queries.add("NOT aaa == true");
+		queries.add("(NOT ((aaa == true) AND (bbb == true)))");
+		queries.add("((aaa == true) AND NOT (bbb == true))");
+
+		for (String query : queries) {
+			validateQueryResult(query, properties, false);
 		}
 	}
 

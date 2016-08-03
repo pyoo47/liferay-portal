@@ -17,16 +17,29 @@ package com.liferay.poshi.runner.pql;
 /**
  * @author Michael Hashimoto
  */
-public abstract class PQLValue {
+public class PQLModifierFactory {
 
-	public PQLValue(String value) {
-		_value = value;
+	public static PQLModifier newInstance(String modifier) throws Exception {
+		PQLModifier.validateModifier(modifier);
+
+		if (modifier.equals("NOT")) {
+			return new PQLModifier(modifier) {
+
+				public Boolean modify(Boolean booleanValue) throws Exception {
+					String modifier = getModifier();
+
+					if (booleanValue == null) {
+						throw new Exception(
+							"Invalid usage of '" + modifier + "' modifier!");
+					}
+
+					return !booleanValue;
+				}
+
+			};
+		}
+
+		throw new Exception("Unsupported '" + modifier + "' modifier!");
 	}
-
-	public String getValue() {
-		return _value;
-	}
-
-	private final String _value;
 
 }

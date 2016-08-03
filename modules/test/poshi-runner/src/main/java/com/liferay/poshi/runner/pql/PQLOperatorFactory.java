@@ -14,10 +14,6 @@
 
 package com.liferay.poshi.runner.pql;
 
-import com.liferay.poshi.runner.util.StringPool;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -25,58 +21,192 @@ import java.util.Properties;
  */
 public class PQLOperatorFactory {
 
-	public static PQLOperator build(String operator, Properties properties)
-		throws Exception {
+	public static PQLOperator newInstance(String operator) throws Exception {
+		PQLOperator.validateOperator(operator);
 
-		PQLOperator pqlOperator = null;
+		if (operator.equals("~") || operator.equals("!~")) {
+			return new PQLOperator(operator) {
 
-		switch (operator) {
-			case _CONTAINS:
-				pqlOperator = new PQLOperatorContains(properties);
+				public Boolean getValue(
+						PQLEntity pqlEntity1, PQLEntity pqlEntity2,
+						Properties properties)
+					throws Exception {
 
-				break;
+					String operator = getOperator();
+					Object value1 = pqlEntity1.getValue(properties);
+					Object value2 = pqlEntity2.getValue(properties);
 
-			case _EQUALS:
-				pqlOperator = new PQLOperatorEquals(properties);
+					if ((value1 == null) || (value2 == null)) {
+						return false;
+					}
 
-				break;
+					if (!(value1 instanceof String) ||
+						!(value2 instanceof String)) {
 
-			case _NOT_CONTAINS:
-				pqlOperator = new PQLOperatorNotEquals(properties);
+						throw new Exception(
+							"The '" + operator + "' operator only works " +
+								"for string values!");
+					}
 
-				break;
+					String stringValue1 = (String)value1;
+					String stringValue2 = (String)value2;
 
-			case _NOT_EQUALS:
-				pqlOperator = new PQLOperatorNotEquals(properties);
+					if (operator.equals("~")) {
+						return stringValue1.contains(stringValue2);
+					}
+					else if (operator.equals("!~")) {
+						return !stringValue1.contains(stringValue2);
+					}
 
-				break;
+					throw new Exception(
+						"Unsupported '" + operator + "' operator!");
+				}
 
-			default:
-				throw new Exception("Invalid operator!");
+			};
+		}
+		else if (operator.equals("==") || operator.equals("!=")) {
+			return new PQLOperator(operator) {
+
+				public Boolean getValue(
+						PQLEntity pqlEntity1, PQLEntity pqlEntity2,
+						Properties properties)
+					throws Exception {
+
+					String operator = getOperator();
+					Object value1 = pqlEntity1.getValue(properties);
+					Object value2 = pqlEntity2.getValue(properties);
+
+					if ((value1 == null) || (value2 == null)) {
+						return false;
+					}
+
+					if (operator.equals("==")) {
+						return value1.equals(value2);
+					}
+					else if (operator.equals("!=")) {
+						return !value1.equals(value2);
+					}
+
+					throw new Exception(
+						"Unsupported '" + operator + "' operator!");
+				}
+
+			};
+		}
+		else if (operator.equals("<") || operator.equals("<=") ||
+				 operator.equals(">") || operator.equals(">=")) {
+
+			return new PQLOperator(operator) {
+
+				public Boolean getValue(
+						PQLEntity pqlEntity1, PQLEntity pqlEntity2,
+						Properties properties)
+					throws Exception {
+
+					String operator = getOperator();
+					Object value1 = pqlEntity1.getValue(properties);
+					Object value2 = pqlEntity2.getValue(properties);
+
+					if ((value1 == null) || (value2 == null)) {
+						throw new Exception(
+							"The '" + operator + "' operator only works " +
+								"for number values!");
+					}
+
+					if ((value1 instanceof Double ||
+						 value1 instanceof Integer) &&
+						(value2 instanceof Double ||
+						 value2 instanceof Integer)) {
+
+						Double doubleValue1 = null;
+						Double doubleValue2 = null;
+
+						if (value1 instanceof Integer) {
+							Integer integerValue1 = (Integer)value1;
+
+							doubleValue1 = integerValue1.doubleValue();
+						}
+						else {
+							doubleValue1 = (Double)value1;
+						}
+
+						if (value2 instanceof Integer) {
+							Integer integerValue2 = (Integer)value2;
+
+							doubleValue2 = integerValue2.doubleValue();
+						}
+						else {
+							doubleValue2 = (Double)value2;
+						}
+
+						if (operator.equals("<")) {
+							return (doubleValue1 < doubleValue2);
+						}
+						else if (operator.equals("<=")) {
+							return (doubleValue1 <= doubleValue2);
+						}
+						else if (operator.equals(">")) {
+							return (doubleValue1 > doubleValue2);
+						}
+						else if (operator.equals(">=")) {
+							return (doubleValue1 >= doubleValue2);
+						}
+
+						throw new Exception(
+							"Unsupported '" + operator + "' operator!");
+					}
+
+					throw new Exception(
+						"The '" + operator + "' operator only works for " +
+							"number values!");
+				}
+
+			};
+		}
+		else if (operator.equals("AND") || operator.equals("OR")) {
+			return new PQLOperator(operator) {
+
+				public Boolean getValue(
+						PQLEntity pqlEntity1, PQLEntity pqlEntity2,
+						Properties properties)
+					throws Exception {
+
+					String operator = getOperator();
+					Object value1 = pqlEntity1.getValue(properties);
+					Object value2 = pqlEntity2.getValue(properties);
+
+					if ((value1 == null) || (value2 == null)) {
+						throw new Exception(
+							"'" + operator + "' operators must be " +
+								"surrounded by 2 boolean values.");
+					}
+
+					if (!(value1 instanceof Boolean) ||
+						!(value2 instanceof Boolean)) {
+
+						throw new Exception(
+							"'" + operator + "' operators must be " +
+								"surrounded by 2 boolean values.");
+					}
+
+					Boolean booleanValue1 = (Boolean)value1;
+					Boolean booleanValue2 = (Boolean)value2;
+
+					if (operator.equals ("AND")) {
+						return (booleanValue1 && booleanValue2);
+					}
+					else if (operator.equals("OR")) {
+						return (booleanValue1 || booleanValue2);
+					}
+
+					throw new Exception(
+						"Unsupported '" + operator + "' operator!");
+				}
+
+			};
 		}
 
-		return pqlOperator;
-	}
-
-	public static List<String> getOperators() {
-		return _operators;
-	}
-
-	private static final String _CONTAINS = StringPool.TILDE;
-
-	private static final String _EQUALS = StringPool.EQUAL + StringPool.EQUAL;
-
-	private static final String _NOT_CONTAINS = "!~";
-
-	private static final String _NOT_EQUALS = StringPool.NOT_EQUAL;
-
-	private static final List<String> _operators = new ArrayList<>();
-
-	static {
-		_operators.add(_CONTAINS);
-		_operators.add(_EQUALS);
-		_operators.add(_NOT_CONTAINS);
-		_operators.add(_NOT_EQUALS);
+		throw new Exception("Unsupported '" + operator + "' operator!");
 	}
 
 }
