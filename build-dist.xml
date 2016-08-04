@@ -2216,11 +2216,16 @@ closeTemplate()
 					<try>
 						<mkdir dir="${app.server.parent.dir}" />
 
-						<mirrors-get
+						<!--<mirrors-get
 							dest="${app.server.parent.dir}/${app.server.weblogic.custom.zip.name}"
 							src="http://172.16.18.40/${app.server.weblogic.custom.zip.name}"
 							verbose="true"
-						/>
+						/>-->
+						<execute>
+							set -x
+
+							curl -o ${app.server.parent.dir}/${app.server.weblogic.custom.zip.name} http://172.16.18.40/${app.server.weblogic.custom.zip.name}
+						</execute>
 					</try>
 					<catch>
 						<fail>
