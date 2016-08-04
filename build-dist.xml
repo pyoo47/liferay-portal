@@ -2218,7 +2218,7 @@ closeTemplate()
 
 						<mirrors-get
 							dest="${app.server.parent.dir}/${app.server.weblogic.custom.zip.name}"
-							src="http://files.liferay.com/private/apps/oracle/weblogicas/12/${app.server.weblogic.custom.zip.name}"
+							src="http://172.16.18.40/${app.server.weblogic.custom.zip.name}"
 							verbose="true"
 						/>
 					</try>
@@ -2252,13 +2252,6 @@ this task.
 				>
 					<replacefilter token="@env.JAVA_HOME@" value="${env.JAVA_HOME}" />
 				</replace>
-
-				<replaceregexp
-					file="${app.server.weblogic.bin.dir}/stopWebLogic.sh"
-					flags="g"
-					match="(t3:\/\/)[^:]*(:\d+)"
-					replace="\1localhost\2"
-				/>
 			</then>
 			<elseif>
 				<os family="windows" />
