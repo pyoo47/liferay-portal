@@ -75,6 +75,21 @@ public class PQLValueTest extends TestCase {
 		}
 	}
 
+	@Test
+	public void testValueModifier() throws Exception {
+		_validateQueryResult("NOT true", Boolean.valueOf(false));
+		_validateQueryResult("NOT false", Boolean.valueOf(true));
+	}
+
+	@Test
+	public void testValueModifierError() throws Exception {
+		_validateQueryError("NOT 3.2", "Invalid usage of 'NOT' modifier.");
+		_validateQueryError("NOT 2016", "Invalid usage of 'NOT' modifier.");
+		_validateQueryError("NOT test", "Invalid usage of 'NOT' modifier.");
+		_validateQueryError(
+			"NOT 'test test'", "Invalid usage of 'NOT' modifier.");
+	}
+
 	private void _validateQueryError(String query, String expected)
 		throws Exception {
 
@@ -82,6 +97,8 @@ public class PQLValueTest extends TestCase {
 
 		try {
 			PQLValue pqlValue = new PQLValue(query);
+
+			Object valueObject = pqlValue.getValue(new Properties());
 		}
 		catch (Exception e) {
 			actual = e.getMessage();
