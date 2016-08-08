@@ -25,61 +25,10 @@ import org.junit.Test;
 /**
  * @author Michael Hashimoto
  */
-public class PQLEntityFactoryTest extends TestCase {
+public class PQLQueryTest extends TestCase {
 
 	@Test
-	public void testPQLQueryErrorComparativeOperator() throws Exception {
-		Properties properties = new Properties();
-
-		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
-		properties.setProperty("portal.smoke", "true");
-		properties.setProperty("priority", "5");
-
-		_validateQueryError("true ==", "Invalid query: true ==", properties);
-		_validateQueryError("false ==", "Invalid query: false ==", properties);
-		_validateQueryError("== true", "Invalid query: == true", properties);
-		_validateQueryError("== false", "Invalid query: == false", properties);
-	}
-
-	@Test
-	public void testPQLQueryErrorConditionalOperator() throws Exception {
-		Properties properties = new Properties();
-
-		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
-		properties.setProperty("portal.smoke", "true");
-		properties.setProperty("priority", "5");
-
-		_validateQueryError(
-			"AND true == true", "Invalid query: AND true == true", properties);
-		_validateQueryError(
-			"true == true AND", "Invalid query: true == true AND", properties);
-		_validateQueryError(
-			"OR true == true", "Invalid query: OR true == true", properties);
-		_validateQueryError(
-			"true == true OR", "Invalid query: true == true OR", properties);
-		_validateQueryError(
-			"true == true AND AND false == false",
-			"Invalid query: AND false == false", properties);
-	}
-
-	@Test
-	public void testPQLQueryErrorParenthesis() throws Exception {
-		Properties properties = new Properties();
-
-		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
-		properties.setProperty("portal.smoke", "true");
-		properties.setProperty("priority", "5");
-
-		_validateQueryError(
-			"(true == true", "Invalid query: (true == true", properties);
-		_validateQueryError(
-			"true == true) AND", "Invalid query: true) AND", properties);
-		_validateQueryError(
-			")true == true(", "Invalid query: )true == true(", properties);
-	}
-
-	@Test
-	public void testPQLQueryGetValueComparativeOperators() throws Exception {
+	public void testGetValueComparativeOperators() throws Exception {
 		Properties properties = new Properties();
 
 		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
@@ -131,7 +80,7 @@ public class PQLEntityFactoryTest extends TestCase {
 	}
 
 	@Test
-	public void testPQLQueryGetValueConditionalOperators() throws Exception {
+	public void testGetValueConditionalOperators() throws Exception {
 		Properties properties = new Properties();
 
 		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
@@ -168,7 +117,7 @@ public class PQLEntityFactoryTest extends TestCase {
 	}
 
 	@Test
-	public void testPQLQueryGetValueParenthesis() throws Exception {
+	public void testGetValueParenthesis() throws Exception {
 		Properties properties = new Properties();
 
 		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
@@ -205,59 +154,54 @@ public class PQLEntityFactoryTest extends TestCase {
 	}
 
 	@Test
-	public void testPQLValueGetValue() throws Exception {
-		_validateQueryResult("false", Boolean.valueOf(false));
-		_validateQueryResult("'false'", Boolean.valueOf(false));
-		_validateQueryResult("\"false\"", Boolean.valueOf(false));
-		_validateQueryResult("true", Boolean.valueOf(true));
-		_validateQueryResult("'true'", Boolean.valueOf(true));
-		_validateQueryResult("\"true\"", Boolean.valueOf(true));
+	public void testQueryErrorComparativeOperator() throws Exception {
+		Properties properties = new Properties();
 
-		_validateQueryResult("3.2", Double.valueOf(3.2));
-		_validateQueryResult("'3.2'", Double.valueOf(3.2));
-		_validateQueryResult("\"3.2\"", Double.valueOf(3.2));
-		_validateQueryResult("2016.0", Double.valueOf(2016));
-		_validateQueryResult("'2016.0'", Double.valueOf(2016));
-		_validateQueryResult("\"2016.0\"", Double.valueOf(2016));
+		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
+		properties.setProperty("portal.smoke", "true");
+		properties.setProperty("priority", "5");
 
-		_validateQueryResult("2016", Integer.valueOf(2016));
-		_validateQueryResult("'2016'", Integer.valueOf(2016));
-		_validateQueryResult("\"2016\"", Integer.valueOf(2016));
-
-		_validateQueryResult("test", "test");
-		_validateQueryResult("'test'", "test");
-		_validateQueryResult("\"test\"", "test");
-
-		_validateQueryResult("'test test'", "test test");
-		_validateQueryResult("\"test test\"", "test test");
+		_validateQueryError("true ==", "Invalid query: true ==", properties);
+		_validateQueryError("false ==", "Invalid query: false ==", properties);
+		_validateQueryError("== true", "Invalid query: == true", properties);
+		_validateQueryError("== false", "Invalid query: == false", properties);
 	}
 
 	@Test
-	public void testPQLVariableGetValue() throws Exception {
-		_validateVariableResult("false", Boolean.valueOf(false));
-		_validateVariableResult("'false'", Boolean.valueOf(false));
-		_validateVariableResult("\"false\"", Boolean.valueOf(false));
-		_validateVariableResult("true", Boolean.valueOf(true));
-		_validateVariableResult("'true'", Boolean.valueOf(true));
-		_validateVariableResult("\"true\"", Boolean.valueOf(true));
+	public void testQueryErrorConditionalOperator() throws Exception {
+		Properties properties = new Properties();
 
-		_validateVariableResult("3.2", Double.valueOf(3.2));
-		_validateVariableResult("'3.2'", Double.valueOf(3.2));
-		_validateVariableResult("\"3.2\"", Double.valueOf(3.2));
-		_validateVariableResult("2016.0", Double.valueOf(2016));
-		_validateVariableResult("'2016.0'", Double.valueOf(2016));
-		_validateVariableResult("\"2016.0\"", Double.valueOf(2016));
+		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
+		properties.setProperty("portal.smoke", "true");
+		properties.setProperty("priority", "5");
 
-		_validateVariableResult("2016", Integer.valueOf(2016));
-		_validateVariableResult("'2016'", Integer.valueOf(2016));
-		_validateVariableResult("\"2016\"", Integer.valueOf(2016));
+		_validateQueryError(
+			"AND true == true", "Invalid query: AND true == true", properties);
+		_validateQueryError(
+			"true == true AND", "Invalid query: true == true AND", properties);
+		_validateQueryError(
+			"OR true == true", "Invalid query: OR true == true", properties);
+		_validateQueryError(
+			"true == true OR", "Invalid query: true == true OR", properties);
+		_validateQueryError(
+			"true == true AND AND false == false",
+			"Invalid query: AND false == false", properties);
+	}
 
-		_validateVariableResult("test", "test");
-		_validateVariableResult("'test'", "test");
-		_validateVariableResult("\"test\"", "test");
+	@Test
+	public void testQueryErrorParenthesis() throws Exception {
+		Properties properties = new Properties();
 
-		_validateVariableResult("'test test'", "test test");
-		_validateVariableResult("\"test test\"", "test test");
+		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
+		properties.setProperty("portal.smoke", "true");
+		properties.setProperty("priority", "5");
+
+		_validateQueryError(
+			"(true == true", "Invalid query: (true == true", properties);
+		_validateQueryError(
+			"true == true) AND", "Invalid query: true) AND", properties);
+		_validateQueryError(
+			")true == true(", "Invalid query: )true == true(", properties);
 	}
 
 	private static void _validateQueryError(
@@ -267,9 +211,9 @@ public class PQLEntityFactoryTest extends TestCase {
 		String actual = null;
 
 		try {
-			PQLEntity pqlEntity = PQLEntityFactory.newInstance(query);
+			PQLQuery pqlQuery = new PQLQuery(query);
 
-			Object objectValue = pqlEntity.getValue(properties);
+			Object result = pqlQuery.getValue(properties);
 		}
 		catch (Exception e) {
 			actual = e.getMessage();
@@ -296,19 +240,13 @@ public class PQLEntityFactoryTest extends TestCase {
 		}
 	}
 
-	private static void _validateQueryResult(String query, Object expected)
-		throws Exception {
-
-		_validateQueryResult(query, expected, new Properties());
-	}
-
 	private static void _validateQueryResult(
 			String query, Object expected, Properties properties)
 		throws Exception {
 
-		PQLEntity pqlEntity = PQLEntityFactory.newInstance(query);
+		PQLQuery pqlQuery = new PQLQuery(query);
 
-		Object actual = pqlEntity.getValue(properties);
+		Object actual = pqlQuery.getValue(properties);
 
 		if (!actual.equals(expected)) {
 			StringBuilder sb = new StringBuilder();
@@ -323,16 +261,6 @@ public class PQLEntityFactoryTest extends TestCase {
 
 			throw new Exception(sb.toString());
 		}
-	}
-
-	private static void _validateVariableResult(String query, Object expected)
-		throws Exception {
-
-		Properties properties = new Properties();
-
-		properties.put("portal.smoke", query);
-
-		_validateQueryResult("portal.smoke", expected, properties);
 	}
 
 }
