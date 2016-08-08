@@ -20,6 +20,10 @@ package com.liferay.poshi.runner.pql;
 public class PQLEntityFactory {
 
 	public static PQLEntity newInstance(String query) throws Exception {
+		if (PQLVariable.isVariable(query)) {
+			return new PQLVariable(query);
+		}
+
 		return new PQLValue(query);
 	}
 
