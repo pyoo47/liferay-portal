@@ -15,6 +15,7 @@
 package com.liferay.poshi.runner.pql;
 
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Michael Hashimoto
@@ -59,14 +60,34 @@ public abstract class PQLEntity {
 		return query.trim();
 	}
 
+	public static String removeModifierFromQuery(String query) {
+		query = fixQuery(query);
+
+		String modifier = _getModifierFromQuery(query);
+
+		if (modifier != null) {
+			query = query.substring(modifier.length());
+		}
+
+		return query.trim();
+	}
+
 	public PQLEntity(String query) throws Exception {
 		_query = query;
 
 		if (query != null) {
 			query = fixQuery(query);
+
+			_setModifierFromQuery(query);
+
+			query = removeModifierFromQuery(query);
 		}
 
 		_fixedQuery = query;
+	}
+
+	public PQLModifier getPQLModifier() {
+		return _pqlModifier;
 	}
 
 	public abstract Object getValue(Properties properties) throws Exception;
@@ -79,7 +100,35 @@ public abstract class PQLEntity {
 		return _query;
 	}
 
+	private static String _getModifierFromQuery(String query) {
+		query = fixQuery(query);
+
+		Set<String> availableModifiers = PQLModifier.getAvailableModifiers();
+
+		for (String modifier : availableModifiers) {
+			if (query.startsWith(modifier)) {
+				return modifier;
+			}
+		}
+
+		return null;
+	}
+
+	private void _setModifierFromQuery(String query) throws Exception {
+		query = fixQuery(query);
+
+		String modifier = _getModifierFromQuery(query);
+
+		if (modifier != null) {
+			_pqlModifier = PQLModifierFactory.newInstance(modifier);
+		}
+		else {
+			_pqlModifier = null;
+		}
+	}
+
 	private final String _fixedQuery;
+	private PQLModifier _pqlModifier;
 	private final String _query;
 
 }
