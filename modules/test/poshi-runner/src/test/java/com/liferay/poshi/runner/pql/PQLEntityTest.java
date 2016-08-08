@@ -37,6 +37,16 @@ public class PQLEntityTest extends TestCase {
 		_compare(PQLEntity.fixQuery("( (test) OR (test))"), "(test) OR (test)");
 	}
 
+	@Test
+	public void testRemoveModifierFromQuery() throws Exception {
+		_compare(PQLEntity.removeModifierFromQuery("test"), "test");
+		_compare(PQLEntity.removeModifierFromQuery("NOT test"), "test");
+		_compare(PQLEntity.removeModifierFromQuery(" NOT test"), "test");
+		_compare(PQLEntity.removeModifierFromQuery(" test NOT"), "test NOT");
+		_compare(PQLEntity.removeModifierFromQuery("OR test"), "OR test");
+		_compare(PQLEntity.removeModifierFromQuery(" OR test"), "OR test");
+	}
+
 	private void _compare(String actualValue, String expectedValue)
 		throws Exception {
 

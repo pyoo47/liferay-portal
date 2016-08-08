@@ -204,6 +204,36 @@ public class PQLQueryTest extends TestCase {
 			")true == true(", "Invalid query: )true == true(", properties);
 	}
 
+	@Test
+	public void testQueryModifier() throws Exception {
+		Properties properties = new Properties();
+
+		properties.setProperty("portal.smoke", "true");
+
+		_validateQueryResult(
+			"NOT portal.smoke == true", Boolean.valueOf(false), properties);
+		_validateQueryResult(
+			"NOT portal.smoke == false", Boolean.valueOf(true), properties);
+	}
+
+	@Test
+	public void testQueryModifierError() throws Exception {
+		_validateQueryError(
+			"portal.smoke == true NOT", "Invalid query: true NOT");
+		_validateQueryError(
+			"portal.smoke == false NOT", "Invalid query: false NOT");
+		_validateQueryError(
+			"portal.smoke == true NOT AND true", "Invalid query: true NOT");
+		_validateQueryError(
+			"portal.smoke == false NOT AND true", "Invalid query: false NOT");
+	}
+
+	private static void _validateQueryError(String query, String expected)
+		throws Exception {
+
+		_validateQueryError(query, expected, new Properties());
+	}
+
 	private static void _validateQueryError(
 			String query, String expected, Properties properties)
 		throws Exception {

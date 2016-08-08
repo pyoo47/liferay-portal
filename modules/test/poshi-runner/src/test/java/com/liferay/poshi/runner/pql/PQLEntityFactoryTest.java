@@ -205,6 +205,30 @@ public class PQLEntityFactoryTest extends TestCase {
 	}
 
 	@Test
+	public void testPQLQueryModifier() throws Exception {
+		Properties properties = new Properties();
+
+		properties.setProperty("portal.smoke", "true");
+
+		_validateQueryResult(
+			"NOT portal.smoke == true", Boolean.valueOf(false), properties);
+		_validateQueryResult(
+			"NOT portal.smoke == false", Boolean.valueOf(true), properties);
+	}
+
+	@Test
+	public void testPQLQueryModifierError() throws Exception {
+		_validateQueryError(
+			"portal.smoke == true NOT", "Invalid query: true NOT");
+		_validateQueryError(
+			"portal.smoke == false NOT", "Invalid query: false NOT");
+		_validateQueryError(
+			"portal.smoke == true NOT AND true", "Invalid query: true NOT");
+		_validateQueryError(
+			"portal.smoke == false NOT AND true", "Invalid query: false NOT");
+	}
+
+	@Test
 	public void testPQLValueGetValue() throws Exception {
 		_validateQueryResult("false", Boolean.valueOf(false));
 		_validateQueryResult("'false'", Boolean.valueOf(false));
@@ -233,6 +257,21 @@ public class PQLEntityFactoryTest extends TestCase {
 	}
 
 	@Test
+	public void testPQLValueModifier() throws Exception {
+		_validateQueryResult("NOT true", Boolean.valueOf(false));
+		_validateQueryResult("NOT false", Boolean.valueOf(true));
+	}
+
+	@Test
+	public void testPQLValueModifierError() throws Exception {
+		_validateQueryError("NOT 3.2", "Invalid usage of 'NOT' modifier.");
+		_validateQueryError("NOT 2016", "Invalid usage of 'NOT' modifier.");
+		_validateQueryError("NOT test", "Invalid usage of 'NOT' modifier.");
+		_validateQueryError(
+			"NOT 'test test'", "Invalid usage of 'NOT' modifier.");
+	}
+
+	@Test
 	public void testPQLVariableGetValue() throws Exception {
 		_validateVariableResult("false", Boolean.valueOf(false));
 		_validateVariableResult("'false'", Boolean.valueOf(false));
@@ -258,6 +297,12 @@ public class PQLEntityFactoryTest extends TestCase {
 
 		_validateVariableResult("'test test'", "test test");
 		_validateVariableResult("\"test test\"", "test test");
+	}
+
+	private static void _validateQueryError(String query, String expected)
+		throws Exception {
+
+		_validateQueryError(query, expected, new Properties());
 	}
 
 	private static void _validateQueryError(
