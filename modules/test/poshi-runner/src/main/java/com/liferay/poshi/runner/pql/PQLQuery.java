@@ -60,6 +60,12 @@ public class PQLQuery extends PQLEntity {
 			throw new Exception("Unable to evaluate " + getFixedQuery());
 		}
 
+		PQLModifier pqlModifier = getPQLModifier();
+
+		if (pqlModifier != null) {
+			objectValue = pqlModifier.modify(objectValue);
+		}
+
 		return objectValue;
 	}
 
