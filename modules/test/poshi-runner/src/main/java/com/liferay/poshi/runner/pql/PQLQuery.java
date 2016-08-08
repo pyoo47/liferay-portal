@@ -27,8 +27,6 @@ public class PQLQuery extends PQLEntity {
 			return false;
 		}
 
-		query = removeModifierFromQuery(query);
-
 		String[] parameters = _getParameters(query);
 
 		if (parameters == null) {
@@ -60,12 +58,6 @@ public class PQLQuery extends PQLEntity {
 
 		if (!(objectValue instanceof Boolean)) {
 			throw new Exception("Unable to evaluate " + getFixedQuery());
-		}
-
-		PQLModifier pqlModifier = getPQLModifier();
-
-		if (pqlModifier != null) {
-			objectValue = pqlModifier.modify(objectValue);
 		}
 
 		return objectValue;
