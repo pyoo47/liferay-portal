@@ -65,12 +65,6 @@ public class PQLValue extends PQLEntity {
 			objectValue = value;
 		}
 
-		PQLModifier pqlModifier = getPQLModifier();
-
-		if (pqlModifier != null) {
-			objectValue = pqlModifier.modify(objectValue);
-		}
-
 		return objectValue;
 	}
 
