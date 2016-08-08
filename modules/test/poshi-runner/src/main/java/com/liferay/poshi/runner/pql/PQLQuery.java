@@ -27,6 +27,8 @@ public class PQLQuery extends PQLEntity {
 			return false;
 		}
 
+		query = removeModifierFromQuery(query);
+
 		String[] parameters = _getParameters(query);
 
 		if (parameters == null) {
