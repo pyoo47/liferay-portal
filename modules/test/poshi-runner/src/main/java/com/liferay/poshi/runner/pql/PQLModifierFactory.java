@@ -19,7 +19,7 @@ package com.liferay.poshi.runner.pql;
  */
 public class PQLModifierFactory {
 
-	public static PQLModifier newInstance(String modifier) throws Exception {
+	public static PQLModifier newModifier(String modifier) throws Exception {
 		PQLModifier.validateModifier(modifier);
 
 		if (modifier.equals("NOT")) {

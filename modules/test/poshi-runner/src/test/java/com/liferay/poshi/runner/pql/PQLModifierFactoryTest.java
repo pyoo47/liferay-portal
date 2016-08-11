@@ -27,16 +27,16 @@ import org.junit.Test;
 public class PQLModifierFactoryTest extends TestCase {
 
 	@Test
-	public void testNewInstance() throws Exception {
+	public void testNewOperator() throws Exception {
 		Set<String> availableModifiers = PQLModifier.getAvailableModifiers();
 
 		for (String modifier : availableModifiers) {
-			PQLModifier pqlModifier = PQLModifierFactory.newInstance(modifier);
+			PQLModifier pqlModifier = PQLModifierFactory.newModifier(modifier);
 		}
 	}
 
 	@Test
-	public void testNewInstanceError() throws Exception {
+	public void testNewOperatorError() throws Exception {
 		Set<String> modifiers = new HashSet<>();
 
 		modifiers.add(null);
@@ -45,18 +45,18 @@ public class PQLModifierFactoryTest extends TestCase {
 		modifiers.addAll(PQLOperator.getAvailableOperators());
 
 		for (String modifier : modifiers) {
-			_validateNewInstanceError(
+			_validateNewModifierError(
 				modifier, "Invalid '" + modifier + "' modifier.");
 		}
 	}
 
-	private void _validateNewInstanceError(String modifier, String expected)
+	private void _validateNewModifierError(String modifier, String expected)
 		throws Exception {
 
 		String actual = null;
 
 		try {
-			PQLModifier pqlModifier = PQLModifierFactory.newInstance(modifier);
+			PQLModifier pqlModifier = PQLModifierFactory.newModifier(modifier);
 		}
 		catch (Exception e) {
 			actual = e.getMessage();

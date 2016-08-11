@@ -31,7 +31,7 @@ public class PQLModifierTest extends TestCase {
 		Set<String> availableModifiers = PQLModifier.getAvailableModifiers();
 
 		for (String modifier : availableModifiers) {
-			PQLModifier pqlModifier = PQLModifierFactory.newInstance(modifier);
+			PQLModifier pqlModifier = PQLModifierFactory.newModifier(modifier);
 
 			_compare(pqlModifier.getModifier(), modifier);
 		}
@@ -125,7 +125,7 @@ public class PQLModifierTest extends TestCase {
 			String operator, Object objectValue, Object expected)
 		throws Exception {
 
-		PQLModifier pqlModifier = PQLModifierFactory.newInstance(operator);
+		PQLModifier pqlModifier = PQLModifierFactory.newModifier(operator);
 
 		Object actual = pqlModifier.modify(objectValue);
 
@@ -135,7 +135,7 @@ public class PQLModifierTest extends TestCase {
 	private void _validateModifyError(String operator, Object objectValue)
 		throws Exception {
 
-		PQLModifier pqlModifier = PQLModifierFactory.newInstance(operator);
+		PQLModifier pqlModifier = PQLModifierFactory.newModifier(operator);
 
 		String actual = null;
 		String expected = "Invalid usage of '" + operator + "' modifier.";
