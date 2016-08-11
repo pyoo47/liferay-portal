@@ -32,7 +32,7 @@ public class PQLOperatorTest extends TestCase {
 		Set<String> availableOperators = PQLOperator.getAvailableOperators();
 
 		for (String operator : availableOperators) {
-			PQLOperator pqlOperator = PQLOperatorFactory.newInstance(operator);
+			PQLOperator pqlOperator = PQLOperatorFactory.newOperator(operator);
 
 			_compare(pqlOperator.getOperator(), operator);
 		}
@@ -288,9 +288,9 @@ public class PQLOperatorTest extends TestCase {
 			String value1, String operator, String value2, Object expected)
 		throws Exception {
 
-		PQLEntity pqlEntity1 = PQLEntityFactory.newInstance(value1);
-		PQLOperator pqlOperator = PQLOperatorFactory.newInstance(operator);
-		PQLEntity pqlEntity2 = PQLEntityFactory.newInstance(value2);
+		PQLEntity pqlEntity1 = PQLEntityFactory.newEntity(value1);
+		PQLOperator pqlOperator = PQLOperatorFactory.newOperator(operator);
+		PQLEntity pqlEntity2 = PQLEntityFactory.newEntity(value2);
 
 		Object actual = pqlOperator.getValue(
 			pqlEntity1, pqlEntity2, new Properties());
@@ -302,9 +302,9 @@ public class PQLOperatorTest extends TestCase {
 			String value1, String operator, String value2, String expected)
 		throws Exception {
 
-		PQLEntity pqlEntity1 = PQLEntityFactory.newInstance(value1);
-		PQLOperator pqlOperator = PQLOperatorFactory.newInstance(operator);
-		PQLEntity pqlEntity2 = PQLEntityFactory.newInstance(value2);
+		PQLEntity pqlEntity1 = PQLEntityFactory.newEntity(value1);
+		PQLOperator pqlOperator = PQLOperatorFactory.newOperator(operator);
+		PQLEntity pqlEntity2 = PQLEntityFactory.newEntity(value2);
 
 		String actual = null;
 

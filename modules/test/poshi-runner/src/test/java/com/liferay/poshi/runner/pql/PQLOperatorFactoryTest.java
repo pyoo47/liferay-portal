@@ -31,12 +31,12 @@ public class PQLOperatorFactoryTest extends TestCase {
 		Set<String> availableOperators = PQLOperator.getAvailableOperators();
 
 		for (String operator : availableOperators) {
-			PQLOperator pqlOperator = PQLOperatorFactory.newInstance(operator);
+			PQLOperator pqlOperator = PQLOperatorFactory.newOperator(operator);
 		}
 	}
 
 	@Test
-	public void testNewInstanceError() throws Exception {
+	public void testNewOperatorError() throws Exception {
 		Set<String> operators = new HashSet<>();
 
 		operators.add(null);
@@ -45,18 +45,18 @@ public class PQLOperatorFactoryTest extends TestCase {
 		operators.addAll(PQLModifier.getAvailableModifiers());
 
 		for (String operator : operators) {
-			_validateNewInstanceError(
+			_validateNewOperatorError(
 				operator, "Invalid '" + operator + "' operator.");
 		}
 	}
 
-	private void _validateNewInstanceError(String operator, String expected)
+	private void _validateNewOperatorError(String operator, String expected)
 		throws Exception {
 
 		String actual = null;
 
 		try {
-			PQLOperator pqlOperator = PQLOperatorFactory.newInstance(operator);
+			PQLOperator pqlOperator = PQLOperatorFactory.newOperator(operator);
 		}
 		catch (Exception e) {
 			actual = e.getMessage();

@@ -21,7 +21,7 @@ import java.util.Properties;
  */
 public class PQLOperatorFactory {
 
-	public static PQLOperator newInstance(String operator) throws Exception {
+	public static PQLOperator newOperator(String operator) throws Exception {
 		PQLOperator.validateOperator(operator);
 
 		if (operator.equals("AND") || operator.equals("OR")) {
