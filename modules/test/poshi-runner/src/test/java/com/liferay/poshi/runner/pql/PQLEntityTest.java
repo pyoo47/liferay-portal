@@ -24,35 +24,37 @@ import org.junit.Test;
 public class PQLEntityTest extends TestCase {
 
 	@Test
-	public void testFixQuery() throws Exception {
-		_compare(PQLEntity.fixQuery("(((test)))"), "test");
-		_compare(PQLEntity.fixQuery(" (((test)) )"), "test");
-		_compare(PQLEntity.fixQuery(" ((( test test ))) "), "test test");
-		_compare(PQLEntity.fixQuery(")test("), ")test(");
-		_compare(PQLEntity.fixQuery(" )test( "), ")test(");
-		_compare(PQLEntity.fixQuery(" ) test"), ") test");
-		_compare(PQLEntity.fixQuery(" ( test"), "( test");
-		_compare(PQLEntity.fixQuery("test ) "), "test )");
-		_compare(PQLEntity.fixQuery("test ( "), "test (");
-		_compare(PQLEntity.fixQuery("( (test) OR (test))"), "(test) OR (test)");
+	public void testFixPQL() throws Exception {
+		_compare(PQLEntity.fixPQL("(((test)))"), "test");
+		_compare(PQLEntity.fixPQL(" (((test)) )"), "test");
+		_compare(PQLEntity.fixPQL(" ((( test test ))) "), "test test");
+		_compare(PQLEntity.fixPQL(")test("), ")test(");
+		_compare(PQLEntity.fixPQL(" )test( "), ")test(");
+		_compare(PQLEntity.fixPQL(" ) test"), ") test");
+		_compare(PQLEntity.fixPQL(" ( test"), "( test");
+		_compare(PQLEntity.fixPQL("test ) "), "test )");
+		_compare(PQLEntity.fixPQL("test ( "), "test (");
+		_compare(PQLEntity.fixPQL("( (test) OR (test))"), "(test) OR (test)");
+		_compare(
+			PQLEntity.fixPQL(" ( (( test ( test ))) "), "( (( test ( test )))");
 	}
 
 	@Test
-	public void testRemoveModifierFromQuery() throws Exception {
-		_compare(PQLEntity.removeModifierFromQuery("test"), "test");
-		_compare(PQLEntity.removeModifierFromQuery("NOT test"), "test");
-		_compare(PQLEntity.removeModifierFromQuery(" NOT test"), "test");
-		_compare(PQLEntity.removeModifierFromQuery(" test NOT"), "test NOT");
-		_compare(PQLEntity.removeModifierFromQuery("OR test"), "OR test");
-		_compare(PQLEntity.removeModifierFromQuery(" OR test"), "OR test");
+	public void testRemoveModifierFromPQL() throws Exception {
+		_compare(PQLEntity.removeModifierFromPQL("test"), "test");
+		_compare(PQLEntity.removeModifierFromPQL("NOT test"), "test");
+		_compare(PQLEntity.removeModifierFromPQL(" NOT test"), "test");
+		_compare(PQLEntity.removeModifierFromPQL(" test NOT"), "test NOT");
+		_compare(PQLEntity.removeModifierFromPQL("OR test"), "OR test");
+		_compare(PQLEntity.removeModifierFromPQL(" OR test"), "OR test");
 	}
 
-	private void _compare(String actualValue, String expectedValue)
+	private void _compare(String actual, String expected)
 		throws Exception {
 
-		if (!actualValue.equals(expectedValue)) {
+		if (!actual.equals(expected)) {
 			throw new Exception(
-				"'" + expectedValue + "' should equal '" + actualValue + "'");
+				"'" + expected + "' should equal '" + actual + "'");
 		}
 	}
 

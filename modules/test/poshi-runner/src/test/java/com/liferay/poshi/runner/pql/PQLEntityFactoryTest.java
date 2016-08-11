@@ -35,10 +35,10 @@ public class PQLEntityFactoryTest extends TestCase {
 		properties.setProperty("portal.smoke", "true");
 		properties.setProperty("priority", "5");
 
-		_validateQueryError("true ==", "Invalid query: true ==", properties);
-		_validateQueryError("false ==", "Invalid query: false ==", properties);
-		_validateQueryError("== true", "Invalid query: == true", properties);
-		_validateQueryError("== false", "Invalid query: == false", properties);
+		_validateQueryError("true ==", "Invalid value: true ==", properties);
+		_validateQueryError("false ==", "Invalid value: false ==", properties);
+		_validateQueryError("== true", "Invalid value: == true", properties);
+		_validateQueryError("== false", "Invalid value: == false", properties);
 	}
 
 	@Test
@@ -50,20 +50,20 @@ public class PQLEntityFactoryTest extends TestCase {
 		properties.setProperty("priority", "5");
 
 		_validateQueryError(
-			"AND true == true", "Invalid query: AND true == true", properties);
+			"AND true == true", "Invalid value: AND true == true", properties);
 		_validateQueryError(
-			"true == true AND", "Invalid query: true == true AND", properties);
+			"true == true AND", "Invalid value: true == true AND", properties);
 		_validateQueryError(
-			"OR true == true", "Invalid query: OR true == true", properties);
+			"OR true == true", "Invalid value: OR true == true", properties);
 		_validateQueryError(
-			"true == true OR", "Invalid query: true == true OR", properties);
+			"true == true OR", "Invalid value: true == true OR", properties);
 		_validateQueryError(
 			"true == true AND AND false == false",
-			"Invalid query: AND false == false", properties);
+			"Invalid value: AND false == false", properties);
 	}
 
 	@Test
-	public void testPQLQueryErrorParenthesis() throws Exception {
+	public void testPQLQueryErrorSpecial() throws Exception {
 		Properties properties = new Properties();
 
 		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
@@ -71,11 +71,11 @@ public class PQLEntityFactoryTest extends TestCase {
 		properties.setProperty("priority", "5");
 
 		_validateQueryError(
-			"(true == true", "Invalid query: (true == true", properties);
+			"(true == true) AND", "Invalid value: (true == true) AND",
+			properties);
 		_validateQueryError(
-			"true == true) AND", "Invalid query: true) AND", properties);
-		_validateQueryError(
-			")true == true(", "Invalid query: )true == true(", properties);
+			"(true == true) OR", "Invalid value: (true == true) OR",
+			properties);
 	}
 
 	@Test
@@ -219,13 +219,13 @@ public class PQLEntityFactoryTest extends TestCase {
 	@Test
 	public void testPQLQueryModifierError() throws Exception {
 		_validateQueryError(
-			"portal.smoke == true NOT", "Invalid query: true NOT");
+			"portal.smoke == true NOT", "Invalid value: true NOT");
 		_validateQueryError(
-			"portal.smoke == false NOT", "Invalid query: false NOT");
+			"portal.smoke == false NOT", "Invalid value: false NOT");
 		_validateQueryError(
-			"portal.smoke == true NOT AND true", "Invalid query: true NOT");
+			"portal.smoke == true NOT AND true", "Invalid value: true NOT");
 		_validateQueryError(
-			"portal.smoke == false NOT AND true", "Invalid query: false NOT");
+			"portal.smoke == false NOT AND true", "Invalid value: false NOT");
 	}
 
 	@Test
@@ -312,7 +312,7 @@ public class PQLEntityFactoryTest extends TestCase {
 		String actual = null;
 
 		try {
-			PQLEntity pqlEntity = PQLEntityFactory.newInstance(query);
+			PQLEntity pqlEntity = PQLEntityFactory.newEntity(query);
 
 			Object objectValue = pqlEntity.getValue(properties);
 		}
@@ -351,7 +351,7 @@ public class PQLEntityFactoryTest extends TestCase {
 			String query, Object expected, Properties properties)
 		throws Exception {
 
-		PQLEntity pqlEntity = PQLEntityFactory.newInstance(query);
+		PQLEntity pqlEntity = PQLEntityFactory.newEntity(query);
 
 		Object actual = pqlEntity.getValue(properties);
 

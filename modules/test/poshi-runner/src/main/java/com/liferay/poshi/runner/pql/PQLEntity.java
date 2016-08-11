@@ -22,20 +22,20 @@ import java.util.Set;
  */
 public abstract class PQLEntity {
 
-	public static String fixQuery(String query) {
+	public static String fixPQL(String pql) {
 		while (true) {
-			query = query.trim();
+			pql = pql.trim();
 
-			if (!query.startsWith("(") || !query.endsWith(")")) {
+			if (!pql.startsWith("(") || !pql.endsWith(")")) {
 				break;
 			}
 
-			String subquery = query.substring(1, query.length() - 1);
+			String subPQL = pql.substring(1, pql.length() - 1);
 
 			int parenthesisCount = 0;
 
-			for (int i = 0; i < subquery.length(); i++) {
-				char c = subquery.charAt(i);
+			for (int i = 0; i < subPQL.length(); i++) {
+				char c = subPQL.charAt(i);
 
 				if (c == '(') {
 					parenthesisCount++;
@@ -43,7 +43,7 @@ public abstract class PQLEntity {
 
 				if (c == ')') {
 					if (parenthesisCount < 1) {
-						return query.trim();
+						return pql.trim();
 					}
 
 					parenthesisCount--;
@@ -51,39 +51,39 @@ public abstract class PQLEntity {
 			}
 
 			if (parenthesisCount > 0) {
-				return query.trim();
+				return pql.trim();
 			}
 
-			query = subquery;
+			pql = subPQL;
 		}
 
-		return query.trim();
+		return pql.trim();
 	}
 
-	public static String removeModifierFromQuery(String query) {
-		query = fixQuery(query);
+	public static String removeModifierFromPQL(String pql) {
+		pql = fixPQL(pql);
 
-		String modifier = _getModifierFromQuery(query);
+		String modifier = _getModifierFromPQL(pql);
 
 		if (modifier != null) {
-			query = query.substring(modifier.length());
+			pql = pql.substring(modifier.length());
 		}
 
-		return query.trim();
+		return pql.trim();
 	}
 
-	public PQLEntity(String query) throws Exception {
-		_query = query;
+	public PQLEntity(String entity) throws Exception {
+		String pql = entity;
 
-		if (query != null) {
-			query = fixQuery(query);
+		if (pql != null) {
+			pql = fixPQL(pql);
 
-			_setModifierFromQuery(query);
+			_setModifierFromPQL(pql);
 
-			query = removeModifierFromQuery(query);
+			pql = removeModifierFromPQL(pql);
 		}
 
-		_fixedQuery = query;
+		_pql = pql;
 	}
 
 	public PQLModifier getPQLModifier() {
@@ -92,21 +92,17 @@ public abstract class PQLEntity {
 
 	public abstract Object getValue(Properties properties) throws Exception;
 
-	protected String getFixedQuery() throws Exception {
-		return _fixedQuery;
+	protected String getPQL() {
+		return _pql;
 	}
 
-	protected String getQuery() {
-		return _query;
-	}
-
-	private static String _getModifierFromQuery(String query) {
-		query = fixQuery(query);
+	private static String _getModifierFromPQL(String pql) {
+		pql = fixPQL(pql);
 
 		Set<String> availableModifiers = PQLModifier.getAvailableModifiers();
 
 		for (String modifier : availableModifiers) {
-			if (query.startsWith(modifier)) {
+			if (pql.startsWith(modifier)) {
 				return modifier;
 			}
 		}
@@ -114,21 +110,20 @@ public abstract class PQLEntity {
 		return null;
 	}
 
-	private void _setModifierFromQuery(String query) throws Exception {
-		query = fixQuery(query);
+	private void _setModifierFromPQL(String pql) throws Exception {
+		pql = fixPQL(pql);
 
-		String modifier = _getModifierFromQuery(query);
+		String modifier = _getModifierFromPQL(pql);
 
 		if (modifier != null) {
-			_pqlModifier = PQLModifierFactory.newInstance(modifier);
+			_pqlModifier = PQLModifierFactory.newModifier(modifier);
 		}
 		else {
 			_pqlModifier = null;
 		}
 	}
 
-	private final String _fixedQuery;
+	private final String _pql;
 	private PQLModifier _pqlModifier;
-	private final String _query;
 
 }

@@ -19,15 +19,15 @@ package com.liferay.poshi.runner.pql;
  */
 public class PQLEntityFactory {
 
-	public static PQLEntity newInstance(String query) throws Exception {
-		if (PQLVariable.isVariable(query)) {
-			return new PQLVariable(query);
+	public static PQLEntity newEntity(String pql) throws Exception {
+		if (PQLVariable.isVariable(pql)) {
+			return new PQLVariable(pql);
 		}
-		else if (PQLQuery.isQuery(query)) {
-			return new PQLQuery(query);
+		else if (PQLQuery.isQuery(pql)) {
+			return new PQLQuery(pql);
 		}
 
-		return new PQLValue(query);
+		return new PQLValue(pql);
 	}
 
 }
