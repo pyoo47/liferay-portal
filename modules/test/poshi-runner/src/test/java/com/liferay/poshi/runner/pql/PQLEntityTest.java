@@ -49,9 +49,7 @@ public class PQLEntityTest extends TestCase {
 		_compare(PQLEntity.removeModifierFromPQL(" OR test"), "OR test");
 	}
 
-	private void _compare(String actual, String expected)
-		throws Exception {
-
+	private void _compare(String actual, String expected) throws Exception {
 		if (!actual.equals(expected)) {
 			throw new Exception(
 				"'" + expected + "' should equal '" + actual + "'");
