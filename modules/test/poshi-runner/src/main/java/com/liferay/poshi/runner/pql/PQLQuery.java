@@ -14,6 +14,9 @@
 
 package com.liferay.poshi.runner.pql;
 
+import com.liferay.poshi.runner.util.ListUtil;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -27,11 +30,9 @@ public class PQLQuery extends PQLEntity {
 			return false;
 		}
 
-		query = removeModifierFromQuery(query);
+		String[] queryTokens = _getQueryTokens(query);
 
-		String[] parameters = _getParameters(query);
-
-		if (parameters == null) {
+		if (queryTokens == null) {
 			return false;
 		}
 
@@ -43,15 +44,15 @@ public class PQLQuery extends PQLEntity {
 
 		_validateQuery(query);
 
-		String[] parameters = _getParameters(getFixedQuery());
+		String[] queryTokens = _getQueryTokens(getPQL());
 
-		String value1 = parameters[0];
-		String operator = parameters[1];
-		String value2 = parameters[2];
+		String value1 = queryTokens[0];
+		String operator = queryTokens[1];
+		String value2 = queryTokens[2];
 
-		_pqlEntity1 = PQLEntityFactory.newInstance(value1);
-		_pqlOperator = PQLOperatorFactory.newInstance(operator);
-		_pqlEntity2 = PQLEntityFactory.newInstance(value2);
+		_pqlEntity1 = PQLEntityFactory.newEntity(value1);
+		_pqlOperator = PQLOperatorFactory.newOperator(operator);
+		_pqlEntity2 = PQLEntityFactory.newEntity(value2);
 	}
 
 	public Object getValue(Properties properties) throws Exception {
@@ -59,7 +60,7 @@ public class PQLQuery extends PQLEntity {
 			_pqlEntity1, _pqlEntity2, properties);
 
 		if (!(objectValue instanceof Boolean)) {
-			throw new Exception("Unable to evaluate " + getFixedQuery());
+			throw new Exception("Unable to evaluate " + getPQL());
 		}
 
 		PQLModifier pqlModifier = getPQLModifier();
@@ -71,94 +72,198 @@ public class PQLQuery extends PQLEntity {
 		return objectValue;
 	}
 
-	private static int _getOperatorIndex(String query, String operator) {
-		int parenthesisCount = 0;
+	private static List<String> _getAllTokens(String query) {
+		List<String> tokens = new ArrayList<>();
 
-		for (int i = 0; i < query.length(); i++) {
+		query = fixPQL(query);
+
+		while (true) {
+			if (query.startsWith("(") && query.contains(")")) {
+				int parenthesisCount = 0;
+
+				for (int i = 0; i < query.length(); i++) {
+					char c = query.charAt(i);
+
+					if (c == '(') {
+						parenthesisCount++;
+					}
+
+					if (c == ')') {
+						parenthesisCount--;
+					}
+
+					if (parenthesisCount < 0) {
+						return null;
+					}
+
+					if (parenthesisCount == 0) {
+						int x = i + 1;
+
+						String token = query.substring(0, x);
+
+						tokens.add(token.trim());
+
+						query = query.substring(x);
+
+						query = query.trim();
+
+						break;
+					}
+				}
+
+				if (parenthesisCount > 0) {
+					return null;
+				}
+			}
+			else if (_startsWithReservedToken(query)) {
+				String reservedToken = _getStartingReservedToken(query);
+
+				tokens.add(reservedToken);
+
+				query = query.substring(reservedToken.length());
+
+				query = query.trim();
+			}
+			else if (query.startsWith("\"") || query.startsWith("'")) {
+				int quotationTokenEndIndex = _getQuotationTokenEndIndex(query);
+
+				if (quotationTokenEndIndex == -1) {
+					return null;
+				}
+
+				String token = query.substring(0, quotationTokenEndIndex);
+
+				tokens.add(token.trim());
+
+				query = query.substring(quotationTokenEndIndex);
+
+				query = query.trim();
+			}
+			else if (!query.equals("")) {
+				if (query.contains(" ")) {
+					int x = query.indexOf(" ");
+
+					String token = query.substring(0, x);
+
+					tokens.add(token.trim());
+
+					query = query.substring(x);
+
+					query = query.trim();
+				}
+				else {
+					tokens.add(query.trim());
+
+					query = "";
+				}
+			}
+			else {
+				break;
+			}
+		}
+
+		return tokens;
+	}
+
+	private static String[] _getQueryTokens(String query) {
+		List<String> tokens = _getAllTokens(query);
+
+		if (tokens == null) {
+			return null;
+		}
+
+		List<List<String>> prioritizedOperatorList =
+			PQLOperator.getPrioritizedOperatorList();
+
+		int x = -1;
+
+		for (int i = (prioritizedOperatorList.size() - 1); i >= 0; i--) {
+			List<String> operators = prioritizedOperatorList.get(i);
+
+			for (int j = 0; j < tokens.size(); j++) {
+				String token = tokens.get(j);
+
+				if (operators.contains(token)) {
+					x = j;
+
+					break;
+				}
+			}
+
+			if (x != -1) {
+				break;
+			}
+		}
+
+		if (x != -1) {
+			String entity1 = ListUtil.toString(tokens.subList(0, x), null, " ");
+			String operator = tokens.get(x);
+			String entity2 = ListUtil.toString(
+				tokens.subList(x + 1, tokens.size()), null, " ");
+
+			if (entity1.equals("") || entity2.equals("")) {
+				return null;
+			}
+
+			return new String[] {entity1, operator, entity2};
+		}
+
+		return null;
+	}
+
+	private static int _getQuotationTokenEndIndex(String query) {
+		boolean escapeNextChar = false;
+
+		char quotation = query.charAt(0);
+
+		for (int i = 1; i < query.length(); i++) {
 			char c = query.charAt(i);
 
-			if (c == '(') {
-				parenthesisCount++;
+			if (escapeNextChar) {
+				escapeNextChar = false;
+
+				continue;
 			}
 
-			if (c == ')') {
-				parenthesisCount--;
+			if (c == '\\') {
+				escapeNextChar = true;
+
+				continue;
 			}
 
-			if (parenthesisCount < 0) {
-				return -1;
-			}
-
-			if (parenthesisCount == 0) {
-				boolean found = true;
-
-				for (int j = 0; j < operator.length(); j++) {
-					if ((i + j) > (query.length() - 1)) {
-						found = false;
-
-						break;
-					}
-
-					if (!(operator.charAt(j) == query.charAt(i + j))) {
-						found = false;
-
-						break;
-					}
-				}
-
-				if (found) {
-					return i;
-				}
+			if (c == quotation) {
+				return i + 1;
 			}
 		}
 
 		return -1;
 	}
 
-	private static String[] _getParameters(String query) {
-		query = fixQuery(query);
+	private static String _getStartingReservedToken(String query) {
+		List<String> reservedTokens = new ArrayList<>();
 
-		String targetOperator = null;
-		int targetOperatorIndex = query.length();
+		reservedTokens.addAll(PQLModifier.getAvailableModifiers());
+		reservedTokens.addAll(PQLOperator.getAvailableOperators());
 
-		List<List<String>> prioritizedOperatorList =
-			PQLOperator.getPrioritizedOperatorList();
+		for (String reservedToken : reservedTokens) {
+			if (query.equals(reservedToken) ||
+				query.startsWith(reservedToken + " ")) {
 
-		for (int i = (prioritizedOperatorList.size() - 1); i >= 0; i--) {
-			List<String> operators = prioritizedOperatorList.get(i);
-
-			for (String operator : operators) {
-				int operatorIndex = _getOperatorIndex(query, operator);
-
-				if ((operatorIndex > -1) &&
-					(operatorIndex < targetOperatorIndex)) {
-
-					targetOperator = operator;
-					targetOperatorIndex = operatorIndex;
-				}
+				return reservedToken;
 			}
-
-			if (targetOperator != null) {
-				break;
-			}
-		}
-
-		if (targetOperator != null) {
-			int x = targetOperatorIndex;
-			int y = targetOperatorIndex + targetOperator.length();
-
-			String value1 = fixQuery(query.substring(0, x));
-			String operator = fixQuery(query.substring(x, y));
-			String value2 = fixQuery(query.substring(y));
-
-			if (value1.equals("") || value2.equals("")) {
-				return null;
-			}
-
-			return new String[] {value1, operator, value2};
 		}
 
 		return null;
+	}
+
+	private static boolean _startsWithReservedToken(String query) {
+		String startingReservedToken = _getStartingReservedToken(query);
+
+		if (startingReservedToken != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private void _validateQuery(String query) throws Exception {

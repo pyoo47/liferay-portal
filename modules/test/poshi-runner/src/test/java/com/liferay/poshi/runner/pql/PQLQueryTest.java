@@ -185,11 +185,11 @@ public class PQLQueryTest extends TestCase {
 			"true == true OR", "Invalid query: true == true OR", properties);
 		_validateQueryError(
 			"true == true AND AND false == false",
-			"Invalid query: AND false == false", properties);
+			"Invalid value: AND false == false", properties);
 	}
 
 	@Test
-	public void testQueryErrorParenthesis() throws Exception {
+	public void testQueryErrorSpecial() throws Exception {
 		Properties properties = new Properties();
 
 		properties.setProperty("component.names", "Blogs,Message Boards,WEM");
@@ -197,11 +197,13 @@ public class PQLQueryTest extends TestCase {
 		properties.setProperty("priority", "5");
 
 		_validateQueryError(
-			"(true == true", "Invalid query: (true == true", properties);
+			"(true == true) AND", "Invalid query: (true == true) AND",
+			properties);
 		_validateQueryError(
-			"true == true) AND", "Invalid query: true) AND", properties);
-		_validateQueryError(
-			")true == true(", "Invalid query: )true == true(", properties);
+			"(true == true) OR", "Invalid query: (true == true) OR",
+			properties);
+		_validateQueryError("'test", "Invalid query: 'test", properties);
+		_validateQueryError("\"test", "Invalid query: \"test", properties);
 	}
 
 	@Test
@@ -219,13 +221,13 @@ public class PQLQueryTest extends TestCase {
 	@Test
 	public void testQueryModifierError() throws Exception {
 		_validateQueryError(
-			"portal.smoke == true NOT", "Invalid query: true NOT");
+			"portal.smoke == true NOT", "Invalid value: true NOT");
 		_validateQueryError(
-			"portal.smoke == false NOT", "Invalid query: false NOT");
+			"portal.smoke == false NOT", "Invalid value: false NOT");
 		_validateQueryError(
-			"portal.smoke == true NOT AND true", "Invalid query: true NOT");
+			"portal.smoke == true NOT AND true", "Invalid value: true NOT");
 		_validateQueryError(
-			"portal.smoke == false NOT AND true", "Invalid query: false NOT");
+			"portal.smoke == false NOT AND true", "Invalid value: false NOT");
 	}
 
 	private static void _validateQueryError(String query, String expected)
