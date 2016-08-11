@@ -14,9 +14,7 @@
 
 package com.liferay.poshi.runner.pql;
 
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -29,63 +27,50 @@ public class PQLVariableTest extends TestCase {
 
 	@Test
 	public void testGetValue() throws Exception {
-		_validateQueryResult("false", Boolean.valueOf(false));
-		_validateQueryResult("'false'", Boolean.valueOf(false));
-		_validateQueryResult("\"false\"", Boolean.valueOf(false));
-		_validateQueryResult("true", Boolean.valueOf(true));
-		_validateQueryResult("'true'", Boolean.valueOf(true));
-		_validateQueryResult("\"true\"", Boolean.valueOf(true));
+		_validateVariableResult("false", Boolean.valueOf(false));
+		_validateVariableResult("'false'", Boolean.valueOf(false));
+		_validateVariableResult("\"false\"", Boolean.valueOf(false));
+		_validateVariableResult("true", Boolean.valueOf(true));
+		_validateVariableResult("'true'", Boolean.valueOf(true));
+		_validateVariableResult("\"true\"", Boolean.valueOf(true));
 
-		_validateQueryResult("3.2", Double.valueOf(3.2));
-		_validateQueryResult("'3.2'", Double.valueOf(3.2));
-		_validateQueryResult("\"3.2\"", Double.valueOf(3.2));
-		_validateQueryResult("2016.0", Double.valueOf(2016));
-		_validateQueryResult("'2016.0'", Double.valueOf(2016));
-		_validateQueryResult("\"2016.0\"", Double.valueOf(2016));
+		_validateVariableResult("3.2", Double.valueOf(3.2));
+		_validateVariableResult("'3.2'", Double.valueOf(3.2));
+		_validateVariableResult("\"3.2\"", Double.valueOf(3.2));
+		_validateVariableResult("2016.0", Double.valueOf(2016));
+		_validateVariableResult("'2016.0'", Double.valueOf(2016));
+		_validateVariableResult("\"2016.0\"", Double.valueOf(2016));
 
-		_validateQueryResult("2016", Integer.valueOf(2016));
-		_validateQueryResult("'2016'", Integer.valueOf(2016));
-		_validateQueryResult("\"2016\"", Integer.valueOf(2016));
+		_validateVariableResult("2016", Integer.valueOf(2016));
+		_validateVariableResult("'2016'", Integer.valueOf(2016));
+		_validateVariableResult("\"2016\"", Integer.valueOf(2016));
 
-		_validateQueryResult("test", "test");
-		_validateQueryResult("'test'", "test");
-		_validateQueryResult("\"test\"", "test");
+		_validateVariableResult("test", "test");
+		_validateVariableResult("'test'", "test");
+		_validateVariableResult("\"test\"", "test");
 
-		_validateQueryResult("'test test'", "test test");
-		_validateQueryResult("\"test test\"", "test test");
+		_validateVariableResult("'test test'", "test test");
+		_validateVariableResult("\"test test\"", "test test");
 	}
 
 	@Test
-	public void testValueError() throws Exception {
-		Set<String> variables = new HashSet<>();
-
-		variables.add("invalid.property");
-
-		for (String variable : variables) {
-			_validateQueryError(
-				variable,
-				"Property not found in 'test.case.available.property.names': " +
-					variable);
-		}
-
-		variables = new HashSet<>();
-
-		variables.add(null);
-		variables.add("test == test");
-		variables.add("true OR true");
-
-		for (String variable : variables) {
-			_validateQueryError(variable, "Invalid query: " + variable);
-		}
+	public void testVariableError() throws Exception {
+		_validateVariableError(
+			"invalid.property",
+			"Property not found in 'test.case.available.property.names': " +
+				"invalid.property");
+		_validateVariableError(null, "Invalid variable: null");
+		_validateVariableError("test == test", "Invalid value: test == test");
+		_validateVariableError("test OR test", "Invalid value: test OR test");
 	}
 
-	private void _validateQueryError(String query, String expected)
+	private void _validateVariableError(String pql, String expected)
 		throws Exception {
 
 		String actual = null;
 
 		try {
-			PQLVariable pqlVariable = new PQLVariable(query);
+			PQLVariable pqlVariable = new PQLVariable(pql);
 		}
 		catch (Exception e) {
 			actual = e.getMessage();
@@ -93,7 +78,8 @@ public class PQLVariableTest extends TestCase {
 			if (!actual.equals(expected)) {
 				StringBuilder sb = new StringBuilder();
 
-				sb.append("Mismatched error:\n");
+				sb.append("Mismatched error within the following PQL:\n");
+				sb.append(pql);
 				sb.append("\n\n* Actual:   \"");
 				sb.append(actual);
 				sb.append("\"\n* Expected: \"");
@@ -106,17 +92,17 @@ public class PQLVariableTest extends TestCase {
 		finally {
 			if (actual == null) {
 				throw new Exception(
-					"No error thrown for the following query:\n" + query);
+					"No error thrown for the following PQL:\n" + pql);
 			}
 		}
 	}
 
-	private void _validateQueryResult(String query, Object expected)
+	private void _validateVariableResult(String pql, Object expected)
 		throws Exception {
 
 		Properties properties = new Properties();
 
-		properties.put("portal.smoke", query);
+		properties.put("portal.smoke", pql);
 
 		Class clazz = expected.getClass();
 
@@ -126,14 +112,14 @@ public class PQLVariableTest extends TestCase {
 
 		if (!clazz.isInstance(actual)) {
 			throw new Exception(
-				query + " should be of type '" + clazz.getName() + "'");
+				pql + " should be of type '" + clazz.getName() + "'");
 		}
 
 		if (!actual.equals(expected)) {
 			StringBuilder sb = new StringBuilder();
 
-			sb.append("Mismatched value within the following query:\n");
-			sb.append(query);
+			sb.append("Mismatched result within the following PQL:\n");
+			sb.append(pql);
 			sb.append("\n\n* Actual:   \"");
 			sb.append(actual);
 			sb.append("\"\n* Expected: \"");

@@ -25,6 +25,12 @@ import java.util.Properties;
 public class PQLVariable extends PQLValue {
 
 	public static boolean isVariable(String variable) {
+		if (variable == null) {
+			return false;
+		}
+
+		variable = removeModifierFromPQL(variable);
+
 		if (_availablePropertyNames.contains(variable)) {
 			return true;
 		}
@@ -32,20 +38,20 @@ public class PQLVariable extends PQLValue {
 		return false;
 	}
 
-	public PQLVariable(String query) throws Exception {
-		super(query);
+	public PQLVariable(String variable) throws Exception {
+		super(variable);
 
-		_validateVariable(getFixedQuery());
+		_validateVariable(getPQL());
 	}
 
 	public Object getValue(Properties properties) throws Exception {
-		String query = getFixedQuery();
+		String pql = getPQL();
 
-		if (!properties.containsKey(query)) {
+		if (!properties.containsKey(pql)) {
 			return null;
 		}
 
-		String value = properties.getProperty(query);
+		String value = properties.getProperty(pql);
 
 		if (!(value.startsWith("'") && value.endsWith("'")) &&
 			!(value.startsWith("\"") && value.endsWith("\"")) &&
@@ -59,7 +65,7 @@ public class PQLVariable extends PQLValue {
 
 	private static void _validateVariable(String variable) throws Exception {
 		if (variable == null) {
-			throw new Exception("Invalid query: " + variable);
+			throw new Exception("Invalid variable: " + variable);
 		}
 
 		variable.trim();

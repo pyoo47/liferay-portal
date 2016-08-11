@@ -21,14 +21,14 @@ import java.util.Properties;
  */
 public class PQLValue extends PQLEntity {
 
-	public PQLValue(String query) throws Exception {
-		super(query);
+	public PQLValue(String value) throws Exception {
+		super(value);
 
-		_validateValue(query);
+		_validateValue(value);
 	}
 
 	public Object getValue(Properties properties) throws Exception {
-		return getObjectValue(getFixedQuery());
+		return getObjectValue(getPQL());
 	}
 
 	protected Object getObjectValue(String value) throws Exception {
@@ -44,7 +44,7 @@ public class PQLValue extends PQLEntity {
 			value = value.substring(1, value.length() - 1);
 		}
 		else if (value.contains(" ")) {
-			throw new Exception("Invalid query: " + value);
+			throw new Exception("Invalid value: " + value);
 		}
 
 		Object objectValue;
@@ -79,7 +79,7 @@ public class PQLValue extends PQLEntity {
 			return;
 		}
 
-		value = removeModifierFromQuery(value);
+		value = removeModifierFromPQL(value);
 
 		if ((value.startsWith("'") && value.endsWith("'")) ||
 			(value.startsWith("\"") && value.endsWith("\""))) {
@@ -88,7 +88,7 @@ public class PQLValue extends PQLEntity {
 		}
 
 		if (value.contains(" ")) {
-			throw new Exception("Invalid query: " + value);
+			throw new Exception("Invalid value: " + value);
 		}
 	}
 

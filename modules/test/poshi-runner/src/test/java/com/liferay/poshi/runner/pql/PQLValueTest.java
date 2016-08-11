@@ -29,74 +29,74 @@ public class PQLValueTest extends TestCase {
 
 	@Test
 	public void testGetValue() throws Exception {
-		_validateQueryResult("false", Boolean.valueOf(false));
-		_validateQueryResult("'false'", Boolean.valueOf(false));
-		_validateQueryResult("\"false\"", Boolean.valueOf(false));
-		_validateQueryResult("true", Boolean.valueOf(true));
-		_validateQueryResult("'true'", Boolean.valueOf(true));
-		_validateQueryResult("\"true\"", Boolean.valueOf(true));
+		_validateValueResult("false", Boolean.valueOf(false));
+		_validateValueResult("'false'", Boolean.valueOf(false));
+		_validateValueResult("\"false\"", Boolean.valueOf(false));
+		_validateValueResult("true", Boolean.valueOf(true));
+		_validateValueResult("'true'", Boolean.valueOf(true));
+		_validateValueResult("\"true\"", Boolean.valueOf(true));
 
-		_validateQueryResult("3.2", Double.valueOf(3.2));
-		_validateQueryResult("'3.2'", Double.valueOf(3.2));
-		_validateQueryResult("\"3.2\"", Double.valueOf(3.2));
-		_validateQueryResult("2016.0", Double.valueOf(2016));
-		_validateQueryResult("'2016.0'", Double.valueOf(2016));
-		_validateQueryResult("\"2016.0\"", Double.valueOf(2016));
+		_validateValueResult("3.2", Double.valueOf(3.2));
+		_validateValueResult("'3.2'", Double.valueOf(3.2));
+		_validateValueResult("\"3.2\"", Double.valueOf(3.2));
+		_validateValueResult("2016.0", Double.valueOf(2016));
+		_validateValueResult("'2016.0'", Double.valueOf(2016));
+		_validateValueResult("\"2016.0\"", Double.valueOf(2016));
 
-		_validateQueryResult("2016", Integer.valueOf(2016));
-		_validateQueryResult("'2016'", Integer.valueOf(2016));
-		_validateQueryResult("\"2016\"", Integer.valueOf(2016));
+		_validateValueResult("2016", Integer.valueOf(2016));
+		_validateValueResult("'2016'", Integer.valueOf(2016));
+		_validateValueResult("\"2016\"", Integer.valueOf(2016));
 
-		_validateQueryResult("test", "test");
-		_validateQueryResult("'test'", "test");
-		_validateQueryResult("\"test\"", "test");
+		_validateValueResult("test", "test");
+		_validateValueResult("'test'", "test");
+		_validateValueResult("\"test\"", "test");
 
-		_validateQueryResult("'test test'", "test test");
-		_validateQueryResult("\"test test\"", "test test");
+		_validateValueResult("'test test'", "test test");
+		_validateValueResult("\"test test\"", "test test");
 	}
 
 	@Test
 	public void testGetValueNull() throws Exception {
-		_validateQueryResultNull(null);
-		_validateQueryResultNull("'null'");
-		_validateQueryResultNull("\"null\"");
+		_validateValueResultNull(null);
+		_validateValueResultNull("'null'");
+		_validateValueResultNull("\"null\"");
 	}
 
 	@Test
 	public void testValueError() throws Exception {
-		Set<String> queries = new HashSet<>();
+		Set<String> pqls = new HashSet<>();
 
-		queries.add("test test");
-		queries.add("true AND true");
-		queries.add("test == test");
+		pqls.add("test test");
+		pqls.add("true AND true");
+		pqls.add("test == test");
 
-		for (String query : queries) {
-			_validateQueryError(query, "Invalid query: " + query);
+		for (String pql : pqls) {
+			_validateValueError(pql, "Invalid value: " + pql);
 		}
 	}
 
 	@Test
 	public void testValueModifier() throws Exception {
-		_validateQueryResult("NOT true", Boolean.valueOf(false));
-		_validateQueryResult("NOT false", Boolean.valueOf(true));
+		_validateValueResult("NOT true", Boolean.valueOf(false));
+		_validateValueResult("NOT false", Boolean.valueOf(true));
 	}
 
 	@Test
 	public void testValueModifierError() throws Exception {
-		_validateQueryError("NOT 3.2", "Invalid usage of 'NOT' modifier.");
-		_validateQueryError("NOT 2016", "Invalid usage of 'NOT' modifier.");
-		_validateQueryError("NOT test", "Invalid usage of 'NOT' modifier.");
-		_validateQueryError(
+		_validateValueError("NOT 3.2", "Invalid usage of 'NOT' modifier.");
+		_validateValueError("NOT 2016", "Invalid usage of 'NOT' modifier.");
+		_validateValueError("NOT test", "Invalid usage of 'NOT' modifier.");
+		_validateValueError(
 			"NOT 'test test'", "Invalid usage of 'NOT' modifier.");
 	}
 
-	private void _validateQueryError(String query, String expected)
+	private void _validateValueError(String pql, String expected)
 		throws Exception {
 
 		String actual = null;
 
 		try {
-			PQLValue pqlValue = new PQLValue(query);
+			PQLValue pqlValue = new PQLValue(pql);
 
 			Object valueObject = pqlValue.getValue(new Properties());
 		}
@@ -106,8 +106,8 @@ public class PQLValueTest extends TestCase {
 			if (!actual.equals(expected)) {
 				StringBuilder sb = new StringBuilder();
 
-				sb.append("Mismatched error within the following query:\n");
-				sb.append(query);
+				sb.append("Mismatched error within the following PQL:\n");
+				sb.append(pql);
 				sb.append("\n\n* Actual:   \"");
 				sb.append(actual);
 				sb.append("\"\n* Expected: \"");
@@ -120,32 +120,32 @@ public class PQLValueTest extends TestCase {
 		finally {
 			if (actual == null) {
 				throw new Exception(
-					"No error thrown for the following query:\n" + query);
+					"No error thrown for the following PQL:\n" + pql);
 			}
 		}
 	}
 
-	private void _validateQueryResult(String query, Object expected)
+	private void _validateValueResult(String pql, Object expected)
 		throws Exception {
 
 		Properties properties = new Properties();
 
 		Class clazz = expected.getClass();
 
-		PQLValue pqlValue = new PQLValue(query);
+		PQLValue pqlValue = new PQLValue(pql);
 
 		Object actual = pqlValue.getValue(properties);
 
 		if (!clazz.isInstance(actual)) {
 			throw new Exception(
-				query + " should be of type '" + clazz.getName() + "'");
+				pql + " should be of type '" + clazz.getName() + "'");
 		}
 
 		if (!actual.equals(expected)) {
 			StringBuilder sb = new StringBuilder();
 
-			sb.append("Mismatched value within the following query:\n");
-			sb.append(query);
+			sb.append("Mismatched value within the following PQL:\n");
+			sb.append(pql);
 			sb.append("\n\n* Actual:   \"");
 			sb.append(actual);
 			sb.append("\"\n* Expected: \"");
@@ -156,10 +156,10 @@ public class PQLValueTest extends TestCase {
 		}
 	}
 
-	private void _validateQueryResultNull(String query) throws Exception {
+	private void _validateValueResultNull(String pql) throws Exception {
 		Properties properties = new Properties();
 
-		PQLValue pqlValue = new PQLValue(query);
+		PQLValue pqlValue = new PQLValue(pql);
 
 		Object actual = pqlValue.getValue(properties);
 		Object expected = null;
@@ -167,8 +167,8 @@ public class PQLValueTest extends TestCase {
 		if (actual != null) {
 			StringBuilder sb = new StringBuilder();
 
-			sb.append("Mismatched value within the following query:\n");
-			sb.append(query);
+			sb.append("Mismatched value within the following PQL:\n");
+			sb.append(pql);
 			sb.append("\n\n* Actual:   \"");
 			sb.append(actual);
 			sb.append("\"\n* Expected: \"");
