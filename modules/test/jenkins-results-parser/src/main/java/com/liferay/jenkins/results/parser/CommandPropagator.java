@@ -31,12 +31,6 @@ public class CommandPropagator {
 		_commands.add(command);
 	}
 
-	public void addErrorSlave(String errorSlave) {
-		_targetSlaves.remove(errorSlave);
-
-		_errorSlaves.add(errorSlave);
-	}
-
 	public long getAverageThreadDuration() {
 		if (_threadsCompletedCount == 0) {
 			return 0;
@@ -129,8 +123,6 @@ public class CommandPropagator {
 				_duration = System.currentTimeMillis() - start;
 
 				if (returnCode == 0) {
-					_successful = true;
-
 					List<String> finishedSlaves =
 						_commandPropagator._finishedSlaves;
 
@@ -189,8 +181,6 @@ public class CommandPropagator {
 		}
 
 		private void _handleError(String errorMessage) {
-			_successful = false;
-
 			List<String> errorSlaves = _commandPropagator._errorSlaves;
 
 			errorSlaves.add(_targetSlave);
@@ -206,7 +196,6 @@ public class CommandPropagator {
 
 		private final CommandPropagator _commandPropagator;
 		private long _duration;
-		private boolean _successful;
 		private final String _targetSlave;
 
 	}
