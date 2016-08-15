@@ -46,7 +46,7 @@ public class CommandPropagator {
 			threadCount);
 
 		System.out.println(
-			"File propagation starting with " + threadCount + " threads.");
+			"Command propagation starting with " + threadCount + " threads.");
 
 		try {
 			long start = System.currentTimeMillis();
@@ -91,7 +91,7 @@ public class CommandPropagator {
 			}
 
 			System.out.println(
-				"File propagation completed in " +
+				"Command propagation completed in " +
 					(System.currentTimeMillis() - start) + "ms.");
 
 			if (!_errorSlaves.isEmpty()) {
