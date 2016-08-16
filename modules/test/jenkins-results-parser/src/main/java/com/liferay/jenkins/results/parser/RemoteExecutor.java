@@ -26,11 +26,11 @@ import java.util.concurrent.Executors;
  */
 public class RemoteExecutor {
 
-	public void addCommand(String command) {
-		_commands.add(command);
-	}
+	public void execute(
+		int threadCount, List<String> targetSlaves, String... commands) {
 
-	public void start(int threadCount, List<String> targetSlaves) {
+		_commands = commands;
+
 		_targetSlaves.clear();
 
 		_targetSlaves.addAll(targetSlaves);
@@ -125,7 +125,7 @@ public class RemoteExecutor {
 	}
 
 	private final List<String> _busySlaves = new ArrayList<>();
-	private final List<String> _commands = new ArrayList<>();
+	private String[] _commands;
 	private final List<String> _errorSlaves = new ArrayList<>();
 	private final List<String> _finishedSlaves = new ArrayList<>();
 	private long _start;
@@ -175,12 +175,12 @@ public class RemoteExecutor {
 			sb.append(_targetSlave);
 			sb.append(" '");
 
-			List<String> commands = _remoteExecutor._commands;
+			String[] commands = _remoteExecutor._commands;
 
-			for (int i = 0; i < commands.size(); i++) {
-				sb.append(commands.get(i));
+			for (int i = 0; i < commands.length; i++) {
+				sb.append(commands[i]);
 
-				if (i < (commands.size() -1)) {
+				if (i < (commands.length -1)) {
 					sb.append(" ; ");
 				}
 			}
