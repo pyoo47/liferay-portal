@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
  */
 public class RemoteExecutor {
 
-	public void execute(
+	public int execute(
 		int threadCount, List<String> targetSlaves, String... commands) {
 
 		_commands = commands;
@@ -62,6 +62,8 @@ public class RemoteExecutor {
 					_errorSlaves.size() + " slaves failed to respond:\n" +
 						_errorSlaves);
 			}
+
+			return _errorSlaves.size();
 		}
 		finally {
 			executorService.shutdown();
