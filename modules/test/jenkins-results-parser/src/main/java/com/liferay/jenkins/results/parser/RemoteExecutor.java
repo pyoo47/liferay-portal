@@ -29,13 +29,15 @@ public class RemoteExecutor {
 	public int execute(
 		int threadCount, List<String> targetSlaves, String... commands) {
 
+		_busySlaves.clear();
+		_errorSlaves.clear();
+		_finishedSlaves.clear();
+		_targetSlaves.clear();
+		_threadsDurationTotal = 0;
+
 		_commands = commands;
 
-		_targetSlaves.clear();
-
 		_targetSlaves.addAll(targetSlaves);
-
-		_threadsDurationTotal = 0;
 
 		ExecutorService executorService = Executors.newFixedThreadPool(
 			threadCount);
