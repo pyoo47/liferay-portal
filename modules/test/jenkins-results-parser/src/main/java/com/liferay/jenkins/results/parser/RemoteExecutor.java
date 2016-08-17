@@ -27,17 +27,14 @@ import java.util.concurrent.Executors;
 public class RemoteExecutor {
 
 	public int execute(
-		int threadCount, List<String> targetSlaves, String... commands) {
+		int threadCount, String[] targetSlaves, String[] commands) {
 
 		_busySlaves.clear();
+		_commands = commands;
 		_errorSlaves.clear();
 		_finishedSlaves.clear();
-		_targetSlaves.clear();
+		_targetSlaves = targetSlaves;
 		_threadsDurationTotal = 0;
-
-		_commands = commands;
-
-		_targetSlaves.addAll(targetSlaves);
 
 		ExecutorService executorService = Executors.newFixedThreadPool(
 			threadCount);
@@ -54,7 +51,7 @@ public class RemoteExecutor {
 			}
 
 			while ((_finishedSlaves.size() + _errorSlaves.size()) <
-						_targetSlaves.size()) {
+						_targetSlaves.length) {
 
 				JenkinsResultsParserUtil.sleep(1000);
 			}
@@ -106,7 +103,7 @@ public class RemoteExecutor {
 		sb.append("\nFinished slaves:");
 		sb.append(_finishedSlaves.size());
 		sb.append("\nTarget slaves:");
-		sb.append(_targetSlaves.size());
+		sb.append(_targetSlaves.length);
 		sb.append("\nTotal duration: ");
 		sb.append(System.currentTimeMillis() - _start);
 		sb.append("\n");
@@ -114,7 +111,7 @@ public class RemoteExecutor {
 		System.out.println(sb.toString());
 
 		if ((_finishedSlaves.size() + _errorSlaves.size()) ==
-				_targetSlaves.size()) {
+				_targetSlaves.length) {
 
 			System.out.println(
 				"Remote execution completed in " +
@@ -133,7 +130,7 @@ public class RemoteExecutor {
 	private final List<String> _errorSlaves = new ArrayList<>();
 	private final List<String> _finishedSlaves = new ArrayList<>();
 	private long _start;
-	private final List<String> _targetSlaves = new ArrayList<>();
+	private String[] _targetSlaves;
 	private long _threadsDurationTotal;
 
 	private static class RemoteExecutorThread implements Runnable {
