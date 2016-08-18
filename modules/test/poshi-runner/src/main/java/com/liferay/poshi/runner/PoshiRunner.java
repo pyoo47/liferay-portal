@@ -109,51 +109,22 @@ public class PoshiRunner {
 
 	@Test
 	public void test() throws Exception {
-		try {
-			_runSetUp();
-
-			_runCommand();
-
-			LiferaySeleniumHelper.assertNoPoshiWarnings();
-		}
-		catch (Exception e) {
-			LiferaySeleniumHelper.printJavaProcessStacktrace();
-
-			PoshiRunnerStackTraceUtil.printStackTrace(e.getMessage());
-
-			PoshiRunnerStackTraceUtil.emptyStackTrace();
-
-			e.printStackTrace();
-
-			if (PropsValues.TEST_PAUSE_ON_FAILURE) {
-				LoggerUtil.pauseFailedTest();
-			}
-
-			throw new Exception(e.getMessage(), e);
-		}
-		finally {
-			LiferaySeleniumHelper.writePoshiWarnings();
-
-			LoggerUtil.createSummary();
-
+		for (int attempt = 1; attempt <= 3; attempt++) {
 			try {
-				if (!PropsValues.TEST_SKIP_TEAR_DOWN) {
-					_runTearDown();
-				}
+				_runTest();
+
+				break;
 			}
 			catch (Exception e) {
-				PoshiRunnerStackTraceUtil.printStackTrace(e.getMessage());
+				String message = e.getMessage();
 
-				PoshiRunnerStackTraceUtil.emptyStackTrace();
+				String unreachableBrowserErrorMessage =
+					"Error communicating with the remote browser." +
+						" It may have died.";
 
-				if (PropsValues.TEST_PAUSE_ON_FAILURE) {
-					LoggerUtil.pauseFailedTest();
+				if (!message.contains(unreachableBrowserErrorMessage)) {
+					throw new Exception(e.getMessage(), e);
 				}
-			}
-			finally {
-				LoggerUtil.stopLogger();
-
-				SeleniumUtil.stopSelenium();
 			}
 		}
 	}
@@ -209,6 +180,56 @@ public class PoshiRunner {
 		SummaryLoggerHandler.startMajorSteps();
 
 		_runClassCommandName(_testClassName + "#tear-down");
+	}
+
+	private void _runTest() throws Exception {
+		try {
+			_runSetUp();
+
+			_runCommand();
+
+			LiferaySeleniumHelper.assertNoPoshiWarnings();
+		}
+		catch (Exception e) {
+			LiferaySeleniumHelper.printJavaProcessStacktrace();
+
+			PoshiRunnerStackTraceUtil.printStackTrace(e.getMessage());
+
+			PoshiRunnerStackTraceUtil.emptyStackTrace();
+
+			e.printStackTrace();
+
+			if (PropsValues.TEST_PAUSE_ON_FAILURE) {
+				LoggerUtil.pauseFailedTest();
+			}
+
+			throw new Exception(e.getMessage(), e);
+		}
+		finally {
+			LiferaySeleniumHelper.writePoshiWarnings();
+
+			LoggerUtil.createSummary();
+
+			try {
+				if (!PropsValues.TEST_SKIP_TEAR_DOWN) {
+					_runTearDown();
+				}
+			}
+			catch (Exception e) {
+				PoshiRunnerStackTraceUtil.printStackTrace(e.getMessage());
+
+				PoshiRunnerStackTraceUtil.emptyStackTrace();
+
+				if (PropsValues.TEST_PAUSE_ON_FAILURE) {
+					LoggerUtil.pauseFailedTest();
+				}
+			}
+			finally {
+				LoggerUtil.stopLogger();
+
+				SeleniumUtil.stopSelenium();
+			}
+		}
 	}
 
 	private final String _testClassCommandName;
