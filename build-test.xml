@@ -2580,6 +2580,12 @@ sprite.root.dir=/tmp/sprite]]></echo>
 
 			<echo file="set-charset.sql">sp_configure 'default sortorder id', 50, 'utf8'
 go
+sp_cacheconfig "default data cache", "25M"
+go
+sp_poolconfig "default data cache", "15M", "8K"
+go
+sp_logiosize "8"
+go
 commit
 go</echo>
 
