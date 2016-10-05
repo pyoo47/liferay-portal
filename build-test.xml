@@ -4131,10 +4131,10 @@ go]]></replacevalue>
 								lines.add(propertyLocation, "<property name=\"testray.case.type.name\" value=\"Automated Functional Test\" />");
 
 								if (testcaseFailures.contains(testrayTestcaseName)) {
-									lines.add(propertyLocation, "<property name=\"testray.testcase.status\" value=\"failed\" />");
+									lines.add(propertyLocation+1, "<property name=\"testray.testcase.status\" value=\"failed\" />");
 								}
 								else {
-									lines.add(propertyLocation, "<property name=\"testray.testcase.status\" value=\"passed\" />");
+									lines.add(propertyLocation+1, "<property name=\"testray.testcase.status\" value=\"passed\" />");
 								}
 							}
 
