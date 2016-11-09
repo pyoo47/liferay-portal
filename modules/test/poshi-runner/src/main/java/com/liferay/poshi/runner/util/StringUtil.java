@@ -533,6 +533,20 @@ public class StringUtil {
 		return sb.toString();
 	}
 
+	public static byte[] toByteArray(String text) {
+		text = text.substring(1, text.length() - 1);
+
+		String[] byteValues = text.split(",");
+
+		byte[] bytes = new byte[byteValues.length];
+
+		for (int i = 0; i < bytes.length; i++) {
+			bytes[i] = Byte.parseByte(byteValues[i].trim());
+		}
+
+		return bytes;
+	}
+
 	public static String toLowerCase(String s) {
 		if (s == null) {
 			return null;
