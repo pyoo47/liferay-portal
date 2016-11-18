@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * @author Kevin Yen
  * @author Peter Yoo
  */
 public class GitHubMessageUtilTest extends BaseJenkinsResultsParserTestCase {
@@ -48,6 +49,9 @@ public class GitHubMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 		downloadSample(
 			"jspc-1", "1672", "test-portal-acceptance-pullrequest(master)",
 			"test-1-5");
+		downloadSample(
+			"poshi-validation-1", "1609",
+			"test-portal-acceptance-pullrequest(master)", "test-1-1");
 		downloadSample(
 			"rebase-1", "58", "test-portal-acceptance-pullrequest(ee-6.2.x)",
 			"test-1-19");
