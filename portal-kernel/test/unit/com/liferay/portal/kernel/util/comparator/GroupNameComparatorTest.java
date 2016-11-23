@@ -16,18 +16,24 @@ package com.liferay.portal.kernel.util.comparator;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.test.rule.TimeoutTestRule;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 import org.mockito.Mock;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+
 
 /**
  * @author Eduardo Garcia
@@ -43,6 +49,13 @@ public class GroupNameComparatorTest extends PowerMockito {
 
 	@Test
 	public void testCompareLocalized() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		GroupNameComparator groupNameComparator = new GroupNameComparator(
 			true, LocaleUtil.SPAIN);
 
@@ -50,6 +63,9 @@ public class GroupNameComparatorTest extends PowerMockito {
 
 		Assert.assertTrue(value < 0);
 	}
+
+	@Rule
+	public final TestRule testRule = TimeoutTestRule.INSTANCE;
 
 	protected void setUpGroups() {
 		_group1 = mock(Group.class);

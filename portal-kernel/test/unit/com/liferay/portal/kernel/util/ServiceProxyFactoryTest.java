@@ -108,6 +108,7 @@ public class ServiceProxyFactoryTest {
 
 	@Test
 	public void testNonblockingProxy() throws Exception {
+		Thread.sleep(11000);
 		_testNonBlockingProxy(false);
 	}
 
