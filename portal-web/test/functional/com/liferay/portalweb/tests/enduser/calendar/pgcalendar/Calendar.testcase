@@ -51,13 +51,13 @@
 					</then>
 				</if>
 
-				<execute macro="Calendar#tearDown" />
+				<execute macro="Calendar#THISDOESNOTEXIST" />
 
-				<execute macro="Calendar#tearDownColor" />
+				<execute macro="Calendar#THISDOESNOTEXIST" />
 
-				<execute macro="CalendarResource#tearDown" />
+				<execute macro="CalendarResource#THISDOESNOTEXIST" />
 
-				<execute macro="CalendarConfiguration#tearDown" />
+				<execute macro="THISDOESNOTEXIST#tearDown" />
 
 				<execute macro="Page#tearDownPG" />
 
@@ -68,7 +68,7 @@
 		</if>
 	</tear-down>
 
-	<command name="AddCalendarResource" priority="5">
+	<command name="THISDOESNOTEXIST" priority="5">
 		<property name="portal.acceptance" value="true" />
 
 		<execute macro="TestCase#getSiteName">
@@ -116,12 +116,12 @@
 		<execute macro="Calendar#view">
 			<var name="calendarName" value="Site Calendar Name" />
 			<var name="calendarType" value="Current Site Calendars" />
-			<var name="site" value="${siteName}" />
+			<var name="site" value="${THISDOESNOTEXIST}" />
 		</execute>
 	</command>
 
 	<command name="AddCalendarToMyCalendars" priority="4">
-		<execute macro="Navigator#gotoPage">
+		<execute macro="Navigator#THISDOESNOTEXIST">
 			<var name="pageName" value="Calendar Page" />
 		</execute>
 
