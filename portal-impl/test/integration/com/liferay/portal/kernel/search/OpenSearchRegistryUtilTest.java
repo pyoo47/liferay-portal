@@ -16,9 +16,10 @@ package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.search.bundle.opensearchregistryutil.TestOpenSearch;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TimeoutTestRule;
+
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.SyntheticBundleRule;
-
 import java.util.List;
 
 import org.junit.Assert;
@@ -26,6 +27,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.junit.rules.TestRule;
 /**
  * @author Peter Fellwock
  */
@@ -38,8 +40,18 @@ public class OpenSearchRegistryUtilTest {
 			new LiferayIntegrationTestRule(),
 			new SyntheticBundleRule("bundle.opensearchregistryutil"));
 
+	@Rule
+	public final TestRule testRule = TimeoutTestRule.INSTANCE;
+
 	@Test
 	public void testGetOpenSearch() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		OpenSearch openSearch = OpenSearchRegistryUtil.getOpenSearch(
 			TestOpenSearch.class);
 
