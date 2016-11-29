@@ -43,6 +43,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.liferay.portal.kernel.test.rule.TimeoutTestRule;
+
+
 /**
  * @author Drew Brokke
  */
@@ -59,43 +64,94 @@ public class LanguagePropertyTest {
 		_portalImplPropertiesMap = _getPropertiesMap(portalImplFileNames);
 	}
 
+	@Rule
+	public final TestRule testRule = TimeoutTestRule.INSTANCE;
+
 	@Test
 	public void testSpecialKeyDir() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testSpecialKey(LanguageConstants.KEY_DIR);
 	}
 
 	@Test
 	public void testSpecialKeyLineBegin() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testSpecialKey(LanguageConstants.KEY_LINE_BEGIN);
 	}
 
 	@Test
 	public void testSpecialKeyLineEnd() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testSpecialKey(LanguageConstants.KEY_LINE_END);
 	}
 
 	@Test
 	public void testSpecialKeyUserNameFieldNames() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testSpecialKey(LanguageConstants.KEY_USER_NAME_FIELD_NAMES);
 	}
 
 	@Test
 	public void testSpecialKeyUserNamePrefixValues() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testSpecialKey(LanguageConstants.KEY_USER_NAME_PREFIX_VALUES);
 	}
 
 	@Test
 	public void testSpecialKeyUserNameRequiredFieldNames() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testSpecialKey(LanguageConstants.KEY_USER_NAME_REQUIRED_FIELD_NAMES);
 	}
 
 	@Test
 	public void testSpecialKeyUserNameSuffixValues() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testSpecialKey(LanguageConstants.KEY_USER_NAME_SUFFIX_VALUES);
 	}
 
 	@Test
 	public void testUserNameRequiredFieldNamesSubsetOfUserNameFieldNames() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		Set<String> paths = _portalImplPropertiesMap.keySet();
 
 		List<String> failureMessages = new ArrayList<>();
@@ -139,36 +195,78 @@ public class LanguagePropertyTest {
 
 	@Test
 	public void testValidKeyDir() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testValidKey(LanguageConstants.KEY_DIR);
 	}
 
 	@Test
 	public void testValidKeyLineBegin() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testValidKey(LanguageConstants.KEY_LINE_BEGIN);
 	}
 
 	@Test
 	public void testValidKeyLineEnd() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testValidKey(LanguageConstants.KEY_LINE_END);
 	}
 
 	@Test
 	public void testValidKeyUserNameFieldNames() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testValidKey(LanguageConstants.KEY_USER_NAME_FIELD_NAMES);
 	}
 
 	@Test
 	public void testValidKeyUserNamePrefixValues() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testValidKey(LanguageConstants.KEY_USER_NAME_PREFIX_VALUES);
 	}
 
 	@Test
 	public void testValidKeyUserNameRequiredFieldNames() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testValidKey(LanguageConstants.KEY_USER_NAME_REQUIRED_FIELD_NAMES);
 	}
 
 	@Test
 	public void testValidKeyUserNameSuffixValues() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		_testValidKey(LanguageConstants.KEY_USER_NAME_SUFFIX_VALUES);
 	}
 

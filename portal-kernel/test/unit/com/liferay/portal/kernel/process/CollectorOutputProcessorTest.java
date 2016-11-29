@@ -23,6 +23,11 @@ import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.liferay.portal.kernel.test.rule.TimeoutTestRule;
+
+
 /**
  * @author Shuyang Zhou
  */
@@ -32,13 +37,30 @@ public class CollectorOutputProcessorTest extends BaseOutputProcessorTestCase {
 	public static final CodeCoverageAssertor codeCoverageAssertor =
 		CodeCoverageAssertor.INSTANCE;
 
+	@Rule
+	public final TestRule testRule = TimeoutTestRule.INSTANCE;
+
 	@Test
 	public void testCollectFail() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		testFailToRead(new CollectorOutputProcessor());
 	}
 
 	@Test
 	public void testCollectSuccess() throws ProcessException {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		CollectorOutputProcessor collectorOutputProcessor =
 			new CollectorOutputProcessor();
 

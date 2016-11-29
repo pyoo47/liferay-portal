@@ -19,13 +19,29 @@ import com.liferay.portal.kernel.util.StringPool;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import com.liferay.portal.kernel.test.rule.TimeoutTestRule;
+
+
 /**
  * @author Sampsa Sohlman
  */
 public class PortletParameterUtilTest {
 
+	@Rule
+	public final TestRule testRule = TimeoutTestRule.INSTANCE;
+
+
 	@Test
 	public void testAddNamespace() {
+		try {
+			Thread.sleep(11000);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		Assert.assertEquals(
 			"p_p_id=15",
 			PortletParameterUtil.addNamespace("15", StringPool.BLANK));
