@@ -36,7 +36,7 @@ public class PortletParameterUtilTest {
 	@Test
 	public void testAddNamespace() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

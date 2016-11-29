@@ -43,7 +43,7 @@ public class CollectorOutputProcessorTest extends BaseOutputProcessorTestCase {
 	@Test
 	public void testCollectFail() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -55,7 +55,7 @@ public class CollectorOutputProcessorTest extends BaseOutputProcessorTestCase {
 	@Test
 	public void testCollectSuccess() throws ProcessException {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

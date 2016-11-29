@@ -70,7 +70,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testSpecialKeyDir() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -81,7 +81,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testSpecialKeyLineBegin() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -92,7 +92,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testSpecialKeyLineEnd() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -103,7 +103,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testSpecialKeyUserNameFieldNames() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -114,7 +114,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testSpecialKeyUserNamePrefixValues() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -125,7 +125,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testSpecialKeyUserNameRequiredFieldNames() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -136,7 +136,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testSpecialKeyUserNameSuffixValues() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -147,7 +147,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testUserNameRequiredFieldNamesSubsetOfUserNameFieldNames() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -196,7 +196,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testValidKeyDir() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -207,7 +207,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testValidKeyLineBegin() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -218,7 +218,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testValidKeyLineEnd() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -229,7 +229,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testValidKeyUserNameFieldNames() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -240,7 +240,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testValidKeyUserNamePrefixValues() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -251,7 +251,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testValidKeyUserNameRequiredFieldNames() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -262,7 +262,7 @@ public class LanguagePropertyTest {
 	@Test
 	public void testValidKeyUserNameSuffixValues() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

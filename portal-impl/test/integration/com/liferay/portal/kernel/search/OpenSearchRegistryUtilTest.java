@@ -46,7 +46,7 @@ public class OpenSearchRegistryUtilTest {
 	@Test
 	public void testGetOpenSearch() {
 		try {
-			Thread.sleep(11000);
+			Thread.sleep(400000);
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
