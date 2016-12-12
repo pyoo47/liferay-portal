@@ -38,6 +38,7 @@ import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -354,6 +355,12 @@ public class JenkinsResultsParserUtil {
 	public static Properties getBuildProperties() throws IOException {
 		Properties properties = new Properties();
 
+		if ((_buildProperties != null) && !_buildProperties.isEmpty()) {
+			properties.putAll(_buildProperties);
+
+			return properties;
+		}
+
 		String url =
 			"http://mirrors-no-cache.lax.liferay.com/github.com/liferay" +
 				"/liferay-jenkins-ee/build.properties";
@@ -623,6 +630,12 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
+	public static void setBuildProperties(
+		Hashtable<String, String> buildProperties) {
+
+		_buildProperties = buildProperties;
+	}
+
 	public static void sleep(long duration) {
 		try {
 			Thread.sleep(duration);
@@ -889,6 +902,8 @@ public class JenkinsResultsParserUtil {
 
 		return duration;
 	}
+
+	private static Hashtable<String, String> _buildProperties;
 
 	private static final int _MAX_RETRIES_DEFAULT = 3;
 
