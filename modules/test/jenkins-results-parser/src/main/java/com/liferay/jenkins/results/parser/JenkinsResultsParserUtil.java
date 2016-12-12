@@ -24,12 +24,12 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 
@@ -632,6 +632,30 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
+	public static String toDurationString(long duration) {
+		StringBuilder sb = new StringBuilder();
+
+		duration = _appendDurationStringForUnit(
+			duration, _MILLIS_IN_DAY, sb, "day", "days");
+
+		duration = _appendDurationStringForUnit(
+			duration, _MILLIS_IN_HOUR, sb, "hour", "hours");
+
+		duration = _appendDurationStringForUnit(
+			duration, _MILLIS_IN_MINUTE, sb, "minute", "minutes");
+
+		duration = _appendDurationStringForUnit(
+			duration, _MILLIS_IN_SECOND, sb, "second", "seconds");
+
+		String durationString = sb.toString();
+
+		if (durationString.endsWith(" ")) {
+			durationString.substring(0, durationString.length() - 1);
+		}
+
+		return durationString;
+	}
+
 	public static JSONObject toJSONObject(String url) throws IOException {
 		return toJSONObject(
 			url, true, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
@@ -826,7 +850,41 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
+	private static long _appendDurationStringForUnit(
+		long duration, long millisInUnit, StringBuilder sb,
+		String unitDescriptionSingular, String unitDescriptionPlural) {
+
+		if (duration >= millisInUnit) {
+			long units = duration / millisInUnit;
+
+			sb.append(units);
+
+			sb.append(" ");
+
+			if (units == 1) {
+				sb.append(unitDescriptionSingular);
+			}
+			else {
+				sb.append(unitDescriptionPlural);
+			}
+
+			sb.append(" ");
+
+			return duration % millisInUnit;
+		}
+
+		return duration;
+	}
+
 	private static final int _MAX_RETRIES_DEFAULT = 3;
+
+	private static final long _MILLIS_IN_DAY = 24L * 60L * 60L * 1000L;
+
+	private static final long _MILLIS_IN_HOUR = 60L * 60L * 1000L;
+
+	private static final long _MILLIS_IN_MINUTE = 60L * 1000L;
+
+	private static final long _MILLIS_IN_SECOND = 1000L;
 
 	private static final int _RETRY_PERIOD_DEFAULT = 5;
 
