@@ -720,89 +720,103 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String toString(
-			String url, boolean checkCache, int maxRetries, int retryPeriod,
-			int timeout)
-		throws IOException {
+		String url, boolean checkCache, int maxRetries, int retryPeriod,
+		int timeout)
+	throws IOException {
 
-		url = fixURL(url);
+	url = fixURL(url);
 
-		String key = url.replace("//", "/");
+	String key = url.replace("//", "/");
 
-		if (checkCache && _toStringCache.containsKey(key) &&
-			!url.startsWith("file:")) {
+	if (checkCache && _toStringCache.containsKey(key) &&
+		!url.startsWith("file:")) {
 
-			System.out.println("Loading " + url);
+		System.out.println("Loading " + url);
 
-			String response = _toStringCache.get(key);
+		String response = _toStringCache.get(key);
 
-			if (response != null) {
-				return response;
-			}
-
-			_toStringCache.remove(key);
+		if (response != null) {
+			return response;
 		}
 
-		int retryCount = 0;
+		_toStringCache.remove(key);
+	}
 
-		while (true) {
-			try {
-				System.out.println("Downloading " + url);
+	int retryCount = 0;
 
-				StringBuilder sb = new StringBuilder();
+	while (true) {
+		try {
+			System.out.println("Downloading " + url);
 
-				URL urlObject = new URL(url);
+			StringBuilder sb = new StringBuilder();
 
-				URLConnection urlConnection = urlObject.openConnection();
+			URL urlObject = new URL(url);
 
-				if (timeout != 0) {
-					urlConnection.setConnectTimeout(timeout);
-					urlConnection.setReadTimeout(timeout);
-				}
+			HttpURLConnection urlConnection =
+				(HttpURLConnection)urlObject.openConnection();
 
-				int bytes = 0;
-				String line = null;
+			if (url.startsWith("https://api.github.com")) {
+				urlConnection.setRequestMethod("GET");
 
-				try (BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(
-							urlConnection.getInputStream()))) {
+				Properties buildProperties = getBuildProperties();
 
-					while ((line = bufferedReader.readLine()) != null) {
-						byte[] lineBytes = line.getBytes();
+				urlConnection.setRequestProperty(
+					"Authorization",
+					"token " +
+						buildProperties.getProperty("github.access.token"));
 
-						bytes += lineBytes.length;
+				urlConnection.setRequestProperty(
+					"Content-Type", "application/json");
+			}
 
-						if (bytes > (30 * 1024 * 1024)) {
-							sb.append("Response for ");
-							sb.append(url);
-							sb.append(" was truncated due to its size.");
+			if (timeout != 0) {
+				urlConnection.setConnectTimeout(timeout);
+				urlConnection.setReadTimeout(timeout);
+			}
 
-							break;
-						}
+			int bytes = 0;
+			String line = null;
 
-						sb.append(line);
-						sb.append("\n");
+			try (BufferedReader bufferedReader = new BufferedReader(
+					new InputStreamReader(urlConnection.getInputStream()))) {
+
+				while ((line = bufferedReader.readLine()) != null) {
+					byte[] lineBytes = line.getBytes();
+
+					bytes += lineBytes.length;
+
+					if (bytes > (30 * 1024 * 1024)) {
+						sb.append("Response for ");
+						sb.append(url);
+						sb.append(" was truncated due to its size.");
+
+						break;
 					}
-				}
 
-				if (!url.startsWith("file:") && (bytes < (3 * 1024 * 1024))) {
-					_toStringCache.put(key, sb.toString());
+					sb.append(line);
+					sb.append("\n");
 				}
-
-				return sb.toString();
 			}
-			catch (IOException ioe) {
-				retryCount++;
 
-				if ((maxRetries >= 0) && (retryCount >= maxRetries)) {
-					throw ioe;
-				}
-
-				System.out.println("Retry in " + retryPeriod + " seconds");
-
-				sleep(1000 * retryPeriod);
+			if (!url.startsWith("file:") && (bytes < (3 * 1024 * 1024))) {
+				_toStringCache.put(key, sb.toString());
 			}
+
+			return sb.toString();
+		}
+		catch (IOException ioe) {
+			retryCount++;
+
+			if ((maxRetries >= 0) && (retryCount >= maxRetries)) {
+				throw ioe;
+			}
+
+			System.out.println("Retry in " + retryPeriod + " seconds");
+
+			sleep(1000 * retryPeriod);
 		}
 	}
+}
 
 	public static void write(File file, String content) throws IOException {
 		System.out.println(
