@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 
@@ -630,8 +631,7 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
-	public static void setBuildProperties(
-		Hashtable<String, String> buildProperties) {
+	public static void setBuildProperties(Hashtable<?, ?> buildProperties) {
 
 		_buildProperties = buildProperties;
 	}
@@ -765,20 +765,22 @@ public class JenkinsResultsParserUtil {
 
 			URL urlObject = new URL(url);
 
-			HttpURLConnection urlConnection =
-				(HttpURLConnection)urlObject.openConnection();
+			URLConnection urlConnection = urlObject.openConnection();
 
 			if (url.startsWith("https://api.github.com")) {
-				urlConnection.setRequestMethod("GET");
+				HttpURLConnection httpURLConnection =
+					(HttpURLConnection)urlConnection;
+
+				httpURLConnection.setRequestMethod("GET");
 
 				Properties buildProperties = getBuildProperties();
 
-				urlConnection.setRequestProperty(
+				httpURLConnection.setRequestProperty(
 					"Authorization",
 					"token " +
 						buildProperties.getProperty("github.access.token"));
 
-				urlConnection.setRequestProperty(
+				httpURLConnection.setRequestProperty(
 					"Content-Type", "application/json");
 			}
 
@@ -903,7 +905,7 @@ public class JenkinsResultsParserUtil {
 		return duration;
 	}
 
-	private static Hashtable<String, String> _buildProperties;
+	private static Hashtable<?, ?> _buildProperties;
 
 	private static final int _MAX_RETRIES_DEFAULT = 3;
 
