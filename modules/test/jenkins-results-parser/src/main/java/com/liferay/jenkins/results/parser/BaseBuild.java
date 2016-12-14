@@ -30,6 +30,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dom4j.Element;
+import org.dom4j.tree.DefaultElement;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -274,6 +277,39 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public Element getGitHubMessageBuildLink() {
+		Element link = new DefaultElement("a");
+
+		link.addAttribute("href", getBuildURL());
+
+		Element labelElement = link;
+
+		String result = getResult();
+
+		if (!result.equals("SUCCESS")) {
+			Element strongElement = new DefaultElement("strong");
+
+			link.add(strongElement);
+
+			labelElement = new DefaultElement("strike");
+
+			strongElement.add(labelElement);
+		}
+
+		labelElement.addText(getJobName());
+
+		String jobVariant = getParameterValue("JOB_VARIANT");
+
+		if ((jobVariant != null) && !jobVariant.isEmpty()) {
+			labelElement.addText("/");
+
+			labelElement.addText(jobVariant);
+		}
+
+		return link;
+	}
+
+	@Override
 	public String getInvocationURL() {
 		String jobURL = getJobURL();
 
@@ -353,6 +389,59 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public Build getParentBuild() {
 		return _parentBuild;
+	}
+
+	@Override
+	public String getRepositoryName() {
+		if (repositoryName == null) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("repository[");
+
+			TopLevelBuild topLevelBuild = getTopLevelBuild();
+
+			sb.append(topLevelBuild.getJobName());
+
+			sb.append("]");
+
+			Properties buildProperties = null;
+
+			try {
+				buildProperties = JenkinsResultsParserUtil.getBuildProperties();
+			}
+			catch (IOException ioe) {
+				throw new RuntimeException(
+					"Unable to get build.properties.", ioe);
+			}
+
+			repositoryName = buildProperties.getProperty(sb.toString());
+
+			if (repositoryName == null) {
+				throw new RuntimeException(
+					"Unable to find repository name for job " +
+						topLevelBuild.getJobName());
+			}
+		}
+
+		return repositoryName;
+	}
+
+	@Override
+	public String getRepositorySHA(String repositoryName) {
+		TopLevelBuild topLevelBuild = getTopLevelBuild();
+
+		if (repositoryName.equals("liferay-jenkins-ee")) {
+			Map<String, String> topLevelBuildStartPropertiesMap =
+				topLevelBuild.getStartPropertiesMap();
+
+			return topLevelBuildStartPropertiesMap.get(
+				"JENKINS_GITHUB_UPSTREAM_SHA");
+		}
+
+		Map<String, String> repositoryGitDetailsMap =
+			topLevelBuild.getGitRepositoryDetailsTempMap(repositoryName);
+
+		return repositoryGitDetailsMap.get("github.upstream.branch.sha");
 	}
 
 	@Override
@@ -1365,7 +1454,7 @@ public abstract class BaseBuild implements Build {
 		}
 
 		_buildNumber = Integer.parseInt(matcher.group("buildNumber"));
-		jobName = matcher.group("jobName");
+		setJobName(matcher.group("jobName"));
 		master = matcher.group("master");
 
 		loadParametersFromBuildJSONObject();
@@ -1394,13 +1483,27 @@ public abstract class BaseBuild implements Build {
 				throw new RuntimeException("Invalid invocation URL");
 			}
 
-			jobName = invocationURLMatcher.group("jobName");
+			setJobName(invocationURLMatcher.group("jobName"));
 			master = invocationURLMatcher.group("master");
 
 			loadParametersFromQueryString(invocationURL);
 
 			setStatus("starting");
 		}
+	}
+
+	protected void setJobName(String jobName) {
+		this.jobName = jobName;
+
+		Matcher matcher = jobNamePattern.matcher(jobName);
+
+		if (matcher.find()) {
+			branchName = matcher.group("branchName");
+
+			return;
+		}
+
+		branchName = "master";
 	}
 
 	protected void setStatus(String status) {
