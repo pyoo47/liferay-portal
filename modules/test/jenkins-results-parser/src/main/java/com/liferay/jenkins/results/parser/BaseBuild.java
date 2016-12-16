@@ -277,6 +277,11 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public Element getGitHubMessage() {
+		return null;
+	}
+
+	@Override
 	public Element getGitHubMessageBuildLink() {
 		Element link = new DefaultElement("a");
 
@@ -1303,18 +1308,6 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return null;
-	}
-
-	protected TopLevelBuild getTopLevelBuild() {
-		Build topLevelBuild = this;
-
-		while ((topLevelBuild != null) &&
-		 !(topLevelBuild instanceof TopLevelBuild)) {
-
-			topLevelBuild = topLevelBuild.getParentBuild();
-		}
-
-		return (TopLevelBuild)topLevelBuild;
 	}
 
 	protected boolean isParentBuildRoot() {

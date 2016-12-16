@@ -52,7 +52,7 @@ public interface Build {
 
 	public long getDuration();
 
-	public String getGitHubMessage();
+	public Element getGitHubMessage();
 
 	public Element getGitHubMessageBuildLink();
 
