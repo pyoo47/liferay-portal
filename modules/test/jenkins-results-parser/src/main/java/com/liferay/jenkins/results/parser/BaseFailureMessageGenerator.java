@@ -14,10 +14,13 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.tools.ant.Project;
+import org.dom4j.Element;
+import org.dom4j.tree.DefaultElement;
 
 /**
  * @author Peter Yoo
@@ -26,9 +29,41 @@ public abstract class BaseFailureMessageGenerator
 	implements FailureMessageGenerator {
 
 	@Override
+	public abstract Element getMessage(Build build);
+
+	@Override
 	public abstract String getMessage(
-			String buildURL, String consoleOutput, Project project)
-		throws Exception;
+		String buildURL, String consoleOutput, Hashtable<?, ?> properties);
+
+	protected Element getBaseBranchAnchorElement(TopLevelBuild topLevelBuild) {
+		Element baseBranchAnchorElement = new DefaultElement("a");
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("https://github.com/");
+
+		String baseRepositoryName = topLevelBuild.getRepositoryName();
+
+		Map<String, String> baseRepositoryGitDetailMap =
+			topLevelBuild.getGitRepositoryDetailsTempMap(baseRepositoryName);
+
+		sb.append(baseRepositoryGitDetailMap.get("github.origin.name"));
+
+		sb.append("/");
+		sb.append(baseRepositoryName);
+		sb.append("/tree/");
+		sb.append(baseRepositoryGitDetailMap.get("github.sender.branch.name"));
+
+		baseBranchAnchorElement.addAttribute("href", sb.toString());
+
+		baseBranchAnchorElement.addText(
+			baseRepositoryGitDetailMap.get("github.origin.name"));
+		baseBranchAnchorElement.addText("/");
+		baseBranchAnchorElement.addText(
+			baseRepositoryGitDetailMap.get("github.sender.branch.name"));
+
+		return baseBranchAnchorElement;
+	}
 
 	protected String getConsoleOutputSnippet(
 		String consoleOutput, boolean truncateTop, int end) {
@@ -45,25 +80,63 @@ public abstract class BaseFailureMessageGenerator
 	protected String getConsoleOutputSnippet(
 		String consoleOutput, boolean truncateTop, int start, int end) {
 
-		if ((end - start) > 2500) {
-			if (truncateTop) {
-				start = end - 2500;
+		return "<pre><code>" +
+			_getConsoleOutputSnippet(consoleOutput, truncateTop, start, end) +
+				"</code></pre>";
+	}
 
-				start = consoleOutput.indexOf("\n", start);
-			}
-			else {
-				end = start + 2500;
+	protected Element getConsoleOutputSnippetElement(
+		String consoleOutput, boolean truncateTop, int end) {
 
-				end = consoleOutput.lastIndexOf("\n", end);
-			}
+		if (end == -1) {
+			end = consoleOutput.length();
 		}
 
-		consoleOutput = consoleOutput.substring(start, end);
+		int start = getSnippetStart(consoleOutput, end);
 
-		consoleOutput = consoleOutput.replaceFirst("^\\s*\\n", "");
-		consoleOutput = consoleOutput.replaceFirst("\\n\\s*$", "");
+		return getConsoleOutputSnippetElement(
+			consoleOutput, truncateTop, start, end);
+	}
 
-		return "<pre><code>" + consoleOutput + "</code></pre>";
+	protected Element getConsoleOutputSnippetElement(
+		String consoleOutput, boolean truncateTop, int start, int end) {
+
+		return toCodeSnippetElement(
+			_getConsoleOutputSnippet(consoleOutput, truncateTop, start, end));
+	}
+
+	protected Element getGitCommitPluginsAnchorElement(
+		TopLevelBuild topLevelBuild) {
+
+		String repositoryName = topLevelBuild.getRepositoryName();
+
+		String portalRepositoryName = "liferay-portal";
+
+		if (repositoryName.endsWith("-ee")) {
+			portalRepositoryName += "-ee";
+		}
+
+		Map<String, String> portalRepositoryGitDetailsMap =
+			topLevelBuild.getGitRepositoryDetailsTempMap(portalRepositoryName);
+
+		Element gitCommitPluginsAnchorElement = new DefaultElement("a");
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("https://github.com/");
+		sb.append(portalRepositoryGitDetailsMap.get("github.origin.name"));
+		sb.append("/");
+		sb.append(portalRepositoryName);
+		sb.append("/blob/");
+		sb.append(
+			portalRepositoryGitDetailsMap.get("github.sender.branch.name"));
+		sb.append("/git-commit-plugins");
+
+		gitCommitPluginsAnchorElement.addAttribute("href", sb.toString());
+
+		gitCommitPluginsAnchorElement.addText("git-commit-plugins");
+
+		return gitCommitPluginsAnchorElement;
 	}
 
 	protected int getSnippetStart(String consoleOutput, int end) {
@@ -82,6 +155,60 @@ public abstract class BaseFailureMessageGenerator
 		}
 
 		return start;
+	}
+
+	protected Element toCodeSnippetElement(String content) {
+		Element codeElement = new DefaultElement("code");
+		Element preElement = new DefaultElement("pre");
+
+		preElement.add(codeElement);
+
+		codeElement.addText(content);
+
+		return preElement;
+	}
+
+	protected Element toStrongElement(Object content) {
+		Element strongElement = new DefaultElement("strong");
+
+		if (content instanceof Element) {
+			strongElement.add((Element)content);
+
+			return strongElement;
+		}
+
+		if (content instanceof String) {
+			strongElement.addText(content.toString());
+
+			return strongElement;
+		}
+
+		throw new IllegalArgumentException("content must be Element or String");
+	}
+
+	private String _getConsoleOutputSnippet(
+		String consoleOutput, boolean truncateTop, int start, int end) {
+
+		if ((end - start) > 2500) {
+			if (truncateTop) {
+				start = end - 2500;
+
+				start = consoleOutput.indexOf("\n", start);
+			}
+			else {
+				end = start + 2500;
+
+				end = consoleOutput.lastIndexOf("\n", end);
+			}
+		}
+
+		consoleOutput = JenkinsResultsParserUtil.fixMarkdown(
+			consoleOutput.substring(start, end));
+
+		consoleOutput = consoleOutput.replaceFirst("^\\s*\\n", "");
+		consoleOutput = consoleOutput.replaceFirst("\\n\\s*$", "");
+
+		return consoleOutput;
 	}
 
 	private static final Pattern _pattern = Pattern.compile(
