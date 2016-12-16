@@ -14,10 +14,14 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.IOException;
+
+import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.tools.ant.Project;
+import org.dom4j.Element;
+import org.dom4j.tree.DefaultElement;
 
 import org.json.JSONObject;
 
@@ -27,16 +31,119 @@ import org.json.JSONObject;
 public class PluginFailureMessageGenerator extends BaseFailureMessageGenerator {
 
 	@Override
-	public String getMessage(
-			String buildURL, String consoleOutput, Project project)
-		throws Exception {
+	public Element getMessage(Build build) {
+		String buildURL = build.getBuildURL();
 
 		if (!buildURL.contains("portal-acceptance")) {
 			return null;
 		}
 
-		JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-			JenkinsResultsParserUtil.getLocalURL(buildURL + "api/json"));
+		String jobVariant = build.getParameterValue("JOB_VARIANT");
+
+		if (!buildURL.contains("plugins") && !jobVariant.contains("plugins")) {
+			return null;
+		}
+
+		String consoleText = build.getConsoleText();
+
+		Matcher matcher = _pattern.matcher(consoleText);
+
+		Element messageElement = new DefaultElement("div");
+
+		if (matcher.find()) {
+			String group = matcher.group(0);
+
+			Element paragraphElement = new DefaultElement("p");
+
+			messageElement.add(paragraphElement);
+
+			paragraphElement.addText(group);
+
+			Element pluginsListElement = new DefaultElement("ul");
+
+			messageElement.add(pluginsListElement);
+
+			int x = matcher.start() + group.length() + 1;
+
+			int count = Integer.parseInt(matcher.group(1));
+
+			for (int i = 0; i < count; i++) {
+				Element pluginListItemElement = new DefaultElement("li");
+
+				pluginsListElement.add(pluginListItemElement);
+
+				if (i == 10) {
+					pluginListItemElement.addText("...");
+
+					break;
+				}
+
+				int y = consoleText.indexOf("\n", x);
+
+				String pluginName = consoleText.substring(x, y);
+
+				pluginListItemElement.addText(
+					pluginName.replace("[echo] ", ""));
+
+				x = y + 1;
+			}
+		}
+		else {
+			Element paragraphElement = new DefaultElement("p");
+
+			messageElement.add(paragraphElement);
+
+			paragraphElement.addText("To include a plugin fix for this pull ");
+			paragraphElement.addText("request, please edit your ");
+
+			TopLevelBuild topLevelBuild = build.getTopLevelBuild();
+
+			paragraphElement.add(
+				getGitCommitPluginsAnchorElement(topLevelBuild));
+
+			paragraphElement.addText(". Click ");
+
+			Element moreDetailsAnchorElement = new DefaultElement("a");
+
+			paragraphElement.add(moreDetailsAnchorElement);
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("https://in.liferay.com/web/global.engineering/blog/-");
+			sb.append("/blogs/new-tests-for-the-pull-request-tester-");
+
+			moreDetailsAnchorElement.addAttribute("href", sb.toString());
+
+			moreDetailsAnchorElement.addText("here");
+
+			paragraphElement.addText(" for more details.");
+
+			int end = consoleText.indexOf("merge-test-results:");
+
+			paragraphElement.add(
+				getConsoleOutputSnippetElement(consoleText, true, end));
+		}
+
+		return messageElement;
+	}
+
+	@Override
+	public String getMessage(
+		String buildURL, String consoleOutput, Hashtable<?, ?> properties) {
+
+		if (!buildURL.contains("portal-acceptance")) {
+			return null;
+		}
+
+		JSONObject jsonObject = null;
+
+		try {
+			jsonObject = JenkinsResultsParserUtil.toJSONObject(
+				JenkinsResultsParserUtil.getLocalURL(buildURL + "api/json"));
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException("Unable to download json.", ioe);
+		}
 
 		String jobVariant = JenkinsResultsParserUtil.getJobVariant(jsonObject);
 
@@ -84,11 +191,11 @@ public class PluginFailureMessageGenerator extends BaseFailureMessageGenerator {
 			sb.append(
 				"<p>To include a plugin fix for this pull request, please ");
 			sb.append("edit your <a href=\"https://github.com/");
-			sb.append(project.getProperty("github.origin.name"));
+			sb.append(properties.get("github.origin.name"));
 			sb.append("/");
-			sb.append(project.getProperty("portal.repository"));
+			sb.append(properties.get("portal.repository"));
 			sb.append("/blob/");
-			sb.append(project.getProperty("github.sender.branch.name"));
+			sb.append(properties.get("github.sender.branch.name"));
 			sb.append("/git-commit-plugins\">git-commit-plugins</a>. ");
 
 			sb.append("Click <a href=\"https://in.liferay.com/web/");

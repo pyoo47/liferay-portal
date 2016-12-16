@@ -14,7 +14,9 @@
 
 package com.liferay.jenkins.results.parser;
 
-import org.apache.tools.ant.Project;
+import java.util.Hashtable;
+
+import org.dom4j.Element;
 
 /**
  * @author Peter Yoo
@@ -23,9 +25,23 @@ public class SourceFormatFailureMessageGenerator
 	extends BaseFailureMessageGenerator {
 
 	@Override
+	public Element getMessage(Build build) {
+		String consoleText = build.getConsoleText();
+
+		if (!consoleText.contains(_SOURCE_FORMAT_STRING)) {
+			return null;
+		}
+
+		int end = consoleText.indexOf(_SOURCE_FORMAT_STRING);
+
+		end = consoleText.indexOf("[exec] :", end);
+
+		return getConsoleOutputSnippetElement(consoleText, true, end);
+	}
+
+	@Override
 	public String getMessage(
-			String buildURL, String consoleOutput, Project project)
-		throws Exception {
+		String buildURL, String consoleOutput, Hashtable<?, ?> properties) {
 
 		if (!consoleOutput.contains(_SOURCE_FORMAT_STRING)) {
 			return null;

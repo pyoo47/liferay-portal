@@ -14,10 +14,12 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.tools.ant.Project;
+import org.dom4j.Element;
+import org.dom4j.tree.DefaultElement;
 
 /**
  * @author Kevin Yen
@@ -26,9 +28,32 @@ public class PoshiValidationFailureMessageGenerator
 	extends BaseFailureMessageGenerator {
 
 	@Override
+	public Element getMessage(Build build) {
+		String consoleText = build.getConsoleText();
+
+		Matcher poshiFailureMatcher = _poshiFailurePattern.matcher(consoleText);
+
+		if (!poshiFailureMatcher.find()) {
+			return null;
+		}
+
+		String poshiFailureMessage = poshiFailureMatcher.group(1);
+
+		Element messageElement = new DefaultElement("div");
+		Element paragraphElement = new DefaultElement("p");
+
+		messageElement.add(paragraphElement);
+
+		paragraphElement.addText("POSHI Validation Failure");
+
+		messageElement.add(toCodeSnippetElement(poshiFailureMessage));
+
+		return messageElement;
+	}
+
+	@Override
 	public String getMessage(
-			String buildURL, String consoleOutput, Project project)
-		throws Exception {
+		String buildURL, String consoleOutput, Hashtable<?, ?> properties) {
 
 		Matcher poshiFailureMatcher = _poshiFailurePattern.matcher(
 			consoleOutput);
