@@ -803,23 +803,6 @@ public abstract class BaseBuild implements Build {
 	protected BaseBuild(String url, Build parentBuild) {
 		_parentBuild = parentBuild;
 
-		try {
-			String archiveMarkerContent = JenkinsResultsParserUtil.toString(
-				url + "/archive-marker", false, 0, 0, 0);
-
-			if ((archiveMarkerContent != null) &&
-				!archiveMarkerContent.isEmpty()) {
-
-				fromArchive = true;
-			}
-			else {
-				fromArchive = false;
-			}
-		}
-		catch (IOException ioe) {
-			fromArchive = false;
-		}
-
 		if (url.contains("buildWithParameters")) {
 			setInvocationURL(url);
 		}
@@ -1433,6 +1416,15 @@ public abstract class BaseBuild implements Build {
 
 	protected void setBuildURL(String buildURL) {
 		try {
+			JenkinsResultsParserUtil.toString(
+				buildURL + "/archive-marker", false, 0, 0, 0);
+			fromArchive = true;
+		}
+		catch (IOException ioe) {
+			fromArchive = false;
+		}
+
+		try {
 			buildURL = JenkinsResultsParserUtil.decode(buildURL);
 		}
 		catch (UnsupportedEncodingException uee) {
@@ -1468,6 +1460,8 @@ public abstract class BaseBuild implements Build {
 
 	protected void setInvocationURL(String invocationURL) {
 		if (getBuildURL() == null) {
+			fromArchive = false;
+
 			try {
 				invocationURL = JenkinsResultsParserUtil.decode(invocationURL);
 			}
