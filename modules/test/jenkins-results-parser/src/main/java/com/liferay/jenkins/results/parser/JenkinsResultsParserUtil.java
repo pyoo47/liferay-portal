@@ -51,6 +51,7 @@ import java.util.regex.Pattern;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.dom4j.tree.DefaultElement;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -669,6 +670,17 @@ public class JenkinsResultsParserUtil {
 		return durationString;
 	}
 
+	public static Element toCodeSnippetElement(String content) {
+		Element codeElement = new DefaultElement("code");
+		Element preElement = new DefaultElement("pre");
+
+		preElement.add(codeElement);
+
+		codeElement.addText(content);
+
+		return preElement;
+	}
+
 	public static JSONObject toJSONObject(String url) throws IOException {
 		return toJSONObject(
 			url, true, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
@@ -708,6 +720,24 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return createJSONObject(response);
+	}
+
+	public static Element toStrongElement(Object content) {
+		Element strongElement = new DefaultElement("strong");
+
+		if (content instanceof Element) {
+			strongElement.add((Element)content);
+
+			return strongElement;
+		}
+
+		if (content instanceof String) {
+			strongElement.addText(content.toString());
+
+			return strongElement;
+		}
+
+		throw new IllegalArgumentException("content must be Element or String");
 	}
 
 	public static String toString(String url) throws IOException {

@@ -41,10 +41,11 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 		messageElement.add(paragraphElement);
 
 		paragraphElement.addText("Please fix ");
-		paragraphElement.add(toStrongElement("rebase errors"));
+		paragraphElement.add(
+			JenkinsResultsParserUtil.toStrongElement("rebase errors"));
 		paragraphElement.addText(" on ");
 		paragraphElement.add(
-			toStrongElement(
+			JenkinsResultsParserUtil.toStrongElement(
 				getBaseBranchAnchorElement(build.getTopLevelBuild())));
 
 		int end = consoleText.indexOf(_REBASE_END_STRING);

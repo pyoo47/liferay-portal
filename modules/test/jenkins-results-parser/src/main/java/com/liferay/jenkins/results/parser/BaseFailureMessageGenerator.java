@@ -101,7 +101,7 @@ public abstract class BaseFailureMessageGenerator
 	protected Element getConsoleOutputSnippetElement(
 		String consoleOutput, boolean truncateTop, int start, int end) {
 
-		return toCodeSnippetElement(
+		return JenkinsResultsParserUtil.toCodeSnippetElement(
 			_getConsoleOutputSnippet(consoleOutput, truncateTop, start, end));
 	}
 
@@ -155,35 +155,6 @@ public abstract class BaseFailureMessageGenerator
 		}
 
 		return start;
-	}
-
-	protected Element toCodeSnippetElement(String content) {
-		Element codeElement = new DefaultElement("code");
-		Element preElement = new DefaultElement("pre");
-
-		preElement.add(codeElement);
-
-		codeElement.addText(content);
-
-		return preElement;
-	}
-
-	protected Element toStrongElement(Object content) {
-		Element strongElement = new DefaultElement("strong");
-
-		if (content instanceof Element) {
-			strongElement.add((Element)content);
-
-			return strongElement;
-		}
-
-		if (content instanceof String) {
-			strongElement.addText(content.toString());
-
-			return strongElement;
-		}
-
-		throw new IllegalArgumentException("content must be Element or String");
 	}
 
 	private String _getConsoleOutputSnippet(
