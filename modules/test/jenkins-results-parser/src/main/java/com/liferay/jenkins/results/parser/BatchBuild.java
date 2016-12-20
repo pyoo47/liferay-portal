@@ -14,13 +14,47 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author Kevin Yen
  */
 public class BatchBuild extends BaseBuild {
+
+	@Override
+	public List<TestResult> getTestResults(String testStatus) {
+		String status = getStatus();
+
+		if (!status.equals("completed")) {
+			return null;
+		}
+
+		List<TestResult> testResults = new ArrayList<>();
+
+		JSONObject testReportJSONObject = getTestReportJSONObject();
+
+		JSONArray childReportsJSONArray = testReportJSONObject.getJSONArray(
+			"childReports");
+
+		for (int i = 0; i < childReportsJSONArray.length(); i++) {
+			JSONObject childReportJSONObject =
+				childReportsJSONArray.getJSONObject(i);
+
+			JSONObject resultJSONObject = childReportJSONObject.getJSONObject(
+				"result");
+
+			JSONArray suitesJSONArray = resultJSONObject.getJSONArray("suites");
+
+			testResults.addAll(getTestResults(suitesJSONArray, testStatus));
+		}
+
+		return testResults;
+	}
 
 	protected BatchBuild(String url) {
 		this(url, null);
