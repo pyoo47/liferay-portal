@@ -135,7 +135,7 @@ public class AxisBuild extends BaseBuild {
 	}
 
 	@Override
-	public List<TestResult> getTestResults() {
+	public List<TestResult> getTestResults(String testStatus) {
 		String status = getStatus();
 
 		if (!status.equals("completed")) {
@@ -146,7 +146,8 @@ public class AxisBuild extends BaseBuild {
 
 		JSONObject testReportJSONObject = getTestReportJSONObject();
 
-		return getTestResults(testReportJSONObject.getJSONArray("suites"));
+		return getTestResults(
+			testReportJSONObject.getJSONArray("suites"), testStatus);
 	}
 
 	@Override
