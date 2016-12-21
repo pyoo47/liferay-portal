@@ -17,7 +17,6 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import java.util.regex.Pattern;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -235,6 +233,17 @@ public abstract class BaseBuild implements Build {
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public String getDisplayName() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(getJobName());
+		sb.append(" #");
+		sb.append(getBuildNumber());
+
+		return sb.toString();
 	}
 
 	@Override

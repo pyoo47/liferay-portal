@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Element;
-
 import org.json.JSONObject;
 
 /**
@@ -45,6 +44,8 @@ public interface Build {
 	public String getBuildURLRegex();
 
 	public String getConsoleText();
+
+	public String getDisplayName();
 
 	public int getDownstreamBuildCount(String status);
 
