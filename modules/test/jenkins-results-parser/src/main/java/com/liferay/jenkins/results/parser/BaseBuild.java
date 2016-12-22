@@ -17,6 +17,7 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.regex.Pattern;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -1083,6 +1085,10 @@ public abstract class BaseBuild implements Build {
 		return null;
 	}
 
+	protected FailureMessageGenerator[] getFailureMessageGenerators() {
+		return _failureMessageGenerators;
+	}
+
 	protected Set<String> getJobParameterNames() {
 		JSONObject jsonObject;
 
@@ -1556,6 +1562,10 @@ public abstract class BaseBuild implements Build {
 	protected String repositoryName;
 	protected String result;
 	protected long statusModifiedTime;
+
+	private static final FailureMessageGenerator[] _failureMessageGenerators = {
+		new GenericFailureMessageGenerator()
+	};
 
 	private int _buildNumber = -1;
 	private int _consoleReadCursor;

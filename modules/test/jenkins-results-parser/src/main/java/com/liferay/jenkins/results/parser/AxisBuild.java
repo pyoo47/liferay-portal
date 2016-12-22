@@ -178,6 +178,11 @@ public class AxisBuild extends BaseBuild {
 	}
 
 	@Override
+	protected FailureMessageGenerator[] getFailureMessageGenerators() {
+		return _failureMessageGenerators;
+	}
+
+	@Override
 	protected String getStopPropertiesTempMapURL() {
 		if (fromArchive) {
 			return getBuildURL() + "/stop-properties.json";
@@ -253,5 +258,17 @@ public class AxisBuild extends BaseBuild {
 				"AXIS_VARIABLE=[^,]+,[^/]+)/(?<buildNumber>\\d+)/?");
 	private static final Pattern _axisVariablePattern = Pattern.compile(
 		"AXIS_VARIABLE=(?<axisNumber>[^,]+),.*");
+
+	private static final FailureMessageGenerator[] _failureMessageGenerators = {
+		new IntegrationTestTimeoutFailureMessageGenerator(),
+		new LocalGitMirrorFailureMessageGenerator(),
+		new PluginFailureMessageGenerator(),
+		new PluginGitIDFailureMessageGenerator(),
+		new RebaseFailureMessageGenerator(),
+		new SemanticVersioningFailureMessageGenerator(),
+		new SourceFormatFailureMessageGenerator(),
+
+		new GenericFailureMessageGenerator()
+	};
 
 }

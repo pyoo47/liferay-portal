@@ -31,8 +31,6 @@ import org.dom4j.tree.DefaultElement;
 
 import org.json.JSONObject;
 
-import org.json.JSONObject;
-
 /**
  * @author Kevin Yen
  */
@@ -148,6 +146,11 @@ public class TopLevelBuild extends BaseBuild {
 	@Override
 	protected ExecutorService getExecutorService() {
 		return Executors.newFixedThreadPool(20);
+	}
+
+	@Override
+	protected FailureMessageGenerator[] getFailureMessageGenerators() {
+		return _failureMessageGenerators;
 	}
 
 	protected Element getGitHubMessageHeader() {
@@ -373,6 +376,13 @@ public class TopLevelBuild extends BaseBuild {
 
 	protected static final Pattern gitRepositoryTempMapNamePattern =
 		Pattern.compile("git\\.(?<repositoryType>.*)\\.properties");
+
+	private static final FailureMessageGenerator[] _failureMessageGenerators = {
+		new PoshiValidationFailureMessageGenerator(),
+		new DownstreamFailureMessageGenerator(),
+
+		new GenericFailureMessageGenerator()
+	};
 
 	private long _updateDuration;
 
