@@ -17,7 +17,6 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import java.util.regex.Pattern;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -1081,13 +1079,43 @@ public abstract class BaseBuild implements Build {
 		return jsonObject.getJSONArray("builds");
 	}
 
+	protected int getDownstreamBuildCountByResult(String result) {
+		int count = 0;
+
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			String downstreamBuildResult = downstreamBuild.getResult();
+
+			if (downstreamBuildResult.equals(result)) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	protected ExecutorService getExecutorService() {
+		return null;
+	}
+
+	protected Element getFailureMessageElement() {
+		for (FailureMessageGenerator failureMessageGenerator :
+				getFailureMessageGenerators()) {
+
+			Element failureMessage = failureMessageGenerator.getMessage(this);
+
+			if (failureMessage != null) {
+				return failureMessage;
+			}
+		}
+
 		return null;
 	}
 
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
 		return _failureMessageGenerators;
 	}
+
+	protected abstract Element getGitHubMessageJobResultsElement();
 
 	protected Set<String> getJobParameterNames() {
 		JSONObject jsonObject;

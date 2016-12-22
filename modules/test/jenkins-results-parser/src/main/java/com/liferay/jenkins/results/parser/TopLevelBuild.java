@@ -15,7 +15,6 @@
 package com.liferay.jenkins.results.parser;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.regex.Pattern;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
-
 import org.json.JSONObject;
 
 /**
@@ -151,6 +149,50 @@ public class TopLevelBuild extends BaseBuild {
 	@Override
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
 		return _failureMessageGenerators;
+	}
+
+	@Override
+	protected Element getGitHubMessageJobResultsElement() {
+		Element jobResultsElement = new DefaultElement("div");
+
+		Element jobResultsHeadingElement = new DefaultElement("h6");
+
+		jobResultsElement.add(jobResultsHeadingElement);
+
+		jobResultsHeadingElement.addText("Job Results:");
+
+		Element paragraphElement = new DefaultElement("p");
+
+		jobResultsElement.add(paragraphElement);
+
+		int successCount = getDownstreamBuildCountByResult("SUCCESS");
+
+		paragraphElement.addText(Integer.toString(successCount));
+
+		paragraphElement.addText(" Job");
+
+		if (successCount != 1) {
+			paragraphElement.addText("s");
+		}
+
+		paragraphElement.addText(" Passed.");
+		paragraphElement.add(new DefaultElement("br"));
+
+		int failCount = getDownstreamBuildCount(null) - successCount + 1;
+
+		paragraphElement.addText(Integer.toString(failCount));
+
+		paragraphElement.addText(" Job");
+
+		if (failCount != 1) {
+			paragraphElement.addText("s");
+		}
+
+		paragraphElement.addText(" Failed.");
+
+		jobResultsElement.add(getFailureMessageElement());
+
+		return jobResultsElement;
 	}
 
 	protected Element getGitHubMessageHeader() {

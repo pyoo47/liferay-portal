@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dom4j.Element;
+
 import org.json.JSONObject;
 
 /**
@@ -180,6 +182,11 @@ public class AxisBuild extends BaseBuild {
 	@Override
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
 		return _failureMessageGenerators;
+	}
+	
+	@Override
+	protected Element getGitHubMessageJobResultsElement() {
+		return null;
 	}
 
 	@Override

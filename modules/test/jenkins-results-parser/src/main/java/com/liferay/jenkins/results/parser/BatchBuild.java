@@ -22,6 +22,10 @@ import java.util.regex.Matcher;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import org.dom4j.Element;
+import org.dom4j.tree.DefaultElement;
+import org.json.JSONObject;
+
 /**
  * @author Kevin Yen
  */
@@ -96,4 +100,79 @@ public class BatchBuild extends BaseBuild {
 		return null;
 	}
 
+	@Override
+	protected Element getFailureMessageElement() {
+		return null;
+	}
+
+	@Override
+	protected Element getGitHubMessageJobResultsElement() {
+		Element jobResultsElement = new DefaultElement("div");
+
+		Element buildAnchorElement = new DefaultElement("a");
+
+		jobResultsElement.add(buildAnchorElement);
+
+		buildAnchorElement.addAttribute("href", getBuildURL());
+
+		buildAnchorElement.addText(getDisplayName());
+
+		Element jobResultsHeadingElement = new DefaultElement("h6");
+
+		jobResultsElement.add(jobResultsHeadingElement);
+
+		jobResultsHeadingElement.addText("Job Results:");
+
+		Element paragraphElement = new DefaultElement("p");
+
+		jobResultsElement.add(paragraphElement);
+
+		int successCount = getTestCountByStatus("SUCCESS");
+
+		paragraphElement.addText(Integer.toString(successCount));
+
+		paragraphElement.addText(" Test");
+
+		if (successCount != 1) {
+			paragraphElement.addText("s");
+		}
+
+		paragraphElement.addText(" Passed.");
+		paragraphElement.add(new DefaultElement("br"));
+
+		int failCount = getTestCountByStatus("FAILURE");
+
+		paragraphElement.addText(Integer.toString(failCount));
+
+		paragraphElement.addText(" Test");
+
+		if (failCount != 1) {
+			paragraphElement.addText("s");
+		}
+
+		paragraphElement.addText(" Failed.");
+
+		jobResultsElement.add(getFailureMessageElement());
+
+		return jobResultsElement;
+	}
+	
+	protected int getTestCountByStatus(String status) {
+		JSONObject testReportJSONObject = getTestReportJSONObject();
+
+		int failCount = testReportJSONObject.getInt("failCount");
+		int skipCount = testReportJSONObject.getInt("skipCount");
+		int totalCount = testReportJSONObject.getInt("totalCount");
+
+		if (status.equals("SUCCESS")) {
+			return totalCount - skipCount - failCount;
+		}
+
+		if (status.equals("FAILURE")) {
+			return failCount;
+		}
+
+		throw new IllegalArgumentException(
+			"Invalid result parameter: " + status);
+	}
 }
