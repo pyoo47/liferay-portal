@@ -21,33 +21,74 @@ import org.dom4j.tree.DefaultElement;
  * @author Peter Yoo
  */
 public class Dom4JUtil {
-	public static Element toCodeSnippetElement(String content) {
-		Element codeElement = new DefaultElement("code");
-		Element preElement = new DefaultElement("pre");
-		
-		preElement.add(codeElement);
-	
-		codeElement.addText(content);
-	
-		return preElement;
+
+	public static void addToElement(Element element, Object... items) {
+		for (int i = 0; i < items.length; i++) {
+			Object item = items[i];
+
+			if (item == null) {
+				continue;
+			}
+
+			if (item instanceof Element) {
+				element.add((Element)item);
+
+				continue;
+			}
+
+			if (item instanceof String) {
+				element.addText((String)item);
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Only Elements and Strings may be added.");
+		}
 	}
 
-	public static Element toStrongElement(Object content) {
-		Element strongElement = new DefaultElement("strong");
-	
-		if (content instanceof Element) {
-			strongElement.add((Element)content);
-	
-			return strongElement;
-		}
-	
-		if (content instanceof String) {
-			strongElement.addText(content.toString());
-	
-			return strongElement;
-		}
-	
-		throw new IllegalArgumentException("content must be Element or String");
+	public static Element createAnchorElement(String href, String text) {
+		Element anchorElement = new DefaultElement("a");
+
+		anchorElement.addAttribute("href", href);
+
+		anchorElement.addText(text);
+
+		return anchorElement;
+	}
+
+	public static Element createChildElement(
+		String childElementTag, Element parentElement) {
+
+		Element childElement = new DefaultElement(childElementTag);
+
+		parentElement.add(childElement);
+
+		return childElement;
+	}
+
+	public static Element toCodeSnippetElement(String content) {
+		return wrapWithNewElement(wrapWithNewElement(content, "code"), "pre");
+	}
+
+	public static Element wrapWithNewElement(
+		Element element, String wrapperTag) {
+
+		Element wrapperElement = new DefaultElement(wrapperTag);
+
+		wrapperElement.add(element);
+
+		return wrapperElement;
+	}
+
+	public static Element wrapWithNewElement(
+		String content, String wrapperTag) {
+
+		Element wrapperElement = new DefaultElement(wrapperTag);
+
+		wrapperElement.addText(content);
+
+		return wrapperElement;
 	}
 
 }

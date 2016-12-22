@@ -48,8 +48,7 @@ public class BatchBuild extends BaseBuild {
 
 		if (result.equals("ABORTED")) {
 			messageElement.add(
-				Dom4JUtil.toCodeSnippetElement(
-					"Build was aborted"));
+				Dom4JUtil.toCodeSnippetElement("Build was aborted"));
 		}
 
 		Element jobResultsHeadingElement = new DefaultElement("h6");

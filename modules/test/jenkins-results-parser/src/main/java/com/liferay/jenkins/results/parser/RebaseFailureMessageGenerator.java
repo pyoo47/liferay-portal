@@ -42,11 +42,12 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 
 		paragraphElement.addText("Please fix ");
 		paragraphElement.add(
-			Dom4JUtil.toStrongElement("rebase errors"));
+			Dom4JUtil.wrapWithNewElement("rebase errors", "strong"));
 		paragraphElement.addText(" on ");
 		paragraphElement.add(
-			Dom4JUtil.toStrongElement(
-				getBaseBranchAnchorElement(build.getTopLevelBuild())));
+			Dom4JUtil.wrapWithNewElement(
+				getBaseBranchAnchorElement(build.getTopLevelBuild()),
+				"strong"));
 
 		int end = consoleText.indexOf(_REBASE_END_STRING);
 

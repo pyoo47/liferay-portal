@@ -29,8 +29,7 @@ public class DownstreamFailureMessageGenerator
 		String consoleOutput = build.getConsoleText();
 
 		if (consoleOutput.contains("Downstream jobs FAILED.")) {
-			return Dom4JUtil.toCodeSnippetElement(
-				"Downstream jobs FAILED.");
+			return Dom4JUtil.toCodeSnippetElement("Downstream jobs FAILED.");
 		}
 
 		return null;

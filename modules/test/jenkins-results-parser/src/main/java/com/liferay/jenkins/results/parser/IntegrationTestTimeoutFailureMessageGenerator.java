@@ -44,8 +44,7 @@ public class IntegrationTestTimeoutFailureMessageGenerator
 		messageElement.add(paragraphElement);
 
 		paragraphElement.add(
-			Dom4JUtil.toStrongElement(
-				matcher.group("testName")));
+			Dom4JUtil.wrapWithNewElement(matcher.group("testName"), "strong"));
 		paragraphElement.addText(
 			" was aborted because it exceeded the timeout ");
 		paragraphElement.addText(" period.");

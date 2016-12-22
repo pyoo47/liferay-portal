@@ -43,11 +43,12 @@ public class SemanticVersioningFailureMessageGenerator
 
 		paragraphElement.addText("Please fix ");
 		paragraphElement.add(
-			Dom4JUtil.toStrongElement("semantic versioning"));
+			Dom4JUtil.wrapWithNewElement("semantic versioning", "strong"));
 		paragraphElement.addText(" on ");
 		paragraphElement.add(
-			Dom4JUtil.toStrongElement(
-				getBaseBranchAnchorElement(build.getTopLevelBuild())));
+			Dom4JUtil.wrapWithNewElement(
+				getBaseBranchAnchorElement(build.getTopLevelBuild()),
+				"strong"));
 
 		int end = consoleText.indexOf(_SEMVER_END_STRING);
 

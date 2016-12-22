@@ -46,8 +46,7 @@ public class PoshiValidationFailureMessageGenerator
 
 		paragraphElement.addText("POSHI Validation Failure");
 
-		messageElement.add(
-			Dom4JUtil.toCodeSnippetElement(poshiFailureMessage));
+		messageElement.add(Dom4JUtil.toCodeSnippetElement(poshiFailureMessage));
 
 		return messageElement;
 	}
