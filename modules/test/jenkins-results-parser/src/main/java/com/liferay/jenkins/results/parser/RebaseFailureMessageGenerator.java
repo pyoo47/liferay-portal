@@ -36,15 +36,10 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 		}
 
 		Element messageElement = new DefaultElement("div");
-		Element paragraphElement = new DefaultElement("p");
 
-		messageElement.add(paragraphElement);
-
-		paragraphElement.addText("Please fix ");
-		paragraphElement.add(
-			Dom4JUtil.wrapWithNewElement("rebase errors", "strong"));
-		paragraphElement.addText(" on ");
-		paragraphElement.add(
+		Dom4JUtil.addToElement(
+			Dom4JUtil.getNewElement("p", messageElement), "Please fix ",
+			Dom4JUtil.wrapWithNewElement("rebase errors", "strong"), " on ",
 			Dom4JUtil.wrapWithNewElement(
 				getBaseBranchAnchorElement(build.getTopLevelBuild()),
 				"strong"));

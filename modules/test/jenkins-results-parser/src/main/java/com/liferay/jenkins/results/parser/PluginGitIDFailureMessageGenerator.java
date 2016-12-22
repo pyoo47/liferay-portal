@@ -34,32 +34,19 @@ public class PluginGitIDFailureMessageGenerator
 			return null;
 		}
 
-		Element messageElement = new DefaultElement("p");
-
-		messageElement.addText("Please update ");
-
+		int end = consoleText.indexOf("merge-test-results:");
 		TopLevelBuild topLevelBuild = build.getTopLevelBuild();
 
-		Element strongElement = new DefaultElement("strong");
+		Element messageElement = new DefaultElement("p");
 
-		messageElement.add(strongElement);
-
-		strongElement.add(getGitCommitPluginsAnchorElement(topLevelBuild));
-
-		messageElement.addText(" to an existing git id from ");
-
-		strongElement = new DefaultElement("strong");
-
-		messageElement.add(strongElement);
-
-		strongElement.add(getPluginsBranchAnchorElement(topLevelBuild));
-
-		strongElement.addText(".");
-
-		int end = consoleText.indexOf("merge-test-results:");
-
-		messageElement.add(
-			getConsoleOutputSnippetElement(consoleText, true, end));
+		Dom4JUtil.addToElement(
+			messageElement, "Please update ",
+			Dom4JUtil.wrapWithNewElement(
+				getGitCommitPluginsAnchorElement(topLevelBuild), "strong"),
+			" to an existing git id from ",
+			Dom4JUtil.wrapWithNewElement(
+				getPluginsBranchAnchorElement(topLevelBuild), "strong"),
+			".", getConsoleOutputSnippetElement(consoleText, true, end));
 
 		return messageElement;
 	}

@@ -50,27 +50,23 @@ public class PluginFailureMessageGenerator extends BaseFailureMessageGenerator {
 
 		Element messageElement = new DefaultElement("div");
 
+		Element paragraphElement = Dom4JUtil.getNewElement("p", messageElement);
+
 		if (matcher.find()) {
 			String group = matcher.group(0);
 
-			Element paragraphElement = new DefaultElement("p");
-
-			messageElement.add(paragraphElement);
-
 			paragraphElement.addText(group);
 
-			Element pluginsListElement = new DefaultElement("ul");
-
-			messageElement.add(pluginsListElement);
+			Element pluginsListElement = Dom4JUtil.getNewElement(
+				"ul", messageElement);
 
 			int x = matcher.start() + group.length() + 1;
 
 			int count = Integer.parseInt(matcher.group(1));
 
 			for (int i = 0; i < count; i++) {
-				Element pluginListItemElement = new DefaultElement("li");
-
-				pluginsListElement.add(pluginListItemElement);
+				Element pluginListItemElement = Dom4JUtil.getNewElement(
+					"li", pluginsListElement);
 
 				if (i == 10) {
 					pluginListItemElement.addText("...");
@@ -89,38 +85,17 @@ public class PluginFailureMessageGenerator extends BaseFailureMessageGenerator {
 			}
 		}
 		else {
-			Element paragraphElement = new DefaultElement("p");
-
-			messageElement.add(paragraphElement);
-
-			paragraphElement.addText("To include a plugin fix for this pull ");
-			paragraphElement.addText("request, please edit your ");
-
 			TopLevelBuild topLevelBuild = build.getTopLevelBuild();
-
-			paragraphElement.add(
-				getGitCommitPluginsAnchorElement(topLevelBuild));
-
-			paragraphElement.addText(". Click ");
-
-			Element moreDetailsAnchorElement = new DefaultElement("a");
-
-			paragraphElement.add(moreDetailsAnchorElement);
-
-			StringBuilder sb = new StringBuilder();
-
-			sb.append("https://in.liferay.com/web/global.engineering/blog/-");
-			sb.append("/blogs/new-tests-for-the-pull-request-tester-");
-
-			moreDetailsAnchorElement.addAttribute("href", sb.toString());
-
-			moreDetailsAnchorElement.addText("here");
-
-			paragraphElement.addText(" for more details.");
 
 			int end = consoleText.indexOf("merge-test-results:");
 
-			paragraphElement.add(
+			Dom4JUtil.addToElement(
+				paragraphElement,
+				"To include a plugin fix for this pull request, ",
+				"please edit your ",
+				getGitCommitPluginsAnchorElement(topLevelBuild), ". Click ",
+				Dom4JUtil.getNewAnchorElement(_blogURL, "here"),
+				" for more details.",
 				getConsoleOutputSnippetElement(consoleText, true, end));
 		}
 
@@ -211,6 +186,9 @@ public class PluginFailureMessageGenerator extends BaseFailureMessageGenerator {
 		return sb.toString();
 	}
 
+	private static final String _blogURL =
+		"https://in.liferay.com/web/global.engineering/blog/-/blogs" +
+			"/new-tests-for-the-pull-request-tester-";
 	private static final Pattern _pattern = Pattern.compile(
 		"(\\d+) of \\d+ plugins? failed to compile:");
 

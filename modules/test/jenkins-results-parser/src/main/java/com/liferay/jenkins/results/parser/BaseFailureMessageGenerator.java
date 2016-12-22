@@ -36,8 +36,6 @@ public abstract class BaseFailureMessageGenerator
 		String buildURL, String consoleOutput, Hashtable<?, ?> properties);
 
 	protected Element getBaseBranchAnchorElement(TopLevelBuild topLevelBuild) {
-		Element baseBranchAnchorElement = new DefaultElement("a");
-
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("https://github.com/");
@@ -54,15 +52,15 @@ public abstract class BaseFailureMessageGenerator
 		sb.append("/tree/");
 		sb.append(baseRepositoryGitDetailMap.get("github.sender.branch.name"));
 
-		baseBranchAnchorElement.addAttribute("href", sb.toString());
+		String url = sb.toString();
 
-		baseBranchAnchorElement.addText(
-			baseRepositoryGitDetailMap.get("github.origin.name"));
-		baseBranchAnchorElement.addText("/");
-		baseBranchAnchorElement.addText(
-			baseRepositoryGitDetailMap.get("github.sender.branch.name"));
+		sb = new StringBuilder();
 
-		return baseBranchAnchorElement;
+		sb.append(baseRepositoryGitDetailMap.get("github.origin.name"));
+		sb.append("/");
+		sb.append(baseRepositoryGitDetailMap.get("github.sender.branch.name"));
+
+		return Dom4JUtil.getNewAnchorElement(url, sb.toString());
 	}
 
 	protected String getConsoleOutputSnippet(

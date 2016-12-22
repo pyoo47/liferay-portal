@@ -47,8 +47,17 @@ public class Dom4JUtil {
 		}
 	}
 
-	public static Element createAnchorElement(String href, String text) {
-		Element anchorElement = new DefaultElement("a");
+	public static Element getNewAnchorElement(
+		String href, Element parentElement, String text) {
+
+		Element anchorElement = null;
+
+		if (parentElement == null) {
+			anchorElement = new DefaultElement("a");
+		}
+		else {
+			anchorElement = getNewElement("a", parentElement);
+		}
 
 		anchorElement.addAttribute("href", href);
 
@@ -57,7 +66,11 @@ public class Dom4JUtil {
 		return anchorElement;
 	}
 
-	public static Element createChildElement(
+	public static Element getNewAnchorElement(String href, String text) {
+		return getNewAnchorElement(href, null, text);
+	}
+
+	public static Element getNewElement(
 		String childElementTag, Element parentElement) {
 
 		Element childElement = new DefaultElement(childElementTag);

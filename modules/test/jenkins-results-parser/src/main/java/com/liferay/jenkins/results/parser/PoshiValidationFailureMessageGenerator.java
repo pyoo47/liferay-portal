@@ -37,16 +37,14 @@ public class PoshiValidationFailureMessageGenerator
 			return null;
 		}
 
-		String poshiFailureMessage = poshiFailureMatcher.group(1);
-
 		Element messageElement = new DefaultElement("div");
-		Element paragraphElement = new DefaultElement("p");
 
-		messageElement.add(paragraphElement);
+		Element paragraphElement = Dom4JUtil.getNewElement("p", messageElement);
 
 		paragraphElement.addText("POSHI Validation Failure");
 
-		messageElement.add(Dom4JUtil.toCodeSnippetElement(poshiFailureMessage));
+		messageElement.add(
+			Dom4JUtil.toCodeSnippetElement(poshiFailureMatcher.group(1)));
 
 		return messageElement;
 	}
