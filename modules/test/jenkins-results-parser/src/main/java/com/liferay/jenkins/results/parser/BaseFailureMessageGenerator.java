@@ -101,7 +101,7 @@ public abstract class BaseFailureMessageGenerator
 	protected Element getConsoleOutputSnippetElement(
 		String consoleOutput, boolean truncateTop, int start, int end) {
 
-		return JenkinsResultsParserUtil.toCodeSnippetElement(
+		return Dom4JUtil.toCodeSnippetElement(
 			_getConsoleOutputSnippet(consoleOutput, truncateTop, start, end));
 	}
 

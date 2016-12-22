@@ -47,7 +47,7 @@ public class PoshiValidationFailureMessageGenerator
 		paragraphElement.addText("POSHI Validation Failure");
 
 		messageElement.add(
-			JenkinsResultsParserUtil.toCodeSnippetElement(poshiFailureMessage));
+			Dom4JUtil.toCodeSnippetElement(poshiFailureMessage));
 
 		return messageElement;
 	}

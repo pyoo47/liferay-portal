@@ -44,7 +44,7 @@ public class IntegrationTestTimeoutFailureMessageGenerator
 		messageElement.add(paragraphElement);
 
 		paragraphElement.add(
-			JenkinsResultsParserUtil.toStrongElement(
+			Dom4JUtil.toStrongElement(
 				matcher.group("testName")));
 		paragraphElement.addText(
 			" was aborted because it exceeded the timeout ");

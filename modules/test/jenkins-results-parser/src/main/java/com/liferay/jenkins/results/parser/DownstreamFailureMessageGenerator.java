@@ -29,7 +29,7 @@ public class DownstreamFailureMessageGenerator
 		String consoleOutput = build.getConsoleText();
 
 		if (consoleOutput.contains("Downstream jobs FAILED.")) {
-			return JenkinsResultsParserUtil.toCodeSnippetElement(
+			return Dom4JUtil.toCodeSnippetElement(
 				"Downstream jobs FAILED.");
 		}
 

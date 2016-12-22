@@ -24,12 +24,93 @@ import org.json.JSONObject;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
+
 import org.json.JSONObject;
 
 /**
  * @author Kevin Yen
  */
 public class BatchBuild extends BaseBuild {
+
+	@Override
+	public Element getGitHubMessage() {
+		Element messageElement = super.getGitHubMessage();
+
+		if (messageElement == null) {
+			return messageElement;
+		}
+
+		String result = getResult();
+
+		if (result.equals("SUCCESS")) {
+			return null;
+		}
+
+		if (result.equals("ABORTED")) {
+			messageElement.add(
+				Dom4JUtil.toCodeSnippetElement(
+					"Build was aborted"));
+		}
+
+		Element jobResultsHeadingElement = new DefaultElement("h6");
+
+		messageElement.add(jobResultsHeadingElement);
+
+		jobResultsHeadingElement.addText("Job Results:");
+
+		Element paragraphElement = new DefaultElement("p");
+
+		messageElement.add(paragraphElement);
+
+		int successCount = 0;
+		int failCount = 0;
+
+		Element downstreamBuildOrderedListElement = new DefaultElement("ol");
+
+		messageElement.add(downstreamBuildOrderedListElement);
+
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			String downstreamBuildResult = downstreamBuild.getResult();
+
+			if (downstreamBuildResult.equals("SUCCESS")) {
+				successCount++;
+			}
+			else {
+				failCount++;
+
+				if (failCount < 2) {
+					Element downstreamBuildListItemElement = new DefaultElement(
+						"li");
+
+					downstreamBuildOrderedListElement.add(
+						downstreamBuildListItemElement);
+
+					downstreamBuildListItemElement.add(
+						downstreamBuild.getGitHubMessage());
+				}
+			}
+		}
+
+		paragraphElement.addText(Integer.toString(successCount));
+		paragraphElement.addText(" Test");
+
+		if (successCount != 1) {
+			paragraphElement.addText("s");
+		}
+
+		paragraphElement.addText(" Passed.");
+		paragraphElement.add(new DefaultElement("br"));
+		paragraphElement.addText(Integer.toString(failCount));
+		paragraphElement.addText(" Test");
+
+		if (failCount != 1) {
+			paragraphElement.addText("s");
+		}
+
+		paragraphElement.addText(" Failed.");
+
+		return messageElement;
+	}
 
 	@Override
 	public List<TestResult> getTestResults(String testStatus) {
@@ -156,7 +237,7 @@ public class BatchBuild extends BaseBuild {
 
 		return jobResultsElement;
 	}
-	
+
 	protected int getTestCountByStatus(String status) {
 		JSONObject testReportJSONObject = getTestReportJSONObject();
 
@@ -175,4 +256,5 @@ public class BatchBuild extends BaseBuild {
 		throw new IllegalArgumentException(
 			"Invalid result parameter: " + status);
 	}
+
 }
