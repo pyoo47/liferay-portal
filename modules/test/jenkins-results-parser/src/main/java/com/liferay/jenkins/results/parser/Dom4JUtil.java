@@ -71,11 +71,15 @@ public class Dom4JUtil {
 	}
 
 	public static Element getNewElement(
-		String childElementTag, Element parentElement) {
+		String childElementTag, Element parentElement, Object... items) {
 
 		Element childElement = new DefaultElement(childElementTag);
 
 		parentElement.add(childElement);
+
+		if ((items != null) && (items.length > 0)) {
+			addToElement(childElement, items);
+		}
 
 		return childElement;
 	}
