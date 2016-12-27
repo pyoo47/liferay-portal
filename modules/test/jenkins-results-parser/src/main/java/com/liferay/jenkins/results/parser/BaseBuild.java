@@ -346,7 +346,8 @@ public abstract class BaseBuild implements Build {
 			sb.append(jobVariant);
 		}
 
-		Element anchor = Dom4JUtil.getNewAnchorElement(getBuildURL(), null);
+		Element anchor = Dom4JUtil.getNewAnchorElement(
+			getBuildURL(), getDisplayName());
 
 		String result = getResult();
 
