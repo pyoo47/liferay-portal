@@ -19,12 +19,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**

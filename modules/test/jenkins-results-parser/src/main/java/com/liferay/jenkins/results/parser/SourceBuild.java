@@ -44,13 +44,13 @@ public class SourceBuild extends BaseBuild {
 	}
 
 	@Override
-	protected Element getGitHubMessageJobResultsElement() {
-		return null;
+	public List<TestResult> getTestResults(String testStatus) {
+		return Collections.emptyList();
 	}
 
 	@Override
-	public List<TestResult> getTestResults(String testStatus) {
-		return Collections.emptyList();
+	protected Element getGitHubMessageJobResultsElement() {
+		return null;
 	}
 
 }
