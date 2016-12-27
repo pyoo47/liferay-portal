@@ -319,40 +319,15 @@ public abstract class BaseBuild implements Build {
 		}
 
 		if (result.equals("UNSTABLE")) {
-			JSONObject testReportJSONObject = getTestReportJSONObject();
-
-			if (testReportJSONObject == null) {
-				return messageElement;
-			}
-
 			Element failedCasesOrderedListElement = Dom4JUtil.getNewElement(
 				"ol", messageElement);
 
-			JSONArray suitesJSONArray = testReportJSONObject.getJSONArray(
-				"suites");
+			for (TestResult testResult : getTestResults("FAILED")) {
+				Element failedCaseListItemElement = Dom4JUtil.getNewElement(
+					"li", failedCasesOrderedListElement);
 
-			// TODO: Simplify the following code by using the TestResult class.
-
-			for (int i = 0; i < suitesJSONArray.length(); i++) {
-				JSONObject suiteJSONObject = suitesJSONArray.getJSONObject(i);
-
-				JSONArray casesJSONArray = suiteJSONObject.getJSONArray(
-					"cases");
-
-				for (int j = 0; j < casesJSONArray.length(); j++) {
-					JSONObject caseJSONObject = casesJSONArray.getJSONObject(j);
-
-					String caseStatus = caseJSONObject.getString("status");
-
-					if (caseStatus.equals("FAILED")) {
-						Element failedCaseListItemElement =
-							Dom4JUtil.getNewElement(
-								"li", failedCasesOrderedListElement);
-
-						Element caseAnchorElement = getFunctionalCaseDivElement(
-							caseJSONObject);
-					}
-				}
+				failedCaseListItemElement.add(
+					getFunctionalCaseDivElement(testResult));
 			}
 		}
 
@@ -1180,69 +1155,38 @@ public abstract class BaseBuild implements Build {
 		return _failureMessageGenerators;
 	}
 
-	protected Element getFunctionalCaseDivElement(JSONObject caseJSONObject) {
+	protected Element getFunctionalCaseDivElement(TestResult testResult) {
 		Element divElement = new DefaultElement("div");
 
-		Element caseAnchorElement = new DefaultElement("a");
+		Dom4JUtil.getNewAnchorElement(
+			testResult.getTestReportURL(), divElement,
+			testResult.getDisplayName());
 
-		divElement.add(caseAnchorElement);
+		AxisBuild axisBuild = testResult.getAxisBuild();
 
-		String className = caseJSONObject.getString("className");
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(getBuildURL());
-		sb.append("/testReport/");
-
-		int x = className.lastIndexOf(".");
-
-		String packageName = className.substring(0, x);
-
-		sb.append(packageName);
-
-		sb.append("/");
-
-		String simpleClassName = className.substring(x + 1);
-
-		sb.append(simpleClassName);
-
-		sb.append("/");
-
-		String testMethodName = caseJSONObject.getString("name");
-
-		String testMethodNameURL = testMethodName;
-
-		testMethodNameURL = testMethodNameURL.replace("[", "_");
-		testMethodNameURL = testMethodNameURL.replace("]", "_");
-		testMethodNameURL = testMethodNameURL.replace("#", "_");
-
-		if (simpleClassName.equals("junit.framework")) {
-			testMethodNameURL = testMethodNameURL.replace(".", "_");
-		}
-
-		sb.append(testMethodNameURL);
-
-		caseAnchorElement.addAttribute("href", sb.toString());
-
-		String jobVariant = getParameterValue("JOB_VARIANT");
+		String jobVariant = axisBuild.getParameterValue("JOB_VARIANT");
 
 		if (jobVariant.contains("functional")) {
-			caseAnchorElement.addText(
-				testMethodName.substring(5, testMethodName.length() - 1));
+			Dom4JUtil.addToElement(
+				divElement, " - ",
+				Dom4JUtil.getNewAnchorElement(
+					testResult.getPoshiReportURL(), "Poshi Report"),
+				" - ",
+				Dom4JUtil.getNewAnchorElement(
+					testResult.getPoshiSummaryURL(), "Poshi Summary"),
+				" - ",
+				Dom4JUtil.getNewAnchorElement(
+					testResult.getConsoleOutputURL(), "Console Output"));
 
-			divElement.addText(" - ");
-
-			Element poshiReportAnchorElement = new DefaultElement("a");
-
-			divElement.add(poshiReportAnchorElement);
+			if (testResult.hasLiferayLog()) {
+				Dom4JUtil.addToElement(
+					divElement, " - ",
+					Dom4JUtil.getNewAnchorElement(
+						testResult.getLiferayLogURL(), "Liferay Log"));
+			}
 		}
-		else {
-			caseAnchorElement.addText(simpleClassName);
-			caseAnchorElement.addText(".");
-			caseAnchorElement.addText(testMethodName);
 
-			sb = new StringBuilder();
-		}
+		return divElement;
 	}
 
 	protected abstract Element getGitHubMessageJobResultsElement();
