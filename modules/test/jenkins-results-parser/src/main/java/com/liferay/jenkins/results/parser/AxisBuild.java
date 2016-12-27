@@ -183,7 +183,7 @@ public class AxisBuild extends BaseBuild {
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
 		return _failureMessageGenerators;
 	}
-	
+
 	@Override
 	protected Element getGitHubMessageJobResultsElement() {
 		return null;
