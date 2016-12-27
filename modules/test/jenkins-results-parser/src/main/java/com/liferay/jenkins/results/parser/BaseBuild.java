@@ -17,6 +17,7 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.regex.Pattern;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -287,40 +289,103 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public Element getGitHubMessage() {
-		return null;
-	}
+		String status = getStatus();
 
-	@Override
-	public Element getGitHubMessageBuildLink() {
-		Element link = new DefaultElement("a");
-
-		link.addAttribute("href", getBuildURL());
-
-		Element labelElement = link;
+		if (!status.equals("completed")) {
+			return null;
+		}
 
 		String result = getResult();
 
-		if (!result.equals("SUCCESS")) {
-			Element strongElement = new DefaultElement("strong");
-
-			link.add(strongElement);
-
-			labelElement = new DefaultElement("strike");
-
-			strongElement.add(labelElement);
+		if (result.equals("SUCCESS")) {
+			return null;
 		}
 
-		labelElement.addText(getJobName());
+		Element messageElement = new DefaultElement("div");
+
+		Dom4JUtil.addToElement(
+			Dom4JUtil.getNewElement("h5", messageElement),
+			Dom4JUtil.getNewAnchorElement(
+				getBuildURL(),
+				JenkinsResultsParserUtil.fixJSON(getDisplayName())),
+			getGitHubMessageJobResultsElement());
+
+		if (result.equals("FAILURE")) {
+			Element failureMessageElement = getFailureMessageElement();
+
+			if (failureMessageElement != null) {
+				messageElement.add(failureMessageElement);
+			}
+		}
+
+		if (result.equals("UNSTABLE")) {
+			JSONObject testReportJSONObject = getTestReportJSONObject();
+
+			if (testReportJSONObject == null) {
+				return messageElement;
+			}
+
+			Element failedCasesOrderedListElement = Dom4JUtil.getNewElement(
+				"ol", messageElement);
+
+			JSONArray suitesJSONArray = testReportJSONObject.getJSONArray(
+				"suites");
+
+			// TODO: Simplify the following code by using the TestResult class.
+
+			for (int i = 0; i < suitesJSONArray.length(); i++) {
+				JSONObject suiteJSONObject = suitesJSONArray.getJSONObject(i);
+
+				JSONArray casesJSONArray = suiteJSONObject.getJSONArray(
+					"cases");
+
+				for (int j = 0; j < casesJSONArray.length(); j++) {
+					JSONObject caseJSONObject = casesJSONArray.getJSONObject(j);
+
+					String caseStatus = caseJSONObject.getString("status");
+
+					if (caseStatus.equals("FAILED")) {
+						Element failedCaseListItemElement =
+							Dom4JUtil.getNewElement(
+								"li", failedCasesOrderedListElement);
+
+						Element caseAnchorElement = getFunctionalCaseDivElement(
+							caseJSONObject);
+					}
+				}
+			}
+		}
+
+		return messageElement;
+	}
+
+	@Override
+	public Element getGitHubMessageBuildAnchor() {
+		StringBuilder sb = new StringBuilder(getJobName());
 
 		String jobVariant = getParameterValue("JOB_VARIANT");
 
 		if ((jobVariant != null) && !jobVariant.isEmpty()) {
-			labelElement.addText("/");
+			sb.append("/");
 
-			labelElement.addText(jobVariant);
+			sb.append(jobVariant);
 		}
 
-		return link;
+		Element anchor = Dom4JUtil.getNewAnchorElement(getBuildURL(), null);
+
+		String result = getResult();
+
+		if (!result.equals("SUCCESS")) {
+			anchor.add(
+				Dom4JUtil.wrapWithNewElement(
+					Dom4JUtil.wrapWithNewElement(sb.toString(), "strong"),
+					"strike"));
+		}
+		else {
+			anchor.addText(sb.toString());
+		}
+
+		return anchor;
 	}
 
 	@Override
@@ -1113,6 +1178,71 @@ public abstract class BaseBuild implements Build {
 
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
 		return _failureMessageGenerators;
+	}
+
+	protected Element getFunctionalCaseDivElement(JSONObject caseJSONObject) {
+		Element divElement = new DefaultElement("div");
+
+		Element caseAnchorElement = new DefaultElement("a");
+
+		divElement.add(caseAnchorElement);
+
+		String className = caseJSONObject.getString("className");
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(getBuildURL());
+		sb.append("/testReport/");
+
+		int x = className.lastIndexOf(".");
+
+		String packageName = className.substring(0, x);
+
+		sb.append(packageName);
+
+		sb.append("/");
+
+		String simpleClassName = className.substring(x + 1);
+
+		sb.append(simpleClassName);
+
+		sb.append("/");
+
+		String testMethodName = caseJSONObject.getString("name");
+
+		String testMethodNameURL = testMethodName;
+
+		testMethodNameURL = testMethodNameURL.replace("[", "_");
+		testMethodNameURL = testMethodNameURL.replace("]", "_");
+		testMethodNameURL = testMethodNameURL.replace("#", "_");
+
+		if (simpleClassName.equals("junit.framework")) {
+			testMethodNameURL = testMethodNameURL.replace(".", "_");
+		}
+
+		sb.append(testMethodNameURL);
+
+		caseAnchorElement.addAttribute("href", sb.toString());
+
+		String jobVariant = getParameterValue("JOB_VARIANT");
+
+		if (jobVariant.contains("functional")) {
+			caseAnchorElement.addText(
+				testMethodName.substring(5, testMethodName.length() - 1));
+
+			divElement.addText(" - ");
+
+			Element poshiReportAnchorElement = new DefaultElement("a");
+
+			divElement.add(poshiReportAnchorElement);
+		}
+		else {
+			caseAnchorElement.addText(simpleClassName);
+			caseAnchorElement.addText(".");
+			caseAnchorElement.addText(testMethodName);
+
+			sb = new StringBuilder();
+		}
 	}
 
 	protected abstract Element getGitHubMessageJobResultsElement();

@@ -56,7 +56,7 @@ public interface Build {
 
 	public Element getGitHubMessage();
 
-	public Element getGitHubMessageBuildLink();
+	public Element getGitHubMessageBuildAnchor();
 
 	public String getInvocationURL();
 

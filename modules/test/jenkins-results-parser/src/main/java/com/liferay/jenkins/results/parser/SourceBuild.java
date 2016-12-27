@@ -39,12 +39,12 @@ public class SourceBuild extends BaseBuild {
 	}
 
 	@Override
-	protected Element getGitHubMessageJobResultsElement() {
+	public JSONObject getTestReportJSONObject() {
 		return null;
 	}
 
 	@Override
-	public JSONObject getTestReportJSONObject() {
+	protected Element getGitHubMessageJobResultsElement() {
 		return null;
 	}
 
