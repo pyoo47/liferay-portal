@@ -309,10 +309,10 @@ public abstract class BaseBuild implements Build {
 		Element messageElement = new DefaultElement("div");
 
 		Dom4JUtil.addToElement(
-			Dom4JUtil.getNewElement("h5", messageElement),
-			Dom4JUtil.getNewAnchorElement(
-				getBuildURL(),
-				JenkinsResultsParserUtil.fixJSON(getDisplayName())),
+			messageElement,
+			Dom4JUtil.wrapWithNewElement(
+				Dom4JUtil.getNewAnchorElement(getBuildURL(), getDisplayName()),
+				"h5"),
 			getGitHubMessageJobResultsElement());
 
 		if (result.equals("FAILURE")) {
