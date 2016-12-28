@@ -198,9 +198,9 @@ public class BatchBuild extends BaseBuild {
 		Dom4JUtil.addToElement(
 			Dom4JUtil.getNewElement("p", jobResultsElement),
 			Integer.toString(successCount),
-			_pluralize(successCount, "s", " Test"), " Passed.",
+			pluralize(successCount, "s", " Test"), " Passed.",
 			new DefaultElement("br"), Integer.toString(failCount),
-			_pluralize(failCount, "s", " Test"), " Failed",
+			pluralize(failCount, "s", " Test"), " Failed",
 			getFailureMessageElement());
 
 		return jobResultsElement;

@@ -1503,6 +1503,14 @@ public abstract class BaseBuild implements Build {
 		}
 	}
 
+	protected String pluralize(int count, String pluralSuffix, String word) {
+		if (count == 1) {
+			return word;
+		}
+
+		return word + pluralSuffix;
+	}
+
 	protected void reset() {
 		result = null;
 

@@ -190,9 +190,9 @@ public class TopLevelBuild extends BaseBuild {
 		Dom4JUtil.addToElement(
 			Dom4JUtil.getNewElement("p", jobResultsElement),
 			Integer.toString(successCount),
-			_pluralize(successCount, "s", " Job"), " Passed.",
+			pluralize(successCount, "s", " Job"), " Passed.",
 			new DefaultElement("br"), Integer.toString(failCount),
-			_pluralize(failCount, "s", " Job"), " Failed.");
+			pluralize(failCount, "s", " Job"), " Failed.");
 
 		jobResultsElement.add(getFailureMessageElement());
 
@@ -406,14 +406,6 @@ public class TopLevelBuild extends BaseBuild {
 
 	protected static final Pattern gitRepositoryTempMapNamePattern =
 		Pattern.compile("git\\.(?<repositoryType>.*)\\.properties");
-
-	private String _pluralize(int count, String pluralSuffix, String word) {
-		if (count == 1) {
-			return word;
-		}
-
-		return word + pluralSuffix;
-	}
 
 	private static final FailureMessageGenerator[] _failureMessageGenerators = {
 		new PoshiValidationFailureMessageGenerator(),
