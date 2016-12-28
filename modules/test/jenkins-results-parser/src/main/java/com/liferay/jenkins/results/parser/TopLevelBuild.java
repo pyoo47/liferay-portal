@@ -194,8 +194,6 @@ public class TopLevelBuild extends BaseBuild {
 			new DefaultElement("br"), Integer.toString(failCount),
 			pluralize(failCount, "s", " Job"), " Failed.");
 
-		jobResultsElement.add(getFailureMessageElement());
-
 		return jobResultsElement;
 	}
 
@@ -360,7 +358,8 @@ public class TopLevelBuild extends BaseBuild {
 			Element failedJobsOrderedListElement = Dom4JUtil.getNewElement(
 				"ol", rootElement);
 
-			failedJobsOrderedListElement.add(super.getGitHubMessage());
+			failedJobsOrderedListElement.add(
+				Dom4JUtil.wrapWithNewElement(super.getGitHubMessage(), "li"));
 
 			int failureCount = 0;
 
