@@ -242,8 +242,13 @@ public abstract class BaseBuild implements Build {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(getJobName());
-		sb.append(" #");
-		sb.append(getBuildNumber());
+
+		String jobVariant = getParameterValue("JOB_VARIANT");
+
+		if ((jobVariant != null) && !jobVariant.isEmpty()) {
+			sb.append("/");
+			sb.append(jobVariant);
+		}
 
 		return sb.toString();
 	}
@@ -336,32 +341,17 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public Element getGitHubMessageBuildAnchor() {
-		StringBuilder sb = new StringBuilder(getJobName());
+		getResult();
 
-		String jobVariant = getParameterValue("JOB_VARIANT");
-
-		if ((jobVariant != null) && !jobVariant.isEmpty()) {
-			sb.append("/");
-
-			sb.append(jobVariant);
+		if (result.equals("SUCCESS")) {
+			return Dom4JUtil.getNewAnchorElement(
+				getBuildURL(), getDisplayName());
 		}
 
-		Element anchor = Dom4JUtil.getNewAnchorElement(
-			getBuildURL(), getDisplayName());
-
-		String result = getResult();
-
-		if (!result.equals("SUCCESS")) {
-			anchor.add(
-				Dom4JUtil.wrapWithNewElement(
-					Dom4JUtil.wrapWithNewElement(sb.toString(), "strong"),
-					"strike"));
-		}
-		else {
-			anchor.addText(sb.toString());
-		}
-
-		return anchor;
+		return Dom4JUtil.getNewAnchorElement(
+			getBuildURL(), null, Dom4JUtil.wrapWithNewElement(
+				Dom4JUtil.wrapWithNewElement(getDisplayName(), "strong"),
+			"strike"));
 	}
 
 	@Override
