@@ -48,7 +48,7 @@ public class Dom4JUtil {
 	}
 
 	public static Element getNewAnchorElement(
-		String href, Element parentElement, String text) {
+		String href, Element parentElement, Object... items) {
 
 		Element anchorElement = null;
 
@@ -61,13 +61,13 @@ public class Dom4JUtil {
 
 		anchorElement.addAttribute("href", href);
 
-		anchorElement.addText(text);
+		addToElement(anchorElement, items);
 
 		return anchorElement;
 	}
 
-	public static Element getNewAnchorElement(String href, String text) {
-		return getNewAnchorElement(href, null, text);
+	public static Element getNewAnchorElement(String href, Object... items) {
+		return getNewAnchorElement(href, null, items);
 	}
 
 	public static Element getNewElement(
