@@ -40,71 +40,34 @@ public class BatchBuild extends BaseBuild {
 
 		String result = getResult();
 
-		if (result.equals("SUCCESS")) {
-			return null;
-		}
-
 		if (result.equals("ABORTED")) {
-			messageElement.add(
-				Dom4JUtil.toCodeSnippetElement("Build was aborted"));
+			return messageElement;
 		}
 
-		Element jobResultsHeadingElement = new DefaultElement("h6");
-
-		messageElement.add(jobResultsHeadingElement);
-
-		jobResultsHeadingElement.addText("Job Results:");
-
-		Element paragraphElement = new DefaultElement("p");
-
-		messageElement.add(paragraphElement);
-
-		int successCount = 0;
 		int failCount = 0;
 
-		Element downstreamBuildOrderedListElement = new DefaultElement("ol");
-
-		messageElement.add(downstreamBuildOrderedListElement);
+		Element downstreamBuildOrderedListElement = Dom4JUtil.getNewElement(
+			"ol", messageElement);
 
 		for (Build downstreamBuild : getDownstreamBuilds(null)) {
 			String downstreamBuildResult = downstreamBuild.getResult();
 
 			if (downstreamBuildResult.equals("SUCCESS")) {
-				successCount++;
+				continue;
 			}
 			else {
 				failCount++;
 
 				if (failCount < 2) {
-					Element downstreamBuildListItemElement = new DefaultElement(
-						"li");
-
-					downstreamBuildOrderedListElement.add(
-						downstreamBuildListItemElement);
-
-					downstreamBuildListItemElement.add(
+					Dom4JUtil.addToElement(
+						Dom4JUtil.getNewElement(
+							"li", downstreamBuildOrderedListElement),
 						downstreamBuild.getGitHubMessage());
+
+					break;
 				}
 			}
 		}
-
-		paragraphElement.addText(Integer.toString(successCount));
-		paragraphElement.addText(" Test");
-
-		if (successCount != 1) {
-			paragraphElement.addText("s");
-		}
-
-		paragraphElement.addText(" Passed.");
-		paragraphElement.add(new DefaultElement("br"));
-		paragraphElement.addText(Integer.toString(failCount));
-		paragraphElement.addText(" Test");
-
-		if (failCount != 1) {
-			paragraphElement.addText("s");
-		}
-
-		paragraphElement.addText(" Failed.");
 
 		return messageElement;
 	}
@@ -191,19 +154,22 @@ public class BatchBuild extends BaseBuild {
 
 		Dom4JUtil.addToElement(
 			jobResultsElement,
-			Dom4JUtil.getNewAnchorElement(getBuildURL(), getDisplayName()),
 			Dom4JUtil.wrapWithNewElement("Job Results:", "h6"));
 
-		int failCount = getTestCountByStatus("FAILURE");
-		int successCount = getTestCountByStatus("SUCCESS");
+		int successCount = result.equals("FAILURE") ?
+			getDownstreamBuildCountByResult("SUCCESS") :
+				getTestCountByStatus("SUCCESS");
+
+		int failCount = result.equals("FAILURE") ?
+			getDownstreamBuildCountByResult(null) - successCount :
+				getTestCountByStatus("FAILURE");
 
 		Dom4JUtil.addToElement(
 			Dom4JUtil.getNewElement("p", jobResultsElement),
 			Integer.toString(successCount),
 			pluralize(successCount, "s", " Test"), " Passed.",
 			new DefaultElement("br"), Integer.toString(failCount),
-			pluralize(failCount, "s", " Test"), " Failed",
-			getFailureMessageElement());
+			pluralize(failCount, "s", " Test"), " Failed");
 
 		return jobResultsElement;
 	}
@@ -214,6 +180,10 @@ public class BatchBuild extends BaseBuild {
 		int failCount = testReportJSONObject.getInt("failCount");
 		int skipCount = testReportJSONObject.getInt("skipCount");
 		int totalCount = testReportJSONObject.getInt("totalCount");
+
+		if (status == null) {
+			return totalCount;
+		}
 
 		if (status.equals("SUCCESS")) {
 			return totalCount - skipCount - failCount;
