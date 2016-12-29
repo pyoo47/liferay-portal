@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.tools.ant.Project;
+
 import org.json.JSONObject;
 
 /**
@@ -131,6 +133,15 @@ public class AxisBuild extends BaseBuild {
 		sb.append("[\\/]*");
 
 		return sb.toString();
+	}
+
+	@Override
+	public Environment getEnvironment(String environmentType, Project project)
+		throws Exception {
+
+		Build parentBuild = getParentBuild();
+
+		return parentBuild.getEnvironment(environmentType, project);
 	}
 
 	@Override
