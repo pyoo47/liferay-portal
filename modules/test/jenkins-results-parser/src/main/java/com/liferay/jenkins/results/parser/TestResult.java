@@ -87,17 +87,13 @@ public class TestResult {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(axisBuild.getTestRayLogsURL());
-		sb.append("/");
-		sb.append(testName.replace("#", "_"));
 		sb.append("/jenkins-console.txt.gz");
 
 		return sb.toString();
 	}
 
 	public String getDisplayName() {
-		String jobVariant = axisBuild.getParameterValue("JOB_VARIANT");
-
-		if (jobVariant.contains("functional")) {
+		if (testName.startsWith("test[")) {
 			return testName.substring(5, testName.length() - 1);
 		}
 
@@ -111,9 +107,11 @@ public class TestResult {
 	public String getLiferayLogURL() {
 		StringBuilder sb = new StringBuilder();
 
+		String name = getDisplayName();
+
 		sb.append(axisBuild.getTestRayLogsURL());
 		sb.append("/");
-		sb.append(testName.replace("#", "_"));
+		sb.append(name.replace("#", "_"));
 		sb.append("/liferay-log.txt.gz");
 
 		return sb.toString();
@@ -122,9 +120,11 @@ public class TestResult {
 	public String getPoshiReportURL() {
 		StringBuilder sb = new StringBuilder();
 
+		String name = getDisplayName();
+
 		sb.append(axisBuild.getTestRayLogsURL());
 		sb.append("/");
-		sb.append(testName.replace("#", "_"));
+		sb.append(name.replace("#", "_"));
 		sb.append("/index.html.gz");
 
 		return sb.toString();
@@ -133,9 +133,11 @@ public class TestResult {
 	public String getPoshiSummaryURL() {
 		StringBuilder sb = new StringBuilder();
 
+		String name = getDisplayName();
+
 		sb.append(axisBuild.getTestRayLogsURL());
 		sb.append("/");
-		sb.append(testName.replace("#", "_"));
+		sb.append(name.replace("#", "_"));
 		sb.append("/summary.html.gz");
 
 		return sb.toString();
