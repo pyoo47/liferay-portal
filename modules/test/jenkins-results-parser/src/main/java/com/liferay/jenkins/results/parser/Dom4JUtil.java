@@ -14,12 +14,18 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.Writer;
+
 import java.util.Iterator;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.Text;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultElement;
 
 /**
@@ -50,6 +56,23 @@ public class Dom4JUtil {
 			throw new IllegalArgumentException(
 				"Only Elements and Strings may be added.");
 		}
+	}
+
+	public static String format(Element element) throws IOException {
+		return format(element, true);
+	}
+
+	public static String format(Element element, boolean pretty)
+		throws IOException {
+
+		Writer writer = new CharArrayWriter();
+
+		XMLWriter xmlWriter = pretty ? new XMLWriter(
+			writer, OutputFormat.createPrettyPrint()) : new XMLWriter(writer);
+
+		xmlWriter.write(element);
+
+		return writer.toString();
 	}
 
 	public static Element getNewAnchorElement(
