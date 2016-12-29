@@ -14,7 +14,12 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.Iterator;
+
+import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.Text;
 import org.dom4j.tree.DefaultElement;
 
 /**
@@ -82,6 +87,47 @@ public class Dom4JUtil {
 		}
 
 		return childElement;
+	}
+
+	public static void replace(
+		Element element, boolean cascade, String replacementText,
+		String targetText) {
+
+		Iterator<?> attributeIterator = element.attributeIterator();
+
+		while (attributeIterator.hasNext()) {
+			Attribute attribute = (Attribute)attributeIterator.next();
+
+			String text = attribute.getValue();
+
+			attribute.setValue(text.replace(targetText, replacementText));
+		}
+
+		Iterator<?> nodeIterator = element.nodeIterator();
+
+		while (nodeIterator.hasNext()) {
+			Node node = (Node)nodeIterator.next();
+
+			if (node instanceof Text) {
+				Text textNode = (Text)node;
+
+				String text = textNode.getText();
+
+				if (text.contains(targetText)) {
+					text = text.replace(targetText, replacementText);
+
+					textNode.setText(text);
+				}
+
+				continue;
+			}
+
+			if (node instanceof Element && cascade) {
+				replace((Element)node, cascade, replacementText, targetText);
+
+				continue;
+			}
+		}
 	}
 
 	public static Element toCodeSnippetElement(String content) {
