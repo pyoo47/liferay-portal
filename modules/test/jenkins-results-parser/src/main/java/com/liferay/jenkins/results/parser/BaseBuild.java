@@ -296,7 +296,7 @@ public abstract class BaseBuild implements Build {
 	public Element getGitHubMessage() {
 		String status = getStatus();
 
-		if (!status.equals("completed")) {
+		if (!status.equals("completed") && (getParentBuild() != null)) {
 			return null;
 		}
 
@@ -307,6 +307,11 @@ public abstract class BaseBuild implements Build {
 		}
 
 		Element messageElement = new DefaultElement("div");
+
+		if (result.equals("ABORTED")) {
+			messageElement.add(
+				Dom4JUtil.toCodeSnippetElement("Build was aborted"));
+		}
 
 		Dom4JUtil.addToElement(
 			messageElement,
@@ -320,19 +325,6 @@ public abstract class BaseBuild implements Build {
 
 			if (failureMessageElement != null) {
 				messageElement.add(failureMessageElement);
-			}
-		}
-
-		if (result.equals("UNSTABLE")) {
-			Element failedCasesOrderedListElement = Dom4JUtil.getNewElement(
-				"ol", messageElement);
-
-			for (TestResult testResult : getTestResults("FAILED")) {
-				Element failedCaseListItemElement = Dom4JUtil.getNewElement(
-					"li", failedCasesOrderedListElement);
-
-				failedCaseListItemElement.add(
-					getFunctionalCaseDivElement(testResult));
 			}
 		}
 
@@ -1115,7 +1107,13 @@ public abstract class BaseBuild implements Build {
 	protected int getDownstreamBuildCountByResult(String result) {
 		int count = 0;
 
-		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+		List<Build> downstreamBuilds = getDownstreamBuilds(null);
+
+		if (result == null) {
+			return downstreamBuilds.size();
+		}
+
+		for (Build downstreamBuild : downstreamBuilds) {
 			String downstreamBuildResult = downstreamBuild.getResult();
 
 			if (downstreamBuildResult.equals(result)) {
@@ -1146,40 +1144,6 @@ public abstract class BaseBuild implements Build {
 
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
 		return _failureMessageGenerators;
-	}
-
-	protected Element getFunctionalCaseDivElement(TestResult testResult) {
-		Element divElement = new DefaultElement("div");
-
-		Dom4JUtil.getNewAnchorElement(
-			testResult.getTestReportURL(), divElement,
-			testResult.getDisplayName());
-
-		AxisBuild axisBuild = testResult.getAxisBuild();
-
-		String jobVariant = axisBuild.getParameterValue("JOB_VARIANT");
-
-		if (jobVariant.contains("functional")) {
-			Dom4JUtil.addToElement(
-				divElement, " - ",
-				Dom4JUtil.getNewAnchorElement(
-					testResult.getPoshiReportURL(), "Poshi Report"),
-				" - ",
-				Dom4JUtil.getNewAnchorElement(
-					testResult.getPoshiSummaryURL(), "Poshi Summary"),
-				" - ",
-				Dom4JUtil.getNewAnchorElement(
-					testResult.getConsoleOutputURL(), "Console Output"));
-
-			if (testResult.hasLiferayLog()) {
-				Dom4JUtil.addToElement(
-					divElement, " - ",
-					Dom4JUtil.getNewAnchorElement(
-						testResult.getLiferayLogURL(), "Liferay Log"));
-			}
-		}
-
-		return divElement;
 	}
 
 	protected abstract Element getGitHubMessageJobResultsElement();
