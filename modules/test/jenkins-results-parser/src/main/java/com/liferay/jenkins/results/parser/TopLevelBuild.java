@@ -37,6 +37,17 @@ import org.json.JSONObject;
 public class TopLevelBuild extends BaseBuild {
 
 	@Override
+	public String getDisplayName() {
+		String displayName = super.getDisplayName();
+
+		if (getParentBuild() != null) {
+			displayName += "/" + getParameterValue("JENKINS_JOB_VARIANT");
+		}
+
+		return displayName;
+	}
+
+	@Override
 	public Element getGitHubMessage() {
 		if (getParentBuild() == null) {
 			return getTopGitHubMessage();
@@ -180,6 +191,40 @@ public class TopLevelBuild extends BaseBuild {
 		return buildTimeElement;
 	}
 
+	protected Element getDownstreamGitHubMessage() {
+		String status = getStatus();
+
+		if (!status.equals("completed") && (getParentBuild() != null)) {
+			return null;
+		}
+
+		String result = getResult();
+
+		if (result.equals("SUCCESS")) {
+			return null;
+		}
+
+		Element messageElement = new DefaultElement("div");
+
+		Dom4JUtil.getNewAnchorElement(
+			getBuildURL(), messageElement, getDisplayName());
+
+		if (result.equals("ABORTED")) {
+			messageElement.add(
+				Dom4JUtil.toCodeSnippetElement("Build was aborted"));
+		}
+
+		if (result.equals("FAILURE")) {
+			Element failureMessageElement = getFailureMessageElement();
+
+			if (failureMessageElement != null) {
+				messageElement.add(failureMessageElement);
+			}
+		}
+
+		return messageElement;
+	}
+
 	@Override
 	protected ExecutorService getExecutorService() {
 		return Executors.newFixedThreadPool(20);
@@ -187,7 +232,11 @@ public class TopLevelBuild extends BaseBuild {
 
 	@Override
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
-		return _failureMessageGenerators;
+		if (getParentBuild() == null) {
+			return _failureMessageGenerators;
+		}
+
+		return super.getFailureMessageGenerators();
 	}
 
 	@Override
