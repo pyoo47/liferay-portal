@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import org.apache.tools.ant.Project;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,6 +37,14 @@ public class BatchBuild extends BaseBuild {
 		}
 
 		return batchName;
+	}
+
+	@Override
+	public Environment getEnvironment(String environmentType, Project project)
+		throws Exception {
+
+		return new Environment(
+			environmentType, project.getProperties(), getBatchName());
 	}
 
 	@Override
