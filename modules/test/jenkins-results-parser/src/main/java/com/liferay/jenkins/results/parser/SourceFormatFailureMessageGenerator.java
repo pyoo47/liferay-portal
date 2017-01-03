@@ -32,9 +32,10 @@ public class SourceFormatFailureMessageGenerator
 			return null;
 		}
 
-		int end = consoleText.indexOf(_SOURCE_FORMAT_STRING);
+		consoleText = consoleText.substring(
+			consoleText.lastIndexOf("format-source:"));
 
-		end = consoleText.indexOf("[exec] :", end);
+		int end = consoleText.indexOf("merge-test-results:");
 
 		return getConsoleOutputSnippetElement(consoleText, true, end);
 	}
@@ -47,15 +48,15 @@ public class SourceFormatFailureMessageGenerator
 			return null;
 		}
 
-		int end = consoleOutput.indexOf(_SOURCE_FORMAT_STRING);
+		consoleOutput = consoleOutput.substring(
+			consoleOutput.lastIndexOf("format-source:"));
 
-		end = consoleOutput.indexOf("[exec] :", end);
+		int end = consoleOutput.indexOf("merge-test-results:");
 
 		return getConsoleOutputSnippet(consoleOutput, true, end);
 	}
 
 	private static final String _SOURCE_FORMAT_STRING =
-		"[exec] com.liferay.source.formatter.SourceFormatterTest > " +
-			"testSourceFormatter FAILED";
+		"at com.liferay.source.formatter.SourceFormatter.format";
 
 }
