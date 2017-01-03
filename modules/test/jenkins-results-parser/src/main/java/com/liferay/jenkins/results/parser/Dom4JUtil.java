@@ -154,7 +154,10 @@ public class Dom4JUtil {
 	}
 
 	public static Element toCodeSnippetElement(String content) {
-		return wrapWithNewElement(wrapWithNewElement(content, "code"), "pre");
+		return wrapWithNewElement(
+			wrapWithNewElement(
+				JenkinsResultsParserUtil.redact(content), "code"),
+			"pre");
 	}
 
 	public static Element wrapWithNewElement(
