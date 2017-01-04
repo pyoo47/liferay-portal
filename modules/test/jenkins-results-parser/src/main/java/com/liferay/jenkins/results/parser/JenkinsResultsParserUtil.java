@@ -684,7 +684,8 @@ public class JenkinsResultsParserUtil {
 		String durationString = sb.toString();
 
 		if (durationString.endsWith(" ")) {
-			durationString.substring(0, durationString.length() - 1);
+			durationString = durationString.substring(
+				0, durationString.length() - 1);
 		}
 
 		return durationString;
