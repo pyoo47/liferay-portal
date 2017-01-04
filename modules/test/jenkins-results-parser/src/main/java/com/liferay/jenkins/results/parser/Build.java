@@ -17,6 +17,8 @@ package com.liferay.jenkins.results.parser;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tools.ant.Project;
+
 import org.json.JSONObject;
 
 /**
@@ -45,6 +47,9 @@ public interface Build {
 	public int getDownstreamBuildCount(String status);
 
 	public List<Build> getDownstreamBuilds(String status);
+
+	public Environment getEnvironment(String environmentType, Project project)
+		throws Exception;
 
 	public String getInvocationURL();
 

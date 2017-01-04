@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import org.apache.tools.ant.Project;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,6 +28,24 @@ import org.json.JSONObject;
  * @author Kevin Yen
  */
 public class BatchBuild extends BaseBuild {
+
+	public String getBatchName() {
+		String batchName = getParameterValue("JOB_VARIANT");
+
+		if ((batchName == null) || batchName.isEmpty()) {
+			batchName = getParameterValue("JENKINS_JOB_VARIANT");
+		}
+
+		return batchName;
+	}
+
+	@Override
+	public Environment getEnvironment(String environmentType, Project project)
+		throws Exception {
+
+		return new Environment(
+			environmentType, project.getProperties(), getBatchName());
+	}
 
 	@Override
 	public List<TestResult> getTestResults(String testStatus) {
