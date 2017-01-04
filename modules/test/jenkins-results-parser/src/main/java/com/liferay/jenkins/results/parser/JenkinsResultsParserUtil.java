@@ -593,7 +593,7 @@ public class JenkinsResultsParserUtil {
 		Properties properties = null;
 
 		try {
-			properties = JenkinsResultsParserUtil.getBuildProperties();
+			properties = getBuildProperties();
 		}
 		catch (IOException ioe) {
 			throw new RuntimeException("Unable to get build properties.", ioe);
