@@ -14,10 +14,15 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
+
+import org.dom4j.Element;
+import org.dom4j.tree.DefaultElement;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,6 +31,91 @@ import org.json.JSONObject;
  * @author Kevin Yen
  */
 public class BatchBuild extends BaseBuild {
+
+	@Override
+	public Element getGitHubMessage() {
+		Collections.sort(
+			downstreamBuilds, new BaseBuild.BuildDisplayNameComparator());
+
+		Element messageElement = super.getGitHubMessage();
+
+		if (messageElement == null) {
+			return messageElement;
+		}
+
+		String result = getResult();
+
+		if (result.equals("ABORTED")) {
+			return messageElement;
+		}
+
+		Element downstreamBuildOrderedListElement = Dom4JUtil.getNewElement(
+			"ol", messageElement);
+
+		List<Element> failureElements = new ArrayList<>();
+
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			String downstreamBuildResult = downstreamBuild.getResult();
+
+			if (downstreamBuildResult.equals("SUCCESS")) {
+				continue;
+			}
+			else {
+				Element failureElement = downstreamBuild.getGitHubMessage();
+
+				if (isHighPriorityBuildFailureElement(failureElement)) {
+					failureElements.add(0, failureElement);
+
+					continue;
+				}
+
+				failureElements.add(failureElement);
+			}
+		}
+
+		int failCount = 0;
+
+		for (Element failureElement : failureElements) {
+			failCount++;
+
+			if (failCount < 4) {
+				Dom4JUtil.addToElement(
+					Dom4JUtil.getNewElement(
+						"li", downstreamBuildOrderedListElement),
+					failureElement);
+
+				continue;
+			}
+
+			Dom4JUtil.addToElement(
+				Dom4JUtil.getNewElement(
+					"li", downstreamBuildOrderedListElement),
+				"...");
+
+			break;
+		}
+
+		String downstreamBuildOrderedListElementHTML = null;
+
+		try {
+			downstreamBuildOrderedListElementHTML = Dom4JUtil.format(
+				downstreamBuildOrderedListElement, false);
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				"Unable to format downstreamBuildOrderedListElement", ioe);
+		}
+
+		if (downstreamBuildOrderedListElementHTML.contains(">...<")) {
+			Dom4JUtil.addToElement(
+				Dom4JUtil.getNewElement("strong", messageElement), "Click ",
+				Dom4JUtil.getNewAnchorElement(
+					getBuildURL() + "testReport", "here"),
+				" for more failures.");
+		}
+
+		return messageElement;
+	}
 
 	@Override
 	public List<TestResult> getTestResults(String testStatus) {
@@ -51,8 +141,10 @@ public class BatchBuild extends BaseBuild {
 
 			String axisBuildURL = childJSONObject.getString("url");
 
-			Matcher axisBuildURLMatcher = AxisBuild.buildURLPattern.matcher(
-				axisBuildURL);
+			Matcher axisBuildURLMatcher =
+				fromArchive ? AxisBuild.buildURLPattern.matcher(
+					axisBuildURL) : AxisBuild.buildURLPattern.matcher(
+						axisBuildURL);
 
 			axisBuildURLMatcher.find();
 
@@ -94,6 +186,60 @@ public class BatchBuild extends BaseBuild {
 		}
 
 		return null;
+	}
+
+	@Override
+	protected Element getFailureMessageElement() {
+		return null;
+	}
+
+	@Override
+	protected Element getGitHubMessageJobResultsElement() {
+		Element jobResultsElement = new DefaultElement("div");
+
+		Dom4JUtil.addToElement(
+			jobResultsElement,
+			Dom4JUtil.wrapWithNewElement("Job Results:", "h6"));
+
+		int successCount = result.equals("FAILURE") ?
+			getDownstreamBuildCountByResult("SUCCESS") :
+				getTestCountByStatus("SUCCESS");
+
+		int failCount = result.equals("FAILURE") ?
+			getDownstreamBuildCountByResult(null) - successCount :
+				getTestCountByStatus("FAILURE");
+
+		Dom4JUtil.addToElement(
+			Dom4JUtil.getNewElement("p", jobResultsElement),
+			Integer.toString(successCount),
+			pluralize(successCount, "s", " Test"), " Passed.",
+			new DefaultElement("br"), Integer.toString(failCount),
+			pluralize(failCount, "s", " Test"), " Failed");
+
+		return jobResultsElement;
+	}
+
+	protected int getTestCountByStatus(String status) {
+		JSONObject testReportJSONObject = getTestReportJSONObject();
+
+		int failCount = testReportJSONObject.getInt("failCount");
+		int skipCount = testReportJSONObject.getInt("skipCount");
+		int totalCount = testReportJSONObject.getInt("totalCount");
+
+		if (status == null) {
+			return totalCount;
+		}
+
+		if (status.equals("SUCCESS")) {
+			return totalCount - skipCount - failCount;
+		}
+
+		if (status.equals("FAILURE")) {
+			return failCount;
+		}
+
+		throw new IllegalArgumentException(
+			"Invalid result parameter: " + status);
 	}
 
 }

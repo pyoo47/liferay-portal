@@ -43,8 +43,6 @@ public class RebaseErrorTopLevelBuild extends TopLevelBuild {
 
 	public RebaseErrorTopLevelBuild(String url, TopLevelBuild topLevelBuild) {
 		super(url, topLevelBuild);
-
-		_validResult = false;
 	}
 
 	@Override
