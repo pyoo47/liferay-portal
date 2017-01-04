@@ -1035,6 +1035,18 @@ public abstract class BaseBuild implements Build {
 			while (downstreamBuildURLMatcher.find()) {
 				String url = downstreamBuildURLMatcher.group("url");
 
+				String reinvocationMarker = url + " restarted at ";
+
+				int reinvocationIndex = consoleText.indexOf(reinvocationMarker);
+
+				if (reinvocationIndex != -1) {
+					url = consoleText.substring(
+						reinvocationIndex + reinvocationMarker.length(),
+						consoleText.indexOf(
+							".\n",
+							reinvocationIndex + reinvocationMarker.length()));
+				}
+
 				if (!foundDownstreamBuildURLs.contains(url)) {
 					foundDownstreamBuildURLs.add(url);
 				}
@@ -1104,6 +1116,12 @@ public abstract class BaseBuild implements Build {
 
 			if (status.equals("running")) {
 				if (badBuildNumbers.size() > 0) {
+					sb.append(" ");
+
+					List<String> badBuildURLs = getBadBuildURLs();
+
+					sb.append(badBuildURLs.get(badBuildNumbers.size() - 1));
+
 					sb.append(" restarted at ");
 				}
 				else {
