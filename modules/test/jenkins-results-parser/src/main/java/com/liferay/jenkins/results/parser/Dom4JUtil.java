@@ -16,15 +16,20 @@ package com.liferay.jenkins.results.parser;
 
 import java.io.CharArrayWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.Writer;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.Text;
 import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.DefaultElement;
 
@@ -110,6 +115,12 @@ public class Dom4JUtil {
 		}
 
 		return childElement;
+	}
+
+	public static Document parse(String xmlString) throws DocumentException {
+		SAXReader saxReader = new SAXReader();
+
+		return saxReader.read(new StringReader(xmlString));
 	}
 
 	public static void replace(
