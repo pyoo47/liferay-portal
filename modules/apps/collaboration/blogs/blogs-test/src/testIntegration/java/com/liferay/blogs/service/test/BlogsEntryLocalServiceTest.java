@@ -114,7 +114,7 @@ public class BlogsEntryLocalServiceTest {
 		int actualCount = BlogsEntryLocalServiceUtil.getGroupEntriesCount(
 			_group.getGroupId(), _statusAnyQueryDefinition);
 
-		Assert.assertEquals(initialCount + 1, actualCount);
+		Assert.assertEquals(initialCount + 3, actualCount);
 	}
 
 	@Test
