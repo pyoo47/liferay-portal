@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
@@ -786,6 +787,16 @@ public class JenkinsResultsParserUtil {
 			int timeout)
 		throws IOException {
 
+		return toString(
+			url, checkCache, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
+			timeout, null);
+	}
+
+	public static String toString(
+			String url, boolean checkCache, int maxRetries, int retryPeriod,
+			int timeout, String request)
+		throws IOException {
+
 		url = fixURL(url);
 
 		String key = url.replace("//", "/");
@@ -822,6 +833,10 @@ public class JenkinsResultsParserUtil {
 
 					httpURLConnection.setRequestMethod("GET");
 
+					if (request != null) {
+						httpURLConnection.setRequestMethod("POST");
+					}
+
 					Properties buildProperties = getBuildProperties();
 
 					httpURLConnection.setRequestProperty(
@@ -831,6 +846,17 @@ public class JenkinsResultsParserUtil {
 
 					httpURLConnection.setRequestProperty(
 						"Content-Type", "application/json");
+
+					if (request != null) {
+						httpURLConnection.setDoOutput(true);
+
+						OutputStream outputStream =
+							httpURLConnection.getOutputStream();
+
+						outputStream.write(request.getBytes("UTF-8"));
+
+						outputStream.close();
+					}
 				}
 
 				if (timeout != 0) {
@@ -881,6 +907,14 @@ public class JenkinsResultsParserUtil {
 				sleep(1000 * retryPeriod);
 			}
 		}
+	}
+
+	public static String toString(String url, String request)
+		throws IOException {
+
+		return toString(
+			url, false, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
+			_TIMEOUT_DEFAULT, request);
 	}
 
 	public static void write(File file, String content) throws IOException {
