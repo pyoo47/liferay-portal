@@ -238,30 +238,17 @@ public class TopLevelBuild extends BaseBuild {
 			"https://github.com/liferay/" + getBaseRepositoryName() + "/tree/" +
 				getBranchName();
 
-		String baseRepositoryName = getBaseRepositoryName();
-
-		String baseRepositorySHA = null;
-
-		if (!baseRepositoryName.equals("liferay-jenkins-ee") &&
-			baseRepositoryName.endsWith("-ee")) {
-
-			baseRepositorySHA = getBaseRepositorySHA(
-				baseRepositoryName.substring(
-					0, baseRepositoryName.length() - 3));
-		}
-		else {
-			baseRepositorySHA = getBaseRepositorySHA(baseRepositoryName);
-		}
-
-		String baseRepositoryCommitURL =
-			"https://github.com/liferay/" + baseRepositoryName + "/commit/" +
-				baseRepositorySHA;
-
 		Element baseBranchDetailsElement = Dom4JUtil.getNewElement(
 			"p", null, "Branch Name: ",
 			Dom4JUtil.getNewAnchorElement(baseBranchURL, getBranchName()));
 
+		String baseRepositorySHA = getBaseRepositorySHA();
+
 		if (baseRepositorySHA != null) {
+			String baseRepositoryCommitURL =
+				"https://github.com/liferay/" + getBaseRepositoryName() +
+					"/commit/" + baseRepositorySHA;
+
 			Dom4JUtil.addToElement(
 				baseBranchDetailsElement, Dom4JUtil.getNewElement("br"),
 				"Branch GIT ID: ",
@@ -270,6 +257,19 @@ public class TopLevelBuild extends BaseBuild {
 		}
 
 		return baseBranchDetailsElement;
+	}
+
+	protected String getBaseRepositorySHA() {
+		String baseRepositoryName = getBaseRepositoryName();
+
+		if (!baseRepositoryName.equals("liferay-jenkins-ee") &&
+			baseRepositoryName.endsWith("-ee")) {
+
+			baseRepositoryName = baseRepositoryName.substring(
+				0, baseRepositoryName.length() - 3);
+		}
+
+		return getBaseRepositorySHA(baseRepositoryName);
 	}
 
 	protected Element getBuildTimeElement() {
@@ -401,6 +401,13 @@ public class TopLevelBuild extends BaseBuild {
 		return resultElement;
 	}
 
+	protected Element getRootElement() {
+		return Dom4JUtil.getNewElement(
+			"html", null, getResultElement(), getBuildTimeElement(),
+			Dom4JUtil.getNewElement("h4", null, "Base Branch:"),
+			getBaseBranchDetailsElement());
+	}
+
 	@Override
 	protected String getStartPropertiesTempMapURL() {
 		if (fromArchive) {
@@ -446,11 +453,10 @@ public class TopLevelBuild extends BaseBuild {
 	protected Element getTopGitHubMessageElement() {
 		update();
 
-		Element rootElement = Dom4JUtil.getNewElement(
-			"html", null, getResultElement(), getBuildTimeElement(),
-			Dom4JUtil.getNewElement("h4", null, "Base Branch:"),
-			getBaseBranchDetailsElement(),
-			Dom4JUtil.getNewElement("h4", null, "Job Summary:"),
+		Element rootElement = getRootElement();
+
+		Dom4JUtil.addToElement(
+			rootElement, Dom4JUtil.getNewElement("h4", null, "Job Summary:"),
 			getJobSummaryListElement(), getMoreDetailsElement());
 
 		String result = getResult();
