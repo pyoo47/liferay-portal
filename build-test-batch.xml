@@ -2381,6 +2381,57 @@ information. Make sure to commit in all build services results.
 		</run-batch-test>
 	</target>
 
+	<target name="subrepository-central-requirements-jdk8">
+		<fail message="Please set the property ${modules.structure.tests}." unless="modules.structure.tests" />
+
+		<trycatch property="failure.property">
+			<try>
+				<propertyfile file="${project.dir}/test.class.file.names.properties">
+					<entry key="TEST_CLASS_GROUP_0" value="${modules.structure.tests}" />
+				</propertyfile>
+
+				<ant dir="portal-kernel" inheritAll="false" target="test-class-group">
+					<property name="test.class.group.index" value="0" />
+				</ant>
+
+				<ant dir="portal-impl" inheritAll="false" target="test-class-group">
+					<property name="test.class.group.index" value="0" />
+					<property name="test.type" value="unit" />
+				</ant>
+
+				<ant dir="util-java" inheritAll="false" target="test-class-group">
+					<property name="test.class.group.index" value="0" />
+				</ant>
+			</try>
+			<catch>
+				<fail message="${failure.property}" />
+			</catch>
+			<finally>
+				<junitreport todir="test-results">
+					<fileset dir="portal-impl/test-results" erroronmissingdir="false">
+						<include name="**/TEST-*.xml" />
+					</fileset>
+					<fileset dir="portal-kernel/test-results" erroronmissingdir="false">
+						<include name="**/TEST-*.xml" />
+					</fileset>
+					<fileset dir="util-java/test-results" erroronmissingdir="false">
+						<include name="**/TEST-*.xml" />
+					</fileset>
+					<report format="frames" todir="test-results/html" />
+				</junitreport>
+
+				<if>
+					<isset property="env.WORKSPACE" />
+					<then>
+						<mkdir dir="${env.WORKSPACE}/test-results" />
+
+						<copy file="test-results/TESTS-TestSuites.xml" tofile="${env.WORKSPACE}/test-results/TESTS-TestSuites.xml" />
+					</then>
+				</if>
+			</finally>
+		</trycatch>
+	</target>
+
 	<target name="subrepository-compile-jdk8">
 		<fail message="Please set the property ${subrepository.name}." unless="subrepository.name" />
 
