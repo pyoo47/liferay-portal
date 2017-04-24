@@ -14,7 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,11 +27,10 @@ public abstract class BaseFailureMessageGenerator
 	implements FailureMessageGenerator {
 
 	@Override
-	public abstract String getMessage(
-		String buildURL, String consoleOutput, Hashtable<?, ?> properties);
+	public abstract Element getMessageElement(Build build);
 
 	@Override
-	public abstract Element getMessageElement(Build build);
+	public abstract Element getMessageElement(String consoleText);
 
 	protected Element getBaseBranchAnchorElement(TopLevelBuild topLevelBuild) {
 		StringBuilder sb = new StringBuilder();

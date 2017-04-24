@@ -14,8 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Hashtable;
-
 import org.dom4j.Element;
 
 /**
@@ -25,58 +23,12 @@ public class LocalGitMirrorFailureMessageGenerator
 	extends BaseFailureMessageGenerator {
 
 	@Override
-	public String getMessage(
-		String buildURL, String consoleOutput, Hashtable<?, ?> properties) {
-
-		if (!consoleOutput.contains(_LOCAL_GIT_FAILURE_END_STRING) ||
-			!consoleOutput.contains(_LOCAL_GIT_FAILURE_START_STRING)) {
-
-			return null;
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("<p>Unable to synchronize with <strong>local Git mirror");
-		sb.append("</strong>.</p>");
-
-		int end = consoleOutput.indexOf(_LOCAL_GIT_FAILURE_END_STRING);
-
-		int start = consoleOutput.lastIndexOf(
-			_LOCAL_GIT_FAILURE_START_STRING, end);
-
-		consoleOutput = consoleOutput.substring(start, end);
-
-		int minIndex = consoleOutput.length();
-
-		for (String string : new String[] {"error: ", "fatal: "}) {
-			int index = consoleOutput.indexOf(string);
-
-			if (index != -1) {
-				if (index < minIndex) {
-					minIndex = index;
-				}
-			}
-		}
-
-		int gitCommandIndex = consoleOutput.lastIndexOf("+ git", minIndex);
-
-		if (gitCommandIndex != -1) {
-			start = gitCommandIndex;
-		}
-
-		start = consoleOutput.lastIndexOf("\n", start);
-
-		end = consoleOutput.lastIndexOf("\n");
-
-		sb.append(getConsoleOutputSnippet(consoleOutput, false, start, end));
-
-		return sb.toString();
+	public Element getMessageElement(Build build) {
+		return getMessageElement(build.getConsoleText());
 	}
 
 	@Override
-	public Element getMessageElement(Build build) {
-		String consoleText = build.getConsoleText();
-
+	public Element getMessageElement(String consoleText) {
 		if (!consoleText.contains(_LOCAL_GIT_FAILURE_END_STRING) ||
 			!consoleText.contains(_LOCAL_GIT_FAILURE_START_STRING)) {
 

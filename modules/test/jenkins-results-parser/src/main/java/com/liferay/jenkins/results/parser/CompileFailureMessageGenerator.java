@@ -14,8 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Hashtable;
-
 import org.dom4j.Element;
 
 /**
@@ -25,29 +23,25 @@ public class CompileFailureMessageGenerator
 	extends BaseFailureMessageGenerator {
 
 	@Override
-	public String getMessage(
-		String buildURL, String consoleOutput, Hashtable<?, ?> properties) {
-
-		return null;
+	public Element getMessageElement(Build build) {
+		return getMessageElement(build.getConsoleText());
 	}
 
 	@Override
-	public Element getMessageElement(Build build) {
-		String consoleOutput = build.getConsoleText();
-
-		int end = consoleOutput.indexOf("Compile failed;");
+	public Element getMessageElement(String consoleText) {
+		int end = consoleText.indexOf("Compile failed;");
 
 		if (end == -1) {
-			end = consoleOutput.indexOf("compileJava FAILED");
+			end = consoleText.indexOf("compileJava FAILED");
 		}
 
 		if (end == -1) {
 			return null;
 		}
 
-		end = consoleOutput.lastIndexOf("\n", end);
+		end = consoleText.lastIndexOf("\n", end);
 
-		return getConsoleOutputSnippetElement(consoleOutput, true, end);
+		return getConsoleOutputSnippetElement(consoleText, true, end);
 	}
 
 }

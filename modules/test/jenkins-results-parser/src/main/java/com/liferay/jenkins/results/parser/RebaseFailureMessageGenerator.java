@@ -14,52 +14,12 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Hashtable;
-
 import org.dom4j.Element;
 
 /**
  * @author Peter Yoo
  */
 public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
-
-	@Override
-	public String getMessage(
-		String buildURL, String consoleOutput, Hashtable<?, ?> properties) {
-
-		if (!consoleOutput.contains(_REBASE_END_STRING) ||
-			!consoleOutput.contains(_REBASE_START_STRING)) {
-
-			return null;
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("<p>Please fix <strong>rebase errors</strong> on <strong>");
-		sb.append("<a href=\"https://github.com/");
-		sb.append(properties.get("github.origin.name"));
-		sb.append("/");
-		sb.append(properties.get("repository"));
-		sb.append("/tree/");
-		sb.append(properties.get("github.sender.branch.name"));
-		sb.append("\">");
-		sb.append(properties.get("github.origin.name"));
-		sb.append("/");
-		sb.append(properties.get("github.sender.branch.name"));
-		sb.append("</a></strong>.</p>");
-
-		int end = consoleOutput.indexOf(_REBASE_END_STRING);
-
-		end = consoleOutput.lastIndexOf("\n", end);
-
-		int start = consoleOutput.lastIndexOf(_REBASE_START_STRING, end);
-
-		start = consoleOutput.lastIndexOf("\n", start);
-
-		sb.append(getConsoleOutputSnippet(consoleOutput, true, start, end));
-
-		return sb.toString();
-	}
 
 	@Override
 	public Element getMessageElement(Build build) {
@@ -89,6 +49,11 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 					"strong", null,
 					getBaseBranchAnchorElement(build.getTopLevelBuild())),
 				getConsoleOutputSnippetElement(consoleText, true, start, end)));
+	}
+
+	@Override
+	public Element getMessageElement(String consoleText) {
+		return null;
 	}
 
 	private static final String _REBASE_END_STRING = "Aborting rebase ABORT";

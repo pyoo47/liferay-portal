@@ -14,7 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,26 +26,12 @@ public class PoshiValidationFailureMessageGenerator
 	extends BaseFailureMessageGenerator {
 
 	@Override
-	public String getMessage(
-		String buildURL, String consoleOutput, Hashtable<?, ?> properties) {
-
-		Matcher poshiFailureMatcher = _poshiFailurePattern.matcher(
-			consoleOutput);
-
-		if (poshiFailureMatcher.find()) {
-			String poshiFailureMessage = poshiFailureMatcher.group(1);
-
-			return "<p>POSHI Validation Failure</p><pre><code>" +
-				poshiFailureMessage + "</code></pre>";
-		}
-
-		return null;
+	public Element getMessageElement(Build build) {
+		return getMessageElement(build.getConsoleText());
 	}
 
 	@Override
-	public Element getMessageElement(Build build) {
-		String consoleText = build.getConsoleText();
-
+	public Element getMessageElement(String consoleText) {
 		Matcher poshiFailureMatcher = _poshiFailurePattern.matcher(consoleText);
 
 		if (!poshiFailureMatcher.find()) {

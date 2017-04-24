@@ -14,8 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Hashtable;
-
 import org.dom4j.Element;
 
 /**
@@ -25,25 +23,12 @@ public class SourceFormatFailureMessageGenerator
 	extends BaseFailureMessageGenerator {
 
 	@Override
-	public String getMessage(
-		String buildURL, String consoleOutput, Hashtable<?, ?> properties) {
-
-		if (!consoleOutput.contains(_SOURCE_FORMAT_STRING)) {
-			return null;
-		}
-
-		consoleOutput = consoleOutput.substring(
-			consoleOutput.lastIndexOf("format-source:"));
-
-		int end = consoleOutput.indexOf("merge-test-results:");
-
-		return getConsoleOutputSnippet(consoleOutput, true, end);
+	public Element getMessageElement(Build build) {
+		return getMessageElement(build.getConsoleText());
 	}
 
 	@Override
-	public Element getMessageElement(Build build) {
-		String consoleText = build.getConsoleText();
-
+	public Element getMessageElement(String consoleText) {
 		if (!consoleText.contains(_SOURCE_FORMAT_STRING)) {
 			return null;
 		}
