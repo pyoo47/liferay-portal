@@ -1356,7 +1356,7 @@ public abstract class BaseBuild implements Build {
 		return "";
 	}
 
-	protected JSONArray getBuildsJSONArray() throws Exception {
+	protected JSONArray getBuildsJSONArray() throws IOException {
 		JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
 			JenkinsResultsParserUtil.getLocalURL(
 				JenkinsResultsParserUtil.combine(
@@ -1451,9 +1451,7 @@ public abstract class BaseBuild implements Build {
 		return parameterNames;
 	}
 
-	protected Map<String, String> getParameters(JSONArray jsonArray)
-		throws Exception {
-
+	protected Map<String, String> getParameters(JSONArray jsonArray) {
 		Map<String, String> parameters = new HashMap<>(jsonArray.length());
 
 		for (int i = 0; i < jsonArray.length(); i++) {
@@ -1472,9 +1470,7 @@ public abstract class BaseBuild implements Build {
 		return parameters;
 	}
 
-	protected Map<String, String> getParameters(JSONObject buildJSONObject)
-		throws Exception {
-
+	protected Map<String, String> getParameters(JSONObject buildJSONObject) {
 		JSONArray actionsJSONArray = buildJSONObject.getJSONArray("actions");
 
 		if (actionsJSONArray.length() == 0) {
@@ -1493,7 +1489,7 @@ public abstract class BaseBuild implements Build {
 		return new HashMap<>();
 	}
 
-	protected JSONObject getQueueItemJSONObject() throws Exception {
+	protected JSONObject getQueueItemJSONObject() throws IOException {
 		JSONArray queueItemsJSONArray = getQueueItemsJSONArray();
 
 		for (int i = 0; i < queueItemsJSONArray.length(); i++) {
@@ -1517,7 +1513,7 @@ public abstract class BaseBuild implements Build {
 		return null;
 	}
 
-	protected JSONArray getQueueItemsJSONArray() throws Exception {
+	protected JSONArray getQueueItemsJSONArray() throws IOException {
 		JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
 			"http://" + master +
 				"/queue/api/json?tree=items[actions[parameters" +
@@ -1538,7 +1534,7 @@ public abstract class BaseBuild implements Build {
 		return sb.toString();
 	}
 
-	protected JSONObject getRunningBuildJSONObject() throws Exception {
+	protected JSONObject getRunningBuildJSONObject() throws IOException {
 		JSONArray buildsJSONArray = getBuildsJSONArray();
 
 		for (int i = 0; i < buildsJSONArray.length(); i++) {
