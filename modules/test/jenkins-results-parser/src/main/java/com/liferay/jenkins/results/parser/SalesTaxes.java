@@ -26,23 +26,23 @@ public class SalesTaxes {
 	public static void main(String[] args) {
 		ShoppingCart cart = new ShoppingCart();
 
-		cart.addItem("1 book at 12.49");
-		cart.addItem("1 music CD at 14.99");
-		cart.addItem("1 chocolate bar at 0.85");
+		cart.addGood("1 book at 12.49");
+		cart.addGood("1 music CD at 14.99");
+		cart.addGood("1 chocolate bar at 0.85");
 		cart.printReceipt();
 
 		cart = new ShoppingCart();
 
-		cart.addItem("1 imported box of chocolates at 10.00");
-		cart.addItem("1 imported bottle of perfume at 47.50");
+		cart.addGood("1 imported box of chocolates at 10.00");
+		cart.addGood("1 imported bottle of perfume at 47.50");
 		cart.printReceipt();
 
 		cart = new ShoppingCart();
 
-		cart.addItem("1 imported bottle of perfume at 27.99");
-		cart.addItem("1 bottle of perfume at 18.99");
-		cart.addItem("1 packet of headache pills at 9.75");
-		cart.addItem("1 imported box of chocolates at 11.25");
+		cart.addGood("1 imported bottle of perfume at 27.99");
+		cart.addGood("1 bottle of perfume at 18.99");
+		cart.addGood("1 packet of headache pills at 9.75");
+		cart.addGood("1 imported box of chocolates at 11.25");
 		cart.printReceipt();
 	}
 
@@ -53,12 +53,12 @@ public class SalesTaxes {
 			int quantity) {
 
 			_imported = imported ? 1 : 0;
-			_imported_tax_rate = 0.05;
+			_importedTaxRate = 0.05;
 			_exempt = exempt ? 0 : 1;
 			_name = name;
 			_price = price;
 			_quantity = quantity;
-			_tax_rate = 0.1;
+			_taxRate = 0.1;
 		}
 
 		public double getFinalPrice() {
@@ -80,54 +80,45 @@ public class SalesTaxes {
 		public double getTax() {
 			return Math.ceil(
 				_quantity * _price *
-					(_imported * _imported_tax_rate + _exempt * _tax_rate) *
+					(_imported * _importedTaxRate + _exempt * _taxRate) *
 						20.0) / 20.0;
 		}
 
 		private final int _exempt;
 		private final int _imported;
-		private final double _imported_tax_rate;
+		private final double _importedTaxRate;
 		private final String _name;
 		private final double _price;
 		private final int _quantity;
-		private final double _tax_rate;
+		private final double _taxRate;
 
 	}
 
 	public static class ShoppingCart {
 
 		public ShoppingCart() {
-			_cart = new ArrayList<>();
+			_goods = new ArrayList<>();
 		}
 
-		public void addItem(String item) {
-			boolean imported = false;
-			boolean exempt = false;
+		public void addGood(String goodDescriptor) {
 			String item_name = "";
-			StringTokenizer item_token = new StringTokenizer(item);
+			boolean imported = goodDescriptor.contains("imported");
+
+			boolean exempt = false;
+
+			if (goodDescriptor.contains("book") ||
+				goodDescriptor.contains("chocolate") ||
+				goodDescriptor.contains("pills")) {
+
+				exempt = true;
+			}
+
+			StringTokenizer item_token = new StringTokenizer(goodDescriptor);
 
 			int item_token_count = item_token.countTokens();
 
 			double price = 0.0;
 			int quantity = 0;
-
-			if (item.contains("imported")) {
-				imported = true;
-			}
-			else {
-				imported = false;
-			}
-
-			if (item.contains("book") || item.contains("chocolate") ||
-				item.contains("pills")) {
-
-				exempt = true;
-			}
-			else {
-				exempt = false;
-			}
-
-			// Tokenize the item to get quantity, price, and item name
 
 			for (int i = 0; i < item_token_count; i++) {
 				if (i == 0) {
@@ -150,40 +141,38 @@ public class SalesTaxes {
 				}
 			}
 
-			_cart.add(new Good(imported, exempt, item_name, price, quantity));
+			_goods.add(new Good(imported, exempt, item_name, price, quantity));
 		}
 
 		public void printReceipt() {
-			double sales_taxes = 0.0;
+			double salesTaxes = 0.0;
 			double total = 0.0;
 
-			// Prints in the format
-			// <quantity> <item_name>: <price>
-			// <sales_taxes>
-			// <total>
-			// <CR><LF>
+			for (Good good : _goods) {
+				double goodFinalPrice = good.getFinalPrice();
 
-			for (int i = 0; i < _cart.size(); i++) {
-				Good item = _cart.get(i);
+				salesTaxes += good.getTax();
 
-				double item_price = item.getFinalPrice();
-
-				sales_taxes += item.getTax();
-
-				total += item_price;
+				total += goodFinalPrice;
 
 				System.out.println(
-					item.getQuantity() + " " + item.getName() + ": " +
-						String.format("%.2f", item_price));
+					good.getQuantity() + " " + good.getName() + ": " +
+						String.format("%.2f", goodFinalPrice));
 			}
 
-			System.out.println(
-				"Sales Taxes: " + String.format("%.2f", sales_taxes));
-			System.out.println("Total: " + String.format("%.2f", total));
-			System.out.println();
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Sales Taxes: ");
+			sb.append(String.format("%.2f", salesTaxes));
+			sb.append("\n");
+			sb.append("Total: ");
+			sb.append(String.format("%.2f", total));
+			sb.append("\n");
+
+			System.out.println(sb.toString());
 		}
 
-		private final List<Good> _cart;
+		private final List<Good> _goods;
 
 	}
 
