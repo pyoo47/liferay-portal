@@ -14,141 +14,48 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 /**
  * @author Yi-Chen Tsai
  */
 public class SalesTaxes {
 
 	public static void main(String[] args) {
-		shoppingCart1();
+		ShoppingCart cart = new ShoppingCart();
 
-		System.out.println();
+		cart.addItem("1 book at 12.49");
+		cart.addItem("1 music CD at 14.99");
+		cart.addItem("1 chocolate bar at 0.85");
+		cart.printReceipt();
 
-		shoppingCart2();
+		cart = new ShoppingCart();
 
-		System.out.println();
+		cart.addItem("1 imported box of chocolates at 10.00");
+		cart.addItem("1 imported bottle of perfume at 47.50");
+		cart.printReceipt();
 
-		shoppingCart3();
-	}
+		cart = new ShoppingCart();
 
-	public static void shoppingCart1() {
-		Good book = new Good(false, true, 12.49, 1);
-
-		double book_price = book.getFinalPrice();
-
-		Good music_CD = new Good(false, false, 14.99, 1);
-
-		double music_CD_price = music_CD.getFinalPrice();
-
-		Good chocolate_bar = new Good(false, true, 0.85, 1);
-
-		double chocolate_bar_price = chocolate_bar.getFinalPrice();
-
-		double sales_taxes =
-			book.getTax() + music_CD.getTax() + chocolate_bar.getTax();
-
-		double total_cost = book_price + music_CD_price + chocolate_bar_price;
-
-		System.out.println(
-			book.getQuantity() + " book: " + String.format("%.2f", book_price));
-
-		System.out.println(
-			music_CD.getQuantity() + " music CD: " +
-				String.format("%.2f", music_CD_price));
-
-		System.out.println(
-			chocolate_bar.getQuantity() + " chocolate bar: " +
-				String.format("%.2f", chocolate_bar_price));
-
-		System.out.println(
-			"Sales Taxes: " + String.format("%.2f", sales_taxes));
-
-		System.out.println("Total: " + String.format("%.2f", total_cost));
-	}
-
-	public static void shoppingCart2() {
-		Good imported_chocolate = new Good(true, true, 10.00, 1);
-
-		double imported_chocolate_price = imported_chocolate.getFinalPrice();
-
-		Good imported_perfume = new Good(true, false, 47.50, 1);
-
-		double imported_perfume_price = imported_perfume.getFinalPrice();
-
-		double sales_taxes =
-			imported_chocolate.getTax() + imported_perfume.getTax();
-
-		double total_cost = imported_chocolate_price + imported_perfume_price;
-
-		System.out.println(
-			imported_chocolate.getQuantity() + " imported box of chocolate: " +
-				String.format("%.2f", imported_chocolate_price));
-
-		System.out.println(
-			imported_perfume.getQuantity() + " imported bottle of perfume: " +
-				String.format("%.2f", imported_perfume_price));
-
-		System.out.println(
-			"Sales Taxes: " + String.format("%.2f", sales_taxes));
-
-		System.out.println("Total: " + String.format("%.2f", total_cost));
-	}
-
-	public static void shoppingCart3() {
-		Good imported_perfume = new Good(true, false, 27.99, 1);
-
-		double imported_perfume_price = imported_perfume.getFinalPrice();
-
-		Good perfume = new Good(false, false, 18.99, 1);
-
-		double perfume_price = perfume.getFinalPrice();
-
-		Good headache_pills = new Good(false, true, 9.75, 1);
-
-		double headache_pills_price = headache_pills.getFinalPrice();
-
-		Good imported_chocolate = new Good(true, true, 11.25, 1);
-
-		double imported_chocolate_price = imported_chocolate.getFinalPrice();
-
-		double sales_taxes =
-			imported_perfume.getTax() + perfume.getTax() +
-				headache_pills.getTax() + imported_chocolate.getTax();
-
-		double total_cost =
-			imported_perfume_price + perfume_price + headache_pills_price +
-				imported_chocolate_price;
-
-		System.out.println(
-			imported_perfume.getQuantity() + " imported bottle of perfume: " +
-				String.format("%.2f", imported_perfume_price));
-
-		System.out.println(
-			perfume.getQuantity() + " bottle of perfume: " +
-				String.format("%.2f", perfume_price));
-
-		System.out.println(
-			perfume.getQuantity() + " packet of headache pills: " +
-				String.format("%.2f", headache_pills_price));
-
-		System.out.println(
-			imported_chocolate.getQuantity() + " imported box of chocolate: " +
-				String.format("%.2f", imported_chocolate_price));
-
-		System.out.println(
-			"Sales Taxes: " + String.format("%.2f", sales_taxes));
-
-		System.out.println("Total: " + String.format("%.2f", total_cost));
+		cart.addItem("1 imported bottle of perfume at 27.99");
+		cart.addItem("1 bottle of perfume at 18.99");
+		cart.addItem("1 packet of headache pills at 9.75");
+		cart.addItem("1 imported box of chocolates at 11.25");
+		cart.printReceipt();
 	}
 
 	public static class Good {
 
 		public Good(
-			boolean imported, boolean exempt, double price, int quantity) {
+			boolean imported, boolean exempt, String name, double price,
+			int quantity) {
 
 			_imported = imported ? 1 : 0;
 			_imported_tax_rate = 0.05;
 			_exempt = exempt ? 0 : 1;
+			_name = name;
 			_price = price;
 			_quantity = quantity;
 			_tax_rate = 0.1;
@@ -158,8 +65,12 @@ public class SalesTaxes {
 			return getPrice() + getTax();
 		}
 
+		public String getName() {
+			return _name;
+		}
+
 		public double getPrice() {
-			return _price;
+			return _quantity * _price;
 		}
 
 		public int getQuantity() {
@@ -168,17 +79,111 @@ public class SalesTaxes {
 
 		public double getTax() {
 			return Math.ceil(
-				(_price *
-					(_imported * _imported_tax_rate + _exempt * _tax_rate)) *
+				_quantity * _price *
+					(_imported * _imported_tax_rate + _exempt * _tax_rate) *
 						20.0) / 20.0;
 		}
 
 		private final int _exempt;
 		private final int _imported;
 		private final double _imported_tax_rate;
+		private final String _name;
 		private final double _price;
 		private final int _quantity;
 		private final double _tax_rate;
+
+	}
+
+	public static class ShoppingCart {
+
+		public ShoppingCart() {
+			_cart = new ArrayList<>();
+		}
+
+		public void addItem(String item) {
+			boolean imported = false;
+			boolean exempt = false;
+			String item_name = "";
+			StringTokenizer item_token = new StringTokenizer(item);
+
+			int item_token_count = item_token.countTokens();
+
+			double price = 0.0;
+			int quantity = 0;
+
+			if (item.contains("imported")) {
+				imported = true;
+			}
+			else {
+				imported = false;
+			}
+
+			if (item.contains("book") || item.contains("chocolate") ||
+				item.contains("pills")) {
+
+				exempt = true;
+			}
+			else {
+				exempt = false;
+			}
+
+			// Tokenize the item to get quantity, price, and item name
+
+			for (int i = 0; i < item_token_count; i++) {
+				if (i == 0) {
+					quantity = Integer.parseInt(item_token.nextToken());
+				}
+				else if (i == (item_token_count - 1)) {
+					price = Double.parseDouble(item_token.nextToken());
+				}
+				else {
+					String tok = item_token.nextToken();
+
+					if (!tok.contentEquals("at")) {
+						if (item_name.isEmpty()) {
+							item_name += tok;
+						}
+						else {
+							item_name += " " + tok;
+						}
+					}
+				}
+			}
+
+			_cart.add(new Good(imported, exempt, item_name, price, quantity));
+		}
+
+		public void printReceipt() {
+			double sales_taxes = 0.0;
+			double total = 0.0;
+
+			// Prints in the format
+			// <quantity> <item_name>: <price>
+			// <sales_taxes>
+			// <total>
+			// <CR><LF>
+
+			for (int i = 0; i < _cart.size(); i++) {
+				Good item = _cart.get(i);
+
+				double item_price = item.getFinalPrice();
+
+				sales_taxes += item.getTax();
+
+				total += item_price;
+
+				System.out.println(
+					item.getQuantity() + " " + item.getName() + ": " +
+						String.format("%.2f", item_price));
+			}
+
+			System.out.println(
+				"Sales Taxes: " + String.format("%.2f", sales_taxes));
+			System.out.println("Total: " + String.format("%.2f", total));
+			System.out.println();
+		}
+
+		private final List<Good> _cart;
 
 	}
 
