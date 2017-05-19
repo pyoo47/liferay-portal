@@ -14,51 +14,67 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Yi-Chen Tsai
  */
-
 public class ShoppingCart {
 
-    public ShoppingCart() {
-        _goods = new ArrayList<>();
-    }
+	public static Pattern quantityPattern;
 
-    public void addGood(String goodDescriptor) {
-        _goods.add(new Good(goodDescriptor));
-    }
+	public ShoppingCart() {
+		_goods = new LinkedHashMap<>();
+	}
 
-    public void printReceipt() {
-        double salesTaxes = 0.0;
-        double total = 0.0;
+	public void addGood(String goodDescriptor) {
+		quantityPattern = Pattern.compile("[0-9]+");
 
-        for (Good good : _goods) {
-            double goodFinalPrice = good.getFinalPrice();
+		Matcher quantityMatcher = quantityPattern.matcher(goodDescriptor);
 
-            salesTaxes += good.getTax();
+		if (!quantityMatcher.find()) {
+			return;
+		}
 
-            total += goodFinalPrice;
+		_goods.put(
+			new Good(goodDescriptor),
+			Integer.parseInt(quantityMatcher.group(0)));
+	}
 
-            System.out.println(
-                    "1" + " " + good.getName() + ": " +
-                            String.format("%.2f", goodFinalPrice));
-        }
+	public void printReceipt() {
+		double salesTaxes = 0.0;
+		double total = 0.0;
 
-        StringBuilder sb = new StringBuilder();
+		for (Map.Entry<Good, Integer> entry : _goods.entrySet()) {
+			Good good = entry.getKey();
+			int goodQuantity = entry.getValue();
 
-        sb.append("Sales Taxes: ");
-        sb.append(String.format("%.2f", salesTaxes));
-        sb.append("\n");
-        sb.append("Total: ");
-        sb.append(String.format("%.2f", total));
-        sb.append("\n");
+			double goodFinalPrice = goodQuantity * good.getFinalPrice();
 
-        System.out.println(sb.toString());
-    }
+			salesTaxes += goodQuantity * good.getTax();
 
-    private final List<Good> _goods;
+			total += goodFinalPrice;
+
+			System.out.println(
+				goodQuantity + " " + good.getName() + ": " +
+					String.format("%.2f", goodFinalPrice));
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Sales Taxes: ");
+		sb.append(String.format("%.2f", salesTaxes));
+		sb.append("\n");
+		sb.append("Total: ");
+		sb.append(String.format("%.2f", total));
+		sb.append("\n");
+
+		System.out.println(sb.toString());
+	}
+
+	private final Map<Good, Integer> _goods;
 
 }

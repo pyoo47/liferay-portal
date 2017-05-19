@@ -14,94 +14,89 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Yi-Chen Tsai
  */
-
 public class Good {
 
-    public Good(String goodDescriptor) {
+	public static Pattern namePattern;
+	public static Pattern pricePattern;
 
-        _importedTaxRate = 0.05;
-        _taxRate = 0.1;
+	public Good(String goodDescriptor) {
+		_importedTaxRate = 0.05;
+		_taxRate = 0.1;
 
-        _imported = goodDescriptor.contains("imported");
+		_imported = goodDescriptor.contains("imported");
 
-        _exempt = goodDescriptor.contains("book") ||
-                goodDescriptor.contains("chocolate") ||
-                goodDescriptor.contains("pills");
+		_exempt = goodDescriptor.contains("book") ||
+				goodDescriptor.contains("chocolate") ||
+				goodDescriptor.contains("pills");
 
-        StringTokenizer item_token = new StringTokenizer(goodDescriptor);
+		namePattern = Pattern.compile("([a-zA-Z][a-zA-Z\\s]*)(?:\\sat)");
 
-        int item_token_count = item_token.countTokens();
+		Matcher nameMatcher = namePattern.matcher(goodDescriptor);
 
-        double price = 0.0;
-        int quantity = 0;
-        String goodName = "";
+		if (nameMatcher.find()) {
+			_name = nameMatcher.group(0);
+		}
+		else {
+			_name = "-";
+		}
 
-        for (int i = 0; i < item_token_count; i++) {
-            if (i == 0) {
-                quantity = Integer.parseInt(item_token.nextToken());
-            }
-            else if (i == (item_token_count - 1)) {
-                price = Double.parseDouble(item_token.nextToken());
-            }
-            else {
-                String tok = item_token.nextToken();
+		pricePattern = Pattern.compile("[0-9]+[.]([0-9])*");
 
-                if (!tok.contentEquals("at")) {
-                    if (goodName.isEmpty()) {
-                        goodName += tok;
-                    }
-                    else {
-                        goodName += " " + tok;
-                    }
-                }
-            }
-        }
+		Matcher priceMatcher = pricePattern.matcher(goodDescriptor);
 
-        _name = goodName;
-        _price = price;
-    }
+		if (priceMatcher.find()) {
+			_price = Double.parseDouble(priceMatcher.group(0));
+		}
+		else {
+			_price = 0.0;
+		}
+	}
 
-    public double getFinalPrice() {
-        return getPrice() + getTax();
-    }
+	public double getFinalPrice() {
+		return getPrice() + getTax();
+	}
 
-    public String getName() {
-        return _name;
-    }
+	public String getName() {
+		return _name;
+	}
 
-    public double getPrice() {
-        return _price;
-    }
+	public double getPrice() {
+		return _price;
+	}
 
-    public double getTax() {
-        return Math.ceil(
-                _price *
-                        getTaxRate() * 20.0) / 20.0;
-    }
+	public double getTax() {
+		return roundToNearestNickel(_price * getTaxRate());
+	}
 
-    protected double getTaxRate(){
-        double taxRate = 0.0;
-        if (_imported){
-            taxRate += _importedTaxRate;
-        }
+	protected double getTaxRate() {
+		double taxRate = 0.0;
 
-        if (!_exempt){
-            taxRate += _taxRate;
-        }
+		if (_imported) {
+			taxRate += _importedTaxRate;
+		}
 
-        return taxRate;
-    }
+		if (!_exempt) {
+			taxRate += _taxRate;
+		}
 
-    private final boolean _exempt;
-    private final boolean _imported;
-    private final double _importedTaxRate;
-    private final String _name;
-    private final double _price;
-    private final double _taxRate;
+		return taxRate;
+	}
+
+	protected double roundToNearestNickel(double tax) {
+		return Math.ceil(tax * 20.0) / 20.0;
+	}
+
+	private final boolean _exempt;
+	private final boolean _imported;
+	private final double _importedTaxRate;
+	private final String _name;
+	private final double _price;
+	private final double _taxRate;
 
 }
