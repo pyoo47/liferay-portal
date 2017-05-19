@@ -48,70 +48,16 @@ public class SalesTaxes {
 
 	public static class Good {
 
-		public Good(
-			boolean imported, boolean exempt, String name, double price,
-			int quantity) {
+		public Good(String goodDescriptor) {
 
-			_imported = imported ? 1 : 0;
 			_importedTaxRate = 0.05;
-			_exempt = exempt ? 0 : 1;
-			_name = name;
-			_price = price;
-			_quantity = quantity;
 			_taxRate = 0.1;
-		}
 
-		public double getFinalPrice() {
-			return getPrice() + getTax();
-		}
+			_imported = goodDescriptor.contains("imported");
 
-		public String getName() {
-			return _name;
-		}
-
-		public double getPrice() {
-			return _quantity * _price;
-		}
-
-		public int getQuantity() {
-			return _quantity;
-		}
-
-		public double getTax() {
-			return Math.ceil(
-				_quantity * _price *
-					(_imported * _importedTaxRate + _exempt * _taxRate) *
-						20.0) / 20.0;
-		}
-
-		private final int _exempt;
-		private final int _imported;
-		private final double _importedTaxRate;
-		private final String _name;
-		private final double _price;
-		private final int _quantity;
-		private final double _taxRate;
-
-	}
-
-	public static class ShoppingCart {
-
-		public ShoppingCart() {
-			_goods = new ArrayList<>();
-		}
-
-		public void addGood(String goodDescriptor) {
-			String item_name = "";
-			boolean imported = goodDescriptor.contains("imported");
-
-			boolean exempt = false;
-
-			if (goodDescriptor.contains("book") ||
-				goodDescriptor.contains("chocolate") ||
-				goodDescriptor.contains("pills")) {
-
-				exempt = true;
-			}
+			_exempt = goodDescriptor.contains("book") ||
+					goodDescriptor.contains("chocolate") ||
+					goodDescriptor.contains("pills");
 
 			StringTokenizer item_token = new StringTokenizer(goodDescriptor);
 
@@ -119,6 +65,7 @@ public class SalesTaxes {
 
 			double price = 0.0;
 			int quantity = 0;
+			String goodName = "";
 
 			for (int i = 0; i < item_token_count; i++) {
 				if (i == 0) {
@@ -131,17 +78,68 @@ public class SalesTaxes {
 					String tok = item_token.nextToken();
 
 					if (!tok.contentEquals("at")) {
-						if (item_name.isEmpty()) {
-							item_name += tok;
+						if (goodName.isEmpty()) {
+							goodName += tok;
 						}
 						else {
-							item_name += " " + tok;
+							goodName += " " + tok;
 						}
 					}
 				}
 			}
 
-			_goods.add(new Good(imported, exempt, item_name, price, quantity));
+			_name = goodName;
+			_price = price;
+		}
+
+		public double getFinalPrice() {
+			return getPrice() + getTax();
+		}
+
+		public String getName() {
+			return _name;
+		}
+
+		public double getPrice() {
+			return _price;
+		}
+
+		public double getTax() {
+			return Math.ceil(
+				_price *
+					getTaxRate() * 20.0) / 20.0;
+		}
+
+		protected double getTaxRate(){
+			double taxRate = 0.0;
+			if (_imported){
+				taxRate += _importedTaxRate;
+			}
+
+			if (!_exempt){
+				taxRate += _taxRate;
+			}
+
+			return taxRate;
+		}
+
+		private final boolean _exempt;
+		private final boolean _imported;
+		private final double _importedTaxRate;
+		private final String _name;
+		private final double _price;
+		private final double _taxRate;
+
+	}
+
+	public static class ShoppingCart {
+
+		public ShoppingCart() {
+			_goods = new ArrayList<>();
+		}
+
+		public void addGood(String goodDescriptor) {
+			_goods.add(new Good(goodDescriptor));
 		}
 
 		public void printReceipt() {
@@ -156,7 +154,7 @@ public class SalesTaxes {
 				total += goodFinalPrice;
 
 				System.out.println(
-					good.getQuantity() + " " + good.getName() + ": " +
+					 "1" + " " + good.getName() + ": " +
 						String.format("%.2f", goodFinalPrice));
 			}
 
