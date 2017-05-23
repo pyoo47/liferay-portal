@@ -22,78 +22,81 @@ import java.util.regex.Pattern;
  */
 public class Good {
 
-    public static Pattern namePattern;
-    public static Pattern pricePattern;
+	public static Pattern namePattern;
+	public static Pattern pricePattern;
 
-    public Good(String goodDescriptor) {
-        _importedTaxRate = 0.05;
-        _taxRate = 0.1;
+	public Good(String goodDescriptor) {
+		_importedTaxRate = 0.05;
+		_taxRate = 0.1;
 
-        _imported = goodDescriptor.contains("imported");
+		_imported = goodDescriptor.contains("imported");
 
-        _exempt = goodDescriptor.contains("book") ||
-                goodDescriptor.contains("chocolate") ||
-                goodDescriptor.contains("pills");
+		_exempt = goodDescriptor.contains("book") ||
+				goodDescriptor.contains("chocolate") ||
+				goodDescriptor.contains("pills");
 
-        namePattern = Pattern.compile("([a-zA-Z][a-zA-Z\\s]*)(?:\\sat)");
+		namePattern = Pattern.compile("([a-zA-Z][a-zA-Z\\s]*)(?:\\sat)");
 
-        Matcher nameMatcher = namePattern.matcher(goodDescriptor);
+		Matcher nameMatcher = namePattern.matcher(goodDescriptor);
 
-        if (nameMatcher.find()) {
-            _name = nameMatcher.group(0);
-        }
-        else {
-            _name = "-";
-        }
+		if (nameMatcher.find()) {
+			_name = nameMatcher.group(0);
+		}
+		else {
+			_name = "-";
+		}
 
-        pricePattern = Pattern.compile("[0-9]+[.]([0-9])*");
+		pricePattern = Pattern.compile("[0-9]+[.]([0-9])*");
 
-        Matcher priceMatcher = pricePattern.matcher(goodDescriptor);
+		Matcher priceMatcher = pricePattern.matcher(goodDescriptor);
 
-        if (priceMatcher.find()) {
-            _price = Double.parseDouble(priceMatcher.group(0));
-        }
-        else {
-            _price = 0.0;
-        }
-    }
+		if (priceMatcher.find()) {
+			_price = Double.parseDouble(priceMatcher.group(0));
+		}
+		else {
+			_price = 0.0;
+		}
+	}
 
-    public double getFinalPrice() {
-        return getPrice() + getTax();
-    }
+	public double getFinalPrice() {
+		return getPrice() + getTax();
+	}
 
-    public String getName() {
-        return _name;
-    }
+	public String getName() {
+		return _name;
+	}
 
-    public double getPrice() {
-        return _price;
-    }
+	public double getPrice() {
+		return _price;
+	}
 
-    public double getTax() {
-        return Math.ceil(
-                _price *
-                        getTaxRate() * 20.0) / 20.0;
-    }
+	public double getTax() {
+		return roundToNearestNicket(_price * getTaxRate());
+	}
 
-    protected double getTaxRate(){
-        double taxRate = 0.0;
-        if (_imported){
-            taxRate += _importedTaxRate;
-        }
+	protected double getTaxRate() {
+		double taxRate = 0.0;
 
-        if (!_exempt){
-            taxRate += _taxRate;
-        }
+		if (_imported) {
+			taxRate += _importedTaxRate;
+		}
 
-        return taxRate;
-    }
+		if (!_exempt) {
+			taxRate += _taxRate;
+		}
 
-    private final boolean _exempt;
-    private final boolean _imported;
-    private final double _importedTaxRate;
-    private final String _name;
-    private final double _price;
-    private final double _taxRate;
+		return taxRate;
+	}
+
+	protected double roundToNearestNicket(double tax) {
+		return Math.ceil(tax * 20.0) / 20.0;
+	}
+
+	private final boolean _exempt;
+	private final boolean _imported;
+	private final double _importedTaxRate;
+	private final String _name;
+	private final double _price;
+	private final double _taxRate;
 
 }

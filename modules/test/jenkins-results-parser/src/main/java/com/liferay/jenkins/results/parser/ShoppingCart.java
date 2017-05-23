@@ -22,59 +22,59 @@ import java.util.regex.Pattern;
 /**
  * @author Yi-Chen Tsai
  */
-
 public class ShoppingCart {
-    public static Pattern quantityPattern;
 
-    public ShoppingCart() {
-        _goods = new LinkedHashMap<>();
-    }
+	public static Pattern quantityPattern;
 
-    public void addGood(String goodDescriptor) {
-        quantityPattern = Pattern.compile("[0-9]+");
+	public ShoppingCart() {
+		_goods = new LinkedHashMap<>();
+	}
 
-        Matcher quantityMatcher = quantityPattern.matcher(goodDescriptor);
+	public void addGood(String goodDescriptor) {
+		quantityPattern = Pattern.compile("[0-9]+");
 
-        if (!quantityMatcher.find()){
-            return;
-        }
+		Matcher quantityMatcher = quantityPattern.matcher(goodDescriptor);
 
-        _goods.put(
-                new Good(goodDescriptor),
-                Integer.parseInt(quantityMatcher.group(0)));
-    }
+		if (!quantityMatcher.find()) {
+			return;
+		}
 
-    public void printReceipt() {
-        double salesTaxes = 0.0;
-        double total = 0.0;
+		_goods.put(
+			new Good(goodDescriptor),
+			Integer.parseInt(quantityMatcher.group(0)));
+	}
 
-        for (Map.Entry<Good, Integer> entry: _goods.entrySet()) {
-            Good good = entry.getKey();
-            int goodQuantity = entry.getValue();
+	public void printReceipt() {
+		double salesTaxes = 0.0;
+		double total = 0.0;
 
-            double goodFinalPrice = goodQuantity * good.getFinalPrice();
+		for (Map.Entry<Good, Integer> entry : _goods.entrySet()) {
+			Good good = entry.getKey();
+			int goodQuantity = entry.getValue();
 
-            salesTaxes += goodQuantity * good.getTax();
+			double goodFinalPrice = goodQuantity * good.getFinalPrice();
 
-            total += goodFinalPrice;
+			salesTaxes += goodQuantity * good.getTax();
 
-            System.out.println(
-                    goodQuantity + " " + good.getName() + ": " +
-                            String.format("%.2f", goodFinalPrice));
-        }
+			total += goodFinalPrice;
 
-        StringBuilder sb = new StringBuilder();
+			System.out.println(
+				goodQuantity + " " + good.getName() + ": " +
+					String.format("%.2f", goodFinalPrice));
+		}
 
-        sb.append("Sales Taxes: ");
-        sb.append(String.format("%.2f", salesTaxes));
-        sb.append("\n");
-        sb.append("Total: ");
-        sb.append(String.format("%.2f", total));
-        sb.append("\n");
+		StringBuilder sb = new StringBuilder();
 
-        System.out.println(sb.toString());
-    }
+		sb.append("Sales Taxes: ");
+		sb.append(String.format("%.2f", salesTaxes));
+		sb.append("\n");
+		sb.append("Total: ");
+		sb.append(String.format("%.2f", total));
+		sb.append("\n");
 
-    private final Map<Good, Integer> _goods;
+		System.out.println(sb.toString());
+	}
+
+	private final Map<Good, Integer> _goods;
 
 }
