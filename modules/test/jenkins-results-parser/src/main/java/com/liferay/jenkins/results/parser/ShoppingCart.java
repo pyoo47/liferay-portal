@@ -25,9 +25,6 @@ import java.util.regex.Pattern;
 public class ShoppingCart {
 
 	public ShoppingCart() {
-		_goods = new LinkedHashMap<>();
-
-		_quantityPattern = Pattern.compile("[0-9]+");
 	}
 
 	public void addGood(String goodDescriptor) {
@@ -79,7 +76,7 @@ public class ShoppingCart {
 		System.out.println(sb.toString());
 	}
 
-	private final Map<Good, Integer> _goods;
-	private final Pattern _quantityPattern;
+	private final Map<Good, Integer> _goods = new LinkedHashMap<>();
+	private final Pattern _quantityPattern = Pattern.compile("[0-9]+");
 
 }
