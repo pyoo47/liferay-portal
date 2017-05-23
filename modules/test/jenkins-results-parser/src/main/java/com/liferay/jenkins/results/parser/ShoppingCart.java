@@ -14,8 +14,8 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Yi-Chen Tsai
@@ -24,21 +24,24 @@ import java.util.List;
 public class ShoppingCart {
 
     public ShoppingCart() {
-        _goods = new ArrayList<>();
+        _goods = new LinkedHashMap<>();
     }
 
     public void addGood(String goodDescriptor) {
-        _goods.add(new Good(goodDescriptor));
+        _goods.put(new Good(goodDescriptor), 0);
     }
 
     public void printReceipt() {
         double salesTaxes = 0.0;
         double total = 0.0;
 
-        for (Good good : _goods) {
-            double goodFinalPrice = good.getFinalPrice();
+        for (Map.Entry<Good, Integer> entry: _goods.entrySet()) {
+            Good good = entry.getKey();
+            int goodQuantity = entry.getValue();
 
-            salesTaxes += good.getTax();
+            double goodFinalPrice = goodQuantity * good.getFinalPrice();
+
+            salesTaxes += goodQuantity * good.getTax();
 
             total += goodFinalPrice;
 
@@ -59,6 +62,6 @@ public class ShoppingCart {
         System.out.println(sb.toString());
     }
 
-    private final List<Good> _goods;
+    private final Map<Good, Integer> _goods;
 
 }
