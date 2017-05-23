@@ -41,8 +41,8 @@ public class ShoppingCart {
 		}
 
 		_goods.put(
-			new Good(goodDescriptor),
-			Integer.parseInt(quantityMatcher.group(0)));
+			new Good(quantityMatcher.group("productData")),
+			Integer.parseInt(quantityMatcher.group("quantity")));
 	}
 
 	public void printReceipt() {
@@ -83,6 +83,7 @@ public class ShoppingCart {
 	}
 
 	private final Map<Good, Integer> _goods = new LinkedHashMap<>();
-	private final Pattern _quantityPattern = Pattern.compile("[0-9]+");
+	private final Pattern _quantityPattern = Pattern.compile(
+		"(?<quantity>[\\d]+) (?<productData>.*)");
 
 }
