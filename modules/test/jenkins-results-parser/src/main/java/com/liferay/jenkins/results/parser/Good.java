@@ -14,16 +14,18 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Yi-Chen Tsai
  */
-
 public class Good {
 
-    public Good(String goodDescriptor) {
+    public static Pattern namePattern;
+    public static Pattern pricePattern;
 
+    public Good(String goodDescriptor) {
         _importedTaxRate = 0.05;
         _taxRate = 0.1;
 
@@ -33,37 +35,27 @@ public class Good {
                 goodDescriptor.contains("chocolate") ||
                 goodDescriptor.contains("pills");
 
-        StringTokenizer item_token = new StringTokenizer(goodDescriptor);
+        namePattern = Pattern.compile("([a-zA-Z][a-zA-Z\\s]*)(?:\\sat)");
 
-        int item_token_count = item_token.countTokens();
+        Matcher nameMatcher = namePattern.matcher(goodDescriptor);
 
-        double price = 0.0;
-        int quantity = 0;
-        String goodName = "";
-
-        for (int i = 0; i < item_token_count; i++) {
-            if (i == 0) {
-                quantity = Integer.parseInt(item_token.nextToken());
-            }
-            else if (i == (item_token_count - 1)) {
-                price = Double.parseDouble(item_token.nextToken());
-            }
-            else {
-                String tok = item_token.nextToken();
-
-                if (!tok.contentEquals("at")) {
-                    if (goodName.isEmpty()) {
-                        goodName += tok;
-                    }
-                    else {
-                        goodName += " " + tok;
-                    }
-                }
-            }
+        if (nameMatcher.find()) {
+            _name = nameMatcher.group(0);
+        }
+        else {
+            _name = "-";
         }
 
-        _name = goodName;
-        _price = price;
+        pricePattern = Pattern.compile("[0-9]+[.]([0-9])*");
+
+        Matcher priceMatcher = pricePattern.matcher(goodDescriptor);
+
+        if (priceMatcher.find()) {
+            _price = Double.parseDouble(priceMatcher.group(0));
+        }
+        else {
+            _price = 0.0;
+        }
     }
 
     public double getFinalPrice() {
