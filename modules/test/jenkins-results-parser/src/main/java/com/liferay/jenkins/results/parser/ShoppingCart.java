@@ -56,9 +56,15 @@ public class ShoppingCart {
 
 			total += goodFinalPrice;
 
-			System.out.println(
-				goodQuantity + " " + good.getName() + ": " +
-					String.format("%.2f", goodFinalPrice));
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(goodQuantity);
+			sb.append(" ");
+			sb.append(good.getName());
+			sb.append(": ");
+			sb.append(String.format("%.2f", goodFinalPrice));
+
+			System.out.println(sb.toString());
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -75,4 +81,5 @@ public class ShoppingCart {
 
 	private final Map<Good, Integer> _goods;
 	private final Pattern _quantityPattern;
+
 }
