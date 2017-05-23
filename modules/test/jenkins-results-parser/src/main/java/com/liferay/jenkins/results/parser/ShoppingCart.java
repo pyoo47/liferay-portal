@@ -16,19 +16,32 @@ package com.liferay.jenkins.results.parser;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Yi-Chen Tsai
  */
 
 public class ShoppingCart {
+    public static Pattern quantityPattern;
 
     public ShoppingCart() {
         _goods = new LinkedHashMap<>();
     }
 
     public void addGood(String goodDescriptor) {
-        _goods.put(new Good(goodDescriptor), 0);
+        quantityPattern = Pattern.compile("[0-9]+");
+
+        Matcher quantityMatcher = quantityPattern.matcher(goodDescriptor);
+
+        if (!quantityMatcher.find()){
+            return;
+        }
+
+        _goods.put(
+                new Good(goodDescriptor),
+                Integer.parseInt(quantityMatcher.group(0)));
     }
 
     public void printReceipt() {
@@ -46,7 +59,7 @@ public class ShoppingCart {
             total += goodFinalPrice;
 
             System.out.println(
-                    "1" + " " + good.getName() + ": " +
+                    goodQuantity + " " + good.getName() + ": " +
                             String.format("%.2f", goodFinalPrice));
         }
 
