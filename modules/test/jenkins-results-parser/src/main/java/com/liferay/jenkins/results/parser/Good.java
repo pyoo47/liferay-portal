@@ -39,8 +39,13 @@ public class Good {
 			_price = Double.parseDouble(namePriceMatcher.group("price"));
 		}
 		else {
-			_name = "-";
-			_price = 0.0;
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Good descriptor \"");
+			sb.append(goodDescriptor);
+			sb.append("\" is invalid");
+
+			throw new IllegalArgumentException(sb.toString());
 		}
 	}
 
