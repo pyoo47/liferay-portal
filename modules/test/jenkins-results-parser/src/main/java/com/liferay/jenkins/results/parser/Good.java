@@ -35,8 +35,8 @@ public class Good {
 		Matcher namePriceMatcher = _namePricePattern.matcher(goodDescriptor);
 
 		if (namePriceMatcher.find()) {
-			_name = namePriceMatcher.group(1);
-			_price = Double.parseDouble(namePriceMatcher.group(2));
+			_name = namePriceMatcher.group("name");
+			_price = Double.parseDouble(namePriceMatcher.group("price"));
 		}
 		else {
 			_name = "-";
@@ -83,7 +83,8 @@ public class Good {
 	private final double _importedTaxRate;
 	private final String _name;
 	private final Pattern _namePricePattern = Pattern.compile(
-		"([a-zA-Z][a-zA-Z\\s]*)(?:\\sat[\\s]*)([0-9]+[.]([0-9])*)");
+		"(?<name>[a-zA-Z][a-zA-Z\\s]*)(?:\\sat[\\s]*)" +
+			"(?<price>[0-9]+[.]([0-9])*)");
 	private final double _price;
 	private final double _taxRate;
 
