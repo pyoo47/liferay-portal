@@ -88,7 +88,7 @@ public class Good {
 	private final double _importedTaxRate;
 	private final String _name;
 	private final Pattern _namePricePattern = Pattern.compile(
-		"(?<name>[a-zA-Z][a-zA-Z\\s]*)(?:\\sat[\\s]*)" +
+		"(?<name>[a-zA-Z][a-zA-Z\\s]*) at " +
 			"(?<price>[0-9]+[.]([0-9])*)");
 	private final double _price;
 	private final double _taxRate;
