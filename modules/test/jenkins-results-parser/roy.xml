@@ -1,29 +1,35 @@
 <project basedir="." default="main" name="jenkins-results-parser">
 
-	<property name="src.dir"     value="src/main/java/" />
 	<property name="build.dir"   value="build" />
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="jar.dir"     value="${build.dir}/jar" />
-	<property name="main-class"  value="SalesTaxes" />
 	<property name="lib.dir"     value="lib" />
+	<property name="main-class"  value="SalesTaxes" />
+	<property name="src.dir"     value="src/main/java/" />
+
 	<path id="classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar" />
 	</path>
+
 	<target name="clean">
 		<delete dir="${build.dir}" />
 	</target>
+
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
 		<javac classpathref="classpath" destdir="${classes.dir}" srcdir="${src.dir}" />
 	</target>
+
 	<target depends="compile" name="jar">
 		<mkdir dir="${jar.dir}" />
+
 		<jar basedir="${classes.dir}" destfile="${jar.dir}/${ant.project.name}.jar">
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}" />
 			</manifest>
 		</jar>
 	</target>
+
 	<target depends="jar" name="run">
 		<java classname="${main-class}" fork="true" />
 			<classpath>
@@ -31,6 +37,8 @@
 				<path location="${jar.dir}/${ant.project.name}.jar" />
 			</classpath>
 	</target>
+
 	<target depends="clean,jar" name="clean-build" />
+	
 	<target depends="clean,jar" name="main" />
 </project>
