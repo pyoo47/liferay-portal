@@ -31,7 +31,13 @@ public class ShoppingCart {
 		Matcher quantityMatcher = _quantityPattern.matcher(goodDescriptor);
 
 		if (!quantityMatcher.find()) {
-			return;
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Good descriptor \"");
+			sb.append(goodDescriptor);
+			sb.append("\" is invalid");
+
+			throw new IllegalArgumentException(sb.toString());
 		}
 
 		_goods.put(
