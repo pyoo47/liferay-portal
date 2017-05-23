@@ -24,16 +24,14 @@ import java.util.regex.Pattern;
  */
 public class ShoppingCart {
 
-	public static Pattern quantityPattern;
-
 	public ShoppingCart() {
 		_goods = new LinkedHashMap<>();
+
+		_quantityPattern = Pattern.compile("[0-9]+");
 	}
 
 	public void addGood(String goodDescriptor) {
-		quantityPattern = Pattern.compile("[0-9]+");
-
-		Matcher quantityMatcher = quantityPattern.matcher(goodDescriptor);
+		Matcher quantityMatcher = _quantityPattern.matcher(goodDescriptor);
 
 		if (!quantityMatcher.find()) {
 			return;
@@ -76,5 +74,5 @@ public class ShoppingCart {
 	}
 
 	private final Map<Good, Integer> _goods;
-
+	private final Pattern _quantityPattern;
 }
