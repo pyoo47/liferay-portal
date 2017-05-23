@@ -22,9 +22,6 @@ import java.util.regex.Pattern;
  */
 public class Good {
 
-	public static Pattern namePattern;
-	public static Pattern pricePattern;
-
 	public Good(String goodDescriptor) {
 		_importedTaxRate = 0.05;
 		_taxRate = 0.1;
@@ -35,25 +32,16 @@ public class Good {
 				goodDescriptor.contains("chocolate") ||
 				goodDescriptor.contains("pills");
 
-		namePattern = Pattern.compile("([a-zA-Z][a-zA-Z\\s]*)(?:\\sat)");
+		_namePricePattern = Pattern.compile("([a-zA-Z][a-zA-Z\\s]*)(?:\\sat[\\s]*)([0-9]+[.]([0-9])*)");
 
-		Matcher nameMatcher = namePattern.matcher(goodDescriptor);
+		Matcher namePriceMatcher = _namePricePattern.matcher(goodDescriptor);
 
-		if (nameMatcher.find()) {
-			_name = nameMatcher.group(0);
+		if (namePriceMatcher.find()) {
+			_name = namePriceMatcher.group(1);
+			_price = Double.parseDouble(namePriceMatcher.group(2));
 		}
 		else {
 			_name = "-";
-		}
-
-		pricePattern = Pattern.compile("[0-9]+[.]([0-9])*");
-
-		Matcher priceMatcher = pricePattern.matcher(goodDescriptor);
-
-		if (priceMatcher.find()) {
-			_price = Double.parseDouble(priceMatcher.group(0));
-		}
-		else {
 			_price = 0.0;
 		}
 	}
@@ -96,6 +84,7 @@ public class Good {
 	private final boolean _imported;
 	private final double _importedTaxRate;
 	private final String _name;
+	private final Pattern _namePricePattern;
 	private final double _price;
 	private final double _taxRate;
 
