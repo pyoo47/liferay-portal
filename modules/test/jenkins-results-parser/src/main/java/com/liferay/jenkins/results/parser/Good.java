@@ -32,9 +32,6 @@ public class Good {
 				goodDescriptor.contains("chocolate") ||
 				goodDescriptor.contains("pills");
 
-		_namePricePattern = Pattern.compile(
-			"([a-zA-Z][a-zA-Z\\s]*)(?:\\sat[\\s]*)([0-9]+[.]([0-9])*)");
-
 		Matcher namePriceMatcher = _namePricePattern.matcher(goodDescriptor);
 
 		if (namePriceMatcher.find()) {
@@ -85,7 +82,8 @@ public class Good {
 	private final boolean _imported;
 	private final double _importedTaxRate;
 	private final String _name;
-	private final Pattern _namePricePattern;
+	private final Pattern _namePricePattern = Pattern.compile(
+		"([a-zA-Z][a-zA-Z\\s]*)(?:\\sat[\\s]*)([0-9]+[.]([0-9])*)");
 	private final double _price;
 	private final double _taxRate;
 
