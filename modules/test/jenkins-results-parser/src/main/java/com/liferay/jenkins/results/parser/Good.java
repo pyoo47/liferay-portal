@@ -32,7 +32,8 @@ public class Good {
 				goodDescriptor.contains("chocolate") ||
 				goodDescriptor.contains("pills");
 
-		_namePricePattern = Pattern.compile("([a-zA-Z][a-zA-Z\\s]*)(?:\\sat[\\s]*)([0-9]+[.]([0-9])*)");
+		_namePricePattern = Pattern.compile(
+			"([a-zA-Z][a-zA-Z\\s]*)(?:\\sat[\\s]*)([0-9]+[.]([0-9])*)");
 
 		Matcher namePriceMatcher = _namePricePattern.matcher(goodDescriptor);
 
@@ -59,7 +60,7 @@ public class Good {
 	}
 
 	public double getTax() {
-		return roundToNearestNicket(_price * getTaxRate());
+		return roundToNearestNickel(_price * getTaxRate());
 	}
 
 	protected double getTaxRate() {
@@ -76,7 +77,7 @@ public class Good {
 		return taxRate;
 	}
 
-	protected double roundToNearestNicket(double tax) {
+	protected double roundToNearestNickel(double tax) {
 		return Math.ceil(tax * 20.0) / 20.0;
 	}
 
