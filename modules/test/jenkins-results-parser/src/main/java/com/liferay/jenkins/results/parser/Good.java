@@ -74,8 +74,8 @@ public class Good {
 		return taxRate;
 	}
 
-	protected double roundToNearestNickel(double tax) {
-		return Math.ceil(tax * 20.0) / 20.0;
+	protected double roundToNearestNickel(double amount) {
+		return Math.ceil(amount * 20.0) / 20.0;
 	}
 
 	private final boolean _exempt;
