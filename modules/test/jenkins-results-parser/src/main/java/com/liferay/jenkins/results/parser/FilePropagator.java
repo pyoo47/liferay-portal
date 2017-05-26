@@ -223,15 +223,11 @@ public class FilePropagator {
 		private FilePropagatorTask(
 			String sourceFileName, String targetFileName) {
 
-			_sourceFileName = _escapeParentheses(sourceFileName);
-			_targetFileName = _escapeParentheses(targetFileName);
-		}
+			_sourceFileName = JenkinsResultsParserUtil.escapeParentheses(
+				sourceFileName);
 
-		private String _escapeParentheses(String fileName) {
-			fileName = fileName.replace(")", "\\)");
-			fileName = fileName.replace("(", "\\(");
-
-			return fileName;
+			_targetFileName = JenkinsResultsParserUtil.escapeParentheses(
+				targetFileName);
 		}
 
 		private final String _sourceFileName;

@@ -215,6 +215,13 @@ public class JenkinsResultsParserUtil {
 		return new URL(uriASCIIString.replace("#", "%23"));
 	}
 
+	public static String escapeParentheses(String value) {
+		value = value.replace(")", "\\)");
+		value = value.replace("(", "\\(");
+
+		return value;
+	}
+
 	public static Process executeBashCommands(
 			boolean exitOnFirstFail, File basedir, long timeout,
 			String... commands)
