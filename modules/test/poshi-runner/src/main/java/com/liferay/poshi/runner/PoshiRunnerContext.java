@@ -29,9 +29,21 @@ import com.liferay.poshi.runner.util.StringUtil;
 import com.liferay.poshi.runner.util.Validator;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.lang.reflect.Method;
+
+import java.net.URI;
+import java.net.URL;
+
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import java.text.SimpleDateFormat;
 
@@ -282,6 +294,39 @@ public class PoshiRunnerContext {
 		_componentClassCommandNames.put(componentName, classCommandNames);
 	}
 
+	private static void _addFilePathsFromResource() throws Exception {
+		Class<?> clazz = PoshiRunnerContext.class;
+
+		URL url = clazz.getResource("/poshi");
+
+		String urlString = url.toString();
+
+		int x = urlString.indexOf("!");
+
+		Map<String, String> env = new HashMap<>();
+
+		FileSystem fs = FileSystems.newFileSystem(
+			URI.create(urlString.substring(0, x)), env);
+
+		Files.walkFileTree(
+			fs.getPath(urlString.substring(x + 1)),
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					URI uri = filePath.toUri();
+
+					_filePathsList.add(uri.toString());
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
+	}
+
 	private static String[] _combine(String[]... arrays) {
 		int size = 0;
 
@@ -434,7 +479,7 @@ public class PoshiRunnerContext {
 					filePath = filePath.replace("/", "\\");
 				}
 
-				filePaths.add(filePath);
+				filePaths.add("file:" + filePath);
 			}
 		}
 
@@ -931,9 +976,9 @@ public class PoshiRunnerContext {
 					className + "#" + commandElement.attributeValue("name");
 
 				if (isCommandElement(classType + "#" + classCommandName)) {
-					throw new Exception(
-						"Duplicate command name\n" + filePath + ":" +
-							commandElement.attributeValue("line-number"));
+					System.out.println(
+						"Overriding command " + className + "#" +
+							commandElement.attributeValue("name"));
 				}
 
 				_commandElements.put(
@@ -1004,6 +1049,8 @@ public class PoshiRunnerContext {
 	}
 
 	private static void _readPoshiFiles() throws Exception {
+		_addFilePathsFromResource();
+
 		String[] poshiFileNames = {
 			"**\\*.action", "**\\*.function", "**\\*.macro", "**\\*.path",
 			"**\\*.testcase"
