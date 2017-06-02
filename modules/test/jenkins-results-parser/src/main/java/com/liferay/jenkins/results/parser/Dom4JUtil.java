@@ -15,9 +15,13 @@
 package com.liferay.jenkins.results.parser;
 
 import java.io.CharArrayWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
+
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +39,7 @@ import org.dom4j.tree.DefaultElement;
 
 /**
  * @author Peter Yoo
+ * @author Kevin Yen
  */
 public class Dom4JUtil {
 
@@ -167,6 +172,14 @@ public class Dom4JUtil {
 		List<Element> itemElements, int maxItems) {
 
 		return getOrderedListElement(itemElements, null, maxItems);
+	}
+
+	public static Document parse(File xmlFile)
+		throws DocumentException, IOException {
+
+		byte[] bytes = Files.readAllBytes(xmlFile.toPath());
+
+		return parse(new String(bytes, Charset.defaultCharset()));
 	}
 
 	public static Document parse(String xml) throws DocumentException {
