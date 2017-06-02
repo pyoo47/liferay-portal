@@ -133,6 +133,7 @@ public class CommandElement extends BasePoshiElement {
 
 	private void _addDescriptionAttribute(String readableSyntax) {
 		int start = readableSyntax.indexOf("Description: ");
+
 		int end = readableSyntax.indexOf("\n", start);
 
 		String description = readableSyntax.substring(start + 13, end);
@@ -142,6 +143,7 @@ public class CommandElement extends BasePoshiElement {
 
 	private void _addPriorityAttribute(String readableSyntax) {
 		int start = readableSyntax.indexOf("Priority: ");
+
 		int end = readableSyntax.indexOf("\n", start);
 
 		String priority = readableSyntax.substring(start + 9, end);
@@ -151,6 +153,7 @@ public class CommandElement extends BasePoshiElement {
 
 	private String _getCommandName(String readableSyntax) {
 		int start = readableSyntax.indexOf(SCENARIO) + SCENARIO.length() + 1;
+
 		int end = readableSyntax.indexOf("\n", start);
 
 		String line = readableSyntax.substring(start, end);
