@@ -32,7 +32,7 @@ import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -225,7 +225,7 @@ public abstract class BasePoshiElement implements PoshiElement {
 		TAB + TAB + PIPE
 	};
 
-	protected Map<String, String> attributes = new HashMap<>();
+	protected Map<String, String> attributes = new TreeMap<>();
 	protected String tagName;
 
 	private final List<PoshiElement> _childElements = new ArrayList<>();
