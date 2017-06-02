@@ -48,6 +48,10 @@ public class CommandElement extends BasePoshiElement {
 
 	@Override
 	public void addAttributes(String readableSyntax) {
+		if (readableSyntax.contains("Description:")) {
+			_addDescriptionAttribute(readableSyntax);
+		}
+
 		attributes.put("name", _getCommandName(readableSyntax));
 
 		_addPriorityAttribute(readableSyntax);
@@ -97,6 +101,14 @@ public class CommandElement extends BasePoshiElement {
 			sb.append(StringUtil.toPhrase(name));
 		}
 
+		if (attributes.get("description") != null) {
+			String description = attributes.get("description");
+
+			sb.append("\n");
+			sb.append("Description: ");
+			sb.append(description);
+		}
+
 		if (attributes.get("priority") != null) {
 			String priority = attributes.get("priority");
 
@@ -117,6 +129,15 @@ public class CommandElement extends BasePoshiElement {
 	@Override
 	protected void setTagName() {
 		tagName = "command";
+	}
+
+	private void _addDescriptionAttribute(String readableSyntax) {
+		int start = readableSyntax.indexOf("Description: ");
+		int end = readableSyntax.indexOf("\n", start);
+
+		String description = readableSyntax.substring(start + 13, end);
+
+		attributes.put("description", description);
 	}
 
 	private void _addPriorityAttribute(String readableSyntax) {
