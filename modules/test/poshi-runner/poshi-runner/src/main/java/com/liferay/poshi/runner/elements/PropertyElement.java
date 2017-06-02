@@ -12,39 +12,37 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
+package com.liferay.poshi.runner.elements;
+
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_PROPERTIES;
 
 import org.dom4j.Element;
 
 /**
  * @author Kenji Heigel
  */
-public class SetUpElement extends CommandElement {
+public class PropertyElement extends VarElement {
 
-	public SetUpElement(Element element) {
+	public PropertyElement(Element element) {
 		this(element, null);
 	}
 
-	public SetUpElement(Element element, PoshiElement parentElement) {
+	public PropertyElement(Element element, PoshiElement parentElement) {
 		super(element, parentElement);
 	}
 
-	public SetUpElement(String readableSyntax, PoshiElement parentElement) {
+	public PropertyElement(String readableSyntax, PoshiElement parentElement) {
 		super(readableSyntax, parentElement);
 	}
 
 	@Override
-	public void addAttributes(String readableSyntax) {
-	}
-
-	@Override
-	protected String getReadableCommandTitle() {
-		return "Setup: This executes before each scenario";
+	protected String getReadableVariableKey() {
+		return THESE_PROPERTIES;
 	}
 
 	@Override
 	protected void setTagName() {
-		tagName = "set-up";
+		tagName = "property";
 	}
 
 }

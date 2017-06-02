@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
+package com.liferay.poshi.runner.elements;
 
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.AND;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.BACKGROUND;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.FEATURE;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.GIVEN;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.THESE_PROPERTIES;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.THESE_VARIABLES;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.AND;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.BACKGROUND;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.FEATURE;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.GIVEN;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_PROPERTIES;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_VARIABLES;
 import static com.liferay.poshi.runner.util.StringPool.COLON;
 
 import com.liferay.poshi.runner.util.StringUtil;

@@ -12,33 +12,39 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
-
-import java.util.List;
+package com.liferay.poshi.runner.elements;
 
 import org.dom4j.Element;
 
 /**
  * @author Kenji Heigel
  */
-public interface PoshiElement {
+public class SetUpElement extends CommandElement {
 
-	public void addAttributes(Element element);
+	public SetUpElement(Element element) {
+		this(element, null);
+	}
 
-	public void addAttributes(String readableSyntax);
+	public SetUpElement(Element element, PoshiElement parentElement) {
+		super(element, parentElement);
+	}
 
-	public void addChildElements(Element element);
+	public SetUpElement(String readableSyntax, PoshiElement parentElement) {
+		super(readableSyntax, parentElement);
+	}
 
-	public void addChildElements(String readableSyntax);
+	@Override
+	public void addAttributes(String readableSyntax) {
+	}
 
-	public List<PoshiElement> getChildElements();
+	@Override
+	protected String getReadableCommandTitle() {
+		return "Setup: This executes before each scenario";
+	}
 
-	public PoshiElement getParentElement();
-
-	public String getTagName();
-
-	public String toReadableSyntax();
-
-	public Element toXML();
+	@Override
+	protected void setTagName() {
+		tagName = "set-up";
+	}
 
 }

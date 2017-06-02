@@ -12,37 +12,38 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
-
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.THESE_PROPERTIES;
+package com.liferay.poshi.runner.elements;
 
 import org.dom4j.Element;
 
 /**
  * @author Kenji Heigel
  */
-public class PropertyElement extends VarElement {
+public class TearDownElement extends CommandElement {
 
-	public PropertyElement(Element element) {
+	public TearDownElement(Element element) {
 		this(element, null);
 	}
 
-	public PropertyElement(Element element, PoshiElement parentElement) {
+	public TearDownElement(Element element, PoshiElement parentElement) {
 		super(element, parentElement);
 	}
 
-	public PropertyElement(String readableSyntax, PoshiElement parentElement) {
+	public TearDownElement(String readableSyntax, PoshiElement parentElement) {
 		super(readableSyntax, parentElement);
 	}
 
 	@Override
-	protected String getReadableVariableKey() {
-		return THESE_PROPERTIES;
+	public void addAttributes(String readableSyntax) {
+	}
+
+	protected String getReadableCommandTitle() {
+		return "Teardown: This executes after each scenario";
 	}
 
 	@Override
 	protected void setTagName() {
-		tagName = "property";
+		tagName = "tear-down";
 	}
 
 }

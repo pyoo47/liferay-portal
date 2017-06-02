@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
+package com.liferay.poshi.runner.elements;
 
 /**
  * @author Kenji Heigel

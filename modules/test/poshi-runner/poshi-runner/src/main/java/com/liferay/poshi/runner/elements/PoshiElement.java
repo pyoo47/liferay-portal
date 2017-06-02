@@ -12,38 +12,33 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
+package com.liferay.poshi.runner.elements;
+
+import java.util.List;
 
 import org.dom4j.Element;
 
 /**
  * @author Kenji Heigel
  */
-public class TearDownElement extends CommandElement {
+public interface PoshiElement {
 
-	public TearDownElement(Element element) {
-		this(element, null);
-	}
+	public void addAttributes(Element element);
 
-	public TearDownElement(Element element, PoshiElement parentElement) {
-		super(element, parentElement);
-	}
+	public void addAttributes(String readableSyntax);
 
-	public TearDownElement(String readableSyntax, PoshiElement parentElement) {
-		super(readableSyntax, parentElement);
-	}
+	public void addChildElements(Element element);
 
-	@Override
-	public void addAttributes(String readableSyntax) {
-	}
+	public void addChildElements(String readableSyntax);
 
-	protected String getReadableCommandTitle() {
-		return "Teardown: This executes after each scenario";
-	}
+	public List<PoshiElement> getChildElements();
 
-	@Override
-	protected void setTagName() {
-		tagName = "tear-down";
-	}
+	public PoshiElement getParentElement();
+
+	public String getTagName();
+
+	public String toReadableSyntax();
+
+	public Element toXML();
 
 }

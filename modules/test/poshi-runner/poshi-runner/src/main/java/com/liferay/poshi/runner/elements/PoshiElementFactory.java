@@ -12,16 +12,16 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
+package com.liferay.poshi.runner.elements;
 
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.AND;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.FEATURE;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.GIVEN;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.SCENARIO;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.SETUP;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.TEARDOWN;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.THEN;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.WHEN;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.AND;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.FEATURE;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.GIVEN;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.SCENARIO;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.SETUP;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.TEARDOWN;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THEN;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.WHEN;
 import static com.liferay.poshi.runner.util.StringPool.PIPE;
 
 import com.liferay.poshi.runner.util.Dom4JUtil;

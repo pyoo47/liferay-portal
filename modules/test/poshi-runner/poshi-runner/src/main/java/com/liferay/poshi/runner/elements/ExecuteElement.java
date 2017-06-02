@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
+package com.liferay.poshi.runner.elements;
 
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.AND;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.AT_LOCATOR;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.GIVEN;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.THEN;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.THE_VALUE;
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.WHEN;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.AND;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.AT_LOCATOR;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.GIVEN;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THEN;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THE_VALUE;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.WHEN;
 
 import com.liferay.poshi.runner.util.StringUtil;
 

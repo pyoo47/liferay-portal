@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
+package com.liferay.poshi.runner.elements;
 
 import org.dom4j.Element;
 

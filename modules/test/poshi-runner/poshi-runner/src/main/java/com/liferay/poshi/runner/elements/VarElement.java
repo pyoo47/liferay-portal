@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.poshi.runner;
+package com.liferay.poshi.runner.elements;
 
-import static com.liferay.poshi.runner.ReadableSyntaxKeys.THESE_VARIABLES;
+import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_VARIABLES;
 
 import org.dom4j.Element;
 
