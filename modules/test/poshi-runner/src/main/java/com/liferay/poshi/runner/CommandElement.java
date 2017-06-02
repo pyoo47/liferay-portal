@@ -130,7 +130,7 @@ public class CommandElement extends BasePoshiElement {
 
 	private String _getCommandName(String readableSyntax) {
 		int start = readableSyntax.indexOf(SCENARIO) + SCENARIO.length() + 1;
-		int end = readableSyntax.indexOf("\n");
+		int end = readableSyntax.indexOf("\n", start);
 
 		String line = readableSyntax.substring(start, end);
 
