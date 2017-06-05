@@ -21,6 +21,7 @@ import org.dom4j.Element;
 /**
  * @author Peter Yoo
  * @author Michael Hashimoto
+ * @author Yi-Chen Tsai
  */
 public class SemanticVersioningFailureMessageGenerator
 	extends BaseFailureMessageGenerator {
@@ -94,7 +95,8 @@ public class SemanticVersioningFailureMessageGenerator
 						consoleText, true, start, end))));
 	}
 
-	private static final String _SEMVER_END_STRING = ":baseline FAILED";
+	private static final String _SEMVER_END_STRING =
+		"Semantic versioning is incorrect";
 
 	private static final String _SEMVER_START_STRING = "PACKAGE_NAME";
 
