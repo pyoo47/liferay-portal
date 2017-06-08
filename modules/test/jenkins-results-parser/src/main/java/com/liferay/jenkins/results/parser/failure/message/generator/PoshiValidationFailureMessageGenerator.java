@@ -90,16 +90,15 @@ public class PoshiValidationFailureMessageGenerator
 		start = consoleText.lastIndexOf("\n", start);
 
 		return Dom4JUtil.getNewElement(
-				"div", null,
-				Dom4JUtil.getNewElement(
-						"p", null, "POSHI validation error: ",
-						Dom4JUtil.getNewElement(
-								"strong", null, failedPoshiTaskToken)),
-				getConsoleOutputSnippetElement(consoleText, true, start, end));
+			"div", null,
+			Dom4JUtil.getNewElement(
+				"p", null, "POSHI validation error: ",
+				Dom4JUtil.getNewElement("strong", null, failedPoshiTaskToken)),
+			getConsoleOutputSnippetElement(consoleText, true, start, end));
 	}
 
 	private static final String _TOKEN_JAVA_LANG_EXCEPTION =
-			"java.lang.Exception";
+		"java.lang.Exception";
 
 	private static final String _TOKEN_TRY = "Try:";
 
