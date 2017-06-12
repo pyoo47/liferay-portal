@@ -36,14 +36,35 @@ public class PoshiValidationFailureMessageGenerator
 		Matcher poshiFailureMatcher = _poshiFailurePattern.matcher(
 			consoleOutput);
 
-		if (poshiFailureMatcher.find()) {
-			String poshiFailureMessage = poshiFailureMatcher.group(1);
-
-			return "<p>POSHI Validation Failure</p><pre><code>" +
-				poshiFailureMessage + "</code></pre>";
+		if (!poshiFailureMatcher.find()) {
+			return null;
 		}
 
-		return null;
+		String failedPoshiTaskToken = poshiFailureMatcher.group(1);
+
+		int end = consoleOutput.indexOf(failedPoshiTaskToken);
+
+		end = consoleOutput.indexOf(_TOKEN_TRY, end);
+
+		end = consoleOutput.lastIndexOf("\n", end);
+
+		int start = consoleOutput.lastIndexOf(_TOKEN_JAVA_LANG_EXCEPTION, end);
+
+		start = consoleOutput.lastIndexOf("\n", start);
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("<p>POSHI Validation Failure: </p><strong>");
+
+		sb.append(failedPoshiTaskToken);
+
+		sb.append("</strong><pre><code>");
+
+		sb.append(getConsoleOutputSnippet(consoleOutput, true, start, end));
+
+		sb.append("</code></pre>");
+
+		return sb.toString();
 	}
 
 	@Override
@@ -56,14 +77,32 @@ public class PoshiValidationFailureMessageGenerator
 			return null;
 		}
 
+		String failedPoshiTaskToken = poshiFailureMatcher.group(1);
+
+		int end = consoleText.indexOf(failedPoshiTaskToken);
+
+		end = consoleText.indexOf(_TOKEN_TRY, end);
+
+		end = consoleText.lastIndexOf("\n", end);
+
+		int start = consoleText.lastIndexOf(_TOKEN_JAVA_LANG_EXCEPTION, end);
+
+		start = consoleText.lastIndexOf("\n", start);
+
 		return Dom4JUtil.getNewElement(
 			"div", null,
 			Dom4JUtil.getNewElement(
-				"p", null, "POSHI Validation Failure",
-				Dom4JUtil.toCodeSnippetElement(poshiFailureMatcher.group(1))));
+				"p", null, "POSHI Validation Failure: ",
+				Dom4JUtil.getNewElement("strong", null, failedPoshiTaskToken)),
+			getConsoleOutputSnippetElement(consoleText, true, start, end));
 	}
 
+	private static final String _TOKEN_JAVA_LANG_EXCEPTION =
+		"java.lang.Exception";
+
+	private static final String _TOKEN_TRY = "Try:";
+
 	private static final Pattern _poshiFailurePattern = Pattern.compile(
-		"\\n(.*errors in POSHI[\\s\\S]+?FAILED)");
+		"(?:\\n.*)(Execution failed for task.*Poshi.*)\\n");
 
 }
