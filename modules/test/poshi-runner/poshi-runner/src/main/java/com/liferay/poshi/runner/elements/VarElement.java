@@ -40,7 +40,7 @@ public class VarElement extends PoshiElement {
 	}
 
 	public void addAttributes(String readableSyntax) {
-		String[] items = readableSyntax.split("\\|");
+		String[] items = readableSyntax.split("\\|", -1);
 
 		addAttribute("name", items[1].trim());
 
@@ -70,31 +70,73 @@ public class VarElement extends PoshiElement {
 			parentElementName.equals("set-up") ||
 			parentElementName.equals("tear-down")) {
 
-			sb.append("\n\t");
-			sb.append(getReadableExecuteKey());
-			sb.append(" ");
-			sb.append(getReadableVariableKey());
+			String previousSiblingElementName = null;
+
+			Element previousSiblingElement = getPreviousSibling();
+
+			if (previousSiblingElement != null) {
+				previousSiblingElementName = getPreviousSibling().getName();
+			}
+
+			if ((previousSiblingElement == null) ||
+				!previousSiblingElementName.equals(getName())) {
+
+				sb.append("\n\t");
+				sb.append(getReadableExecuteKey());
+				sb.append(" ");
+				sb.append(getReadableVariableKey());
+			}
 		}
 
 		sb.append("\n\t\t");
 		sb.append("|");
-		sb.append(attributeValue("name"));
+		sb.append(_pad(attributeValue("name"), getNamePadLength()));
 		sb.append("|");
-
-		if (attributeValue("method") != null) {
-			sb.append(attributeValue("method"));
-		}
-		else if (attributeValue("value") != null) {
-			sb.append(attributeValue("value"));
-		}
-
+		sb.append(_pad(getVariableValueAttribute(), getValuePadLength()));
 		sb.append("|");
 
 		return sb.toString();
 	}
 
+	protected int getNamePadLength() {
+		PoshiElement parentElement = (PoshiElement)getParent();
+
+		return parentElement.getNamePadLength();
+	}
+
 	protected String getReadableVariableKey() {
 		return THESE_VARIABLES;
+	}
+
+	protected int getValuePadLength() {
+		PoshiElement parentElement = (PoshiElement)getParent();
+
+		return parentElement.getValuePadLength();
+	}
+
+	private String _pad(String s, int padLength) {
+		if (s == null) {
+			s = "";
+		}
+
+		int length = s.length();
+
+		if (length <= padLength) {
+			int pad = 1 + padLength - length;
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(" ");
+			sb.append(s);
+
+			for (int i = 0; i < pad; i++) {
+				sb.append(" ");
+			}
+
+			return sb.toString();
+		}
+
+		return s;
 	}
 
 }

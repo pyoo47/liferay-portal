@@ -35,6 +35,8 @@ public class DefinitionElement extends PoshiElement {
 
 	public DefinitionElement(Element element) {
 		super("definition", element);
+
+		setPadLengths();
 	}
 
 	public DefinitionElement(String readableSyntax) {
@@ -121,6 +123,8 @@ public class DefinitionElement extends PoshiElement {
 		}
 
 		for (PoshiElement poshiElement : toPoshiElements(elements("command"))) {
+			sb.append("\n");
+
 			sb.append(poshiElement.toReadableSyntax());
 		}
 
