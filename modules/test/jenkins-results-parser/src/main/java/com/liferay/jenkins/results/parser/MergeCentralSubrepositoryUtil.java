@@ -81,6 +81,10 @@ public class MergeCentralSubrepositoryUtil {
 				}
 
 				if (centralSubrepository.isAutopullEnabled()) {
+					_deleteStalePulls(
+						centralGitWorkingDirectory, centralSubrepository,
+						receiverUserName);
+
 					_deleteStaleBranches(
 						centralGitWorkingDirectory, centralSubrepository,
 						receiverUserName);
@@ -239,6 +243,88 @@ public class MergeCentralSubrepositoryUtil {
 		}
 	}
 
+	private static void _deleteStalePulls(
+			GitWorkingDirectory centralGitWorkingDirectory,
+			CentralSubrepository centralSubrepository, String receiverUserName)
+		throws IOException {
+
+		if (_pullsJSONArray == null) {
+			_pullsJSONArray = new JSONArray();
+
+			int page = 1;
+
+			while (page < 10) {
+				String url = JenkinsResultsParserUtil.combine(
+					"https://api.github.com/repos/", receiverUserName, "/",
+					centralGitWorkingDirectory.getRepositoryName(),
+					"/pulls?page=", String.valueOf(page));
+
+				JSONArray jsonArray = JenkinsResultsParserUtil.toJSONArray(url);
+
+				if ((jsonArray != null) && (jsonArray.length() > 0)) {
+					for (int i = 0; i < jsonArray.length(); i++) {
+						JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+						JSONObject userJSONObject = jsonObject.getJSONObject(
+							"user");
+
+						String login = userJSONObject.getString("login");
+
+						if (login.equals("liferay-continuous-integration")) {
+							_pullsJSONArray.put(jsonArray.getJSONObject(i));
+						}
+					}
+				}
+				else {
+					break;
+				}
+
+				page++;
+			}
+		}
+
+		String mergeBranchName = _getMergeBranchName(
+			centralSubrepository.getSubrepositoryName(),
+			centralSubrepository.getSubrepositoryUpstreamCommit());
+
+		String mergeBranchNamePrefix = mergeBranchName.substring(
+			0, mergeBranchName.lastIndexOf("-"));
+
+		for (int i = 0; i < _pullsJSONArray.length(); i++) {
+			JSONObject pullJSONObject = _pullsJSONArray.getJSONObject(i);
+
+			JSONObject headJSONObject = pullJSONObject.getJSONObject("head");
+
+			String refName = headJSONObject.getString("ref");
+
+			if (refName.equals(mergeBranchName) &&
+				!centralSubrepository.isSubrepositoryUpstreamCommitMerged()) {
+
+				continue;
+			}
+
+			if (!refName.startsWith(mergeBranchNamePrefix)) {
+				continue;
+			}
+
+			JSONObject requestJSONObject = new JSONObject();
+
+			requestJSONObject.put(
+				"body", "This stale merge pull request has been closed.");
+
+			JenkinsResultsParserUtil.toJSONObject(
+				pullJSONObject.getString("comments_url"),
+				requestJSONObject.toString());
+
+			requestJSONObject = new JSONObject();
+
+			requestJSONObject.put("state", "closed");
+
+			JenkinsResultsParserUtil.toJSONObject(
+				pullJSONObject.getString("url"), requestJSONObject.toString());
+		}
+	}
+
 	private static String _getCiMergeFilePath(
 			GitWorkingDirectory centralGitWorkingDirectory, File gitrepoFile)
 		throws IOException {
@@ -284,5 +370,6 @@ public class MergeCentralSubrepositoryUtil {
 	}
 
 	private static JSONArray _branchesJSONArray;
+	private static JSONArray _pullsJSONArray;
 
 }
