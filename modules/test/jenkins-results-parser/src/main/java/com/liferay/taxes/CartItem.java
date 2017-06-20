@@ -1,16 +1,33 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
 /* Item class
  * This is the class of which every item in the basket will be an instance.
  */
-package challenge.coding.liferay;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.io.IOException;
+
+package com.liferay.taxes;
+
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+
 import java.io.Console;
+import java.io.IOException;
+
+import java.math.BigDecimal;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import static java.nio.file.StandardOpenOption.*;
 import java.nio.file.StandardOpenOption;
 
 import java.util.ArrayList;
