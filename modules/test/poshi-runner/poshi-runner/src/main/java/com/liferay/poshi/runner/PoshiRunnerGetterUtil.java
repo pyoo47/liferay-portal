@@ -28,7 +28,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -249,28 +252,14 @@ public class PoshiRunnerGetterUtil {
 		return getCanonicalPath(PropsValues.PROJECT_DIR);
 	}
 
-	public static Element getRootElementFromFilePath(String filePath)
+	public static Element getRootElement(
+			BufferedReader bufferedReader, String filePath)
 		throws Exception {
 
-		String fileContent = FileUtil.read(filePath);
-
-		if (!fileContent.contains("<definition") &&
-			filePath.endsWith(".testcase")) {
-
-			Element element = PoshiElementFactory.newPoshiElementFromFile(
-				filePath);
-
-			fileContent = Dom4JUtil.format(element);
-		}
-
 		boolean cdata = false;
+		String line = null;
 		int lineNumber = 1;
 		StringBuilder sb = new StringBuilder();
-
-		BufferedReader bufferedReader = new BufferedReader(
-			new StringReader(fileContent));
-
-		String line = null;
 
 		while ((line = bufferedReader.readLine()) != null) {
 			Matcher matcher = _tagPattern.matcher(line);
@@ -358,6 +347,33 @@ public class PoshiRunnerGetterUtil {
 		Element rootElement = document.getRootElement();
 
 		return rootElement;
+	}
+
+	public static Element getRootElementFromFilePath(String filePath)
+		throws Exception {
+
+		String fileContent = FileUtil.read(filePath);
+
+		if (!fileContent.contains("<definition") &&
+			filePath.endsWith(".testcase")) {
+
+			Element element = PoshiElementFactory.newPoshiElementFromFile(
+				filePath);
+
+			fileContent = Dom4JUtil.format(element);
+		}
+
+		BufferedReader bufferedReader = new BufferedReader(
+			new StringReader(fileContent));
+
+		return getRootElement(bufferedReader, filePath);
+	}
+
+	public static Element getRootElementFromURL(URL url) throws Exception {
+		BufferedReader bufferedReader = new BufferedReader(
+			new InputStreamReader(url.openStream()));
+
+		return getRootElement(bufferedReader, url.toString());
 	}
 
 	public static Object getVarMethodValue(String classCommandName)
