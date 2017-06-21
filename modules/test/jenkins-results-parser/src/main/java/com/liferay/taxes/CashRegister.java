@@ -114,6 +114,15 @@ public class CashRegister {
 			}
 		}
 
+		if (!interactiveMethod && !fileMethod) {
+			System.out.println(
+				"Usage: Specify either interactive mode '-interactive' or " +
+					"file mode '-file'\n File mode requires a filename as an" +
+						"argument\nInteractive Mode takes precedence");
+
+			return;
+		}
+
 		if (interactiveMethod) {
 			try {
 				console = System.console();
@@ -145,29 +154,24 @@ public class CashRegister {
 
 			userCart.calculateTotal();
 			printReceipt(userCart);
-		}
-		else if (fileMethod) {
-			try {
-				for (String line :
-						Files.readAllLines(
-							Paths.get(fileName), Charset.defaultCharset())) {
 
-					userCart.addToCart(line);
-				}
-
-				userCart.setTotalTax(calculateCartTax(userCart));
-				userCart.calculateTotal();
-				printReceipt(userCart);
-			}
-			catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
+			return;
 		}
-		else {
-			System.out.println(
-				"Usage: Specify either interactive mode '-interactive' or " +
-					"file mode '-file'\n File mode requires a filename as an" +
-						"argument\nInteractive Mode takes precedence");
+
+		try {
+			for (String line :
+					Files.readAllLines(
+						Paths.get(fileName), Charset.defaultCharset())) {
+
+				userCart.addToCart(line);
+			}
+
+			userCart.setTotalTax(calculateCartTax(userCart));
+			userCart.calculateTotal();
+			printReceipt(userCart);
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
 		}
 	}
 
