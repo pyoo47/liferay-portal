@@ -51,34 +51,14 @@ public class CartItem {
 	}
 
 	public boolean checkBasicTaxability(String productName) {
-		if (_isSeen(productName)) {
-			if (!(_isFood(productName) ||
-				 _isMedicine(productName) ||
-				_isBook(productName))) {
+		if (!(_isFood(productName) ||
+			 _isMedicine(productName) ||
+			_isBook(productName))) {
 
-				return true;
-			}
-
-			return false;
+			return true;
 		}
-		else {
-			_addToSeen(productName);
 
-			if (_isBook(productName)) {
-				return false;
-			}
-			else if (_askIfFood(productName)) {
-				_addToFood(productName);
-				return false;
-			}
-			else if (_askIfMedicine(productName)) {
-				_addToMedicine(productName);
-				return false;
-			}
-			else {
-				return true;
-			}
-		}
+		return false;
 	}
 
 	public String getName() {
