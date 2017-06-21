@@ -19,6 +19,9 @@
 
 package com.liferay.taxes;
 
+import java.io.Console;
+import java.io.IOException;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -42,7 +45,7 @@ public class CashRegister {
 		BigDecimal cartTax = new BigDecimal("0.00");
 		BigDecimal itemTax;
 
-		for (CartItem product : customer.contents) {
+		for (CartItem product : customer.getContents()) {
 			itemTax = calculateItemTax(product);
 
 			cartTax = cartTax.add(itemTax);
