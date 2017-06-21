@@ -39,7 +39,7 @@ import java.util.Arrays;
  */
 public class CartItem {
 
-	public CartItem(int amount, String productName, String extPrice) {
+	public CartItem(int amount, String extPrice, String productName) {
 		_basicSalesTaxApplicable = checkBasicTaxability(productName);
 		_importSalesTaxApplicable = _checkImportTaxability(productName);
 		_name = productName;

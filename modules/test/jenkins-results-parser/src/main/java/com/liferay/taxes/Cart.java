@@ -62,7 +62,7 @@ public class Cart {
 
 		String price = brokenDownEntry[brokenDownEntry.length - 1];
 
-		CartItem product = new CartItem(quantity, nameString, price);
+		CartItem product = new CartItem(quantity, price, nameString);
 
 		addToCart(product);
 	}
