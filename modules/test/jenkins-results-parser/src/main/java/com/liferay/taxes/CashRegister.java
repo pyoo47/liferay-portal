@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -145,9 +146,13 @@ public class CashRegister {
 		}
 		else if (fileMethod) {
 			try {
-				Files.lines(
-					Paths.get(fileName)).forEach((line) -> userCart.addToCart(
-					line));
+				for (String line :
+						Files.readAllLines(
+							Paths.get(fileName), Charset.defaultCharset())) {
+
+					userCart.addToCart(line);
+				}
+
 				userCart.setTotalTax(calculateCartTax(userCart));
 				userCart.calculateTotal();
 				printReceipt(userCart);
