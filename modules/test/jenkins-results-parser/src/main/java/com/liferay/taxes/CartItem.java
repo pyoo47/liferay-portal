@@ -102,7 +102,7 @@ public class CartItem {
 	}
 
 	public void setPostTaxPrice(BigDecimal taxTotal) {
-		_postTaxPrice = _preTaxPrice.add(taxTotal);
+		_postTaxPrice = new BigDecimal("0.00").add(_preTaxPrice.add(taxTotal));
 	}
 
 	private void _addToFood(String productName) {
@@ -307,7 +307,7 @@ public class CartItem {
 	private final String _name;
 	private final StandardOpenOption[] _options =
 		new StandardOpenOption[] {APPEND, CREATE};
-	private final BigDecimal _postTaxPrice;
+	private BigDecimal _postTaxPrice;
 	private final BigDecimal _preTaxPrice;
 	private final int _quantity;
 
