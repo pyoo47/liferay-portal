@@ -86,7 +86,6 @@ public class CashRegister {
 	public static void main(String[] args) {
 		Cart userCart = new Cart();
 
-		String inputString = "";
 		boolean interactiveMethod = false;
 		boolean fileMethod = false;
 		String fileName = "";
@@ -133,20 +132,19 @@ public class CashRegister {
 					throw new RuntimeException("Unable to get console object");
 				}
 
-				while (!(inputString.equals("Done") ||
-				 inputString.equals("done"))) {
+				while (true) {
+					String inputString = console.readLine(
+						"Please enter item: ");
 
-					inputString = console.readLine("Please enter item: ");
+				if (inputString.equalsIgnoreCase("done")) {
+					System.out.println("Thank you!");
 
-					if (!(inputString.equals("Done") ||
-					 inputString.equals("done"))) {
-
-						userCart.addToCart(inputString);
-						System.out.println("Added!");
+						break;
 					}
-					else {
-						System.out.println("Thank you!");
-					}
+
+					userCart.addToCart(inputString);
+
+					System.out.println("Added: " + inputString);
 				}
 			}
 			catch (Exception e) {
