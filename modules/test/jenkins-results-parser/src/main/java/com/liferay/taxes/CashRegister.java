@@ -98,6 +98,8 @@ public class CashRegister {
 		for (String arg : args) {
 			if (arg.equals("-interactive")) {
 				interactiveMethod = true;
+
+				break;
 			}
 
 			if (arg.equals("-file")) {
