@@ -166,7 +166,7 @@ public class CashRegister {
 			printReceipt(userCart);
 		}
 		catch (IOException ioe) {
-			ioe.printStackTrace();
+			throw new RuntimeException("Unable to read file " + fileName, ioe);
 		}
 	}
 
