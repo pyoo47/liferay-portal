@@ -23,6 +23,7 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.Console;
+import java.io.File;
 import java.io.IOException;
 
 import java.math.BigDecimal;
@@ -126,19 +127,14 @@ public class CartItem {
 	}
 
 	private void _addToMedicine(String productName) {
+		_medicineProducts.add(productName);
 
-		// Add to Medicine file
-
-		ArrayList<String> iterableProduct = new ArrayList<>();
-
-		iterableProduct.add(productName);
 		try {
-			Files.write(
-				Paths.get(_MEDICINEFILE), iterableProduct,
-				Charset.defaultCharset(), _options);
+			_listToFile(_MEDICINEFILE, _medicineProducts);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				"Unable to write file " + _MEDICINEFILE, ioe);
 		}
 	}
 
@@ -182,30 +178,33 @@ public class CartItem {
 	}
 
 	private boolean _askIfMedicine(String productName) {
+		if (_askIfType(productName, "medicine")) {
+			_addToMedicine(productName);
 
-		// Ask via commandline if this product is Medicine
+			return true;
+		}
 
-		boolean answer = false;
-		Console console = null;
-		String response = null;
+		return false;
+	}
 
+	private boolean _askIfType(String productName, String type) {
 		try {
-			console = System.console();
+			Console console = System.console();
 
 			if (console != null) {
-				response = console.readLine(
-					"Is " + productName + " medicine: ");
+				String response = console.readLine(
+					"Is " + productName + " " + type + ": ");
 
-				if (response.equals("yes") || response.equals("Yes")) {
-					answer = true;
+				if (response.equalsIgnoreCase("yes")) {
+					return true;
 				}
 			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
 
-		return answer;
+			return false;
+		}
+		finally {
+			_addToSeen(productName);
+		}
 	}
 
 	private boolean _checkImportTaxability(String productName) {
@@ -215,6 +214,25 @@ public class CartItem {
 		else {
 			return false;
 		}
+	}
+
+	private List<String> _fileToList(String fileName) throws IOException {
+		File file = new File(fileName);
+
+		List<String> list = new ArrayList<>();
+
+		if (!file.exists()) {
+			return list;
+		}
+
+		for (String line :
+				Files.readAllLines(
+					Paths.get(fileName), Charset.defaultCharset())) {
+
+			list.add(line.trim());
+		}
+
+		return list;
 	}
 
 	private boolean _isBook(String productName) {
@@ -260,31 +278,19 @@ public class CartItem {
 
 		// Consult MEDICINE file
 
-		boolean existsInMedicine = false;
-
-		try {
-			for (String line :
-					Files.readAllLines(
-						Paths.get(_MEDICINEFILE), Charset.defaultCharset())) {
-
-				if (line.equals(productName)) {
-					existsInMedicine = true;
-					break;
-				}
-			}
-		}
-		catch (IOException e) {
-			//e.printStackTrace();
-			try {
-				Files.createFile(Paths.get(_MEDICINEFILE));
-				_isMedicine(productName);
-			}
-			catch (IOException x) {
-				x.printStackTrace();
-			}
+		if (_medicineProducts == null) {
+			_loadMedicineFile();
 		}
 
-		return existsInMedicine;
+		if (_medicineProducts.contains(productName)) {
+			return true;
+		}
+
+		if (_isSeen(productName)) {
+			return false;
+		}
+
+		return _askIfMedicine(productName);
 	}
 
 	private boolean _isSeen(String productName) {
@@ -303,21 +309,29 @@ public class CartItem {
 			new StandardOpenOption[] {CREATE, TRUNCATE_EXISTING, WRITE});
 	}
 
-	private void _loadSeenFile() {
-		_seenProducts = new ArrayList<>();
-
+	private void _loadMedicineFile() {
 		try {
-			for (String line :
-					Files.readAllLines(
-						Paths.get(_SEENFILE), Charset.defaultCharset())) {
+			_medicineProducts = _fileToList(_MEDICINEFILE);
+		}
+		catch (IOException ioe) {
+			System.out.println(
+				"WARNING - " + _MEDICINEFILE + " could not be read. " +
+					ioe.getMessage());
 
-				_seenProducts.add(line.trim());
-			}
+			_medicineProducts = new ArrayList<>();
+		}
+	}
+
+	private void _loadSeenFile() {
+		try {
+			_seenProducts = _fileToList(_SEENFILE);
 		}
 		catch (IOException ioe) {
 			System.out.println(
 				"WARNING - " + _SEENFILE + " could not be read. " +
 					ioe.getMessage());
+
+			_seenProducts = new ArrayList<>();
 		}
 	}
 
@@ -327,6 +341,7 @@ public class CartItem {
 
 	private static final String _SEENFILE = "all_seen_products.txt";
 
+	private static List<String> _medicineProducts;
 	private static List<String> _seenProducts;
 
 	private final boolean _basicSalesTaxApplicable;
