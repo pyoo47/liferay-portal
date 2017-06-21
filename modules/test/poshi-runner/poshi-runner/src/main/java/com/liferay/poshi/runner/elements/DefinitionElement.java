@@ -74,7 +74,7 @@ public class DefinitionElement extends PoshiElement {
 	}
 
 	@Override
-	public String toReadableSyntax() {
+	public String toOldReadableSyntax() {
 		prepareVarElementsForReadableSyntax();
 
 		StringBuilder sb = new StringBuilder();
@@ -92,7 +92,7 @@ public class DefinitionElement extends PoshiElement {
 		for (PoshiElement poshiElement :
 				toPoshiElements(elements("property"))) {
 
-			sb.append(poshiElement.toReadableSyntax());
+			sb.append(poshiElement.toOldReadableSyntax());
 		}
 
 		List<Element> elements = elements("var");
@@ -104,14 +104,14 @@ public class DefinitionElement extends PoshiElement {
 			sb.append(THESE_VARIABLES);
 
 			for (PoshiElement poshiElement : toPoshiElements(elements())) {
-				sb.append(poshiElement.toReadableSyntax());
+				sb.append(poshiElement.toOldReadableSyntax());
 			}
 		}
 
 		sb.append("\n");
 
 		for (PoshiElement poshiElement : toPoshiElements(elements("set-up"))) {
-			sb.append(poshiElement.toReadableSyntax());
+			sb.append(poshiElement.toOldReadableSyntax());
 		}
 
 		sb.append("\n");
@@ -119,12 +119,12 @@ public class DefinitionElement extends PoshiElement {
 		for (PoshiElement poshiElement :
 				toPoshiElements(elements("tear-down"))) {
 
-			sb.append(poshiElement.toReadableSyntax());
+			sb.append(poshiElement.toOldReadableSyntax());
 		}
 
 		for (PoshiElement poshiElement : toPoshiElements(elements("command"))) {
 			sb.append("\n");
-			sb.append(poshiElement.toReadableSyntax());
+			sb.append(poshiElement.toOldReadableSyntax());
 		}
 
 		return sb.toString();

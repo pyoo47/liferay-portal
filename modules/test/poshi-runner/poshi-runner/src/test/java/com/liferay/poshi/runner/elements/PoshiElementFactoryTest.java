@@ -35,7 +35,7 @@ public class PoshiElementFactoryTest {
 		PoshiElement poshiElement = PoshiElementFactory.newPoshiElementFromFile(
 			_POSHI_TEST_FILE_PATH);
 
-		String readableSyntax = poshiElement.toReadableSyntax();
+		String readableSyntax = poshiElement.toOldReadableSyntax();
 
 		if (!readableSyntax.equals(baselineReadableSyntax)) {
 			throw new Exception(
@@ -48,7 +48,7 @@ public class PoshiElementFactoryTest {
 		PoshiElement poshiElement = PoshiElementFactory.newPoshiElementFromFile(
 			_POSHI_TEST_FILE_PATH);
 
-		String readableSyntax = poshiElement.toReadableSyntax();
+		String readableSyntax = poshiElement.toOldReadableSyntax();
 
 		PoshiElement elementFromReadableSyntax =
 			PoshiElementFactory.newPoshiElement(readableSyntax);

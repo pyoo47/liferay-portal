@@ -85,7 +85,7 @@ public class VarElement extends PoshiElement {
 	}
 
 	@Override
-	public String toReadableSyntax() {
+	public String toOldReadableSyntax() {
 		StringBuilder sb = new StringBuilder();
 
 		Element parentElement = getParent();

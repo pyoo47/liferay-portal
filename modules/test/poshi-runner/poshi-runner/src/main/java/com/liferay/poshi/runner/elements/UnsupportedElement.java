@@ -38,7 +38,7 @@ public class UnsupportedElement extends PoshiElement {
 	}
 
 	@Override
-	public String toReadableSyntax() {
+	public String toOldReadableSyntax() {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("\n");

@@ -92,7 +92,7 @@ public class CommandElement extends PoshiElement {
 	}
 
 	@Override
-	public String toReadableSyntax() {
+	public String toOldReadableSyntax() {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("\n");
@@ -122,7 +122,7 @@ public class CommandElement extends PoshiElement {
 			sb.append(priority);
 		}
 
-		sb.append(super.toReadableSyntax());
+		sb.append(super.toOldReadableSyntax());
 
 		return sb.toString();
 	}

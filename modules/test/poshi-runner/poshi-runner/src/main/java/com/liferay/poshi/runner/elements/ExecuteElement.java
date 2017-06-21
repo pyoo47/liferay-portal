@@ -78,7 +78,7 @@ public class ExecuteElement extends PoshiElement {
 	}
 
 	@Override
-	public String toReadableSyntax() {
+	public String toOldReadableSyntax() {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("\n\t");
@@ -122,7 +122,7 @@ public class ExecuteElement extends PoshiElement {
 			sb.append(_getReadableSyntaxCommandPhrase(macro));
 		}
 
-		sb.append(super.toReadableSyntax());
+		sb.append(super.toOldReadableSyntax());
 
 		return sb.toString();
 	}

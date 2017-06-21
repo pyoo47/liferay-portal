@@ -86,13 +86,13 @@ public abstract class PoshiElement extends DefaultElement {
 		}
 	}
 
-	public String toReadableSyntax() {
+	public String toOldReadableSyntax() {
 		prepareVarElementsForReadableSyntax();
 
 		StringBuilder sb = new StringBuilder();
 
 		for (PoshiElement poshiElement : toPoshiElements(elements())) {
-			sb.append(poshiElement.toReadableSyntax());
+			sb.append(poshiElement.toOldReadableSyntax());
 		}
 
 		return sb.toString();
