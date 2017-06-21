@@ -33,6 +33,7 @@ import java.nio.file.StandardOpenOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Cesar Polanco
@@ -211,6 +212,15 @@ public class CartItem {
 		return answer;
 	}
 
+	private boolean _checkImportTaxability(String productName) {
+		if (Arrays.asList(productName.split(" ")).contains("imported")) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	private boolean _isBook(String productName) {
 		if (productName.equals("book") || productName.equals("books")) {
 			return true;
@@ -282,42 +292,28 @@ public class CartItem {
 	}
 
 	private boolean _isSeen(String productName) {
+		if (_seenProducts == null) {
+			_loadSeenFile();
+		}
 
-		// Consult SEEN file
+		return _seenProducts.contains(productName);
+	}
 
-		boolean existsInSeen = false;
+	private void _loadSeenFile() {
+		_seenProducts = new ArrayList<>();
 
 		try {
 			for (String line :
 					Files.readAllLines(
 						Paths.get(_SEENFILE), Charset.defaultCharset())) {
 
-				if (line.equals(productName)) {
-					existsInSeen = true;
-					break;
-				}
+				_seenProducts.add(line.trim());
 			}
 		}
-		catch (IOException e) {
-			//e.printStackTrace();
-			try {
-				Files.createFile(Paths.get(_SEENFILE));
-				_isSeen(productName);
-			}
-			catch (IOException x) {
-				x.printStackTrace();
-			}
-		}
-
-		return existsInSeen;
-	}
-
-	private boolean _checkImportTaxability(String productName) {
-		if (Arrays.asList(productName.split(" ")).contains("imported")) {
-			return true;
-		}
-		else {
-			return false;
+		catch (IOException ioe) {
+			System.out.println(
+				"WARNING - " + _SEENFILE + " could not be read. " +
+					ioe.getMessage());
 		}
 	}
 
@@ -326,6 +322,8 @@ public class CartItem {
 	private static final String _MEDICINEFILE = "medicine_file.txt";
 
 	private static final String _SEENFILE = "all_seen_products.txt";
+
+	private static List<String> _seenProducts;
 
 	private final boolean _basicSalesTaxApplicable;
 	private final boolean _importSalesTaxApplicable;
