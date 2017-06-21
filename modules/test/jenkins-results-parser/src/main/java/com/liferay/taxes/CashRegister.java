@@ -86,7 +86,6 @@ public class CashRegister {
 	public static void main(String[] args) {
 		Cart userCart = new Cart();
 
-		Console console = null;
 		String inputString = "";
 		boolean interactiveMethod = false;
 		boolean fileMethod = false;
@@ -125,24 +124,28 @@ public class CashRegister {
 
 		if (interactiveMethod) {
 			try {
-				console = System.console();
 				System.out.println(
 					"Interactive Mode: enter 'Done' to finish the cart");
+
+				Console console = System.console();
+
+				if (console == null) {
+					throw new RuntimeException("Unable to get console object");
+				}
+
 				while (!(inputString.equals("Done") ||
 				 inputString.equals("done"))) {
 
-					if (console != null) {
-						inputString = console.readLine("Please enter item: ");
+					inputString = console.readLine("Please enter item: ");
 
-						if (!(inputString.equals("Done") ||
-						 inputString.equals("done"))) {
+					if (!(inputString.equals("Done") ||
+					 inputString.equals("done"))) {
 
-							userCart.addToCart(inputString);
-							System.out.println("Added!");
-						}
-						else {
-							System.out.println("Thank you!");
-						}
+						userCart.addToCart(inputString);
+						System.out.println("Added!");
+					}
+					else {
+						System.out.println("Thank you!");
 					}
 				}
 			}
