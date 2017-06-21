@@ -114,7 +114,9 @@ public class CartItem {
 
 		iterableProduct.add(productName);
 		try {
-			Files.write(Paths.get(_FOODFILE), iterableProduct, _options);
+			Files.write(
+				Paths.get(_FOODFILE), iterableProduct, Charset.defaultCharset(),
+				_options);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -129,7 +131,9 @@ public class CartItem {
 
 		iterableProduct.add(productName);
 		try {
-			Files.write(Paths.get(_MEDICINEFILE), iterableProduct, _options);
+			Files.write(
+				Paths.get(_MEDICINEFILE), iterableProduct,
+				Charset.defaultCharset(), _options);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -144,7 +148,9 @@ public class CartItem {
 
 		iterableProduct.add(productName);
 		try {
-			Files.write(Paths.get(_SEENFILE), iterableProduct, _options);
+			Files.write(
+				Paths.get(_SEENFILE), iterableProduct, Charset.defaultCharset(),
+				_options);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
