@@ -122,33 +122,27 @@ public class CashRegister {
 		}
 
 		if (interactiveMethod) {
-			try {
-				System.out.println(
-					"Interactive Mode: enter 'Done' to finish the cart");
+			System.out.println(
+				"Interactive Mode: enter 'Done' to finish the cart");
 
-				Console console = System.console();
+			Console console = System.console();
 
-				if (console == null) {
-					throw new RuntimeException("Unable to get console object");
-				}
+			if (console == null) {
+				throw new RuntimeException("Unable to get console object");
+			}
 
-				while (true) {
-					String inputString = console.readLine(
-						"Please enter item: ");
+			while (true) {
+				String inputString = console.readLine("Please enter item: ");
 
 				if (inputString.equalsIgnoreCase("done")) {
 					System.out.println("Thank you!");
 
-						break;
-					}
-
-					userCart.addToCart(inputString);
-
-					System.out.println("Added: " + inputString);
+					break;
 				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
+
+				userCart.addToCart(inputString);
+
+				System.out.println("Added: " + inputString);
 			}
 
 			userCart.setTotalTax(calculateCartTax(userCart));
