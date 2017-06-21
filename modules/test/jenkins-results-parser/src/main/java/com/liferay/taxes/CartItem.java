@@ -40,11 +40,11 @@ import java.util.Arrays;
 public class CartItem {
 
 	public CartItem(int amount, String productName, String extPrice) {
-		_quantity = amount;
-		_name = productName;
 		_basicSalesTaxApplicable = checkBasicTaxability(productName);
 		_importSalesTaxApplicable = _checkImportTaxability(productName);
+		_name = productName;
 		_preTaxPrice = new BigDecimal(extPrice);
+		_quantity = amount;
 	}
 
 	public boolean checkBasicTaxability(String productName) {
