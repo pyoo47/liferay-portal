@@ -18,8 +18,9 @@
 
 package com.liferay.taxes;
 
-import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.Console;
 import java.io.IOException;
@@ -142,19 +143,14 @@ public class CartItem {
 	}
 
 	private void _addToSeen(String productName) {
+		_seenProducts.add(productName);
 
-		// Add to SEEN file
-
-		ArrayList<String> iterableProduct = new ArrayList<>();
-
-		iterableProduct.add(productName);
 		try {
-			Files.write(
-				Paths.get(_SEENFILE), iterableProduct, Charset.defaultCharset(),
-				_options);
+			_listToFile(_SEENFILE, _seenProducts);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				"Unable to write file " + _SEENFILE, ioe);
 		}
 	}
 
@@ -299,6 +295,14 @@ public class CartItem {
 		return _seenProducts.contains(productName);
 	}
 
+	private void _listToFile(String fileName, List<String> list)
+		throws IOException {
+
+		Files.write(
+			Paths.get(fileName), list, Charset.defaultCharset(),
+			new StandardOpenOption[] {CREATE, TRUNCATE_EXISTING, WRITE});
+	}
+
 	private void _loadSeenFile() {
 		_seenProducts = new ArrayList<>();
 
@@ -329,7 +333,7 @@ public class CartItem {
 	private final boolean _importSalesTaxApplicable;
 	private final String _name;
 	private final StandardOpenOption[] _options =
-		new StandardOpenOption[] {APPEND, CREATE};
+		new StandardOpenOption[] {CREATE, TRUNCATE_EXISTING, WRITE};
 	private BigDecimal _postTaxPrice;
 	private final BigDecimal _preTaxPrice;
 	private final int _quantity;
