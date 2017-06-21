@@ -48,10 +48,10 @@ public class CartItem {
 	}
 
 	public boolean checkBasicTaxability(String productName) {
-		if (_checkIfSeen(productName)) {
-			if (!(_checkIfFood(productName) ||
-				 _checkIfMedicine(productName) ||
-				_checkIfBook(productName))) {
+		if (_isSeen(productName)) {
+			if (!(_isFood(productName) ||
+				 _isMedicine(productName) ||
+				_isBook(productName))) {
 
 				return true;
 			}
@@ -61,7 +61,7 @@ public class CartItem {
 		else {
 			_addToSeen(productName);
 
-			if (_checkIfBook(productName)) {
+			if (_isBook(productName)) {
 				return false;
 			}
 			else if (_askIfFood(productName)) {
@@ -211,7 +211,7 @@ public class CartItem {
 		return answer;
 	}
 
-	private boolean _checkIfBook(String productName) {
+	private boolean _isBook(String productName) {
 		if (productName.equals("book") || productName.equals("books")) {
 			return true;
 		}
@@ -219,7 +219,7 @@ public class CartItem {
 		return false;
 	}
 
-	private boolean _checkIfFood(String productName) {
+	private boolean _isFood(String productName) {
 
 		// consult Food file
 
@@ -240,7 +240,7 @@ public class CartItem {
 			//e.printStackTrace();
 			try {
 				Files.createFile(Paths.get(_FOODFILE));
-				_checkIfFood(productName);
+				_isFood(productName);
 			}
 			catch (IOException x) {
 				x.printStackTrace();
@@ -250,7 +250,7 @@ public class CartItem {
 		return existsInFood;
 	}
 
-	private boolean _checkIfMedicine(String productName) {
+	private boolean _isMedicine(String productName) {
 
 		// Consult MEDICINE file
 
@@ -271,7 +271,7 @@ public class CartItem {
 			//e.printStackTrace();
 			try {
 				Files.createFile(Paths.get(_MEDICINEFILE));
-				_checkIfMedicine(productName);
+				_isMedicine(productName);
 			}
 			catch (IOException x) {
 				x.printStackTrace();
@@ -281,7 +281,7 @@ public class CartItem {
 		return existsInMedicine;
 	}
 
-	private boolean _checkIfSeen(String productName) {
+	private boolean _isSeen(String productName) {
 
 		// Consult SEEN file
 
@@ -302,7 +302,7 @@ public class CartItem {
 			//e.printStackTrace();
 			try {
 				Files.createFile(Paths.get(_SEENFILE));
-				_checkIfSeen(productName);
+				_isSeen(productName);
 			}
 			catch (IOException x) {
 				x.printStackTrace();
