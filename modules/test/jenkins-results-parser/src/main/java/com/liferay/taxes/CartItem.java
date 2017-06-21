@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -219,9 +220,15 @@ public class CartItem {
 		boolean existsInFood = false;
 
 		try {
-			existsInFood = Files.lines(
-				Paths.get(_FOODFILE)).anyMatch((item) -> item.equals(
-					productName));
+			for (String line :
+					Files.readAllLines(
+						Paths.get(_FOODFILE), Charset.defaultCharset())) {
+
+				if (line.equals(productName)) {
+					existsInFood = true;
+					break;
+				}
+			}
 		}
 		catch (IOException e) {
 			//e.printStackTrace();
@@ -244,9 +251,15 @@ public class CartItem {
 		boolean existsInMedicine = false;
 
 		try {
-			existsInMedicine = Files.lines(
-				Paths.get(_MEDICINEFILE)).anyMatch((item) -> item.equals(
-					productName));
+			for (String line :
+					Files.readAllLines(
+						Paths.get(_MEDICINEFILE), Charset.defaultCharset())) {
+
+				if (line.equals(productName)) {
+					existsInMedicine = true;
+					break;
+				}
+			}
 		}
 		catch (IOException e) {
 			//e.printStackTrace();
@@ -269,9 +282,15 @@ public class CartItem {
 		boolean existsInSeen = false;
 
 		try {
-			existsInSeen = Files.lines(
-				Paths.get(_SEENFILE)).anyMatch((item) -> item.equals(
-					productName));
+			for (String line :
+					Files.readAllLines(
+						Paths.get(_SEENFILE), Charset.defaultCharset())) {
+
+				if (line.equals(productName)) {
+					existsInSeen = true;
+					break;
+				}
+			}
 		}
 		catch (IOException e) {
 			//e.printStackTrace();
