@@ -12,11 +12,6 @@
  * details.
  */
 
-/* Register class
- * This is the class which will hold tax data and perform calculations.
- * It will also be the class responsible for printing out the receipt.
- */
-
 package com.liferay.taxes;
 
 import java.io.Console;
@@ -88,9 +83,6 @@ public class CashRegister {
 		boolean interactiveMethod = false;
 		boolean fileMethod = false;
 		String fileName = "";
-
-		// Differentiate between interactive mode and file mode
-		// Priority goes to -interactive, if both are present
 
 		for (String arg : args) {
 			if (arg.equals("-interactive")) {
