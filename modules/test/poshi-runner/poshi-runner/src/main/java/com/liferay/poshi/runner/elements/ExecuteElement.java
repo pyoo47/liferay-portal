@@ -21,6 +21,7 @@ import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THEN;
 import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THE_VALUE;
 import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.WHEN;
 
+import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 
 import java.util.Arrays;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
@@ -127,6 +129,42 @@ public class ExecuteElement extends PoshiElement {
 		return sb.toString();
 	}
 
+	@Override
+	public String toReadableSyntax() {
+		if (attributeValue("function") != null) {
+			StringBuilder sb = new StringBuilder();
+
+			for (Attribute attribute :
+					Dom4JUtil.toAttributeList(attributeList())) {
+
+				String name = attribute.getName();
+
+				if (name.equals("function")) {
+					continue;
+				}
+
+				String value = attribute.getValue();
+
+				sb.append(getAssignmentStatement(name, value));
+
+				sb.append(", ");
+			}
+
+			if (sb.length() > 2) {
+				sb.setLength(sb.length() - 2);
+			}
+
+			String function = attributeValue("function");
+
+			return _createReadableExecuteBlock(function, sb.toString());
+		}
+
+		String macro = attributeValue("macro");
+		String readableSyntax = super.toReadableSyntax();
+
+		return _createReadableExecuteBlock(macro, readableSyntax);
+	}
+
 	private void _addFunctionAttribute(
 		String readableSyntax, String attributeName) {
 
@@ -161,6 +199,35 @@ public class ExecuteElement extends PoshiElement {
 
 			addAttribute("function", _getClassCommandName(functionItem));
 		}
+	}
+
+	private static String _createReadableExecuteBlock(
+	String commandName, String content) {
+
+		StringBuilder sb = new StringBuilder();
+
+		String pad = "\t";
+
+		sb.append("\n\n");
+		sb.append(pad);
+		sb.append(commandName.replace("#", "."));
+		sb.append("(");
+
+		String trimmedContent = content.trim();
+
+		if (!trimmedContent.equals("")) {
+			if (content.contains("\n")) {
+				content = content.replaceAll("\n", ",\n" + pad);
+				content = content.replaceFirst(",", "");
+				content = content + "\n" + pad;
+			}
+
+			sb.append(content);
+		}
+
+		sb.append(");");
+
+		return sb.toString();
 	}
 
 	private String _getClassCommandName(String readableSyntax) {
