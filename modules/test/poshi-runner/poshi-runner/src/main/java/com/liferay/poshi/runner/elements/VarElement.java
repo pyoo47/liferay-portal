@@ -124,6 +124,35 @@ public class VarElement extends PoshiElement {
 		return sb.toString();
 	}
 
+	@Override
+	public String toReadableSyntax() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("\n\t");
+
+		PoshiElement parentElement = (PoshiElement)getParent();
+
+		String parentElementName = parentElement.getName();
+
+		if (!parentElementName.equals("execute")) {
+			sb.append(getName());
+			sb.append(" ");
+		}
+
+		String name = attributeValue("name");
+		String value = getVarValue();
+
+		value = value.replace("Util#", "Util.");
+
+		sb.append(getAssignmentStatement(name, value));
+
+		if (!parentElementName.equals("execute")) {
+			sb.append(";");
+		}
+
+		return sb.toString();
+	}
+
 	protected String getReadableVariableKey() {
 		return THESE_VARIABLES;
 	}
