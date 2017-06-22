@@ -135,26 +135,14 @@ public class CartItem {
 		System.out.println(
 			"This product has not been seen before. Please answer the " +
 				"following for tax purposes:");
-		boolean answer = false;
-		Console console = null;
-		String response = null;
 
-		try {
-			console = System.console();
+		if (_askIfType(productName, "food")) {
+			_addToFood(productName);
 
-			if (console != null) {
-				response = console.readLine("Is " + productName + " food: ");
-
-				if (response.equals("yes") || response.equals("Yes")) {
-					answer = true;
-				}
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+			return true;
 		}
 
-		return answer;
+		return false;
 	}
 
 	private boolean _askIfMedicine(String productName) {
@@ -225,33 +213,19 @@ public class CartItem {
 
 	private boolean _isFood(String productName) {
 
-		// consult Food file
-
-		boolean existsInFood = false;
-
-		try {
-			for (String line :
-					Files.readAllLines(
-						Paths.get(_FOODFILE), Charset.defaultCharset())) {
-
-				if (line.equals(productName)) {
-					existsInFood = true;
-					break;
-				}
-			}
-		}
-		catch (IOException e) {
-			//e.printStackTrace();
-			try {
-				Files.createFile(Paths.get(_FOODFILE));
-				_isFood(productName);
-			}
-			catch (IOException x) {
-				x.printStackTrace();
-			}
+		if (_foodProducts == null) {
+			_loadFoodFile();
 		}
 
-		return existsInFood;
+		if (_foodProducts.contains(productName)) {
+			return true;
+		}
+
+		if (_isSeen(productName)) {
+			return false;
+		}
+
+		return _askIfFood(productName);
 	}
 
 	private boolean _isMedicine(String productName) {
@@ -289,6 +263,19 @@ public class CartItem {
 			new StandardOpenOption[] {CREATE, TRUNCATE_EXISTING, WRITE});
 	}
 
+	private void _loadFoodFile() {
+		try {
+			_foodProducts = _fileToList(_FOODFILE);
+		}
+		catch (IOException ioe) {
+			System.out.println(
+				"WARNING - " + _FOODFILE + " could not be read. " +
+					ioe.getMessage());
+
+			_foodProducts = new ArrayList<>();
+		}
+	}
+
 	private void _loadMedicineFile() {
 		try {
 			_medicineProducts = _fileToList(_MEDICINEFILE);
@@ -321,6 +308,7 @@ public class CartItem {
 
 	private static final String _SEENFILE = "all_seen_products.txt";
 
+	private static List<String> _foodProducts;
 	private static List<String> _medicineProducts;
 	private static List<String> _seenProducts;
 
