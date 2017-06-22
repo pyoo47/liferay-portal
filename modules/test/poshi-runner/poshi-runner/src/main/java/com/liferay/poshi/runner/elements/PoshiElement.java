@@ -98,6 +98,16 @@ public abstract class PoshiElement extends DefaultElement {
 		return sb.toString();
 	}
 
+	public String toReadableSyntax() {
+		StringBuilder sb = new StringBuilder();
+
+		for (PoshiElement poshiElement : toPoshiElements(elements())) {
+			sb.append(poshiElement.toReadableSyntax());
+		}
+
+		return sb.toString();
+	}
+
 	protected static String toPhrase(String s) {
 		String phrase = s.replaceAll(_PHRASE_REGEX, " $0");
 
