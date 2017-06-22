@@ -108,6 +108,17 @@ public abstract class PoshiElement extends DefaultElement {
 		return sb.toString();
 	}
 
+	protected static String getAssignmentStatement(String name, String value) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(name);
+		sb.append(" = \"");
+		sb.append(value);
+		sb.append("\"");
+
+		return sb.toString();
+	}
+
 	protected static String toPhrase(String s) {
 		String phrase = s.replaceAll(_PHRASE_REGEX, " $0");
 
