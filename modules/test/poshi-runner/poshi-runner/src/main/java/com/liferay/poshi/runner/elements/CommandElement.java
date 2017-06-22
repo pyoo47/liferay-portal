@@ -26,10 +26,12 @@ import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_VARIABL
 import static com.liferay.poshi.runner.util.StringPool.COLON;
 import static com.liferay.poshi.runner.util.StringPool.SPACE;
 
+import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 
 import java.util.List;
 
+import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
@@ -123,6 +125,32 @@ public class CommandElement extends PoshiElement {
 		}
 
 		sb.append(super.toOldReadableSyntax());
+
+		return sb.toString();
+	}
+
+	@Override
+	public String toReadableSyntax() {
+		StringBuilder sb = new StringBuilder();
+
+		for (Attribute attribute : Dom4JUtil.toAttributeList(attributeList())) {
+			String name = attribute.getName();
+
+			if (name.equals("name")) {
+				continue;
+			}
+
+			sb.append("\n\t@");
+
+			String value = attribute.getValue();
+
+			sb.append(getAssignmentStatement(name, value));
+		}
+
+		String readableCommandTitle = getReadableCommandTitle();
+		String readableSyntax = super.toReadableSyntax();
+
+		sb.append(createReadableBlock(readableCommandTitle, readableSyntax));
 
 		return sb.toString();
 	}
