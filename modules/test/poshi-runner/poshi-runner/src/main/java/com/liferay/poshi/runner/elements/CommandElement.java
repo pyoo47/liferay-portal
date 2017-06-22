@@ -96,7 +96,7 @@ public class CommandElement extends PoshiElement {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("\n");
-		sb.append(getReadableCommandTitle());
+		sb.append(getOldReadableCommandTitle());
 
 		if (attributeValue("name") != null) {
 			String name = attributeValue("name");
@@ -127,8 +127,12 @@ public class CommandElement extends PoshiElement {
 		return sb.toString();
 	}
 
-	protected String getReadableCommandTitle() {
+	protected String getOldReadableCommandTitle() {
 		return SCENARIO + COLON + SPACE;
+	}
+
+	protected String getReadableCommandTitle() {
+		return "test" + attributeValue("name");
 	}
 
 	private void _addDescriptionAttribute(String readableSyntax) {

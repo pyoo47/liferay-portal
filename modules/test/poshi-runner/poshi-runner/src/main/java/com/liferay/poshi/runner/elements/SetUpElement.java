@@ -34,9 +34,14 @@ public class SetUpElement extends CommandElement {
 	}
 
 	@Override
-	protected String getReadableCommandTitle() {
+	protected String getOldReadableCommandTitle() {
 		return ReadableSyntaxKeys.SET_UP +
 			": This executes before each scenario";
+	}
+
+	@Override
+	protected String getReadableCommandTitle() {
+		return "setUp";
 	}
 
 }
