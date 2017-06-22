@@ -43,15 +43,11 @@ import java.util.List;
 public class CartItem {
 
 	public CartItem(int amount, String extPrice, String productName) {
-		_basicSalesTaxApplicable = checkBasicTaxability(productName);
+		_basicSalesTaxApplicable = _isDomesticallyTaxable(productName);
 		_importSalesTaxApplicable = _checkImportTaxability(productName);
 		_name = productName;
 		_preTaxPrice = new BigDecimal(extPrice);
 		_quantity = amount;
-	}
-
-	public boolean checkBasicTaxability(String productName) {
-		return _isDomesticallyTaxable(productName);
 	}
 
 	public String getName() {
@@ -194,7 +190,6 @@ public class CartItem {
 			Paths.get(fileName), list, Charset.defaultCharset(),
 			new StandardOpenOption[] {CREATE, TRUNCATE_EXISTING, WRITE});
 	}
-
 
 	private void _loadNonTaxableFile() {
 		try {
