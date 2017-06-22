@@ -22,10 +22,12 @@ import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_PROPERT
 import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_VARIABLES;
 import static com.liferay.poshi.runner.util.StringPool.COLON;
 
+import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 
 import java.util.List;
 
+import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
@@ -128,6 +130,53 @@ public class DefinitionElement extends PoshiElement {
 		}
 
 		return sb.toString();
+	}
+
+	@Override
+	public String toReadableSyntax() {
+		StringBuilder sb = new StringBuilder();
+
+		for (Attribute attribute : Dom4JUtil.toAttributeList(attributeList())) {
+			sb.append("\n@");
+
+			String name = attribute.getName();
+			String value = attribute.getValue();
+
+			sb.append(getAssignmentStatement(name, value));
+		}
+
+		StringBuilder content = new StringBuilder();
+
+		for (PoshiElement poshiElement :
+				toPoshiElements(elements("property"))) {
+
+			content.append(poshiElement.toReadableSyntax());
+		}
+
+		content.append("\n");
+
+		for (PoshiElement poshiElement : toPoshiElements(elements("set-up"))) {
+			content.append(poshiElement.toReadableSyntax());
+		}
+
+		content.append("\n");
+
+		for (PoshiElement poshiElement :
+				toPoshiElements(elements("tear-down"))) {
+
+			content.append(poshiElement.toReadableSyntax());
+		}
+
+		for (PoshiElement poshiElement : toPoshiElements(elements("command"))) {
+			content.append("\n");
+			content.append(poshiElement.toReadableSyntax());
+		}
+
+		sb.append(createReadableBlock("definition", content.toString()));
+
+		String sbString = sb.toString();
+
+		return sbString.trim();
 	}
 
 }
