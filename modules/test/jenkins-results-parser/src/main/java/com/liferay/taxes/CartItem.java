@@ -51,14 +51,21 @@ public class CartItem {
 	}
 
 	public boolean checkBasicTaxability(String productName) {
-		if (!(_isFood(productName) ||
-			 _isMedicine(productName) ||
-			_isBook(productName))) {
 
-			return true;
-		}
+		// if (!(_isFood(productName) ||
+		// 	 _isMedicine(productName) ||
+		// 	_isBook(productName))) {
 
-		return false;
+		//
+
+		// 	return true;
+		// }
+
+		//
+
+		// return false;
+
+		return _isDomesticallyTaxable(productName);
 	}
 
 	public String getName() {
@@ -118,6 +125,18 @@ public class CartItem {
 		}
 	}
 
+	private void _addToNonTaxable(String productName) {
+		_nonTaxableProducts.add(productName);
+
+		try {
+			_listToFile(_NONTAXABLEFILE, _nonTaxableProducts);
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				"Could not write to file: " + _NONTAXABLEFILE, ioe);
+		}
+	}
+
 	private void _addToSeen(String productName) {
 		_seenProducts.add(productName);
 
@@ -127,6 +146,18 @@ public class CartItem {
 		catch (IOException ioe) {
 			throw new RuntimeException(
 				"Unable to write file " + _SEENFILE, ioe);
+		}
+	}
+
+	private void _addToTaxable(String productName) {
+		_taxableProducts.add(productName);
+
+		try {
+			_listToFile(_TAXABLEFILE, _taxableProducts);
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				"Could not write to file: " + _TAXABLEFILE, ioe);
 		}
 	}
 
@@ -153,6 +184,31 @@ public class CartItem {
 		}
 
 		return false;
+	}
+
+	private boolean _askIfTaxable(String productName) {
+		try {
+			Console console = System.console();
+
+			if (console != null) {
+				String response = console.readLine(
+					"Product cannot be identified. Is it a food or medicine? ");
+
+				if (response.equalsIgnoreCase("yes")) {
+					_addToNonTaxable(productName);
+					return false;
+				}
+				else {
+					_addToTaxable(productName);
+					return true;
+				}
+			}
+
+			return true;
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Console unavailable to use: " + e);
+		}
 	}
 
 	private boolean _askIfType(String productName, String type) {
@@ -211,8 +267,27 @@ public class CartItem {
 		return false;
 	}
 
-	private boolean _isFood(String productName) {
+	private boolean _isDomesticallyTaxable(String productName) {
+		if (_nonTaxableProducts == null) {
+			_loadNonTaxableFile();
+		}
 
+		if (_taxableProducts == null) {
+			_loadTaxableFile();
+		}
+
+		if (_isBook(productName) || _nonTaxableProducts.contains(productName)) {
+			return false;
+		}
+		else if (_taxableProducts.contains(productName)) {
+			return true;
+		}
+		else {
+			return _askIfTaxable(productName);
+		}
+	}
+
+	private boolean _isFood(String productName) {
 		if (_foodProducts == null) {
 			_loadFoodFile();
 		}
@@ -289,6 +364,18 @@ public class CartItem {
 		}
 	}
 
+	private void _loadNonTaxableFile() {
+		try {
+			_nonTaxableProducts = _fileToList(_NONTAXABLEFILE);
+		}
+		catch (IOException ioe) {
+			System.out.println(
+				_NONTAXABLEFILE + " could not be read. " + ioe.getMessage());
+
+			_nonTaxableProducts = new ArrayList<>();
+		}
+	}
+
 	private void _loadSeenFile() {
 		try {
 			_seenProducts = _fileToList(_SEENFILE);
@@ -302,15 +389,33 @@ public class CartItem {
 		}
 	}
 
+	private void _loadTaxableFile() {
+		try {
+			_taxableProducts = _fileToList(_TAXABLEFILE);
+		}
+		catch (IOException ioe) {
+			System.out.println(
+				_TAXABLEFILE + " could not be read. " + ioe.getMessage());
+
+			_taxableProducts = new ArrayList<>();
+		}
+	}
+
 	private static final String _FOODFILE = "food_file.txt";
 
 	private static final String _MEDICINEFILE = "medicine_file.txt";
 
+	private static final String _NONTAXABLEFILE = "nontaxable.txt";
+
 	private static final String _SEENFILE = "all_seen_products.txt";
+
+	private static final String _TAXABLEFILE = "taxable.txt";
 
 	private static List<String> _foodProducts;
 	private static List<String> _medicineProducts;
+	private static List<String> _nonTaxableProducts;
 	private static List<String> _seenProducts;
+	private static List<String> _taxableProducts;
 
 	private final boolean _basicSalesTaxApplicable;
 	private final boolean _importSalesTaxApplicable;

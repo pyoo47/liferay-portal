@@ -44,10 +44,9 @@ public class CashRegister {
 
 	public static BigDecimal calculateCartTax(Cart customer) {
 		BigDecimal cartTax = new BigDecimal("0.00");
-		BigDecimal itemTax;
 
 		for (CartItem product : customer.getContents()) {
-			itemTax = calculateItemTax(product);
+			BigDecimal itemTax = calculateItemTax(product);
 
 			cartTax = cartTax.add(itemTax);
 			product.setPostTaxPrice(itemTax);
@@ -171,10 +170,8 @@ public class CashRegister {
 	}
 
 	public static void printReceipt(Cart currentCart) {
-		BigDecimal itemTotal;
-
 		for (CartItem inCart : currentCart.getContents()) {
-			itemTotal = new BigDecimal(
+			BigDecimal itemTotal = new BigDecimal(
 				inCart.getQuantity()).multiply(
 					inCart.getPostTaxPrice()).setScale(2, RoundingMode.HALF_UP);
 
