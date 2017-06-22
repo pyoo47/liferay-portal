@@ -51,20 +51,6 @@ public class CartItem {
 	}
 
 	public boolean checkBasicTaxability(String productName) {
-
-		// if (!(_isFood(productName) ||
-		// 	 _isMedicine(productName) ||
-		// 	_isBook(productName))) {
-
-		//
-
-		// 	return true;
-		// }
-
-		//
-
-		// return false;
-
 		return _isDomesticallyTaxable(productName);
 	}
 
@@ -96,35 +82,6 @@ public class CartItem {
 		_postTaxPrice = new BigDecimal("0.00").add(_preTaxPrice.add(taxTotal));
 	}
 
-	private void _addToFood(String productName) {
-
-		// Add to Food file
-
-		ArrayList<String> iterableProduct = new ArrayList<>();
-
-		iterableProduct.add(productName);
-		try {
-			Files.write(
-				Paths.get(_FOODFILE), iterableProduct, Charset.defaultCharset(),
-				_options);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void _addToMedicine(String productName) {
-		_medicineProducts.add(productName);
-
-		try {
-			_listToFile(_MEDICINEFILE, _medicineProducts);
-		}
-		catch (IOException ioe) {
-			throw new RuntimeException(
-				"Unable to write file " + _MEDICINEFILE, ioe);
-		}
-	}
-
 	private void _addToNonTaxable(String productName) {
 		_nonTaxableProducts.add(productName);
 
@@ -134,18 +91,6 @@ public class CartItem {
 		catch (IOException ioe) {
 			throw new RuntimeException(
 				"Could not write to file: " + _NONTAXABLEFILE, ioe);
-		}
-	}
-
-	private void _addToSeen(String productName) {
-		_seenProducts.add(productName);
-
-		try {
-			_listToFile(_SEENFILE, _seenProducts);
-		}
-		catch (IOException ioe) {
-			throw new RuntimeException(
-				"Unable to write file " + _SEENFILE, ioe);
 		}
 	}
 
@@ -159,31 +104,6 @@ public class CartItem {
 			throw new RuntimeException(
 				"Could not write to file: " + _TAXABLEFILE, ioe);
 		}
-	}
-
-	private boolean _askIfFood(String productName) {
-		//Ask via commandline if this product is Food
-		System.out.println(
-			"This product has not been seen before. Please answer the " +
-				"following for tax purposes:");
-
-		if (_askIfType(productName, "food")) {
-			_addToFood(productName);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private boolean _askIfMedicine(String productName) {
-		if (_askIfType(productName, "medicine")) {
-			_addToMedicine(productName);
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private boolean _askIfTaxable(String productName) {
@@ -208,26 +128,6 @@ public class CartItem {
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Console unavailable to use: " + e);
-		}
-	}
-
-	private boolean _askIfType(String productName, String type) {
-		try {
-			Console console = System.console();
-
-			if (console != null) {
-				String response = console.readLine(
-					"Is " + productName + " " + type + ": ");
-
-				if (response.equalsIgnoreCase("yes")) {
-					return true;
-				}
-			}
-
-			return false;
-		}
-		finally {
-			_addToSeen(productName);
 		}
 	}
 
@@ -287,49 +187,6 @@ public class CartItem {
 		}
 	}
 
-	private boolean _isFood(String productName) {
-		if (_foodProducts == null) {
-			_loadFoodFile();
-		}
-
-		if (_foodProducts.contains(productName)) {
-			return true;
-		}
-
-		if (_isSeen(productName)) {
-			return false;
-		}
-
-		return _askIfFood(productName);
-	}
-
-	private boolean _isMedicine(String productName) {
-
-		// Consult MEDICINE file
-
-		if (_medicineProducts == null) {
-			_loadMedicineFile();
-		}
-
-		if (_medicineProducts.contains(productName)) {
-			return true;
-		}
-
-		if (_isSeen(productName)) {
-			return false;
-		}
-
-		return _askIfMedicine(productName);
-	}
-
-	private boolean _isSeen(String productName) {
-		if (_seenProducts == null) {
-			_loadSeenFile();
-		}
-
-		return _seenProducts.contains(productName);
-	}
-
 	private void _listToFile(String fileName, List<String> list)
 		throws IOException {
 
@@ -338,31 +195,6 @@ public class CartItem {
 			new StandardOpenOption[] {CREATE, TRUNCATE_EXISTING, WRITE});
 	}
 
-	private void _loadFoodFile() {
-		try {
-			_foodProducts = _fileToList(_FOODFILE);
-		}
-		catch (IOException ioe) {
-			System.out.println(
-				"WARNING - " + _FOODFILE + " could not be read. " +
-					ioe.getMessage());
-
-			_foodProducts = new ArrayList<>();
-		}
-	}
-
-	private void _loadMedicineFile() {
-		try {
-			_medicineProducts = _fileToList(_MEDICINEFILE);
-		}
-		catch (IOException ioe) {
-			System.out.println(
-				"WARNING - " + _MEDICINEFILE + " could not be read. " +
-					ioe.getMessage());
-
-			_medicineProducts = new ArrayList<>();
-		}
-	}
 
 	private void _loadNonTaxableFile() {
 		try {
@@ -373,19 +205,6 @@ public class CartItem {
 				_NONTAXABLEFILE + " could not be read. " + ioe.getMessage());
 
 			_nonTaxableProducts = new ArrayList<>();
-		}
-	}
-
-	private void _loadSeenFile() {
-		try {
-			_seenProducts = _fileToList(_SEENFILE);
-		}
-		catch (IOException ioe) {
-			System.out.println(
-				"WARNING - " + _SEENFILE + " could not be read. " +
-					ioe.getMessage());
-
-			_seenProducts = new ArrayList<>();
 		}
 	}
 
@@ -401,20 +220,11 @@ public class CartItem {
 		}
 	}
 
-	private static final String _FOODFILE = "food_file.txt";
-
-	private static final String _MEDICINEFILE = "medicine_file.txt";
-
 	private static final String _NONTAXABLEFILE = "nontaxable.txt";
-
-	private static final String _SEENFILE = "all_seen_products.txt";
 
 	private static final String _TAXABLEFILE = "taxable.txt";
 
-	private static List<String> _foodProducts;
-	private static List<String> _medicineProducts;
 	private static List<String> _nonTaxableProducts;
-	private static List<String> _seenProducts;
 	private static List<String> _taxableProducts;
 
 	private final boolean _basicSalesTaxApplicable;
