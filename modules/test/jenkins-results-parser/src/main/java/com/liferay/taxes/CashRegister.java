@@ -31,12 +31,6 @@ import java.util.Arrays;
  */
 public class CashRegister {
 
-	public static final BigDecimal BASICSALESTAX = new BigDecimal("0.10");
-
-	public static final BigDecimal IMPORTSALESTAX = new BigDecimal("0.05");
-
-	public static final BigDecimal ROUNDINGVALUE = new BigDecimal("0.05");
-
 	public static BigDecimal calculateCartTax(Cart customer) {
 		BigDecimal cartTax = new BigDecimal("0.00");
 
@@ -55,12 +49,12 @@ public class CashRegister {
 
 		if (inItem.isTaxable()) {
 			itemTax = itemTax.add(
-				calculateTax(inItem.getPreTaxPrice(), BASICSALESTAX));
+				calculateTax(inItem.getPreTaxPrice(), _BASICSALESTAX));
 		}
 
 		if (inItem.isImported()) {
 			itemTax = itemTax.add(
-				calculateTax(inItem.getPreTaxPrice(), IMPORTSALESTAX));
+				calculateTax(inItem.getPreTaxPrice(), _IMPORTSALESTAX));
 		}
 
 		return itemTax;
@@ -125,7 +119,7 @@ public class CashRegister {
 			while (true) {
 				String inputString = console.readLine("Please enter item: ");
 
-				if (inputString.equalsIgnoreCase("done")) {
+				if (inputString.equals("done")) {
 					System.out.println("Thank you!");
 
 					break;
@@ -180,10 +174,10 @@ public class CashRegister {
 	}
 
 	public static BigDecimal roundTax(BigDecimal tax) {
-		BigDecimal moduloResult = tax.remainder(ROUNDINGVALUE);
+		BigDecimal moduloResult = tax.remainder(_ROUNDINGVALUE);
 
 		if (moduloResult.compareTo(BigDecimal.ZERO) != 0) {
-			tax = tax.add(ROUNDINGVALUE.subtract(moduloResult));
+			tax = tax.add(_ROUNDINGVALUE.subtract(moduloResult));
 		}
 
 		return tax;
@@ -192,5 +186,11 @@ public class CashRegister {
 	public static BigDecimal scaleTax(BigDecimal tax) {
 		return tax.setScale(2, RoundingMode.HALF_UP);
 	}
+
+	private static final BigDecimal _BASICSALESTAX = new BigDecimal("0.10");
+
+	private static final BigDecimal _IMPORTSALESTAX = new BigDecimal("0.05");
+
+	private static final BigDecimal _ROUNDINGVALUE = new BigDecimal("0.05");
 
 }

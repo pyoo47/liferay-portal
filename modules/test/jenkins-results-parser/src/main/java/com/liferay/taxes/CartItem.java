@@ -110,7 +110,7 @@ public class CartItem {
 				String response = console.readLine(
 					"Product cannot be identified. Is it a food or medicine? ");
 
-				if (response.equalsIgnoreCase("yes")) {
+				if (response.equals("yes")) {
 					_addToNonTaxable(productName);
 					return false;
 				}
