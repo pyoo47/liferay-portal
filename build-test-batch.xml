@@ -2209,6 +2209,44 @@ ${output.content}</echo>
 		</run-batch-test>
 	</target>
 
+	<target name="portal-startup-space-in-path-jdk8">
+		<run-batch-test>
+			<test-action>
+				<sequential>
+					<execute dir="${project.dir}/bundles/tomcat-${app.server.version}/webapps/ROOT/WEB-INF/classes">
+						<![CDATA[
+							sed -i 's/bundles/bun\ dles/g' portal-ext.properties
+						]]>
+					</execute>
+
+					<execute>
+						<![CDATA[
+							mv bundles bun\ dles
+						]]>
+					</execute>
+
+					<echo file="app.server.${env.HOSTNAME}.properties">app.server.parent.dir=${project.dir}/bun\ dles</echo>
+
+					<antcall inheritAll="false" target="start-app-server" />
+
+					<antcall inheritAll="false" target="stop-app-server" />
+				</sequential>
+			</test-action>
+
+			<test-set-up>
+				<if>
+					<isset property="env.DIST_PATH" />
+					<then>
+						<prepare-test-environment />
+					</then>
+					<else>
+						<prepare-test-build />
+					</else>
+				</if>
+			</test-set-up>
+		</run-batch-test>
+	</target>
+
 	<target name="portal-web-jdk8">
 		<run-batch-test>
 			<test-action>
