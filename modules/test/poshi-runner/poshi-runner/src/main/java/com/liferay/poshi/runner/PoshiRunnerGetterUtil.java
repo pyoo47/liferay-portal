@@ -28,7 +28,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -263,14 +266,85 @@ public class PoshiRunnerGetterUtil {
 			fileContent = Dom4JUtil.format(element);
 		}
 
-		boolean cdata = false;
-		int lineNumber = 1;
-		StringBuilder sb = new StringBuilder();
-
 		BufferedReader bufferedReader = new BufferedReader(
 			new StringReader(fileContent));
 
+		return _getRootElement(bufferedReader, filePath);
+	}
+
+	public static Element getRootElementFromURL(URL url) throws Exception {
+		BufferedReader bufferedReader = new BufferedReader(
+			new InputStreamReader(url.openStream()));
+
+		return _getRootElement(bufferedReader, url.toString());
+	}
+
+	public static Object getVarMethodValue(String classCommandName)
+		throws Exception {
+
+		int x = classCommandName.indexOf("(");
+		int y = classCommandName.lastIndexOf(")");
+
+		String className = getClassNameFromClassCommandName(classCommandName);
+		String commandName = getCommandNameFromClassCommandName(
+			classCommandName);
+
+		List<String> args = new ArrayList<>();
+
+		if ((x + 1) < y) {
+			String parameterString = classCommandName.substring(x + 1, y);
+
+			Matcher parameterMatcher = _parameterPattern.matcher(
+				parameterString);
+
+			while (parameterMatcher.find()) {
+				String parameterValue = parameterMatcher.group();
+
+				if (parameterValue.startsWith("'") &&
+					parameterValue.endsWith("'")) {
+
+					parameterValue = parameterValue.substring(
+						1, parameterValue.length() - 1);
+				}
+				else if (parameterValue.contains("#")) {
+					parameterValue = PoshiRunnerContext.getPathLocator(
+						parameterValue);
+				}
+
+				if (parameterValue.contains("\'")) {
+					parameterValue = parameterValue.replaceAll("\\\\'", "'");
+				}
+
+				args.add(parameterValue);
+			}
+		}
+
+		Object returnObject = null;
+
+		if (className.equals("selenium")) {
+			Object object = SeleniumUtil.getSelenium();
+
+			returnObject = getMethodReturnValue(
+				args, className, commandName, object);
+		}
+		else {
+			className = "com.liferay.poshi.runner.util." + className;
+
+			returnObject = getMethodReturnValue(
+				args, className, commandName, null);
+		}
+
+		return returnObject;
+	}
+
+	private static Element _getRootElement(
+			BufferedReader bufferedReader, String filePath)
+		throws Exception {
+
+		boolean cdata = false;
 		String line = null;
+		int lineNumber = 1;
+		StringBuilder sb = new StringBuilder();
 
 		while ((line = bufferedReader.readLine()) != null) {
 			Matcher matcher = _tagPattern.matcher(line);
@@ -358,64 +432,6 @@ public class PoshiRunnerGetterUtil {
 		Element rootElement = document.getRootElement();
 
 		return rootElement;
-	}
-
-	public static Object getVarMethodValue(String classCommandName)
-		throws Exception {
-
-		int x = classCommandName.indexOf("(");
-		int y = classCommandName.lastIndexOf(")");
-
-		String className = getClassNameFromClassCommandName(classCommandName);
-		String commandName = getCommandNameFromClassCommandName(
-			classCommandName);
-
-		List<String> args = new ArrayList<>();
-
-		if ((x + 1) < y) {
-			String parameterString = classCommandName.substring(x + 1, y);
-
-			Matcher parameterMatcher = _parameterPattern.matcher(
-				parameterString);
-
-			while (parameterMatcher.find()) {
-				String parameterValue = parameterMatcher.group();
-
-				if (parameterValue.startsWith("'") &&
-					parameterValue.endsWith("'")) {
-
-					parameterValue = parameterValue.substring(
-						1, parameterValue.length() - 1);
-				}
-				else if (parameterValue.contains("#")) {
-					parameterValue = PoshiRunnerContext.getPathLocator(
-						parameterValue);
-				}
-
-				if (parameterValue.contains("\'")) {
-					parameterValue = parameterValue.replaceAll("\\\\'", "'");
-				}
-
-				args.add(parameterValue);
-			}
-		}
-
-		Object returnObject = null;
-
-		if (className.equals("selenium")) {
-			Object object = SeleniumUtil.getSelenium();
-
-			returnObject = getMethodReturnValue(
-				args, className, commandName, object);
-		}
-		else {
-			className = "com.liferay.poshi.runner.util." + className;
-
-			returnObject = getMethodReturnValue(
-				args, className, commandName, null);
-		}
-
-		return returnObject;
 	}
 
 	private static final Pattern _parameterPattern = Pattern.compile(
