@@ -81,6 +81,50 @@ public class ExecuteElement extends PoshiElement {
 
 	@Override
 	public void parseReadableSyntax(String readableSyntax) {
+		int contentStart = readableSyntax.indexOf("(") + 1;
+
+		String classCommandName = readableSyntax.substring(0, contentStart - 1);
+
+		classCommandName = classCommandName.replace(".", "#");
+
+		int contentEnd = readableSyntax.lastIndexOf(")");
+
+		String content = "";
+
+		if (contentEnd > contentStart) {
+			content = readableSyntax.substring(contentStart, contentEnd);
+		}
+
+		String executeType = "macro";
+
+		if (content.contains("locator1") || content.contains("locator2") ||
+			content.contains("value1") || content.contains("value2")) {
+
+			executeType = "function";
+		}
+
+		addAttribute(executeType, classCommandName);
+
+		if (content.length() == 0) {
+			return;
+		}
+
+		String[] assignments = content.split(",");
+
+		for (String assignment : assignments) {
+			if (executeType.equals("macro")) {
+				assignment = "var " + assignment;
+
+				addElementFromReadableSyntax(assignment);
+
+				continue;
+			}
+
+			String name = getNameFromAssignment(assignment);
+			String value = getValueFromAssignment(assignment);
+
+			addAttribute(name, value);
+		}
 	}
 
 	@Override
