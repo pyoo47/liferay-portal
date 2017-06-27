@@ -14,8 +14,6 @@
 
 package com.liferay.poshi.runner.elements;
 
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_VARIABLES;
-
 import com.liferay.poshi.runner.util.Dom4JUtil;
 
 import java.io.IOException;
@@ -47,10 +45,6 @@ public class VarElement extends PoshiElement {
 		super(name, readableSyntax);
 	}
 
-	public String getVarName() {
-		return attributeValue("name");
-	}
-
 	public String getVarValue() {
 		return attributeValue(valueAttributeName);
 	}
@@ -72,14 +66,6 @@ public class VarElement extends PoshiElement {
 		}
 
 		addAttribute("value", value);
-	}
-
-	public void setNamePadLength(int namePadLength) {
-		this.namePadLength = namePadLength;
-	}
-
-	public void setValuePadLength(int valuePadLength) {
-		this.valuePadLength = valuePadLength;
 	}
 
 	@Override
@@ -111,10 +97,6 @@ public class VarElement extends PoshiElement {
 		return sb.toString();
 	}
 
-	protected String getReadableVariableKey() {
-		return THESE_VARIABLES;
-	}
-
 	protected void initValueAttributeName(Element element) {
 		if (element.attribute("method") != null) {
 			valueAttributeName = "method";
@@ -137,33 +119,6 @@ public class VarElement extends PoshiElement {
 		}
 	}
 
-	protected int namePadLength;
 	protected String valueAttributeName;
-	protected int valuePadLength;
-
-	private String _pad(String s, int padLength) {
-		if (s == null) {
-			s = "";
-		}
-
-		int length = s.length();
-
-		if (length <= padLength) {
-			int pad = 1 + padLength - length;
-
-			StringBuilder sb = new StringBuilder();
-
-			sb.append(" ");
-			sb.append(s);
-
-			for (int i = 0; i < pad; i++) {
-				sb.append(" ");
-			}
-
-			return sb.toString();
-		}
-
-		return s;
-	}
 
 }

@@ -14,25 +14,10 @@
 
 package com.liferay.poshi.runner.elements;
 
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.BACKGROUND;
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.DESCRIPTION;
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.FEATURE;
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.PRIORITY;
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.SCENARIO;
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.SET_UP;
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.TEAR_DOWN;
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_PROPERTIES;
-import static com.liferay.poshi.runner.elements.ReadableSyntaxKeys.THESE_VARIABLES;
-import static com.liferay.poshi.runner.util.StringPool.COLON;
-import static com.liferay.poshi.runner.util.StringPool.SPACE;
-
 import com.liferay.poshi.runner.util.Dom4JUtil;
-import com.liferay.poshi.runner.util.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-
-import java.util.List;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -148,31 +133,8 @@ public class CommandElement extends PoshiElement {
 		return sb.toString();
 	}
 
-	protected String getOldReadableCommandTitle() {
-		return SCENARIO + COLON + SPACE;
-	}
-
 	protected String getReadableCommandTitle() {
 		return "test" + attributeValue("name");
-	}
-
-	private void _addDescriptionAttribute(String readableSyntax) {
-		String description = getAttributeValue(
-			DESCRIPTION + COLON, readableSyntax);
-
-		addAttribute("description", description);
-	}
-
-	private void _addPriorityAttribute(String readableSyntax) {
-		String priority = getAttributeValue(PRIORITY + COLON, readableSyntax);
-
-		addAttribute("priority", priority);
-	}
-
-	private String _getCommandName(String readableSyntax) {
-		String scenario = getAttributeValue(SCENARIO + COLON, readableSyntax);
-
-		return StringUtil.removeSpaces(scenario);
 	}
 
 }
