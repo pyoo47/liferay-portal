@@ -182,6 +182,13 @@ public abstract class PoshiElement extends DefaultElement {
 		return phrase;
 	}
 
+	protected void addElementFromReadableSyntax(String readableSyntax) {
+		PoshiElement poshiElement = PoshiElementFactory.newPoshiElement(
+			readableSyntax);
+
+		add(poshiElement);
+	}
+
 	protected String getAttributeValue(String startKey, String readableSyntax) {
 		return getAttributeValue(startKey, "\n", readableSyntax);
 	}
