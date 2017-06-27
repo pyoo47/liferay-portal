@@ -123,42 +123,6 @@ public class CommandElement extends PoshiElement {
 	}
 
 	@Override
-	public String toOldReadableSyntax() {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("\n");
-		sb.append(getOldReadableCommandTitle());
-
-		if (attributeValue("name") != null) {
-			String name = attributeValue("name");
-
-			sb.append(toPhrase(name));
-		}
-
-		if (attributeValue("description") != null) {
-			String description = attributeValue("description");
-
-			sb.append("\n");
-			sb.append(DESCRIPTION);
-			sb.append(": ");
-			sb.append(description);
-		}
-
-		if (attributeValue("priority") != null) {
-			String priority = attributeValue("priority");
-
-			sb.append("\n");
-			sb.append(PRIORITY);
-			sb.append(": ");
-			sb.append(priority);
-		}
-
-		sb.append(super.toOldReadableSyntax());
-
-		return sb.toString();
-	}
-
-	@Override
 	public String toReadableSyntax() {
 		StringBuilder sb = new StringBuilder();
 

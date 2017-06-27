@@ -83,46 +83,6 @@ public class VarElement extends PoshiElement {
 	}
 
 	@Override
-	public String toOldReadableSyntax() {
-		StringBuilder sb = new StringBuilder();
-
-		Element parentElement = getParent();
-
-		String parentElementName = parentElement.getName();
-
-		if (parentElementName.equals("command") ||
-			parentElementName.equals("set-up") ||
-			parentElementName.equals("tear-down")) {
-
-			String previousSiblingElementName = null;
-
-			Element previousSiblingElement = getPreviousSiblingElement();
-
-			if (previousSiblingElement != null) {
-				previousSiblingElementName = previousSiblingElement.getName();
-			}
-
-			if ((previousSiblingElement == null) ||
-				!previousSiblingElementName.equals(getName())) {
-
-				sb.append("\n\t");
-				sb.append(getReadableExecuteKey());
-				sb.append(" ");
-				sb.append(getReadableVariableKey());
-			}
-		}
-
-		sb.append("\n\t\t");
-		sb.append("|");
-		sb.append(_pad(getVarName(), namePadLength));
-		sb.append("|");
-		sb.append(_pad(getVarValue(), valuePadLength));
-		sb.append("|");
-
-		return sb.toString();
-	}
-
-	@Override
 	public String toReadableSyntax() {
 		StringBuilder sb = new StringBuilder();
 

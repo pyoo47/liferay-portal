@@ -94,56 +94,6 @@ public class ExecuteElement extends PoshiElement {
 	}
 
 	@Override
-	public String toOldReadableSyntax() {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("\n\t");
-		sb.append(getReadableExecuteKey());
-
-		if (attributeValue("function") != null) {
-			sb.append(" ");
-
-			String function = attributeValue("function");
-
-			sb.append(_getReadableSyntaxCommandPhrase(function));
-
-			List<String> functionAttributeNames = Arrays.asList(
-				"value1", "locator1", "value2", "locator2");
-
-			for (String functionAttributeName : functionAttributeNames) {
-				String functionAttributeValue = attributeValue(
-					functionAttributeName);
-
-				if (functionAttributeValue != null) {
-					if (functionAttributeName.startsWith("locator")) {
-						sb.append(" ");
-						sb.append(AT_LOCATOR);
-					}
-					else {
-						sb.append(" ");
-						sb.append(THE_VALUE);
-					}
-
-					sb.append(" '");
-					sb.append(functionAttributeValue);
-					sb.append("'");
-				}
-			}
-		}
-		else if (attributeValue("macro") != null) {
-			sb.append(" ");
-
-			String macro = attributeValue("macro");
-
-			sb.append(_getReadableSyntaxCommandPhrase(macro));
-		}
-
-		sb.append(super.toOldReadableSyntax());
-
-		return sb.toString();
-	}
-
-	@Override
 	public String toReadableSyntax() {
 		if (attributeValue("function") != null) {
 			StringBuilder sb = new StringBuilder();

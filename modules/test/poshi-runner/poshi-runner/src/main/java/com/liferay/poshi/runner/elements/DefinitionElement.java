@@ -108,63 +108,6 @@ public class DefinitionElement extends PoshiElement {
 	}
 
 	@Override
-	public String toOldReadableSyntax() {
-		prepareVarElementsForReadableSyntax();
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(FEATURE);
-		sb.append(COLON);
-		sb.append("\n\n");
-		sb.append(BACKGROUND);
-		sb.append(": This executes once per feature file");
-		sb.append("\n\t");
-		sb.append(GIVEN);
-		sb.append(" ");
-		sb.append(THESE_PROPERTIES);
-
-		for (PoshiElement poshiElement :
-				toPoshiElements(elements("property"))) {
-
-			sb.append(poshiElement.toOldReadableSyntax());
-		}
-
-		List<Element> elements = elements("var");
-
-		if (!elements.isEmpty()) {
-			sb.append("\n\t");
-			sb.append(AND);
-			sb.append(" ");
-			sb.append(THESE_VARIABLES);
-
-			for (PoshiElement poshiElement : toPoshiElements(elements())) {
-				sb.append(poshiElement.toOldReadableSyntax());
-			}
-		}
-
-		sb.append("\n");
-
-		for (PoshiElement poshiElement : toPoshiElements(elements("set-up"))) {
-			sb.append(poshiElement.toOldReadableSyntax());
-		}
-
-		sb.append("\n");
-
-		for (PoshiElement poshiElement :
-				toPoshiElements(elements("tear-down"))) {
-
-			sb.append(poshiElement.toOldReadableSyntax());
-		}
-
-		for (PoshiElement poshiElement : toPoshiElements(elements("command"))) {
-			sb.append("\n");
-			sb.append(poshiElement.toOldReadableSyntax());
-		}
-
-		return sb.toString();
-	}
-
-	@Override
 	public String toReadableSyntax() {
 		StringBuilder sb = new StringBuilder();
 
