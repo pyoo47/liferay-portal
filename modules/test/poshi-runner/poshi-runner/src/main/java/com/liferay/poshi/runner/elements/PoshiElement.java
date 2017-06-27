@@ -54,8 +54,7 @@ public abstract class PoshiElement extends DefaultElement {
 	public PoshiElement(String name, String readableSyntax) {
 		super(name);
 
-		addAttributes(readableSyntax);
-		addElements(readableSyntax);
+		parseReadableSyntax(readableSyntax);
 	}
 
 	public abstract void addAttributes(String readableSyntax);
