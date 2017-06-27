@@ -57,10 +57,6 @@ public abstract class PoshiElement extends DefaultElement {
 		parseReadableSyntax(readableSyntax);
 	}
 
-	public abstract void addAttributes(String readableSyntax);
-
-	public abstract void addElements(String readableSyntax);
-
 	public void addVariableElements(String readableSyntax) {
 		List<String> readableVariableBlocks = StringUtil.partition(
 			readableSyntax, READABLE_VARIABLE_BLOCK_KEYS);

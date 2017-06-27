@@ -30,14 +30,6 @@ public class UnsupportedElement extends PoshiElement {
 	}
 
 	@Override
-	public void addAttributes(String readableSyntax) {
-	}
-
-	@Override
-	public void addElements(String readableSyntax) {
-	}
-
-	@Override
 	public void parseReadableSyntax(String readableSyntax) {
 	}
 

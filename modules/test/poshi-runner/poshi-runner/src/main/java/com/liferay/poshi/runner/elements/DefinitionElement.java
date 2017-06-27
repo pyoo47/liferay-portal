@@ -47,38 +47,6 @@ public class DefinitionElement extends PoshiElement {
 	}
 
 	@Override
-	public void addAttributes(String readableSyntax) {
-		addAttribute("component-name", "portal-acceptance");
-	}
-
-	@Override
-	public void addElements(String readableSyntax) {
-		List<String> readableBlocks = StringUtil.partition(
-			readableSyntax, READABLE_COMMAND_BLOCK_KEYS);
-
-		for (String readableBlock : readableBlocks) {
-			if (readableBlock.startsWith(FEATURE)) {
-				continue;
-			}
-			else if (readableBlock.startsWith(BACKGROUND)) {
-				List<String> readableCommandBlocks = StringUtil.partition(
-					readableBlock, READABLE_COMMAND_BLOCK_KEYS);
-
-				for (String readableCommandBlock : readableCommandBlocks) {
-					addVariableElements(readableCommandBlock);
-				}
-
-				continue;
-			}
-
-			PoshiElement poshiElement = PoshiElementFactory.newPoshiElement(
-				readableBlock);
-
-			add(poshiElement);
-		}
-	}
-
-	@Override
 	public void parseReadableSyntax(String readableSyntax) {
 		try (BufferedReader bufferedReader = new BufferedReader(
 				new StringReader(readableSyntax))) {

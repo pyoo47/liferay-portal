@@ -29,10 +29,6 @@ public class TearDownElement extends CommandElement {
 		super("tear-down", readableSyntax);
 	}
 
-	@Override
-	public void addAttributes(String readableSyntax) {
-	}
-
 	protected String getOldReadableCommandTitle() {
 		return ReadableSyntaxKeys.TEAR_DOWN +
 			": This executes after each scenario";

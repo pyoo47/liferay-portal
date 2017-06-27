@@ -46,40 +46,6 @@ public class ExecuteElement extends PoshiElement {
 	}
 
 	@Override
-	public void addAttributes(String readableSyntax) {
-		if (readableSyntax.contains(AT_LOCATOR) ||
-			readableSyntax.contains(THE_VALUE)) {
-
-			_addFunctionAttributes(readableSyntax);
-
-			return;
-		}
-
-		addAttribute("macro", _getClassCommandName(readableSyntax));
-	}
-
-	@Override
-	public void addElements(String readableSyntax) {
-		List<String> readableBlocks = StringUtil.partition(
-			readableSyntax, READABLE_VARIABLE_BLOCK_KEYS);
-
-		for (String readableBlock : readableBlocks) {
-			readableBlock = readableBlock.trim();
-
-			if (readableBlock.contains(AND) || readableBlock.contains(GIVEN) ||
-				readableBlock.contains(THEN) || readableBlock.contains(WHEN)) {
-
-				continue;
-			}
-
-			PoshiElement poshiElement = PoshiElementFactory.newPoshiElement(
-				readableBlock);
-
-			add(poshiElement);
-		}
-	}
-
-	@Override
 	public void parseReadableSyntax(String readableSyntax) {
 		int contentStart = readableSyntax.indexOf("(") + 1;
 

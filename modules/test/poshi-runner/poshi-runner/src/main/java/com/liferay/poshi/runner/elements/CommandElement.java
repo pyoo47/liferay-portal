@@ -59,44 +59,6 @@ public class CommandElement extends PoshiElement {
 	}
 
 	@Override
-	public void addAttributes(String readableSyntax) {
-		if (readableSyntax.contains(DESCRIPTION + COLON)) {
-			_addDescriptionAttribute(readableSyntax);
-		}
-
-		addAttribute("name", _getCommandName(readableSyntax));
-
-		_addPriorityAttribute(readableSyntax);
-	}
-
-	@Override
-	public void addElements(String readableSyntax) {
-		List<String> readableBlocks = StringUtil.partition(
-			readableSyntax, READABLE_EXECUTE_BLOCK_KEYS);
-
-		for (String readableBlock : readableBlocks) {
-			if (readableBlock.contains(BACKGROUND) ||
-				readableBlock.contains(FEATURE) ||
-				readableBlock.contains(SCENARIO) ||
-				readableBlock.contains(SET_UP) ||
-				readableBlock.contains(TEAR_DOWN)) {
-
-				continue;
-			}
-
-			if (readableBlock.contains(THESE_PROPERTIES) ||
-				readableBlock.contains(THESE_VARIABLES)) {
-
-				addVariableElements(readableBlock);
-
-				continue;
-			}
-
-			add(PoshiElementFactory.newPoshiElement(readableBlock));
-		}
-	}
-
-	@Override
 	public void parseReadableSyntax(String readableSyntax) {
 		try (BufferedReader bufferedReader = new BufferedReader(
 				new StringReader(readableSyntax))) {

@@ -47,27 +47,6 @@ public class VarElement extends PoshiElement {
 		super(name, readableSyntax);
 	}
 
-	public void addAttributes(String readableSyntax) {
-		String[] items = readableSyntax.split("\\|", -1);
-
-		addAttribute("name", items[1].trim());
-
-		String value = items[2].trim();
-
-		if (value.contains("Util#")) {
-			valueAttributeName = "method";
-		}
-		else {
-			valueAttributeName = "value";
-		}
-
-		addAttribute(valueAttributeName, value);
-	}
-
-	@Override
-	public void addElements(String readableSyntax) {
-	}
-
 	public String getVarName() {
 		return attributeValue("name");
 	}
