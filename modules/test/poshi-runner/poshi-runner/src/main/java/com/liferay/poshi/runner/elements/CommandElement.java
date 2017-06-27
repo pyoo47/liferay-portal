@@ -148,7 +148,7 @@ public class CommandElement extends PoshiElement {
 
 			String value = attribute.getValue();
 
-			sb.append(getAssignmentStatement(name, value));
+			sb.append(getAssignment(name, value));
 		}
 
 		String readableCommandTitle = getReadableCommandTitle();

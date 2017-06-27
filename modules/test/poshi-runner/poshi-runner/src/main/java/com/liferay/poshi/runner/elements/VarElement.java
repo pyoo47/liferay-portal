@@ -148,7 +148,7 @@ public class VarElement extends PoshiElement {
 
 		value = value.replace("Util#", "Util.");
 
-		sb.append(getAssignmentStatement(name, value));
+		sb.append(getAssignment(name, value));
 
 		if (!parentElementName.equals("execute")) {
 			sb.append(";");

@@ -146,7 +146,7 @@ public class DefinitionElement extends PoshiElement {
 			String name = attribute.getName();
 			String value = attribute.getValue();
 
-			sb.append(getAssignmentStatement(name, value));
+			sb.append(getAssignment(name, value));
 		}
 
 		StringBuilder content = new StringBuilder();

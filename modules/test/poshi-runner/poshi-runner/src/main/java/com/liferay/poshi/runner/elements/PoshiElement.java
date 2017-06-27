@@ -141,7 +141,7 @@ public abstract class PoshiElement extends DefaultElement {
 		return sb.toString();
 	}
 
-	protected static String getAssignmentStatement(String name, String value) {
+	protected static String getAssignment(String name, String value) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(name);

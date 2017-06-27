@@ -149,7 +149,7 @@ public class ExecuteElement extends PoshiElement {
 
 				String value = attribute.getValue();
 
-				sb.append(getAssignmentStatement(name, value));
+				sb.append(getAssignment(name, value));
 
 				sb.append(", ");
 			}
