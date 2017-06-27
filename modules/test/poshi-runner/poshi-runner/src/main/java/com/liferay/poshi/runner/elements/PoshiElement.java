@@ -152,6 +152,26 @@ public abstract class PoshiElement extends DefaultElement {
 		return sb.toString();
 	}
 
+	protected static String getNameFromAssignment(String assignment) {
+		String name = assignment.split("=")[0];
+
+		name = name.trim();
+
+		name = name.replaceAll("@", "");
+
+		name = name.replaceAll("property ", "");
+
+		return name.replaceAll("var ", "");
+	}
+
+	protected static String getValueFromAssignment(String assignment) {
+		int start = assignment.indexOf("\"") + 1;
+
+		int end = assignment.indexOf("\"", start);
+
+		return assignment.substring(start, end);
+	}
+
 	protected static String toPhrase(String s) {
 		String phrase = s.replaceAll(_PHRASE_REGEX, " $0");
 
