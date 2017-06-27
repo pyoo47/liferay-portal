@@ -48,7 +48,7 @@ public class PoshiElementFactoryTest {
 		PoshiElement poshiElement = PoshiElementFactory.newPoshiElementFromFile(
 			_POSHI_TEST_FILE_PATH);
 
-		String readableSyntax = poshiElement.toOldReadableSyntax();
+		String readableSyntax = poshiElement.toReadableSyntax();
 
 		PoshiElement elementFromReadableSyntax =
 			PoshiElementFactory.newPoshiElement(readableSyntax);
