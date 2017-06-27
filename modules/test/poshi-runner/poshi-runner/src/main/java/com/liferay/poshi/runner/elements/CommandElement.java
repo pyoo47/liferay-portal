@@ -29,6 +29,9 @@ import static com.liferay.poshi.runner.util.StringPool.SPACE;
 import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
+
 import java.util.List;
 
 import org.dom4j.Attribute;
@@ -95,6 +98,66 @@ public class CommandElement extends PoshiElement {
 
 	@Override
 	public void parseReadableSyntax(String readableSyntax) {
+		try (BufferedReader bufferedReader = new BufferedReader(
+				new StringReader(readableSyntax))) {
+
+			StringBuilder sb = new StringBuilder();
+
+			String line = null;
+
+			while ((line = bufferedReader.readLine()) != null) {
+				String endKey = " {";
+
+				if (line.endsWith(endKey)) {
+					String startKey = "test";
+
+					if (line.startsWith(startKey)) {
+						int start = startKey.length();
+						int end = line.length() - endKey.length();
+
+						String name = line.substring(start, end);
+
+						addAttribute("name", name);
+					}
+
+					continue;
+				}
+
+				if (line.equals(");")) {
+					sb.append(line);
+
+					addElementFromReadableSyntax(sb.toString());
+
+					sb.setLength(0);
+
+					continue;
+				}
+
+				if (line.endsWith(";")) {
+					addElementFromReadableSyntax(line);
+
+					continue;
+				}
+
+				if (line.equals("}")) {
+					continue;
+				}
+
+				if (line.startsWith("@")) {
+					String name = getNameFromAssignment(line);
+					String value = getValueFromAssignment(line);
+
+					addAttribute(name, value);
+
+					continue;
+				}
+
+				sb.append(line);
+			}
+		}
+		catch (Exception e) {
+			System.out.println("Unable to generate the 'command' element");
+		}
 	}
 
 	@Override

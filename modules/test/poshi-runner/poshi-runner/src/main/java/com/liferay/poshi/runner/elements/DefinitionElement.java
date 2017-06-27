@@ -25,6 +25,9 @@ import static com.liferay.poshi.runner.util.StringPool.COLON;
 import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
+
 import java.util.List;
 
 import org.dom4j.Attribute;
@@ -77,6 +80,63 @@ public class DefinitionElement extends PoshiElement {
 
 	@Override
 	public void parseReadableSyntax(String readableSyntax) {
+		try (BufferedReader bufferedReader = new BufferedReader(
+				new StringReader(readableSyntax))) {
+
+			StringBuilder sb = new StringBuilder();
+
+			String line = null;
+
+			while ((line = bufferedReader.readLine()) != null) {
+				line = line.trim();
+
+				if (line.length() == 0) {
+					continue;
+				}
+
+				if (line.startsWith("@") && !line.contains("@description") &&
+					!line.contains("@priority")) {
+
+					String name = getNameFromAssignment(line);
+					String value = getValueFromAssignment(line);
+
+					addAttribute(name, value);
+
+					continue;
+				}
+
+				if (line.startsWith("definition {")) {
+					continue;
+				}
+
+				if ((line.startsWith("property") || line.startsWith("var")) &&
+					(sb.length() == 0)) {
+
+					addElementFromReadableSyntax(line);
+
+					continue;
+				}
+
+				if (line.equals("}")) {
+					sb.append(line);
+
+					if (sb.length() > 1) {
+						addElementFromReadableSyntax(sb.toString());
+
+						sb.setLength(0);
+
+						continue;
+					}
+				}
+
+				sb.append(line);
+				sb.append("\n");
+			}
+
+		}
+		catch (Exception e) {
+			System.out.println("Unable to generate the 'definition' element");
+		}
 	}
 
 	@Override
