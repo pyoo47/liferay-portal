@@ -213,6 +213,35 @@ public class ExecuteElement extends PoshiElement {
 		return _createReadableExecuteBlock(macro, readableSyntax);
 	}
 
+	private static String _createReadableExecuteBlock(
+		String commandName, String content) {
+
+		StringBuilder sb = new StringBuilder();
+
+		String pad = "\t";
+
+		sb.append("\n\n");
+		sb.append(pad);
+		sb.append(commandName.replace("#", "."));
+		sb.append("(");
+
+		String trimmedContent = content.trim();
+
+		if (!trimmedContent.equals("")) {
+			if (content.contains("\n")) {
+				content = content.replaceAll("\n", ",\n" + pad);
+				content = content.replaceFirst(",", "");
+				content = content + "\n" + pad;
+			}
+
+			sb.append(content);
+		}
+
+		sb.append(");");
+
+		return sb.toString();
+	}
+
 	private void _addFunctionAttribute(
 		String readableSyntax, String attributeName) {
 
@@ -247,35 +276,6 @@ public class ExecuteElement extends PoshiElement {
 
 			addAttribute("function", _getClassCommandName(functionItem));
 		}
-	}
-
-	private static String _createReadableExecuteBlock(
-	String commandName, String content) {
-
-		StringBuilder sb = new StringBuilder();
-
-		String pad = "\t";
-
-		sb.append("\n\n");
-		sb.append(pad);
-		sb.append(commandName.replace("#", "."));
-		sb.append("(");
-
-		String trimmedContent = content.trim();
-
-		if (!trimmedContent.equals("")) {
-			if (content.contains("\n")) {
-				content = content.replaceAll("\n", ",\n" + pad);
-				content = content.replaceFirst(",", "");
-				content = content + "\n" + pad;
-			}
-
-			sb.append(content);
-		}
-
-		sb.append(");");
-
-		return sb.toString();
 	}
 
 	private String _getClassCommandName(String readableSyntax) {
