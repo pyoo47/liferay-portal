@@ -86,6 +86,8 @@ public abstract class PoshiElement extends DefaultElement {
 		}
 	}
 
+	public abstract void parseReadableSyntax(String readableSyntax);
+
 	public String toOldReadableSyntax() {
 		prepareVarElementsForReadableSyntax();
 

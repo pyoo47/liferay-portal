@@ -76,6 +76,10 @@ public class DefinitionElement extends PoshiElement {
 	}
 
 	@Override
+	public void parseReadableSyntax(String readableSyntax) {
+	}
+
+	@Override
 	public String toOldReadableSyntax() {
 		prepareVarElementsForReadableSyntax();
 

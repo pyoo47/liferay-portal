@@ -80,6 +80,10 @@ public class ExecuteElement extends PoshiElement {
 	}
 
 	@Override
+	public void parseReadableSyntax(String readableSyntax) {
+	}
+
+	@Override
 	public String toOldReadableSyntax() {
 		StringBuilder sb = new StringBuilder();
 

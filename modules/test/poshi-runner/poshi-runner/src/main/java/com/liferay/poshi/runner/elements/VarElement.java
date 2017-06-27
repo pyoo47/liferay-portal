@@ -76,6 +76,10 @@ public class VarElement extends PoshiElement {
 		return attributeValue(valueAttributeName);
 	}
 
+	@Override
+	public void parseReadableSyntax(String readableSyntax) {
+	}
+
 	public void setNamePadLength(int namePadLength) {
 		this.namePadLength = namePadLength;
 	}
