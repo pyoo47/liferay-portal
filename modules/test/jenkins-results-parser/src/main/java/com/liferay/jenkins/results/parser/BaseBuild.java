@@ -121,6 +121,11 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void discard() {
+		setStatus("discarded");
+	}
+
+	@Override
 	public String getAppServer() {
 		return null;
 	}
@@ -815,6 +820,33 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return false;
+	}
+
+	@Override
+	public void invoke() {
+		String hostName = JenkinsResultsParserUtil.getHostName("");
+
+		if (!hostName.startsWith("cloud-10-0")) {
+			System.out.println("A build may not be invoked by " + hostName);
+
+			setStatus("discarded");
+
+			return;
+		}
+
+		String invocationURL = getInvocationURL();
+
+		try {
+			JenkinsResultsParserUtil.toString(
+				JenkinsResultsParserUtil.getLocalURL(invocationURL));
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		System.out.println(getInvocationMessage());
+
+		setStatus("starting");
 	}
 
 	@Override
