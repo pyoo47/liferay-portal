@@ -126,6 +126,8 @@ public interface Build {
 
 	public String replaceBuildURL(String text);
 
+	public void setPrerequisiteRules(PrerequisiteRules prerequisiteRules);
+
 	public void update();
 
 }
