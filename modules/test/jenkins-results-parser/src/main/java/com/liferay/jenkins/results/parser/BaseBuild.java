@@ -60,6 +60,10 @@ public abstract class BaseBuild implements Build {
 				downstreamBuilds.add(BuildFactory.newBuild(url, this));
 			}
 		}
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			downstreamBuild.setPrerequisiteRules(prerequisiteRules);
+		}
 	}
 
 	@Override
@@ -948,6 +952,15 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void setPrerequisiteRules(PrerequisiteRules prerequisiteRules) {
+		this.prerequisiteRules = prerequisiteRules;
+
+		for (Build build : downstreamBuilds) {
+			build.setPrerequisiteRules(prerequisiteRules);
+		}
+	}
+
+	@Override
 	public void update() {
 		String status = getStatus();
 
@@ -1088,6 +1101,8 @@ public abstract class BaseBuild implements Build {
 
 	protected BaseBuild(String url, Build parentBuild) {
 		_parentBuild = parentBuild;
+
+		prerequisiteRules = new PrerequisiteRules();
 
 		if (url.contains("buildWithParameters")) {
 			setInvocationURL(url);
@@ -1941,6 +1956,7 @@ public abstract class BaseBuild implements Build {
 	protected boolean fromArchive;
 	protected String jobName;
 	protected String master;
+	protected PrerequisiteRules prerequisiteRules;
 	protected List<ReinvokeRule> reinvokeRules =
 		ReinvokeRule.getReinvokeRules();
 	protected String repositoryName;
