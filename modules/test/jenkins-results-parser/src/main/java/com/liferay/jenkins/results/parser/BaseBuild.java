@@ -129,8 +129,33 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void deregister(BuildEventListener buildEventListener) {
+		buildEventListeners.remove(buildEventListener);
+	}
+
+	@Override
 	public void discard() {
 		setStatus("discarded");
+	}
+
+	@Override
+	public void evaluate() {
+		PrerequisiteRule.State prerequisiteState = getPrerequisitesState(this);
+
+		String status = getStatus();
+
+		if (status.equals("pending")) {
+			if (prerequisiteState.equals(PrerequisiteRule.State.INVOKE)) {
+				invoke();
+			}
+			else if (prerequisiteState.equals(PrerequisiteRule.State.DISCARD)) {
+				discard();
+			}
+		}
+
+		for (Build build : getDownstreamBuilds("pending")) {
+			build.evaluate();
+		}
 	}
 
 	@Override
@@ -878,6 +903,11 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void register(BuildEventListener buildEventListener) {
+		buildEventListeners.add(buildEventListener);
+	}
+
+	@Override
 	public void reinvoke() {
 		reinvoke(null);
 	}
@@ -1053,14 +1083,26 @@ public abstract class BaseBuild implements Build {
 
 					String result = getResult();
 
-					if ((downstreamBuilds.size() ==
-							getDownstreamBuildCount("completed")) &&
+					int finishedBuildCount =
+						getDownstreamBuildCount("completed") +
+							getDownstreamBuildCount("discarded");
+
+					if ((downstreamBuilds.size() == finishedBuildCount) &&
 						(result != null)) {
 
 						setStatus("completed");
 					}
 
-					findDownstreamBuilds();
+					if (!status.equals(getStatus())) {
+						BuildEvent buildEvent = new BuildEvent(
+							this, getStatus(), status);
+
+						for (BuildEventListener buildEventListener :
+								buildEventListeners) {
+
+							buildEventListener.onBuildEvent(buildEvent);
+						}
+					}
 
 					if (this instanceof AxisBuild ||
 						this instanceof BatchBuild ||
@@ -1086,6 +1128,23 @@ public abstract class BaseBuild implements Build {
 			catch (IOException ioe) {
 				throw new RuntimeException(ioe);
 			}
+		}
+	}
+
+	@Override
+	public void updateBuildTriggers() {
+		List<Build> applicableBuilds = getApplicableBuilds(
+			this, BuildUtil.getAllBuilds(getTopLevelBuild()));
+
+		for (Build build : applicableBuilds) {
+			BuildTriggerEventListener buildTriggerEventListener =
+				new BuildTriggerEventListener(build);
+
+			register(buildTriggerEventListener);
+		}
+
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			downstreamBuild.updateBuildTriggers();
 		}
 	}
 
@@ -1387,6 +1446,8 @@ public abstract class BaseBuild implements Build {
 
 			downstreamBaseBuild.checkForReinvocation(consoleText);
 		}
+
+		updateBuildTriggers();
 	}
 
 	protected List<String> findDownstreamBuildsInConsoleText(
@@ -1443,6 +1504,21 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return foundDownstreamBuildURLs;
+	}
+
+	protected List<Build> getApplicableBuilds(
+		Build build, List<Build> allBuilds) {
+
+		Set<Build> applicableBuilds = new HashSet<>();
+
+		for (PrerequisiteRule prerequisiteRule : prerequisiteRules) {
+			if (prerequisiteRule.isPrerequisite(build)) {
+				applicableBuilds.addAll(
+					prerequisiteRule.getApplicableBuilds(allBuilds));
+			}
+		}
+
+		return new ArrayList<>(applicableBuilds);
 	}
 
 	protected String getBaseRepositoryType() {
@@ -1713,6 +1789,51 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return new HashMap<>();
+	}
+
+	protected Map<Build, PrerequisiteRule> getPrerequisites(
+		Build build, List<Build> allBuilds) {
+
+		Map<Build, PrerequisiteRule> prerequisites = new HashMap<>();
+
+		for (PrerequisiteRule prerequisiteRule : prerequisiteRules) {
+			if (prerequisiteRule.isApplicable(build)) {
+				List<Build> prerequisiteBuilds =
+					prerequisiteRule.getPrerequisiteBuilds(allBuilds);
+
+				for (Build prerequisiteBuild : prerequisiteBuilds) {
+					prerequisites.put(prerequisiteBuild, prerequisiteRule);
+				}
+			}
+		}
+
+		return prerequisites;
+	}
+
+	protected PrerequisiteRule.State getPrerequisitesState(Build build) {
+		TopLevelBuild topLevelBuild = build.getTopLevelBuild();
+
+		Map<Build, PrerequisiteRule> prerequisites = getPrerequisites(
+			build, BuildUtil.getAllBuilds(topLevelBuild));
+
+		PrerequisiteRule.State state = PrerequisiteRule.State.INVOKE;
+
+		for (Build prerequisiteBuild : prerequisites.keySet()) {
+			PrerequisiteRule prerequisiteRule = prerequisites.get(
+				prerequisiteBuild);
+
+			if (prerequisiteRule.shouldDiscard(prerequisiteBuild)) {
+				return PrerequisiteRule.State.DISCARD;
+			}
+
+			if (!prerequisiteRule.shouldDiscard(prerequisiteBuild) &&
+				!prerequisiteRule.shouldInvoke(prerequisiteBuild)) {
+
+				state = PrerequisiteRule.State.PENDING;
+			}
+		}
+
+		return state;
 	}
 
 	protected JSONObject getQueueItemJSONObject() throws IOException {
@@ -2122,6 +2243,7 @@ public abstract class BaseBuild implements Build {
 	protected String archiveName;
 	protected List<Integer> badBuildNumbers = new ArrayList<>();
 	protected String branchName;
+	protected Set<BuildEventListener> buildEventListeners = new HashSet<>();
 	protected List<Build> downstreamBuilds = new ArrayList<>();
 	protected boolean fromArchive;
 	protected String jobName;
