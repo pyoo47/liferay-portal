@@ -672,6 +672,12 @@ public abstract class BaseBuild implements Build {
 
 		String status = getStatus();
 
+		if (status.equals("discarded")) {
+			sb.append(" was discarded because its prerequisite build failed.");
+
+			return sb.toString();
+		}
+
 		if (status.equals("completed")) {
 			sb.append(" completed at ");
 			sb.append(getBuildURL());
@@ -685,6 +691,12 @@ public abstract class BaseBuild implements Build {
 			sb.append(" is missing ");
 			sb.append(getJobURL());
 			sb.append(".");
+
+			return sb.toString();
+		}
+
+		if (status.equals("pending")) {
+			sb.append(" is pending.");
 
 			return sb.toString();
 		}
@@ -736,6 +748,12 @@ public abstract class BaseBuild implements Build {
 			" Starting  ", "/ ",
 
 			Integer.toString(getDownstreamBuildCount("missing")), " Missing  ",
+			"/ ",
+
+			Integer.toString(getDownstreamBuildCount("discarded")),
+			" Discarded  ", "/ ",
+
+			Integer.toString(getDownstreamBuildCount("pending")), " Pending  ",
 			"/ ",
 
 			Integer.toString(getDownstreamBuildCount("queued")), " Queued  ",
@@ -1438,6 +1456,12 @@ public abstract class BaseBuild implements Build {
 				return sb.toString();
 			}
 
+			if (status.equals("discarded")) {
+				sb.append(" has been discarded.");
+
+				return sb.toString();
+			}
+
 			if (status.equals("missing")) {
 				sb.append(" is missing ");
 				sb.append(getJobURL());
@@ -1470,6 +1494,12 @@ public abstract class BaseBuild implements Build {
 
 				sb.append(getBuildURL());
 				sb.append(".\n");
+
+				return sb.toString();
+			}
+
+			if (status.equals("pending")) {
+				sb.append(" is pending trigger.");
 
 				return sb.toString();
 			}
@@ -1548,6 +1578,17 @@ public abstract class BaseBuild implements Build {
 		boolean showCommonFailuresCount) {
 
 		return getGitHubMessageJobResultsElement();
+	}
+
+	protected String getInvocationMessage() {
+		StringBuffer sb = new StringBuffer();
+
+		sb.append("Invoked: ");
+		sb.append(getJobName());
+		sb.append(" at ");
+		sb.append(getInvocationURL());
+
+		return sb.toString();
 	}
 
 	protected Set<String> getJobParameterNames() {
