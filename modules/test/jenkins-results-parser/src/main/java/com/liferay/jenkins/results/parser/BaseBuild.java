@@ -64,6 +64,10 @@ public abstract class BaseBuild implements Build {
 				downstreamBuilds.add(BuildFactory.newBuild(url, this));
 			}
 		}
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			downstreamBuild.setPrerequisiteRules(prerequisiteRules);
+		}
 	}
 
 	@Override
@@ -122,6 +126,11 @@ public abstract class BaseBuild implements Build {
 
 		archiveConsoleLog();
 		archiveJSON();
+	}
+
+	@Override
+	public void discard() {
+		setStatus("discarded");
 	}
 
 	@Override
@@ -842,6 +851,33 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void invoke() {
+		String hostName = JenkinsResultsParserUtil.getHostName("");
+
+		if (!hostName.startsWith("cloud-10-0")) {
+			System.out.println("A build may not be invoked by " + hostName);
+
+			setStatus("discarded");
+
+			return;
+		}
+
+		String invocationURL = getInvocationURL();
+
+		try {
+			JenkinsResultsParserUtil.toString(
+				JenkinsResultsParserUtil.getLocalURL(invocationURL));
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		System.out.println(getInvocationMessage());
+
+		setStatus("starting");
+	}
+
+	@Override
 	public void reinvoke() {
 		reinvoke(null);
 	}
@@ -941,6 +977,15 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public void setCompareToUpstream(boolean compareToUpstream) {
+	}
+
+	@Override
+	public void setPrerequisiteRules(Set<PrerequisiteRule> prerequisiteRules) {
+		this.prerequisiteRules = prerequisiteRules;
+
+		for (Build build : downstreamBuilds) {
+			build.setPrerequisiteRules(prerequisiteRules);
+		}
 	}
 
 	@Override
@@ -1193,6 +1238,8 @@ public abstract class BaseBuild implements Build {
 
 	protected BaseBuild(String url, Build parentBuild) {
 		_parentBuild = parentBuild;
+
+		prerequisiteRules = new HashSet<>();
 
 		if (url.contains("buildWithParameters")) {
 			setInvocationURL(url);
@@ -2079,6 +2126,7 @@ public abstract class BaseBuild implements Build {
 	protected boolean fromArchive;
 	protected String jobName;
 	protected String master;
+	protected Set<PrerequisiteRule> prerequisiteRules = new HashSet<>();
 	protected List<ReinvokeRule> reinvokeRules =
 		ReinvokeRule.getReinvokeRules();
 	protected String repositoryName;
