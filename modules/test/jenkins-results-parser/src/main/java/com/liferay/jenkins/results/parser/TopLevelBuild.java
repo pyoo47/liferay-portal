@@ -98,6 +98,8 @@ public class TopLevelBuild extends BaseBuild {
 
 	@Override
 	public Element getGitHubMessageElement() {
+		update();
+
 		Collections.sort(
 			downstreamBuilds, new BaseBuild.BuildDisplayNameComparator());
 
