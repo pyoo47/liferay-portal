@@ -30,6 +30,8 @@ public interface Build {
 
 	public void archive(String archiveName);
 
+	public void discard();
+
 	public String getAppServer();
 
 	public String getArchivePath();
@@ -115,6 +117,8 @@ public interface Build {
 	public TopLevelBuild getTopLevelBuild();
 
 	public boolean hasBuildURL(String buildURL);
+
+	public void invoke();
 
 	public void reinvoke();
 
