@@ -994,10 +994,10 @@ public abstract class BaseBuild implements Build {
 	public void update() {
 		String status = getStatus();
 
-		if (!status.equals("completed")) {
+		if (!status.equals("completed") && !status.equals("discarded")) {
 			try {
 				if (status.equals("missing") || status.equals("queued") ||
-					status.equals("starting")) {
+					status.equals("starting") || status.equals("pending")) {
 
 					JSONObject runningBuildJSONObject =
 						getRunningBuildJSONObject();
@@ -1009,7 +1009,8 @@ public abstract class BaseBuild implements Build {
 						JSONObject queueItemJSONObject =
 							getQueueItemJSONObject();
 
-						if (status.equals("starting") &&
+						if ((status.equals("pending") ||
+							 status.equals("starting")) &&
 							(queueItemJSONObject != null)) {
 
 							setStatus("queued");
@@ -1022,9 +1023,9 @@ public abstract class BaseBuild implements Build {
 					}
 				}
 
-				status = getStatus();
-
 				if (downstreamBuilds != null) {
+					findDownstreamBuilds();
+
 					ExecutorService executorService = getExecutorService();
 
 					for (final Build downstreamBuild : downstreamBuilds) {
@@ -1943,7 +1944,7 @@ public abstract class BaseBuild implements Build {
 
 			loadParametersFromQueryString(invocationURL);
 
-			setStatus("starting");
+			setStatus("pending");
 		}
 	}
 
