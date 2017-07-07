@@ -778,19 +778,19 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public String getStatusSummary() {
 		return JenkinsResultsParserUtil.combine(
-			Integer.toString(getDownstreamBuildCount("starting")),
-			" Starting  ", "/ ",
-
-			Integer.toString(getDownstreamBuildCount("missing")), " Missing  ",
+			Integer.toString(getDownstreamBuildCount("pending")), " Pending  ",
 			"/ ",
 
 			Integer.toString(getDownstreamBuildCount("discarded")),
 			" Discarded  ", "/ ",
 
-			Integer.toString(getDownstreamBuildCount("pending")), " Pending  ",
-			"/ ",
+			Integer.toString(getDownstreamBuildCount("starting")),
+			" Starting  ", "/ ",
 
 			Integer.toString(getDownstreamBuildCount("queued")), " Queued  ",
+			"/ ",
+
+			Integer.toString(getDownstreamBuildCount("missing")), " Missing  ",
 			"/ ",
 
 			Integer.toString(getDownstreamBuildCount("running")), " Running  ",
