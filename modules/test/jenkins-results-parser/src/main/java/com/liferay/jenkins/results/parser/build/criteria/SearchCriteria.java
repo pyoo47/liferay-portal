@@ -14,13 +14,11 @@
 
 package com.liferay.jenkins.results.parser.build.criteria;
 
-import com.liferay.jenkins.results.parser.Build;
-
 /**
  * @author Kevin Yen
  */
-public interface BuildCriteria {
+public interface SearchCriteria<T> {
 
-	public boolean matches(Build build);
+	public boolean matches(T Object);
 
 }
