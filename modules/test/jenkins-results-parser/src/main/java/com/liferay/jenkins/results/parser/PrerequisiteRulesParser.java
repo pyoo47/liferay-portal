@@ -17,7 +17,7 @@ package com.liferay.jenkins.results.parser;
 import com.liferay.jenkins.results.parser.build.criteria.AxisBuildCriteria;
 import com.liferay.jenkins.results.parser.build.criteria.AxisNumberBuildCriteria;
 import com.liferay.jenkins.results.parser.build.criteria.BatchBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.BuildCriteria;
+import com.liferay.jenkins.results.parser.matcher.Matcher;
 import com.liferay.jenkins.results.parser.build.criteria.HasDownstreamBuildsBuildCriteria;
 import com.liferay.jenkins.results.parser.build.criteria.NameBuildCriteria;
 import com.liferay.jenkins.results.parser.build.criteria.NameContainBuildCriteria;
@@ -65,7 +65,7 @@ public class PrerequisiteRulesParser {
 
 			Element jobElement = triggerElement.element("job");
 
-			List<BuildCriteria> applicableBuildCriterias = new ArrayList<>();
+			List<Matcher> applicableBuildCriterias = new ArrayList<>();
 
 			applicableBuildCriterias.addAll(
 				parseJobRequirementBuildCriterias(jobElement));
@@ -74,9 +74,9 @@ public class PrerequisiteRulesParser {
 
 			jobElement = prerequisiteElement.element("job");
 
-			List<BuildCriteria> completeBuildCriterias = new ArrayList<>();
-			List<BuildCriteria> passingBuildCriterias = new ArrayList<>();
-			List<BuildCriteria> prerequisiteBuildCriterias = new ArrayList<>();
+			List<Matcher> completeBuildCriterias = new ArrayList<>();
+			List<Matcher> passingBuildCriterias = new ArrayList<>();
+			List<Matcher> prerequisiteBuildCriterias = new ArrayList<>();
 
 			prerequisiteBuildCriterias.addAll(
 				parseJobRequirementBuildCriterias(jobElement));
@@ -136,10 +136,10 @@ public class PrerequisiteRulesParser {
 		return prerequisiteRules;
 	}
 
-	protected static List<BuildCriteria> parseAxisBuildCriterias(
+	protected static List<Matcher> parseAxisBuildCriterias(
 		Element jobElement) {
 
-		List<BuildCriteria> buildCriterias = new ArrayList<>();
+		List<Matcher> buildCriterias = new ArrayList<>();
 
 		String type = jobElement.attributeValue("type");
 
@@ -166,10 +166,10 @@ public class PrerequisiteRulesParser {
 		return buildCriterias;
 	}
 
-	protected static List<BuildCriteria> parseJobRequirementBuildCriterias(
+	protected static List<Matcher> parseJobRequirementBuildCriterias(
 		Element jobElement) {
 
-		List<BuildCriteria> buildCriterias = new ArrayList<>();
+		List<Matcher> buildCriterias = new ArrayList<>();
 
 		Element nameElement = jobElement.element("name");
 
@@ -187,10 +187,10 @@ public class PrerequisiteRulesParser {
 		return buildCriterias;
 	}
 
-	protected static List<BuildCriteria> parseNameBuildCriterias(
+	protected static List<Matcher> parseNameBuildCriterias(
 		Element nameElement) {
 
-		List<BuildCriteria> nameBuildCriterias = new ArrayList<>();
+		List<Matcher> nameBuildCriterias = new ArrayList<>();
 
 		if (nameElement.element("contain") != null) {
 			Element containElement = nameElement.element("contain");
@@ -238,10 +238,10 @@ public class PrerequisiteRulesParser {
 		return nameBuildCriterias;
 	}
 
-	protected static List<BuildCriteria> parseParameterBuildCriteria(
+	protected static List<Matcher> parseParameterBuildCriteria(
 		Element parameterElement) {
 
-		List<BuildCriteria> parameterBuildCriterias = new ArrayList<>();
+		List<Matcher> parameterBuildCriterias = new ArrayList<>();
 
 		if (parameterElement.element("contain") != null) {
 			String name = parameterElement.attributeValue("name");
