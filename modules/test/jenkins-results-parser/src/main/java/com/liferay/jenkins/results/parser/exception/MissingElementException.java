@@ -12,26 +12,23 @@
  * details.
  */
 
-package com.liferay.jenkins.results.parser;
+package com.liferay.jenkins.results.parser.exception;
 
 /**
  * @author Kevin Yen
  */
-public class PrerequisiteRulesException extends RuntimeException {
+public class MissingElementException extends PrerequisiteRulesException {
 
-	public PrerequisiteRulesException() {
+	public MissingElementException(String elementName) {
+		super(_generateMessage(elementName));
 	}
 
-	public PrerequisiteRulesException(String message) {
-		super(message);
+	public MissingElementException(String elementName, Throwable cause) {
+		super(_generateMessage(elementName), cause);
 	}
 
-	public PrerequisiteRulesException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public PrerequisiteRulesException(Throwable cause) {
-		super(cause);
+	private static String _generateMessage(String elementName) {
+		return "Missing required element '" + elementName + "'";
 	}
 
 }
