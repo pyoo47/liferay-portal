@@ -14,7 +14,7 @@
 
 package com.liferay.jenkins.results.parser;
 
-import com.liferay.jenkins.results.parser.build.criteria.BuildCriteria;
+import com.liferay.jenkins.results.parser.matcher.Matcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,56 +25,47 @@ import java.util.List;
 public class PrerequisiteRule {
 
 	public PrerequisiteRule(
-		String description, List<BuildCriteria> applicableBuildCriterias,
-		List<BuildCriteria> prerequisiteBuildCriterias,
-		List<BuildCriteria> completeBuildCriterias,
-		List<BuildCriteria> passingBuildCriterias) {
+		String description, Matcher applicableMatcher,
+		Matcher prerequisiteMatcher, Matcher invokeMatcher,
+		Matcher discardMatcher) {
 
 		this.description = description;
-		this.applicableBuildCriterias = applicableBuildCriterias;
-		this.prerequisiteBuildCriterias = prerequisiteBuildCriterias;
-		this.completeBuildCriterias = completeBuildCriterias;
-		this.passingBuildCriterias = passingBuildCriterias;
+		this.applicableMatcher = applicableMatcher;
+		this.prerequisiteMatcher = prerequisiteMatcher;
+		this.invokeMatcher = invokeMatcher;
+		this.discardMatcher = discardMatcher;
 	}
 
 	public List<Build> getApplicableBuilds(List<Build> builds) {
-		return getMatchingBuilds(builds, applicableBuildCriterias);
-	}
-
-	public List<Build> getCompleteBuilds(List<Build> builds) {
-		return getMatchingBuilds(builds, completeBuildCriterias);
+		return getMatchingBuilds(builds, applicableMatchers);
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public List<Build> getPassingBuilds(List<Build> builds) {
-		return getMatchingBuilds(builds, passingBuildCriterias);
-	}
-
 	public List<Build> getPrerequisiteBuilds(List<Build> builds) {
-		return getMatchingBuilds(builds, prerequisiteBuildCriterias);
+		return getMatchingBuilds(builds, prerequisiteMatchers);
 	}
 
 	public boolean isApplicable(Build build) {
-		return isMatching(build, applicableBuildCriterias);
-	}
-
-	public boolean isComplete(Build build) {
-		return isMatching(build, completeBuildCriterias);
-	}
-
-	public boolean isPassing(Build build) {
-		return isMatching(build, passingBuildCriterias);
+		return isMatching(build, applicableMatchers);
 	}
 
 	public boolean isPrerequisite(Build build) {
-		return isMatching(build, prerequisiteBuildCriterias);
+		return isMatching(build, prerequisiteMatchers);
+	}
+
+	public boolean shouldDiscard(Build build) {
+		return discardMatcher.matches(build);
+	}
+
+	public boolean shouldInvoke(Build build) {
+		return invokeMatcher.matches(build);
 	}
 
 	protected static List<Build> getMatchingBuilds(
-		List<Build> builds, List<BuildCriteria> buildCriterias) {
+		List<Build> builds, List<Matcher> buildCriterias) {
 
 		List<Build> matchingBuilds = new ArrayList<>();
 
@@ -88,9 +79,9 @@ public class PrerequisiteRule {
 	}
 
 	protected static boolean isMatching(
-		Build build, List<BuildCriteria> buildCriterias) {
+		Build build, List<Matcher> buildCriterias) {
 
-		for (BuildCriteria buildCriteria : buildCriterias) {
+		for (Matcher buildCriteria : buildCriterias) {
 			if (!buildCriteria.matches(build)) {
 				return false;
 			}
@@ -99,10 +90,12 @@ public class PrerequisiteRule {
 		return true;
 	}
 
-	protected List<BuildCriteria> applicableBuildCriterias;
-	protected List<BuildCriteria> completeBuildCriterias;
+	protected Matcher applicableMatcher;
+	protected List<Matcher> applicableMatchers;
 	protected String description;
-	protected List<BuildCriteria> passingBuildCriterias;
-	protected List<BuildCriteria> prerequisiteBuildCriterias;
+	protected Matcher discardMatcher;
+	protected Matcher invokeMatcher;
+	protected Matcher prerequisiteMatcher;
+	protected List<Matcher> prerequisiteMatchers;
 
 }

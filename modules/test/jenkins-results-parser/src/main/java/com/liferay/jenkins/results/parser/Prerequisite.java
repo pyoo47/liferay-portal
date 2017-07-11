@@ -24,16 +24,15 @@ public class Prerequisite {
 	}
 
 	public PrerequisiteState getState() {
-		if (prerequisiteRule.isComplete(prerequisiteBuild)) {
-			if (prerequisiteRule.isPassing(prerequisiteBuild)) {
-				return PrerequisiteState.INVOKE;
-			}
-			else {
-				return PrerequisiteState.DISCARD;
-			}
+		if (prerequisiteRule.shouldInvoke(prerequisiteBuild)) {
+			return PrerequisiteState.INVOKE;
 		}
-
-		return PrerequisiteState.PENDING;
+		else if (prerequisiteRule.shouldDiscard(prerequisiteBuild)) {
+			return PrerequisiteState.DISCARD;
+		}
+		else {
+			return PrerequisiteState.PENDING;
+		}
 	}
 
 	protected Prerequisite(

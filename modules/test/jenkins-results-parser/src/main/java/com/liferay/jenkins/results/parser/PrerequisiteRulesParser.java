@@ -14,25 +14,18 @@
 
 package com.liferay.jenkins.results.parser;
 
-import com.liferay.jenkins.results.parser.build.criteria.AxisBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.AxisNumberBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.BatchBuildCriteria;
+import com.liferay.jenkins.results.parser.exception.EmptyElementTextException;
+import com.liferay.jenkins.results.parser.exception.MissingElementException;
+import com.liferay.jenkins.results.parser.exception.UnknownElementException;
+import com.liferay.jenkins.results.parser.matcher.AxisBuildMatcher;
+import com.liferay.jenkins.results.parser.matcher.BuildMatcher;
 import com.liferay.jenkins.results.parser.matcher.Matcher;
-import com.liferay.jenkins.results.parser.build.criteria.HasDownstreamBuildsBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.NameBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.NameContainBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.NameDoesNotContainBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.ParameterBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.ParameterContainBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.ParameterDoesNotContainBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.ResultBuildCriteria;
-import com.liferay.jenkins.results.parser.build.criteria.StatusBuildCriteria;
 
 import java.io.File;
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -61,259 +54,168 @@ public class PrerequisiteRulesParser {
 				description = ruleElement.attributeValue("description");
 			}
 
-			Element triggerElement = ruleElement.element("trigger");
+			Element assignElement = ruleElement.element("assign");
 
-			Element jobElement = triggerElement.element("job");
+			Element jobElement = assignElement.element("job");
 
-			List<Matcher> applicableBuildCriterias = new ArrayList<>();
-
-			applicableBuildCriterias.addAll(
-				parseJobRequirementBuildCriterias(jobElement));
+			Matcher assignMatcher = parseJobElement(jobElement);
 
 			Element prerequisiteElement = ruleElement.element("prerequisite");
 
 			jobElement = prerequisiteElement.element("job");
 
-			List<Matcher> completeBuildCriterias = new ArrayList<>();
-			List<Matcher> passingBuildCriterias = new ArrayList<>();
-			List<Matcher> prerequisiteBuildCriterias = new ArrayList<>();
+			Matcher prerequisiteMatcher = parseJobElement(jobElement);
 
-			prerequisiteBuildCriterias.addAll(
-				parseJobRequirementBuildCriterias(jobElement));
+			Element invokeElement = ruleElement.element("assign");
 
-			String type = jobElement.attributeValue("type");
+			jobElement = invokeElement.element("job");
 
-			if (type != null) {
-				if (type.equals("AxisBuild")) {
-					prerequisiteBuildCriterias.addAll(
-						parseAxisBuildCriterias(jobElement));
-				}
-				else if (type.equals("BatchBuild")) {
-					prerequisiteBuildCriterias.add(new BatchBuildCriteria());
-				}
-			}
+			Matcher invokeMatcher = parseJobElement(jobElement);
 
-			if (jobElement.element("status") != null) {
-				Element statusElement = jobElement.element("status");
+			Element discardElement = ruleElement.element("discard");
 
-				String text = statusElement.getText();
+			jobElement = discardElement.element("job");
 
-				if (text.isEmpty()) {
-					throw new PrerequisiteRulesException(
-						"The value field of " + statusElement.getName() +
-							" cannot be empty");
-				}
-
-				completeBuildCriterias.add(new StatusBuildCriteria(text));
-			}
-
-			if (jobElement.element("has-downstream-jobs") != null) {
-				completeBuildCriterias.add(
-					new HasDownstreamBuildsBuildCriteria());
-			}
-
-			if (jobElement.element("result") != null) {
-				Element resultElement = jobElement.element("result");
-
-				String text = resultElement.getText();
-
-				if (text.isEmpty()) {
-					throw new PrerequisiteRulesException(
-						"The value field of " + resultElement.getName() +
-							" cannot be empty");
-				}
-
-				passingBuildCriterias.add(new ResultBuildCriteria(text));
-			}
+			Matcher discardMatcher = parseJobElement(jobElement);
 
 			prerequisiteRules.add(
 				new PrerequisiteRule(
-					description, applicableBuildCriterias,
-					prerequisiteBuildCriterias, completeBuildCriterias,
-					passingBuildCriterias));
+					description, assignMatcher, prerequisiteMatcher,
+					invokeMatcher, discardMatcher));
 		}
 
 		return prerequisiteRules;
 	}
 
-	protected static List<Matcher> parseAxisBuildCriterias(
-		Element jobElement) {
+	public static BuildMatcher parseJobElement(Element jobElement) {
+		String attributeValue = jobElement.attributeValue("type");
 
-		List<Matcher> buildCriterias = new ArrayList<>();
+		BuildMatcher buildMatcher;
 
-		String type = jobElement.attributeValue("type");
+		if ((attributeValue != null) && attributeValue.equals("AxisBuild")) {
+			AxisBuildMatcher axisBuildMatcher = new AxisBuildMatcher();
 
-		if (!type.equals("AxisBuild")) {
-			return buildCriterias;
+			Element axisElement = jobElement.element("axis");
+
+			Pattern axisNamePattern = parseTextElement(axisElement);
+
+			axisBuildMatcher.setAxisNumberPattern(axisNamePattern);
+
+			buildMatcher = axisBuildMatcher;
+		}
+		else {
+			buildMatcher = new BuildMatcher();
 		}
 
-		buildCriterias.add(new AxisBuildCriteria());
+		for (Element element : jobElement.elements()) {
+			String elementName = element.getName();
 
-		Element axisElement = jobElement.element("axis");
+			if (elementName.equals("name")) {
+				Pattern namePattern = parseTextElement(element);
 
-		if (axisElement != null) {
-			String text = axisElement.getText();
-
-			if (text.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The value field of " + axisElement.getName() +
-						" cannot be empty");
+				buildMatcher.setJobNamePattern(namePattern);
 			}
+			else if (elementName.equals("status")) {
+				Pattern statusPattern = parseTextElement(element);
 
-			buildCriterias.add(new AxisNumberBuildCriteria(text));
+				buildMatcher.setStatusPattern(statusPattern);
+			}
+			else if (elementName.equals("result")) {
+				Pattern resultPattern = parseTextElement(element);
+
+				buildMatcher.setStatusPattern(resultPattern);
+			}
+			else if (elementName.equals("parameter")) {
+				Element parameterNameElement = element.element("name");
+
+				if (parameterNameElement == null) {
+					throw new MissingElementException("name");
+				}
+
+				Pattern parameterNamePattern = parseTextElement(
+					parameterNameElement);
+
+				Element parameterValueElement = element.element("value");
+
+				if (parameterValueElement == null) {
+					throw new MissingElementException("value");
+				}
+
+				Pattern parameterValuePattern = parseTextElement(
+					parameterValueElement);
+
+				buildMatcher.addParameterNameValuePatterns(
+					parameterNamePattern, parameterValuePattern);
+			}
 		}
 
-		return buildCriterias;
+		return buildMatcher;
 	}
 
-	protected static List<Matcher> parseJobRequirementBuildCriterias(
-		Element jobElement) {
-
-		List<Matcher> buildCriterias = new ArrayList<>();
-
-		Element nameElement = jobElement.element("name");
-
-		if (nameElement != null) {
-			buildCriterias.addAll(parseNameBuildCriterias(nameElement));
-		}
-
-		Element parameterElement = jobElement.element("parameter");
-
-		if (parameterElement != null) {
-			buildCriterias.addAll(
-				parseParameterBuildCriteria(parameterElement));
-		}
-
-		return buildCriterias;
-	}
-
-	protected static List<Matcher> parseNameBuildCriterias(
-		Element nameElement) {
-
-		List<Matcher> nameBuildCriterias = new ArrayList<>();
-
-		if (nameElement.element("contain") != null) {
-			Element containElement = nameElement.element("contain");
-
-			String text = containElement.getText();
+	public static Pattern parseTextElement(Element element) {
+		if (element.isTextOnly()) {
+			String text = element.getText();
 
 			if (text.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The value field of " + containElement.getName() +
-						" cannot be empty");
+				throw new EmptyElementTextException(element);
 			}
 
-			nameBuildCriterias.add(new NameContainBuildCriteria(text));
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("^");
+
+			for (String parsedText : text.split("\\s*,\\s*")) {
+				if (sb.length() > 1) {
+					sb.append("|");
+				}
+
+				sb.append(Pattern.quote(parsedText));
+			}
+
+			sb.append("$");
+
+			return Pattern.compile(sb.toString());
 		}
 
-		if (nameElement.element("does-not-contain") != null) {
-			Element doesNotContainElement = nameElement.element(
-				"does-not-contain");
+		StringBuilder sb = new StringBuilder();
 
-			String text = doesNotContainElement.getText();
+		for (Element childElement : element.elements()) {
+			String name = childElement.getName();
 
-			if (text.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The value field of " + doesNotContainElement.getName() +
-						" cannot be empty");
+			if (name.equals("contains")) {
+				String text = childElement.getText();
+
+				if (text.isEmpty()) {
+					throw new EmptyElementTextException(childElement);
+				}
+
+				if (sb.length() > 0) {
+					sb.append("|");
+				}
+
+				sb.append(Pattern.quote(text));
 			}
+			else if (name.equals("regex")) {
+				String text = childElement.getText();
 
-			nameBuildCriterias.add(new NameDoesNotContainBuildCriteria(text));
+				if (text.isEmpty()) {
+					throw new EmptyElementTextException(childElement);
+				}
+
+				if (sb.length() > 0) {
+					sb.append("|");
+				}
+
+				sb.append("(");
+				sb.append(text);
+				sb.append(")");
+			}
+			else {
+				throw new UnknownElementException(childElement);
+			}
 		}
 
-		if ((nameElement.element("contain") == null) &&
-			(nameElement.element("does-not-contain") == null)) {
-
-			String text = nameElement.getText();
-
-			if (text.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The value field of " + nameElement.getName() +
-						" cannot be empty");
-			}
-
-			nameBuildCriterias.add(new NameBuildCriteria(text));
-		}
-
-		return nameBuildCriterias;
-	}
-
-	protected static List<Matcher> parseParameterBuildCriteria(
-		Element parameterElement) {
-
-		List<Matcher> parameterBuildCriterias = new ArrayList<>();
-
-		if (parameterElement.element("contain") != null) {
-			String name = parameterElement.attributeValue("name");
-
-			if ((name == null) || name.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The attribute field of " + parameterElement.getName() +
-						" cannot be empty");
-			}
-
-			Element containElement = parameterElement.element("contain");
-
-			String value = containElement.getText();
-
-			if (value.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The value field of " + containElement.getName() +
-						" cannot be empty");
-			}
-
-			parameterBuildCriterias.add(
-				new ParameterContainBuildCriteria(name, value));
-		}
-
-		if (parameterElement.element("does-not-contain") != null) {
-			String name = parameterElement.attributeValue("name");
-
-			if ((name == null) || name.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The attribute field of " + parameterElement.getName() +
-						" cannot be empty");
-			}
-
-			Element doesNotContainElement = parameterElement.element(
-				"does-not-contain");
-
-			String value = doesNotContainElement.getText();
-
-			if (value.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The value field of " + doesNotContainElement.getName() +
-						" cannot be empty");
-			}
-
-			parameterBuildCriterias.add(
-				new ParameterDoesNotContainBuildCriteria(name, value));
-		}
-
-		if ((parameterElement.element("contain") == null) &&
-			(parameterElement.element("does-not-contain") == null)) {
-
-			String name = parameterElement.attributeValue("name");
-
-			if ((name == null) || name.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The attribute field of " + parameterElement.getName() +
-						" cannot be empty");
-			}
-
-			String value = parameterElement.getText();
-
-			if (value.isEmpty()) {
-				throw new PrerequisiteRulesException(
-					"The value field of " + parameterElement.getName() +
-						" cannot be empty");
-			}
-
-			parameterBuildCriterias.add(
-				new ParameterBuildCriteria(name, value));
-		}
-
-		return parameterBuildCriterias;
+		return Pattern.compile(sb.toString());
 	}
 
 }
