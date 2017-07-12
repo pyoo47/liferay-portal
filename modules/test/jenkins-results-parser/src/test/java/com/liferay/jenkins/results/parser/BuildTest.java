@@ -97,6 +97,8 @@ public class BuildTest extends BaseJenkinsResultsParserTestCase {
 		Build build = BuildFactory.newBuildFromArchive(
 			"BuildTest/" + sampleDir.getName());
 
+		build.setCompareToUpstream(false);
+
 		return Dom4JUtil.format(build.getGitHubMessageElement(), true);
 	}
 
@@ -130,6 +132,8 @@ public class BuildTest extends BaseJenkinsResultsParserTestCase {
 
 		Build build = BuildFactory.newBuildFromArchive(
 			"BuildTest/" + sampleDir.getName());
+
+		build.setCompareToUpstream(false);
 
 		String expectedMessage = fixMessage(
 			Dom4JUtil.format(build.getGitHubMessageElement()));
