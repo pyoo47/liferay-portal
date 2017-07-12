@@ -56,23 +56,39 @@ public class PrerequisiteRulesParser {
 
 			Element assignElement = ruleElement.element("assign");
 
+			if (assignElement != null) {
+				throw new MissingElementException("assign");
+			}
+
 			Element jobElement = assignElement.element("job");
 
 			Matcher assignMatcher = parseJobElement(jobElement);
 
 			Element prerequisiteElement = ruleElement.element("prerequisite");
 
+			if (assignElement != null) {
+				throw new MissingElementException("prerequisite");
+			}
+
 			jobElement = prerequisiteElement.element("job");
 
 			Matcher prerequisiteMatcher = parseJobElement(jobElement);
 
-			Element invokeElement = ruleElement.element("assign");
+			Element invokeElement = ruleElement.element("invoke");
+
+			if (assignElement != null) {
+				throw new MissingElementException("invoke");
+			}
 
 			jobElement = invokeElement.element("job");
 
 			Matcher invokeMatcher = parseJobElement(jobElement);
 
 			Element discardElement = ruleElement.element("discard");
+
+			if (assignElement != null) {
+				throw new MissingElementException("discard");
+			}
 
 			jobElement = discardElement.element("job");
 
