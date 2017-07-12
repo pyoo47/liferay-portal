@@ -66,7 +66,7 @@ public class PrerequisiteRulesParser {
 
 			Element prerequisiteElement = ruleElement.element("prerequisite");
 
-			if (assignElement != null) {
+			if (prerequisiteElement != null) {
 				throw new MissingElementException("prerequisite");
 			}
 
@@ -76,7 +76,7 @@ public class PrerequisiteRulesParser {
 
 			Element invokeElement = ruleElement.element("invoke");
 
-			if (assignElement != null) {
+			if (invokeElement != null) {
 				throw new MissingElementException("invoke");
 			}
 
@@ -85,10 +85,6 @@ public class PrerequisiteRulesParser {
 			Matcher invokeMatcher = parseJobElement(jobElement);
 
 			Element discardElement = ruleElement.element("discard");
-
-			if (assignElement != null) {
-				throw new MissingElementException("discard");
-			}
 
 			jobElement = discardElement.element("job");
 
@@ -162,6 +158,14 @@ public class PrerequisiteRulesParser {
 
 				buildMatcher.addParameterNameValuePatterns(
 					parameterNamePattern, parameterValuePattern);
+			}
+			else if (elementName.equals("has-downstream-jobs")) {
+				if (element.element("has-downstream-jobs") != null) {
+					buildMatcher.setCheckHasDownstreamBuilds(true);
+				}
+				else {
+					buildMatcher.setCheckHasDownstreamBuilds(false);
+				}
 			}
 		}
 
