@@ -15,9 +15,11 @@
 package com.liferay.poshi.runner.elements;
 
 import com.liferay.poshi.runner.util.Dom4JUtil;
+import com.liferay.poshi.runner.util.RegexUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -81,6 +83,10 @@ public abstract class PoshiElement extends DefaultElement {
 		return sb.toString();
 	}
 
+	protected static String getBracedContent(String readableSyntax) {
+		return RegexUtil.getGroup(readableSyntax, ".*?\\{(.*)\\}", 1);
+	}
+
 	protected static String getNameFromAssignment(String assignment) {
 		String name = assignment.split("=")[0];
 
@@ -91,12 +97,12 @@ public abstract class PoshiElement extends DefaultElement {
 		return name.replaceAll("var ", "");
 	}
 
-	protected static String getValueFromAssignment(String assignment) {
-		int start = assignment.indexOf("\"") + 1;
+	protected static String getParentheticalContent(String readableSyntax) {
+		return RegexUtil.getGroup(readableSyntax, ".*?\\((.*)\\)", 1);
+	}
 
-		int end = assignment.indexOf("\"", start);
-
-		return assignment.substring(start, end);
+	protected static String getQuotedContent(String readableSyntax) {
+		return RegexUtil.getGroup(readableSyntax, ".*?\"(.*)\"", 1);
 	}
 
 	protected void addElementFromReadableSyntax(String readableSyntax) {
@@ -135,6 +141,90 @@ public abstract class PoshiElement extends DefaultElement {
 
 	protected String getPad() {
 		return "\t";
+	}
+
+	protected boolean isBalancedReadableSyntax(String readableSyntax) {
+		Stack<Character> stack = new Stack<>();
+
+		for (int i = 0; i < readableSyntax.length(); i++) {
+			char c = readableSyntax.charAt(i);
+
+			if (!stack.isEmpty() && (stack.peek() == '\"')) {
+				if (c == '\"') {
+					stack.pop();
+				}
+
+				continue;
+			}
+
+			if (c == '\"') {
+				stack.push('\"');
+			}
+
+			if (c == '{') {
+				stack.push('{');
+
+				continue;
+			}
+
+			if (c == '(') {
+				stack.push('(');
+
+				continue;
+			}
+
+			if (c == '}') {
+				if (stack.isEmpty()) {
+					return false;
+				}
+
+				if (stack.pop() != '{') {
+					return false;
+				}
+			}
+
+			if (c == ')') {
+				if (stack.isEmpty()) {
+					return false;
+				}
+
+				if (stack.pop() != '(') {
+					return false;
+				}
+			}
+		}
+
+		return stack.isEmpty();
+	}
+
+	protected boolean isBalanceValidationRequired(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (readableSyntax.endsWith(";") || readableSyntax.endsWith("}")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	protected boolean isValidReadableBlock(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (readableSyntax.startsWith("property") ||
+			readableSyntax.startsWith("var")) {
+
+			if (readableSyntax.endsWith(";")) {
+				return true;
+			}
+
+			return false;
+		}
+
+		if (isBalanceValidationRequired(readableSyntax)) {
+			return isBalancedReadableSyntax(readableSyntax);
+		}
+
+		return false;
 	}
 
 	protected List<PoshiElementAttribute> toPoshiElementAttributes(
