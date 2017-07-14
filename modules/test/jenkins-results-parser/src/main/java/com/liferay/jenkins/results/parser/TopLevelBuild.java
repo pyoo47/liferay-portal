@@ -26,7 +26,6 @@ import java.io.StringWriter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -124,6 +123,7 @@ public class TopLevelBuild extends BaseBuild {
 	public Element getJenkinsReportElement() {
 		Map<String, Build> axisBuilds = new TreeMap<>();
 		Map<String, Build> batchBuilds = new TreeMap<>();
+		Map<String, TestResult> testResults = new TreeMap<>();
 
 		try {
 			for (Build batchBuild : getDownstreamBuilds(null)) {
@@ -133,14 +133,22 @@ public class TopLevelBuild extends BaseBuild {
 					String key = null;
 
 					try {
-						key = batchBuild.getDisplayName() + "/" +
-						JenkinsResultsParserUtil.getAxisVariable(
-						axisBuild.getBuildURL());
+						key =
+							batchBuild.getDisplayName() + "/" +
+								JenkinsResultsParserUtil.getAxisVariable(
+									axisBuild.getBuildURL());
 					}
 					catch (Exception e) {
 					}
 
 					axisBuilds.put(key, axisBuild);
+
+					for (TestResult testResult :
+							axisBuild.getTestResults(null)) {
+
+						testResults.put(
+							testResult.getDisplayName(), testResult);
+					}
 				}
 			}
 
@@ -150,18 +158,17 @@ public class TopLevelBuild extends BaseBuild {
 
 			Dom4JUtil.addToElement(
 				h3Element, "Jenkins timeline for ",
-				Dom4JUtil.getNewAnchorElement(
-					this.getBuildURL(), this.getBuildURL()));
+				Dom4JUtil.getNewAnchorElement(getBuildURL(), getBuildURL()));
 
 			Dom4JUtil.addToElement(
 				divElement, h3Element,
-				JenkinsReportUtil.getBasicHeaderElement(this, axisBuilds),
+				JenkinsReportUtil.getBasicHeaderElement(
+					this, axisBuilds, batchBuilds, testResults),
 				JenkinsReportUtil.getTimelineElement(this, axisBuilds));
 
 			return divElement;
 		}
-		catch (Exception e)
-		{
+		catch (Exception e) {
 		}
 
 		return null;
