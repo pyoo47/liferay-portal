@@ -409,6 +409,10 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public Element getGitHubMessageElement() {
+		return getGitHubMessageElement(false);
+	}
+
+	public Element getGitHubMessageElement(boolean upstreamFailureElement) {
 		String status = getStatus();
 
 		if (!status.equals("completed") && (getParentBuild() != null)) {
@@ -427,8 +431,18 @@ public abstract class BaseBuild implements Build {
 			messageElement,
 			Dom4JUtil.getNewElement(
 				"h5", null,
-				Dom4JUtil.getNewAnchorElement(getBuildURL(), getDisplayName())),
-			getGitHubMessageJobResultsElement());
+				Dom4JUtil.getNewAnchorElement(
+					getBuildURL(), getDisplayName())));
+
+		if (upstreamFailureElement) {
+			Dom4JUtil.addToElement(
+				messageElement,
+				getGitHubMessageJobResultsElement(upstreamFailureElement));
+		}
+		else {
+			Dom4JUtil.addToElement(
+				messageElement, getGitHubMessageJobResultsElement());
+		}
 
 		if (result.equals("ABORTED") && (getDownstreamBuildCount(null) == 0)) {
 			messageElement.add(
@@ -444,6 +458,11 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return messageElement;
+	}
+
+	@Override
+	public Element getGitHubMessageUpstreamJobFailureElement() {
+		return upstreamJobFailureMessageElement;
 	}
 
 	@Override
@@ -898,6 +917,10 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void setCompareToUpstream(boolean compareToUpstream) {
+	}
+
+	@Override
 	public void update() {
 		String status = getStatus();
 
@@ -1011,6 +1034,94 @@ public abstract class BaseBuild implements Build {
 
 	}
 
+	protected static List<String> getUpstreamJobFailures(String type)
+		throws Exception {
+
+		List<String> upstreamFailures = new ArrayList<>();
+
+		JSONArray failedBatchesJSONArray =
+			upstreamFailuresJobJSONObject.getJSONArray("failedBatches");
+
+		for (int i = 0; i < failedBatchesJSONArray.length(); i++) {
+			JSONObject failedBatchJSONObject =
+				failedBatchesJSONArray.getJSONObject(i);
+
+			JSONArray failedTestsJSONArray = failedBatchJSONObject.getJSONArray(
+				"failedTests");
+
+			StringBuilder sb = new StringBuilder();
+
+			if (type.equals("build")) {
+				if (failedTestsJSONArray.length() == 0) {
+					sb.append(failedBatchJSONObject.getString("jobVariant"));
+					sb.append(",");
+					sb.append(failedBatchJSONObject.getString("result"));
+
+					upstreamFailures.add(sb.toString());
+				}
+			}
+			else if (type.equals("test")) {
+				for (int j = 0; j < failedTestsJSONArray.length(); j++) {
+					sb.append(failedTestsJSONArray.get(j));
+					sb.append(",");
+					sb.append(failedBatchJSONObject.getString("jobVariant"));
+
+					upstreamFailures.add(sb.toString());
+				}
+			}
+		}
+
+		return upstreamFailures;
+	}
+
+	protected static String getUpstreamJobFailuresSHA() {
+		try {
+			return upstreamFailuresJobJSONObject.getString("SHA");
+		}
+		catch (Exception e) {
+			System.out.println(
+				"Unable to get upstream acceptance failure data.");
+
+			e.printStackTrace();
+
+			return "";
+		}
+	}
+
+	protected static boolean isBuildFailingInUpstreamJob(Build build) {
+		try {
+			String jobVariant = build.getJobVariant();
+			String result = build.getResult();
+
+			List<TestResult> testResults = new ArrayList<>();
+
+			testResults.addAll(build.getTestResults("FAILED"));
+			testResults.addAll(build.getTestResults("REGRESSION"));
+
+			if (testResults.isEmpty()) {
+				for (String upstreamJobFailure :
+						getUpstreamJobFailures("build")) {
+
+					if (upstreamJobFailure.contains(jobVariant) &&
+						upstreamJobFailure.contains(result)) {
+
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+		catch (Exception e) {
+			System.out.println(
+				"Unable to get upstream acceptance failure data.");
+
+			e.printStackTrace();
+
+			return false;
+		}
+	}
+
 	protected static boolean isHighPriorityBuildFailureElement(
 		Element gitHubMessage) {
 
@@ -1030,6 +1141,30 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return false;
+	}
+
+	protected static boolean isTestFailingInUpstreamJob(TestResult testResult) {
+		try {
+			for (String failure : getUpstreamJobFailures("test")) {
+				Build axisBuild = testResult.getAxisBuild();
+
+				if (failure.contains(axisBuild.getJobVariant()) &&
+					failure.contains(testResult.getDisplayName())) {
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+		catch (Exception e) {
+			System.out.println(
+				"Unable to get upstream acceptance failure data.");
+
+			e.printStackTrace();
+
+			return false;
+		}
 	}
 
 	protected BaseBuild(String url) {
@@ -1367,6 +1502,12 @@ public abstract class BaseBuild implements Build {
 		return jsonObject.getJSONArray("builds");
 	}
 
+	protected boolean getCompareToUpstream() {
+		TopLevelBuild topLevelBuild = getTopLevelBuild();
+
+		return topLevelBuild.getCompareToUpstream();
+	}
+
 	protected int getDownstreamBuildCountByResult(String result) {
 		int count = 0;
 
@@ -1411,6 +1552,12 @@ public abstract class BaseBuild implements Build {
 	}
 
 	protected abstract Element getGitHubMessageJobResultsElement();
+
+	protected Element getGitHubMessageJobResultsElement(
+		boolean upstreamFailureElement) {
+
+		return getGitHubMessageJobResultsElement();
+	}
 
 	protected Set<String> getJobParameterNames() {
 		JSONObject jsonObject;
@@ -1830,6 +1977,26 @@ public abstract class BaseBuild implements Build {
 		}
 	}
 
+	protected void setUpstreamJobFailuresJSONObject() {
+		try {
+			if (getJobName().contains("pullrequest")) {
+				String upstreamJobName =
+					getJobName().replace("pullrequest", "upstream");
+
+				upstreamFailuresJobJSONObject =
+					JenkinsResultsParserUtil.toJSONObject(
+						upstreamFailuresJobBaseURL + upstreamJobName +
+							"/builds/latest/test.results.json");
+			}
+		}
+		catch (Exception e) {
+			System.out.println(
+				"Unable to set upstream acceptance failure data.");
+
+			e.printStackTrace();
+		}
+	}
+
 	protected void writeArchiveFile(String content, String path)
 		throws IOException {
 
@@ -1864,6 +2031,10 @@ public abstract class BaseBuild implements Build {
 		"(?<baseJob>[^\\(]+)\\((?<branchName>[^\\)]+)\\)");
 	protected static final String tempMapBaseURL =
 		"http://cloud-10-0-0-31.lax.liferay.com/osb-jenkins-web/map/";
+	protected static final String upstreamFailuresJobBaseURL =
+		"https://test-1-0.liferay.com/userContent/testResults/";
+	protected static JSONObject upstreamFailuresJobJSONObject = new JSONObject(
+		"{\"SHA\":\"\",\"failedBatches\":[]}");
 
 	protected String archiveName;
 	protected List<Integer> badBuildNumbers = new ArrayList<>();
@@ -1877,6 +2048,7 @@ public abstract class BaseBuild implements Build {
 	protected String repositoryName;
 	protected String result;
 	protected long statusModifiedTime;
+	protected Element upstreamJobFailureMessageElement;
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
 		{

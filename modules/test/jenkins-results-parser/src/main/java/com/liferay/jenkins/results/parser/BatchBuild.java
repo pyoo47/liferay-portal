@@ -69,6 +69,7 @@ public class BatchBuild extends BaseBuild {
 		}
 
 		List<Element> failureElements = new ArrayList<>();
+		List<Element> upstreamJobFailureElements = new ArrayList<>();
 
 		for (Build downstreamBuild : getDownstreamBuilds(null)) {
 			String downstreamBuildResult = downstreamBuild.getResult();
@@ -76,10 +77,10 @@ public class BatchBuild extends BaseBuild {
 			if (downstreamBuildResult.equals("SUCCESS")) {
 				continue;
 			}
-			else {
-				Element failureElement =
-					downstreamBuild.getGitHubMessageElement();
 
+			Element failureElement = downstreamBuild.getGitHubMessageElement();
+
+			if (failureElement != null) {
 				if (isHighPriorityBuildFailureElement(failureElement)) {
 					failureElements.add(0, failureElement);
 
@@ -88,6 +89,21 @@ public class BatchBuild extends BaseBuild {
 
 				failureElements.add(failureElement);
 			}
+
+			Element upstreamJobFailureElement =
+				downstreamBuild.getGitHubMessageUpstreamJobFailureElement();
+
+			if (upstreamJobFailureElement != null) {
+				upstreamJobFailureElements.add(upstreamJobFailureElement);
+			}
+		}
+
+		if (!upstreamJobFailureElements.isEmpty()) {
+			upstreamJobFailureMessageElement = getGitHubMessageElement(true);
+
+			Dom4JUtil.getOrderedListElement(
+				upstreamJobFailureElements, upstreamJobFailureMessageElement,
+				4);
 		}
 
 		Dom4JUtil.getOrderedListElement(failureElements, messageElement, 4);
@@ -98,6 +114,10 @@ public class BatchBuild extends BaseBuild {
 				Dom4JUtil.getNewAnchorElement(
 					getBuildURL() + "testReport", "here"),
 				" for more failures.");
+		}
+
+		if (failureElements.isEmpty()) {
+			return null;
 		}
 
 		return messageElement;
@@ -316,14 +336,44 @@ public class BatchBuild extends BaseBuild {
 
 	@Override
 	protected Element getGitHubMessageJobResultsElement() {
+		return getGitHubMessageJobResultsElement(false);
+	}
+
+	protected Element getGitHubMessageJobResultsElement(
+		boolean upstreamFailureElement) {
+
 		String result = getResult();
 
 		int failCount = getDownstreamBuildCountByResult("FAILURE");
 		int successCount = getDownstreamBuildCountByResult("SUCCESS");
+		int upstreamFailCount = 0;
 
 		if (result.equals("UNSTABLE")) {
 			failCount = getTestCountByStatus("FAILURE");
 			successCount = getTestCountByStatus("SUCCESS");
+
+			if (getCompareToUpstream()) {
+				for (TestResult testResult : getTestResults(null)) {
+					String testStatus = testResult.getStatus();
+
+					if (testStatus.equals("PASSED") ||
+						testStatus.equals("SKIPPED")) {
+
+						continue;
+					}
+
+					if (isTestFailingInUpstreamJob(testResult)) {
+						upstreamFailCount++;
+					}
+				}
+
+				if (upstreamFailureElement) {
+					failCount = upstreamFailCount;
+				}
+				else {
+					failCount = failCount - upstreamFailCount;
+				}
+			}
 		}
 
 		return Dom4JUtil.getNewElement(

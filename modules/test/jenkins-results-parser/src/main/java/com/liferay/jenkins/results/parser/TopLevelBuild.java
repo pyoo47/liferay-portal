@@ -176,6 +176,11 @@ public class TopLevelBuild extends BaseBuild {
 	}
 
 	@Override
+	public void setCompareToUpstream(boolean compareToUpstream) {
+		_compareToUpstream = compareToUpstream;
+	}
+
+	@Override
 	public void update() {
 		long start = System.currentTimeMillis();
 
@@ -303,6 +308,11 @@ public class TopLevelBuild extends BaseBuild {
 		return Dom4JUtil.getNewElement(
 			"p", null, "Build Time: ",
 			JenkinsResultsParserUtil.toDurationString(getDuration()));
+	}
+
+	@Override
+	protected boolean getCompareToUpstream() {
+		return _compareToUpstream;
 	}
 
 	protected Element getDownstreamGitHubMessageElement() {
@@ -483,11 +493,16 @@ public class TopLevelBuild extends BaseBuild {
 		String result = getResult();
 
 		if (!result.equals("SUCCESS")) {
+			if (getCompareToUpstream()) {
+				setUpstreamJobFailuresJSONObject();
+			}
+
 			Dom4JUtil.addToElement(
 				rootElement, Dom4JUtil.getNewElement("hr"),
 				Dom4JUtil.getNewElement("h4", null, "Failed Jobs:"));
 
 			List<Element> failureElements = new ArrayList<>();
+			List<Element> upstreamJobFailureElements = new ArrayList<>();
 
 			for (Build downstreamBuild : getDownstreamBuilds(null)) {
 				String downstreamBuildResult = downstreamBuild.getResult();
@@ -499,18 +514,54 @@ public class TopLevelBuild extends BaseBuild {
 				Element failureElement =
 					downstreamBuild.getGitHubMessageElement();
 
-				if (isHighPriorityBuildFailureElement(failureElement)) {
-					failureElements.add(0, failureElement);
+				if (failureElement != null) {
+					if (isBuildFailingInUpstreamJob(downstreamBuild)) {
+						upstreamJobFailureElements.add(failureElement);
 
-					continue;
+						continue;
+					}
+
+					if (isHighPriorityBuildFailureElement(failureElement)) {
+						failureElements.add(0, failureElement);
+
+						continue;
+					}
+
+					failureElements.add(failureElement);
 				}
 
-				failureElements.add(downstreamBuild.getGitHubMessageElement());
+				Element upstreamJobFailureElement =
+					downstreamBuild.getGitHubMessageUpstreamJobFailureElement();
+
+				if (upstreamJobFailureElement != null) {
+					upstreamJobFailureElements.add(upstreamJobFailureElement);
+				}
 			}
 
 			failureElements.add(0, super.getGitHubMessageElement());
 
-			Dom4JUtil.getOrderedListElement(failureElements, rootElement, 5);
+			int maxFailureCount = 5;
+
+			Dom4JUtil.getOrderedListElement(
+				failureElements, rootElement, maxFailureCount);
+
+			if ((failureElements.size() < maxFailureCount) &&
+				!upstreamJobFailureElements.isEmpty()) {
+
+				Dom4JUtil.addToElement(
+					rootElement, Dom4JUtil.getNewElement("hr"),
+					Dom4JUtil.getNewElement(
+						"h4", null,
+						"Failures in common with upstream(" +
+							getUpstreamJobFailuresSHA() + "):"));
+
+				int remainingFailureCount =
+					maxFailureCount - failureElements.size();
+
+				Dom4JUtil.getOrderedListElement(
+					upstreamJobFailureElements, rootElement,
+					remainingFailureCount);
+			}
 
 			String jobName = getJobName();
 
@@ -525,7 +576,7 @@ public class TopLevelBuild extends BaseBuild {
 						0);
 
 					Dom4JUtil.addToElement(
-						Dom4JUtil.getNewElement("h5", rootElement),
+						Dom4JUtil.getNewElement("h4", rootElement),
 						"For upstream results, click ",
 						Dom4JUtil.getNewAnchorElement(url, "here"), ".");
 				}
@@ -570,6 +621,7 @@ public class TopLevelBuild extends BaseBuild {
 			new GenericFailureMessageGenerator()
 		};
 
+	private boolean _compareToUpstream = true;
 	private long _lastDownstreamBuildsListingTimestamp = -1L;
 	private long _updateDuration;
 
