@@ -25,9 +25,8 @@ import java.util.List;
 public class PrerequisiteRule {
 
 	public PrerequisiteRule(
-		String description, Matcher assignMatcher,
-		Matcher prerequisiteMatcher, Matcher invokeMatcher,
-		Matcher discardMatcher) {
+		String description, Matcher assignMatcher, Matcher prerequisiteMatcher,
+		Matcher invokeMatcher, Matcher discardMatcher) {
 
 		this.description = description;
 		this.assignMatcher = assignMatcher;

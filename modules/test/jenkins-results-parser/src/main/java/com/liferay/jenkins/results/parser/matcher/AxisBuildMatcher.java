@@ -50,7 +50,6 @@ public class AxisBuildMatcher extends BuildMatcher {
 
 	@Override
 	public void setBuildType(Class<? extends Build> clazz) {
-		return;
 	}
 
 	protected boolean axisNumberPatternMatches(AxisBuild axisBuild) {

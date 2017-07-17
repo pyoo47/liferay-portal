@@ -90,7 +90,7 @@ public class PrerequisiteRulesParser {
 			Matcher discardMatcher;
 
 			if (discardElement == null) {
-				discardMatcher = new FalseMatcher<Build>();
+				discardMatcher = new FalseMatcher<>();
 			}
 			else {
 				jobElement = discardElement.element("job");
@@ -170,7 +170,7 @@ public class PrerequisiteRulesParser {
 					parameterNamePattern, parameterValuePattern);
 			}
 			else if (elementName.equals("has-downstream-jobs") &&
-				element.isTextOnly()) {
+					 element.isTextOnly()) {
 
 				buildMatcher.setCheckHasDownstreamBuilds(true);
 			}
