@@ -16,7 +16,10 @@ package com.liferay.jenkins.results.parser;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +27,7 @@ import org.dom4j.Element;
 
 /**
  * @author Kenji Heigel
+ * @author Yi-Chen Tsai
  */
 public class JenkinsReportUtil {
 
@@ -57,16 +61,95 @@ public class JenkinsReportUtil {
 
 		Set<String> batchBuildsKeySet = batchBuilds.keySet();
 
+		List<Build> queuedBuilds = new ArrayList();
+
+		List<Build> startingBuilds = new ArrayList();
+
+		List<Build> runningBuilds = new ArrayList();
+
+		List<Build> completedAbortedBuilds = new ArrayList();
+
+		List<Build> completedFailureBuilds = new ArrayList();
+
+		List<Build> completedSuccessBuilds = new ArrayList();
+
 		for (String key : batchBuildsKeySet) {
 			Build build = batchBuilds.get(key);
 
 			long buildDuration = build.getDuration();
+
 			long batchBuildstartTime = build.getStartTimestamp();
 
 			long buildEndTime = buildDuration + batchBuildstartTime;
+
+			switch (build.getStatus()) {
+
+				case "queued":
+					queuedBuilds.add(build);
+					break;
+
+				case "starting":
+					startingBuilds.add(build);
+					break;
+
+				case "running":
+					runningBuilds.add(build);
+					break;
+
+				case "completed":
+					String result = build.getResult();
+
+					if (result.equals("SUCCESS")) {
+						completedSuccessBuilds.add(build);
+					}
+					else if (result.equals("FAILURE") ||
+							 result.equals("UNSTABLE")) {
+
+						completedFailureBuilds.add(build);
+					}
+					else if (result.equals("ABORTED")) {
+						completedAbortedBuilds.add(build);
+					}
+
+					break;
+
+				case "missing":
+					completedAbortedBuilds.add(build);
+					break;
+			}
 		}
 
-		return null;
+		Element queuedBatchElement = getBatchInfoElement(
+			queuedBuilds, "Queued: " + queuedBuilds.size());
+
+		Element startingBatchElement = getBatchInfoElement(
+			startingBuilds, "Starting: " + startingBuilds.size());
+
+		Element runningBatchElement = getBatchInfoElement(
+			runningBuilds, "Running: " + runningBuilds.size());
+
+		Element completedAbortedBatchElement = getBatchInfoElement(
+			completedAbortedBuilds,
+			"Completed - Aborted (Missing): " + completedAbortedBuilds.size());
+
+		Element completedFailureBatchElement = getBatchInfoElement(
+			completedFailureBuilds,
+			"Completed - Failure: " + completedFailureBuilds.size());
+
+		Element completedSuccessBatchElement = getBatchInfoElement(
+			completedSuccessBuilds,
+			"Completed - Success: " + completedSuccessBuilds.size());
+
+		Element divElement = Dom4JUtil.getNewElement("div");
+
+		divElement.add(queuedBatchElement);
+		divElement.add(startingBatchElement);
+		divElement.add(runningBatchElement);
+		divElement.add(completedAbortedBatchElement);
+		divElement.add(completedFailureBatchElement);
+		divElement.add(completedSuccessBatchElement);
+
+		return divElement;
 	}
 
 	public static Element getChartJSScriptElement(
@@ -131,7 +214,6 @@ public class JenkinsReportUtil {
 
 		long[] timeData = new long[dataPoints];
 
-//		timeData[0] = topLevelStartTime;
 		timeData[0] = 0;
 
 		for (int i = 1; i < timeData.length; i++) {
@@ -158,6 +240,134 @@ public class JenkinsReportUtil {
 			divElement, canvasElement, scriptElement, chartJSScriptElement);
 
 		return divElement;
+	}
+
+	protected static Element getAxisInfoElement(List<Build> axisBuilds) {
+		Element returnElement = Dom4JUtil.getNewElement("div");
+
+		for (Build axisBuild : axisBuilds) {
+			String axisName =
+				"AXIS_VARIABLE=" + ((AxisBuild)axisBuild).getAxisNumber();
+
+			String axisBuildURL = axisBuild.getBuildURL();
+
+			String axisConsoleURL = axisBuildURL + "console";
+
+			String axisTestReportURL = axisBuildURL + "testReport";
+
+			long axisDuration = axisBuild.getDuration();
+
+			String batchDurationString =
+				JenkinsResultsParserUtil.toDurationString(axisDuration);
+
+			long axisStartTime = axisBuild.getStartTimestamp();
+
+			Date axisStartDate = new Date(axisStartTime);
+
+			String status = axisBuild.getStatus();
+
+			String result = axisBuild.getResult();
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("START TIME: ");
+			sb.append(axisStartDate.toLocaleString());
+			sb.append(" - BUILD TIME: ");
+			sb.append(batchDurationString);
+			sb.append(" - ");
+
+			if (result != null) {
+				sb.append(result);
+			}
+			else {
+				sb.append(status);
+			}
+
+			Element axisJobElement = Dom4JUtil.getNewAnchorElement(
+				axisBuildURL, null, axisName);
+
+			Element axisConsoleElement = Dom4JUtil.getNewAnchorElement(
+				axisConsoleURL, null, "Console");
+
+			Element axisTestReportElement = Dom4JUtil.getNewAnchorElement(
+				axisTestReportURL, null, "Test Report");
+
+			Element axisBuildElement = Dom4JUtil.getNewElement(
+				"p style='margin-left:120px'", null,
+				Dom4JUtil.getNewElement(
+					"font size = '2'", null, axisJobElement, " - ",
+					axisConsoleElement, " - ", axisTestReportElement, " - ",
+					sb.toString()));
+
+			returnElement.add(axisBuildElement);
+		}
+
+		return returnElement;
+	}
+
+	protected static Element getBatchInfoElement(
+		List<Build> batchBuilds, String status) {
+
+		Element returnElement = Dom4JUtil.getNewElement("div");
+
+		returnElement.add(
+			Dom4JUtil.getNewElement("font size='6'", null, status));
+
+		for (Build batchBuild : batchBuilds) {
+			String jobName = batchBuild.getJobName();
+
+			String batchName = batchBuild.getDisplayName();
+
+			batchName = batchName.replace(jobName, "");
+
+			String batchBuildURL = batchBuild.getBuildURL();
+
+			String batchConsoleURL = batchBuildURL + "console";
+
+			String batchTestReportURL = batchBuildURL + "testReport";
+
+			long batchDuration = batchBuild.getDuration();
+
+			String batchDurationString =
+				JenkinsResultsParserUtil.toDurationString(batchDuration);
+
+			long batchStartTime = batchBuild.getStartTimestamp();
+
+			Date batchStartDate = new Date(batchStartTime);
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("START TIME: ");
+			sb.append(batchStartDate.toLocaleString());
+			sb.append(" - BUILD TIME: ");
+			sb.append(batchDurationString);
+
+			Element batchJobElement = Dom4JUtil.getNewAnchorElement(
+				batchBuildURL, null, batchName);
+
+			Element batchConsoleElement = Dom4JUtil.getNewAnchorElement(
+				batchConsoleURL, null, "Console");
+
+			Element batchTestReportElement = Dom4JUtil.getNewAnchorElement(
+				batchTestReportURL, null, "Test Report");
+
+			Element batchBuildElement = Dom4JUtil.getNewElement(
+				"p style='margin-left:40px'", null,
+				Dom4JUtil.getNewElement(
+					"font size = '4'", null, batchJobElement, " - ",
+					batchConsoleElement, " - ", batchTestReportElement, " - ",
+					sb.toString()));
+
+			List<Build> axisBuilds = batchBuild.getDownstreamBuilds(null);
+
+			Element axisBuildElement = getAxisInfoElement(axisBuilds);
+
+			batchBuildElement.add(axisBuildElement);
+
+			returnElement.add(batchBuildElement);
+		}
+
+		return returnElement;
 	}
 
 	protected static Element getLongestAxisElement(
