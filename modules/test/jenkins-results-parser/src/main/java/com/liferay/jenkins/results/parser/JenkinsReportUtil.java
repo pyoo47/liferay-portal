@@ -35,6 +35,17 @@ public class JenkinsReportUtil {
 		Build topLevelBuild, Map<String, Build> axisBuilds,
 		Map<String, Build> batchBuilds, Map<String, TestResult> testResults) {
 
+		long startTimeStamp = topLevelBuild.getStartTimestamp();
+
+		long durationTime = topLevelBuild.getDuration();
+
+		Date startTime = new Date( topLevelBuild.getStartTimestamp() );
+
+		Element startTimeElement = Dom4JUtil.getNewElement(
+			"p", null, "Start Time: ",
+			startTime.toLocaleString(), " - Build Time: ",
+			JenkinsResultsParserUtil.toDurationString(durationTime));
+
 		Element ciUsageElement = getTotalCIUsageElement(axisBuilds);
 
 		Element longestAxisElement = getLongestAxisElement(axisBuilds);
@@ -47,6 +58,7 @@ public class JenkinsReportUtil {
 
 		Element divElement = Dom4JUtil.getNewElement("div");
 
+		divElement.add(startTimeElement);
 		divElement.add(ciUsageElement);
 		divElement.add(vmUsageElement);
 		divElement.add(longestAxisElement);
