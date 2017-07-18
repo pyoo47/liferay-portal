@@ -164,7 +164,8 @@ public class TopLevelBuild extends BaseBuild {
 				divElement, h3Element,
 				JenkinsReportUtil.getBasicHeaderElement(
 					this, axisBuilds, batchBuilds, testResults),
-				JenkinsReportUtil.getTimelineElement(this, axisBuilds));
+				JenkinsReportUtil.getTimelineElement(this, axisBuilds),
+				JenkinsReportUtil.getBatchReportElement(this, batchBuilds));
 
 			return divElement;
 		}
