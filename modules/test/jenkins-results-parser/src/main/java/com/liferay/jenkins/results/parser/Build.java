@@ -30,6 +30,12 @@ public interface Build {
 
 	public void archive(String archiveName);
 
+	public void deregister(BuildEventListener buildEventListener);
+
+	public void discard();
+
+	public void evaluate();
+
 	public String getAppServer();
 
 	public String getArchivePath();
@@ -116,12 +122,20 @@ public interface Build {
 
 	public boolean hasBuildURL(String buildURL);
 
+	public void invoke();
+
+	public void register(BuildEventListener buildEventListener);
+
 	public void reinvoke();
 
 	public void reinvoke(ReinvokeRule reinvokeRule);
 
 	public String replaceBuildURL(String text);
 
+	public void setPrerequisiteRules(PrerequisiteRules prerequisiteRules);
+
 	public void update();
+
+	public void updateBuildTriggers();
 
 }
