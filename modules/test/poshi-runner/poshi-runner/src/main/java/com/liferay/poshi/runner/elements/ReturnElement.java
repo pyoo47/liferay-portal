@@ -15,6 +15,7 @@
 package com.liferay.poshi.runner.elements;
 
 import com.liferay.poshi.runner.util.RegexUtil;
+
 import org.dom4j.Element;
 
 /**
