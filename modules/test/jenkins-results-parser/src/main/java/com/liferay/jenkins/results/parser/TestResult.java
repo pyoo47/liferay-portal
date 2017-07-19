@@ -70,16 +70,25 @@ public class TestResult {
 
 		int x = className.lastIndexOf(".");
 
-		simpleClassName = className.substring(x + 1);
+		try {
+			simpleClassName = className.substring(x + 1);
 
-		packageName = className.substring(0, x);
+			packageName = className.substring(0, x);
+		}
+		catch (StringIndexOutOfBoundsException sioobe) {
+			packageName = className;
+			simpleClassName = className;
+
+			System.out.println("Invalid test className: " + className + " in " +
+				"build: " + axisBuild.getBuildURL());
+		}
 
 		testName = caseJSONObject.getString("name");
 
 		status = caseJSONObject.getString("status");
 
-		if (status.equals("FAILED") && caseJSONObject.has("errorDetails") &&
-			caseJSONObject.has("errorStackTrace")) {
+		if (status.equals("FAILED") && !caseJSONObject.isNull("errorDetails") &&
+			!caseJSONObject.isNull("errorStackTrace")) {
 
 			errorDetails = caseJSONObject.getString("errorDetails");
 			errorStackTrace = caseJSONObject.getString("errorStackTrace");
