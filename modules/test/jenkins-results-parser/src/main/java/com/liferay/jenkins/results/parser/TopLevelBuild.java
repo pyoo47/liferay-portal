@@ -152,6 +152,25 @@ public class TopLevelBuild extends BaseBuild {
 				}
 			}
 
+			Element headElement = Dom4JUtil.getNewElement("head");
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("table, th, td { border:'0';}");
+
+			sb.append("th { padding: 5px; text-align: left;} ");
+
+			sb.append("td { padding: 5px; text-align: left;} ");
+
+			sb.append("td:first-child { text-indent: 4em;} ");
+
+			sb.append("caption { text-align: left; font-size: 150%; ");
+
+			sb.append("white-space: nowrap;}");
+
+			headElement.add(
+				Dom4JUtil.getNewElement("style", null, sb.toString()));
+
 			Element divElement = Dom4JUtil.getNewElement("div");
 
 			Element h3Element = Dom4JUtil.getNewElement("h3");
@@ -167,7 +186,12 @@ public class TopLevelBuild extends BaseBuild {
 				JenkinsReportUtil.getTimelineElement(this, axisBuilds),
 				JenkinsReportUtil.getBatchReportElement(this, batchBuilds));
 
-			return divElement;
+			Element jenkinsReportElement = Dom4JUtil.getNewElement("html");
+
+			Dom4JUtil.addToElement(
+				jenkinsReportElement, headElement, divElement);
+
+			return jenkinsReportElement;
 		}
 		catch (Exception e) {
 		}
