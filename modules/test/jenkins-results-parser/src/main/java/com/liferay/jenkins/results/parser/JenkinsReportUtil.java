@@ -524,6 +524,8 @@ public class JenkinsReportUtil {
 
 		String longestTestParentName = "Unavailable";
 
+		TestResult longestTestResult = null;
+
 		Set<String> testResultsKeySet = testResults.keySet();
 
 		for (String key : testResultsKeySet) {
@@ -532,23 +534,26 @@ public class JenkinsReportUtil {
 			long testDuration = testResult.getDuration();
 
 			if (longestTestDuration < testDuration) {
-				longestTestDuration = testDuration;
-
-				longestTestName = testResult.getDisplayName();
-
-				longestTestURL = testResult.getTestReportURL();
-
-				Build testAxisBuild = testResult.getAxisBuild();
-
-				Build testBatchBuild = testAxisBuild.getParentBuild();
-
-				String testBatchBuildName = testBatchBuild.getDisplayName();
-
-				String testBatchJobName = testBatchBuild.getJobName();
-
-				longestTestParentName = testBatchBuildName.replace(
-					testBatchJobName, "");
+				longestTestResult = testResult;
 			}
+		}
+
+		if ( longestTestResult != null){
+			longestTestName = longestTestResult.getDisplayName();
+
+			longestTestURL = longestTestResult.getTestReportURL();
+
+			Build testAxisBuild = longestTestResult.getAxisBuild();
+
+			Build testBatchBuild = testAxisBuild.getParentBuild();
+
+			String testBatchBuildName = testBatchBuild.getDisplayName();
+
+			String testBatchJobName = testBatchBuild.getJobName();
+
+			longestTestParentName = testBatchBuildName.replace(
+					testBatchJobName, "");
+
 		}
 
 		StringBuilder sb = new StringBuilder();
