@@ -127,11 +127,11 @@ public interface Build {
 
 	public void invoke();
 
+	public void register(BuildEventListener buildEventListener);
+
 	public void reinvoke();
 
 	public void reinvoke(ReinvokeRule reinvokeRule);
-
-	public void register(BuildEventListener buildEventListener);
 
 	public String replaceBuildURL(String text);
 
