@@ -2436,6 +2436,101 @@ ${output.content}</echo>
 		</run-batch-test>
 	</target>
 
+	<target name="portal-license-jdk8">
+		<run-batch-test>
+			<test-action>
+				<sequential>
+					<execute>
+						<![CDATA[
+							git diff --name-only ${liferay.portal.branch}...HEAD > ${project.dir}/modifiedList
+						]]>
+					</execute>
+
+					<print-file file.name="${project.dir}/modifiedList" />
+
+					<var name="fileMatchFound" unset="true" />
+
+					<beanshell>
+						<![CDATA[
+							import java.io.FileReader;
+							import java.util.List;
+							import java.util.ArrayList;
+
+							String project_dir = project.getProperty("project.dir");
+
+							ArrayList modifiedList = new ArrayList();
+
+							FileReader fileReader = null;
+
+							try {
+								fileReader = new FileReader(project_dir + "/modifiedList");
+
+								BufferedReader bufferedReader = null;
+
+								try {
+
+									bufferedReader = new BufferedReader(fileReader);
+
+									String line = bufferedReader.readLine();
+
+									while (line != null) {
+										modifiedList.add(line);
+
+										line = bufferedReader.readLine();
+									}
+								}
+								finally {
+									if (bufferedReader != null) {
+										bufferedReader.close();
+									}
+								}
+							}
+							finally {
+								if (fileReader != null) {
+									fileReader.close();
+								}
+							}
+
+							String licensing_watch_list = project.getProperty("licensing.watch.list");
+
+							String[] licensing_watch_filenames = licensing_watch_list.split(",");
+
+							ArrayList licensingWatchList = new ArrayList(Arrays.asList(licensing_watch_filenames));
+
+							for (int i = 0; i < modifiedList.size(); i++){
+								if (licensingWatchList.contains( modifiedList.get(i) ) ){
+									project.setProperty("fileMatchFound", "true");
+
+									return;
+								}
+							}
+
+						]]>
+					</beanshell>
+
+					<if>
+						<isset property="fileMatchFound" />
+						<then>
+							<execute dir="${project.dir}">
+								<![CDATA[
+									git clean -d -f -x
+								]]>
+							</execute>
+
+							<execute dir="${release.tool.dir}">
+								<![CDATA[
+									ant dist
+								]]>
+							</execute>
+						</then>
+					</if>
+
+					<delete file="${project.dir}/modifiedList" />
+				</sequential>
+			</test-action>
+		</run-batch-test>
+	</target>
+
 	<target name="portal-startup-space-in-path-jdk8">
 		<sequential>
 			<run-batch-test>
