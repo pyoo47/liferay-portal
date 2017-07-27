@@ -19,26 +19,14 @@ import org.dom4j.Element;
 /**
  * @author Kenji Heigel
  */
-public class ElseElement extends ThenElement {
+public class WhileElement extends IfElement {
 
-	public ElseElement(Element element) {
-		super("else", element);
+	public WhileElement(Element element) {
+		super("while", element);
 	}
 
-	public ElseElement(String readableSyntax) {
-		super("else", readableSyntax);
-	}
-
-	@Override
-	public String getBlockName() {
-		return "else";
-	}
-
-	@Override
-	public String toReadableSyntax() {
-		String readableSyntax = super.toReadableSyntax();
-
-		return createReadableBlock(readableSyntax);
+	public WhileElement(String readableSyntax) {
+		super("while", readableSyntax);
 	}
 
 }
