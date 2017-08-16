@@ -191,21 +191,21 @@ public class JenkinsReportUtil {
 
 		Element ciUsageElement = getTotalCIUsageElement(axisBuilds);
 
-		Element longestAxisElement = getLongestAxisElement(axisBuilds);
+		Element vmUsageElement = getTotalVMUSageElement(topLevelBuild);
 
 		Element longestBatchElement = getLongestBatchElement(batchBuilds);
 
-		Element longestTestElement = getLongestTestElement(testResults);
+		Element longestAxisElement = getLongestAxisElement(axisBuilds);
 
-		Element vmUsageElement = getTotalVMUSageElement(topLevelBuild);
+		Element longestTestElement = getLongestTestElement(testResults);
 
 		Element divElement = Dom4JUtil.getNewElement("div");
 
 		divElement.add(startTimeElement);
 		divElement.add(ciUsageElement);
 		divElement.add(vmUsageElement);
-		divElement.add(longestAxisElement);
 		divElement.add(longestBatchElement);
+		divElement.add(longestAxisElement);
 		divElement.add(longestTestElement);
 
 		return divElement;
