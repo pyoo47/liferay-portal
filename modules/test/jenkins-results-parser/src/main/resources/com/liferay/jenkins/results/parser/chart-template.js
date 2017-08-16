@@ -1,4 +1,3 @@
-
 var ctx = document.getElementById("timeline");
 var timeline = new Chart(ctx, {
 	data: {
