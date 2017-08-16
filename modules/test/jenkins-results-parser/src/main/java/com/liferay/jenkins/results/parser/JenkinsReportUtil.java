@@ -189,6 +189,28 @@ public class JenkinsReportUtil {
 		return scriptElement;
 	}
 
+	public static Element getHTMLHeaderElement() {
+		Element headElement = Dom4JUtil.getNewElement("head");
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("table, th, td { border:'0';}");
+
+		sb.append("th { padding: 5px; text-align: left;} ");
+
+		sb.append("td { padding: 5px; text-align: left;} ");
+
+		sb.append("td:first-child { text-indent: 4em;} ");
+
+		sb.append("caption { text-align: left; font-size: 150%; ");
+
+		sb.append("white-space: nowrap;}");
+
+		headElement.add(Dom4JUtil.getNewElement("style", null, sb.toString()));
+
+		return headElement;
+	}
+
 	public static Element getTimelineElement(
 		Build topLevelBuild, Map<String, Build> builds) {
 
@@ -538,7 +560,7 @@ public class JenkinsReportUtil {
 			}
 		}
 
-		if ( longestTestResult != null){
+		if (longestTestResult != null) {
 			longestTestName = longestTestResult.getDisplayName();
 
 			longestTestURL = longestTestResult.getTestReportURL();
@@ -552,8 +574,7 @@ public class JenkinsReportUtil {
 			String testBatchJobName = testBatchBuild.getJobName();
 
 			longestTestParentName = testBatchBuildName.replace(
-					testBatchJobName, "");
-
+				testBatchJobName, "");
 		}
 
 		StringBuilder sb = new StringBuilder();

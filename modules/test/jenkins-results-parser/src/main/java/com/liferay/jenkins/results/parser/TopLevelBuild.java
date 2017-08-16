@@ -152,35 +152,18 @@ public class TopLevelBuild extends BaseBuild {
 				}
 			}
 
-			Element headElement = Dom4JUtil.getNewElement("head");
+			Element headElement = JenkinsReportUtil.getHTMLHeaderElement();
 
-			StringBuilder sb = new StringBuilder();
+			Element bodyElement = Dom4JUtil.getNewElement("body");
 
-			sb.append("table, th, td { border:'0';}");
-
-			sb.append("th { padding: 5px; text-align: left;} ");
-
-			sb.append("td { padding: 5px; text-align: left;} ");
-
-			sb.append("td:first-child { text-indent: 4em;} ");
-
-			sb.append("caption { text-align: left; font-size: 150%; ");
-
-			sb.append("white-space: nowrap;}");
-
-			headElement.add(
-				Dom4JUtil.getNewElement("style", null, sb.toString()));
-
-			Element divElement = Dom4JUtil.getNewElement("div");
-
-			Element h3Element = Dom4JUtil.getNewElement("h3");
+			Element h1Element = Dom4JUtil.getNewElement("h1");
 
 			Dom4JUtil.addToElement(
-				h3Element, "Jenkins timeline for ",
+				h1Element, "Jenkins timeline for ",
 				Dom4JUtil.getNewAnchorElement(getBuildURL(), getBuildURL()));
 
 			Dom4JUtil.addToElement(
-				divElement, h3Element,
+				bodyElement, h1Element,
 				JenkinsReportUtil.getBasicHeaderElement(
 					this, axisBuilds, batchBuilds, testResults),
 				JenkinsReportUtil.getTimelineElement(this, axisBuilds),
@@ -189,7 +172,7 @@ public class TopLevelBuild extends BaseBuild {
 			Element jenkinsReportElement = Dom4JUtil.getNewElement("html");
 
 			Dom4JUtil.addToElement(
-				jenkinsReportElement, headElement, divElement);
+				jenkinsReportElement, headElement, bodyElement);
 
 			return jenkinsReportElement;
 		}
