@@ -17,9 +17,7 @@ package com.liferay.poshi.runner.elements;
 import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.FileUtil;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.StringReader;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -29,160 +27,57 @@ import org.dom4j.Element;
  */
 public class PoshiElementFactory {
 
+	public static PoshiElement getSupportedPoshiElement(
+		PoshiElement[] poshiElements) {
+
+		for (PoshiElement poshiElement : poshiElements) {
+			String poshiElementName = poshiElement.getName();
+
+			if (!poshiElementName.equals("unsupported")) {
+				return poshiElement;
+			}
+		}
+
+		return null;
+	}
+
 	public static PoshiElement newPoshiElement(Element element) {
-		String elementName = element.getName();
+		PoshiElement[] poshiElements = {
+			new CommandElement(element), new ConditionElement(element),
+			new DefinitionElement(element), new DescriptionElement(element),
+			new ElseElement(element), new EqualsElement(element),
+			new ExecuteElement(element), new ForElement(element),
+			new IfElement(element), new IssetElement(element),
+			new PropertyElement(element), new ReturnElement(element),
+			new SetUpElement(element), new TearDownElement(element),
+			new ThenElement(element), new VarElement(element),
+			new WhileElement(element)
+		};
 
-		if (elementName.equals("command")) {
-			return new CommandElement(element);
-		}
+		PoshiElement poshiElement = getSupportedPoshiElement(poshiElements);
 
-		if (elementName.equals("condition")) {
-			return new ConditionElement(element);
-		}
-
-		if (elementName.equals("definition")) {
-			return new DefinitionElement(element);
-		}
-
-		if (elementName.equals("description")) {
-			return new DescriptionElement(element);
-		}
-
-		if (elementName.equals("else")) {
-			return new ElseElement(element);
-		}
-
-		if (elementName.equals("equals")) {
-			return new EqualsElement(element);
-		}
-
-		if (elementName.equals("execute")) {
-			return new ExecuteElement(element);
-		}
-
-		if (elementName.equals("for")) {
-			return new ForElement(element);
-		}
-
-		if (elementName.equals("if")) {
-			return new IfElement(element);
-		}
-
-		if (elementName.equals("isset")) {
-			return new IssetElement(element);
-		}
-
-		if (elementName.equals("property")) {
-			return new PropertyElement(element);
-		}
-
-		if (elementName.equals("return")) {
-			return new ReturnElement(element);
-		}
-
-		if (elementName.equals("set-up")) {
-			return new SetUpElement(element);
-		}
-
-		if (elementName.equals("tear-down")) {
-			return new TearDownElement(element);
-		}
-
-		if (elementName.equals("then")) {
-			return new ThenElement(element);
-		}
-
-		if (elementName.equals("var")) {
-			return new VarElement(element);
+		if (poshiElement != null) {
+			return poshiElement;
 		}
 
 		return new UnsupportedElement(element);
 	}
 
 	public static PoshiElement newPoshiElement(String readableSyntax) {
-		try (BufferedReader bufferedReader = new BufferedReader(
-				new StringReader(readableSyntax))) {
+		PoshiElement[] poshiElements = {
+			new CommandElement(readableSyntax),
+			new DefinitionElement(readableSyntax),
+			new ExecuteElement(readableSyntax), new ForElement(readableSyntax),
+			new IfElement(readableSyntax), new PropertyElement(readableSyntax),
+			new SetUpElement(readableSyntax),
+			new TearDownElement(readableSyntax), new VarElement(readableSyntax),
+			new WhileElement(readableSyntax)
+		};
 
-			String line = null;
+		PoshiElement poshiElement = getSupportedPoshiElement(poshiElements);
 
-			while ((line = bufferedReader.readLine()) != null) {
-				line = line.trim();
-
-				if (line.length() == 0) {
-					continue;
-				}
-
-				if (line.endsWith(");")) {
-					return new ExecuteElement(readableSyntax);
-				}
-
-				if (line.startsWith("@description") &&
-					!readableSyntax.endsWith("}")) {
-
-					return new DescriptionElement(readableSyntax);
-				}
-
-				if (line.startsWith("@")) {
-					continue;
-				}
-
-				if (line.startsWith("definition {")) {
-					return new DefinitionElement(readableSyntax);
-				}
-
-				if (line.startsWith("else {")) {
-					return new ElseElement(readableSyntax);
-				}
-
-				if (line.startsWith("for (")) {
-					return new ForElement(readableSyntax);
-				}
-
-				if (line.startsWith("if (")) {
-					return new IfElement(readableSyntax);
-				}
-
-				if (line.contains("==")) {
-					return new EqualsElement(readableSyntax);
-				}
-
-				if (line.startsWith("isset(")) {
-					return new IssetElement(readableSyntax);
-				}
-
-				if (line.endsWith(")")) {
-					return new ConditionElement(readableSyntax);
-				}
-
-				if (line.startsWith("property ")) {
-					return new PropertyElement(readableSyntax);
-				}
-
-				if (line.startsWith("setUp {")) {
-					return new SetUpElement(readableSyntax);
-				}
-
-				if (line.startsWith("tearDown {")) {
-					return new TearDownElement(readableSyntax);
-				}
-
-				if (line.startsWith("test") && line.endsWith(" {")) {
-					return new CommandElement(readableSyntax);
-				}
-
-				if (line.startsWith("var") && line.endsWith("return(")) {
-					return new ExecuteElement(readableSyntax);
-				}
-
-				if (line.startsWith("var ")) {
-					return new VarElement(readableSyntax);
-				}
-			}
-		}
-		catch (Exception e) {
-			System.out.println("Unable to generate the Poshi element");
-
-			e.printStackTrace();
+		if (poshiElement != null) {
+			return poshiElement;
 		}
 
 		return new UnsupportedElement(readableSyntax);

@@ -43,17 +43,45 @@ public class CommandElement extends PoshiElement {
 		super(name, readableSyntax);
 	}
 
+	public boolean isElementType(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (!isBalancedReadableSyntax(readableSyntax)) {
+			return false;
+		}
+
+		if (!readableSyntax.endsWith("}")) {
+			return false;
+		}
+
+		for (String line : readableSyntax.split("\n")) {
+			line = line.trim();
+
+			if (line.startsWith("@")) {
+				continue;
+			}
+
+			if (!(line.endsWith("{") && line.startsWith("test"))) {
+				return false;
+			}
+
+			break;
+		}
+
+		return true;
+	}
+
 	@Override
 	public void parseReadableSyntax(String readableSyntax) {
 		for (String readableBlock : getReadableBlocks(readableSyntax)) {
-			if (readableBlock.startsWith("setUp")) {
-				System.out.println(readableBlock);
+			if (readableBlock.endsWith("}") || readableBlock.endsWith(";")) {
+				addElementFromReadableSyntax(readableBlock);
+
+				continue;
 			}
 
-			if (readableBlock.endsWith("}") || readableBlock.endsWith(";") ||
-				readableBlock.startsWith("@description")) {
-
-				addElementFromReadableSyntax(readableBlock);
+			if (readableBlock.startsWith("@description")) {
+				add(new DescriptionElement(readableBlock));
 
 				continue;
 			}

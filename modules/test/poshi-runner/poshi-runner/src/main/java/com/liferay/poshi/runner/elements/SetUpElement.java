@@ -29,6 +29,34 @@ public class SetUpElement extends CommandElement {
 		super("set-up", readableSyntax);
 	}
 
+	public boolean isElementType(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (!isBalancedReadableSyntax(readableSyntax)) {
+			return false;
+		}
+
+		if (!readableSyntax.endsWith("}")) {
+			return false;
+		}
+
+		for (String line : readableSyntax.split("\n")) {
+			line = line.trim();
+
+			if (line.startsWith("@")) {
+				continue;
+			}
+
+			if (!line.equals("setUp {")) {
+				return false;
+			}
+
+			break;
+		}
+
+		return true;
+	}
+
 	@Override
 	protected String getReadableCommandTitle() {
 		return "setUp";

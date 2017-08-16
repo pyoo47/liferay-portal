@@ -32,11 +32,19 @@ public class IfElement extends PoshiElement {
 		super("if", readableSyntax);
 	}
 
+	public IfElement(String name, Element element) {
+		super(name, element);
+	}
+
+	public IfElement(String name, String readableSyntax) {
+		super(name, readableSyntax);
+	}
+
 	@Override
 	public String getBlockName() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("if");
+		sb.append(getName());
 
 		for (String conditionName : _conditionNames) {
 			if (element(conditionName) != null) {
@@ -54,26 +62,48 @@ public class IfElement extends PoshiElement {
 		return sb.toString();
 	}
 
+	public boolean isElementType(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (!isBalancedReadableSyntax(readableSyntax)) {
+			return false;
+		}
+
+		if (!readableSyntax.startsWith("if (")) {
+			return false;
+		}
+
+		if (!readableSyntax.endsWith("}")) {
+			return false;
+		}
+
+		return true;
+	}
+
 	@Override
 	public void parseReadableSyntax(String readableSyntax) {
 		for (String readableBlock : getReadableBlocks(readableSyntax)) {
-			if (readableBlock.startsWith("if (")) {
-				String ifContent = getParentheticalContent(readableBlock);
+			if (readableBlock.startsWith(getName() + " (")) {
+				String condition = getParentheticalContent(readableBlock);
 
-				addElementFromReadableSyntax(ifContent);
+				addConditionElement(condition);
+
+				continue;
+			}
+
+			if (readableBlock.startsWith("{")) {
+				add(new ThenElement(readableBlock));
 
 				continue;
 			}
 
 			if (readableBlock.startsWith("else {")) {
-				addElementFromReadableSyntax(readableBlock);
+				add(new ElseElement(readableBlock));
 
 				continue;
 			}
 
-			PoshiElement thenElement = new ThenElement(readableBlock);
-
-			add(thenElement);
+			addElementFromReadableSyntax(readableBlock);
 		}
 	}
 
@@ -98,25 +128,50 @@ public class IfElement extends PoshiElement {
 		return sb.toString();
 	}
 
+	protected void addConditionElement(String condition) {
+		if (condition.contains("==")) {
+			add(new EqualsElement(condition));
+
+			return;
+		}
+
+		if (condition.startsWith("isset(")) {
+			add(new IssetElement(condition));
+
+			return;
+		}
+
+		if (condition.endsWith(")")) {
+			add(new ConditionElement(condition));
+
+			return;
+		}
+	}
+
 	protected List<String> getReadableBlocks(String readableSyntax) {
 		StringBuilder sb = new StringBuilder();
 
 		List<String> readableBlocks = new ArrayList<>();
 
 		for (String line : readableSyntax.split("\n")) {
-			if (line.startsWith("if (")) {
+			String readableBlock = sb.toString();
+
+			readableBlock = readableBlock.trim();
+
+			if (line.startsWith(getName() + " (") && line.endsWith("{") &&
+				(readableBlock.length() == 0)) {
+
 				readableBlocks.add(line);
+
+				sb.append("{\n");
 
 				continue;
 			}
 
-			if (line.startsWith("else {")) {
-				sb.setLength(0);
-			}
-
 			sb.append(line);
+			sb.append("\n");
 
-			String readableBlock = sb.toString();
+			readableBlock = sb.toString();
 
 			readableBlock = readableBlock.trim();
 
@@ -124,10 +179,6 @@ public class IfElement extends PoshiElement {
 				readableBlocks.add(readableBlock);
 
 				sb.setLength(0);
-			}
-
-			if (readableBlock.startsWith("else {")) {
-				sb.append("\n");
 			}
 		}
 

@@ -19,14 +19,14 @@ import org.dom4j.Element;
 /**
  * @author Kenji Heigel
  */
-public class PropertyElement extends VarElement {
+public class WhileElement extends IfElement {
 
-	public PropertyElement(Element element) {
-		super("property", element);
+	public WhileElement(Element element) {
+		super("while", element);
 	}
 
-	public PropertyElement(String readableSyntax) {
-		super("property", readableSyntax);
+	public WhileElement(String readableSyntax) {
+		super("while", readableSyntax);
 	}
 
 	public boolean isElementType(String readableSyntax) {
@@ -36,11 +36,11 @@ public class PropertyElement extends VarElement {
 			return false;
 		}
 
-		if (!readableSyntax.endsWith(";")) {
+		if (!readableSyntax.startsWith("while (")) {
 			return false;
 		}
 
-		if (!readableSyntax.startsWith("property ")) {
+		if (!readableSyntax.endsWith("}")) {
 			return false;
 		}
 

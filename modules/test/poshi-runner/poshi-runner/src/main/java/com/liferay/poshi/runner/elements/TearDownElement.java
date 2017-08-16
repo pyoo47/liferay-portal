@@ -29,6 +29,34 @@ public class TearDownElement extends CommandElement {
 		super("tear-down", readableSyntax);
 	}
 
+	public boolean isElementType(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (!isBalancedReadableSyntax(readableSyntax)) {
+			return false;
+		}
+
+		if (!readableSyntax.endsWith("}")) {
+			return false;
+		}
+
+		for (String line : readableSyntax.split("\n")) {
+			line = line.trim();
+
+			if (line.startsWith("@")) {
+				continue;
+			}
+
+			if (!line.equals("tearDown {")) {
+				return false;
+			}
+
+			break;
+		}
+
+		return true;
+	}
+
 	@Override
 	protected String getReadableCommandTitle() {
 		return "tearDown";

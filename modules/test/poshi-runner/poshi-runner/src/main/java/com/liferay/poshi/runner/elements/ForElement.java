@@ -36,14 +36,31 @@ public class ForElement extends PoshiElement {
 	public String getBlockName() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("for ");
-		sb.append("(");
+		sb.append("for (");
 		sb.append(attributeValue("param"));
 		sb.append(" : \"");
 		sb.append(attributeValue("list"));
 		sb.append("\")");
 
 		return sb.toString();
+	}
+
+	public boolean isElementType(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (!isBalancedReadableSyntax(readableSyntax)) {
+			return false;
+		}
+
+		if (!readableSyntax.startsWith("for (")) {
+			return false;
+		}
+
+		if (!readableSyntax.endsWith("}")) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -91,17 +108,20 @@ public class ForElement extends PoshiElement {
 				continue;
 			}
 
-			String readableBlock = sb.toString();
+			if (!line.startsWith("else {")) {
+				String readableBlock = sb.toString();
 
-			readableBlock = readableBlock.trim();
+				readableBlock = readableBlock.trim();
 
-			if (isValidReadableBlock(readableBlock)) {
-				readableBlocks.add(readableBlock);
+				if (isValidReadableBlock(readableBlock)) {
+					readableBlocks.add(readableBlock);
 
-				sb.setLength(0);
+					sb.setLength(0);
+				}
 			}
 
 			sb.append(line);
+			sb.append("\n");
 		}
 
 		return readableBlocks;

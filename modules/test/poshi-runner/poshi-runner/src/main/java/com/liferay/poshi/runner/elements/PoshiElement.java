@@ -35,14 +35,24 @@ public abstract class PoshiElement extends DefaultElement {
 	public PoshiElement(String name, Element element) {
 		super(name);
 
-		_addAttributes(element);
-		_addElements(element);
+		if (isElementType(name, element)) {
+			_addAttributes(element);
+			_addElements(element);
+		}
+		else {
+			setName("unsupported");
+		}
 	}
 
 	public PoshiElement(String name, String readableSyntax) {
 		super(name);
 
-		parseReadableSyntax(readableSyntax);
+		if (isElementType(readableSyntax)) {
+			parseReadableSyntax(readableSyntax);
+		}
+		else {
+			setName("unsupported");
+		}
 	}
 
 	@Override
@@ -54,6 +64,18 @@ public abstract class PoshiElement extends DefaultElement {
 		}
 
 		super.add(new PoshiElementAttribute(attribute));
+	}
+
+	public boolean isElementType(String readableSyntax) {
+		return true;
+	}
+
+	public boolean isElementType(String name, Element element) {
+		if (name.equals(element.getName())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public abstract void parseReadableSyntax(String readableSyntax);
@@ -107,6 +129,38 @@ public abstract class PoshiElement extends DefaultElement {
 		return RegexUtil.getGroup(readableSyntax, ".*?\"(.*)\"", 1);
 	}
 
+	protected static boolean isBalancedReadableSyntax(String readableSyntax) {
+		Stack<Character> stack = new Stack<>();
+
+		for (char c : readableSyntax.toCharArray()) {
+			if (!stack.isEmpty()) {
+				Character topCodeBoundary = stack.peek();
+
+				if (c == _codeBoundariesMap.get(topCodeBoundary)) {
+					stack.pop();
+
+					continue;
+				}
+
+				if (topCodeBoundary == '\"') {
+					continue;
+				}
+			}
+
+			if (_codeBoundariesMap.containsKey(c)) {
+				stack.push(c);
+
+				continue;
+			}
+
+			if (_codeBoundariesMap.containsValue(c)) {
+				return false;
+			}
+		}
+
+		return stack.isEmpty();
+	}
+
 	protected void addElementFromReadableSyntax(String readableSyntax) {
 		PoshiElement poshiElement = PoshiElementFactory.newPoshiElement(
 			readableSyntax);
@@ -143,38 +197,6 @@ public abstract class PoshiElement extends DefaultElement {
 
 	protected String getPad() {
 		return "\t";
-	}
-
-	protected boolean isBalancedReadableSyntax(String readableSyntax) {
-		Stack<Character> stack = new Stack<>();
-
-		for (char c : readableSyntax.toCharArray()) {
-			if (!stack.isEmpty()) {
-				Character topCodeBoundary = stack.peek();
-
-				if (c == _codeBoundariesMap.get(topCodeBoundary)) {
-					stack.pop();
-
-					continue;
-				}
-
-				if (topCodeBoundary == '\"') {
-					continue;
-				}
-			}
-
-			if (_codeBoundariesMap.containsKey(c)) {
-				stack.push(c);
-
-				continue;
-			}
-
-			if (_codeBoundariesMap.containsValue(c)) {
-				return false;
-			}
-		}
-
-		return stack.isEmpty();
 	}
 
 	protected boolean isBalanceValidationRequired(String readableSyntax) {

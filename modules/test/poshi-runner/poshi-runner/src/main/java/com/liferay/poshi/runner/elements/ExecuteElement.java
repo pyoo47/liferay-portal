@@ -44,6 +44,34 @@ public class ExecuteElement extends PoshiElement {
 		super(name, readableSyntax);
 	}
 
+	public boolean isElementType(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (!isBalancedReadableSyntax(readableSyntax)) {
+			return false;
+		}
+
+		if (readableSyntax.startsWith("property ")) {
+			return false;
+		}
+
+		if (readableSyntax.startsWith("var ") &&
+			readableSyntax.contains(" = return(")) {
+
+			return true;
+		}
+
+		if (readableSyntax.startsWith("var ")) {
+			return false;
+		}
+
+		if (!readableSyntax.endsWith(");")) {
+			return false;
+		}
+
+		return true;
+	}
+
 	@Override
 	public void parseReadableSyntax(String readableSyntax) {
 		if (readableSyntax.contains("return(\n")) {
@@ -102,9 +130,9 @@ public class ExecuteElement extends PoshiElement {
 			assignment = assignment.trim();
 
 			if (executeType.equals("macro")) {
-				assignment = "var " + assignment;
+				assignment = "var " + assignment + ";";
 
-				addElementFromReadableSyntax(assignment);
+				add(new VarElement(assignment));
 
 				continue;
 			}

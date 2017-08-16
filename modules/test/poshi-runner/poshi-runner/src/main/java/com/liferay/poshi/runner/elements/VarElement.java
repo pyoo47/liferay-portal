@@ -38,7 +38,9 @@ public class VarElement extends PoshiElement {
 	public VarElement(String name, Element element) {
 		super(name, element);
 
-		initValueAttributeName(element);
+		if (isElementType(name, element)) {
+			initValueAttributeName(element);
+		}
 	}
 
 	public VarElement(String name, String readableSyntax) {
@@ -55,6 +57,28 @@ public class VarElement extends PoshiElement {
 		}
 
 		return attributeValue(valueAttributeName);
+	}
+
+	public boolean isElementType(String readableSyntax) {
+		readableSyntax = readableSyntax.trim();
+
+		if (!isBalancedReadableSyntax(readableSyntax)) {
+			return false;
+		}
+
+		if (!readableSyntax.endsWith(";")) {
+			return false;
+		}
+
+		if (!readableSyntax.startsWith("var ")) {
+			return false;
+		}
+
+		if (readableSyntax.contains(" = return(")) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
