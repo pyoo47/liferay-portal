@@ -556,6 +556,8 @@ public class JenkinsReportUtil {
 			long testDuration = testResult.getDuration();
 
 			if (longestTestDuration < testDuration) {
+				longestTestDuration = testDuration;
+
 				longestTestResult = testResult;
 			}
 		}
