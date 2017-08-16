@@ -164,7 +164,7 @@ public class TopLevelBuild extends BaseBuild {
 
 			Dom4JUtil.addToElement(
 				bodyElement, h1Element,
-				JenkinsReportUtil.getBasicHeaderElement(
+				JenkinsReportUtil.getSummaryElement(
 					this, axisBuilds, batchBuilds, testResults),
 				JenkinsReportUtil.getTimelineElement(this, axisBuilds),
 				JenkinsReportUtil.getBatchReportElement(this, batchBuilds));
