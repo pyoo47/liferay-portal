@@ -159,9 +159,13 @@ public class JenkinsReportUtil {
 
 		sb.append("table, th, td { border:'0';}");
 
-		sb.append("th { padding: 5px; text-align: left;} ");
+		sb.append("th { padding: 5px; text-align: left;");
 
-		sb.append("td { padding: 5px; text-align: left;} ");
+		sb.append("border-bottom:1pt solid black;}");
+
+		sb.append("td { padding: 5px; text-align: left;");
+
+		sb.append("border-bottom:1pt solid black;}");
 
 		sb.append("td:first-child { text-indent: 4em;} ");
 
@@ -175,8 +179,8 @@ public class JenkinsReportUtil {
 	}
 
 	public static Element getSummaryElement(
-			Build topLevelBuild, Map<String, Build> axisBuilds,
-			Map<String, Build> batchBuilds, Map<String, TestResult> testResults) {
+		Build topLevelBuild, Map<String, Build> axisBuilds,
+		Map<String, Build> batchBuilds, Map<String, TestResult> testResults) {
 
 		long startTimeStamp = topLevelBuild.getStartTimestamp();
 
@@ -185,9 +189,9 @@ public class JenkinsReportUtil {
 		Date startTime = new Date(startTimeStamp);
 
 		Element startTimeElement = Dom4JUtil.getNewElement(
-				"p", null, "Start Time: ", startTime.toLocaleString(),
-				" - Build Time: ",
-				JenkinsResultsParserUtil.toDurationString(durationTime));
+			"p", null, "Start Time: ", startTime.toLocaleString(),
+			" - Build Time: ",
+			JenkinsResultsParserUtil.toDurationString(durationTime));
 
 		Element ciUsageElement = getTotalCIUsageElement(axisBuilds);
 
