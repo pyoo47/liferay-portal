@@ -152,7 +152,7 @@ public class TopLevelBuild extends BaseBuild {
 				}
 			}
 
-			Element headElement = JenkinsReportUtil.getHTMLHeaderElement();
+			Element headElement = JenkinsReportUtil.getHTMLHeadElement();
 
 			Element bodyElement = Dom4JUtil.getNewElement("body");
 

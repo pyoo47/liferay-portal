@@ -152,7 +152,7 @@ public class JenkinsReportUtil {
 		return scriptElement;
 	}
 
-	public static Element getHTMLHeaderElement() {
+	public static Element getHTMLHeadElement() {
 		Element headElement = Dom4JUtil.getNewElement("head");
 
 		StringBuilder sb = new StringBuilder();
