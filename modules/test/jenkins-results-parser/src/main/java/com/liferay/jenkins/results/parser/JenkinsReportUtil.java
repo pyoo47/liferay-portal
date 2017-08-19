@@ -195,7 +195,7 @@ public class JenkinsReportUtil {
 
 		Element ciUsageElement = getTotalCIUsageElement(axisBuilds);
 
-		Element vmUsageElement = getTotalVMUSageElement(topLevelBuild);
+		Element vmUsageElement = getTotalVMUSageElement(axisBuilds);
 
 		Element longestBatchElement = getLongestBatchElement(batchBuilds);
 
@@ -372,7 +372,7 @@ public class JenkinsReportUtil {
 
 			String batchName = batchBuild.getDisplayName();
 
-			batchName = batchName.replace(jobName, "");
+			batchName = batchName.replace(jobName + "/", "");
 
 			String batchBuildURL = batchBuild.getBuildURL();
 
@@ -476,7 +476,8 @@ public class JenkinsReportUtil {
 			}
 		}
 
-		longestAxisParentName = longestAxisParentName.replace(jobName, "");
+		longestAxisParentName = longestAxisParentName.replace(
+			jobName + "/", "");
 
 		StringBuilder sb = new StringBuilder();
 
@@ -527,7 +528,8 @@ public class JenkinsReportUtil {
 			}
 		}
 
-		String longestBatchDisplayName = longestBatchName.replace(jobName, "");
+		String longestBatchDisplayName = longestBatchName.replace(
+			jobName + "/", "");
 
 		Element longestBatchElement = Dom4JUtil.getNewElement(
 			"p", null, "Longest Batch: ",
@@ -580,7 +582,7 @@ public class JenkinsReportUtil {
 			String testBatchJobName = testBatchBuild.getJobName();
 
 			longestTestParentName = testBatchBuildName.replace(
-				testBatchJobName, "");
+				testBatchJobName + "/", "");
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -622,8 +624,10 @@ public class JenkinsReportUtil {
 		return totalCIUsageElement;
 	}
 
-	protected static Element getTotalVMUSageElement(Build topLevelBuild) {
-		long totalVMUsed = topLevelBuild.getDownstreamBuildCount(null);
+	protected static Element getTotalVMUSageElement(
+		Map<String, Build> axisBuilds) {
+
+		long totalVMUsed = axisBuilds.size();
 
 		Element totalVMUsageElement = Dom4JUtil.getNewElement(
 			"p", null, "Total VM used: " + totalVMUsed + " slaves");
