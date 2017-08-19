@@ -160,10 +160,19 @@ public class JenkinsReportUtil {
 
 		Element h1Element = Dom4JUtil.getNewElement("h1");
 
+		String githubReceiverUsername = topLevelBuild.getParameterValue(
+			"GITHUB_RECEIVER_USERNAME");
+
+		String githubPullRequestNumber = topLevelBuild.getParameterValue(
+			"GITHUB_PULL_REQUEST_NUMBER");
+
 		Dom4JUtil.addToElement(
 			h1Element, "Jenkins timeline for ",
 			Dom4JUtil.getNewAnchorElement(
-				topLevelBuild.getBuildURL(), topLevelBuild.getBuildURL()));
+				topLevelBuild.getBuildURL(), topLevelBuild.getBuildURL()),
+			Dom4JUtil.getNewElement(
+				"p", null, githubReceiverUsername, " - ",
+				githubPullRequestNumber, " - ", "JENKINS REPORT LINK"));
 
 		Dom4JUtil.addToElement(
 			bodyElement, h1Element,
