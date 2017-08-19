@@ -152,6 +152,28 @@ public class JenkinsReportUtil {
 		return scriptElement;
 	}
 
+	public static Element getHTMLBodyElement(
+		Build topLevelBuild, Map<String, Build> batchBuilds,
+		Map<String, Build> axisBuilds, Map<String, TestResult> testResults) {
+		Element bodyElement = Dom4JUtil.getNewElement("body");
+
+		Element h1Element = Dom4JUtil.getNewElement("h1");
+
+		Dom4JUtil.addToElement(
+				h1Element, "Jenkins timeline for ",
+				Dom4JUtil.getNewAnchorElement(
+					topLevelBuild.getBuildURL(), topLevelBuild.getBuildURL()));
+
+		Dom4JUtil.addToElement(
+				bodyElement, h1Element,
+				getSummaryElement(
+					topLevelBuild, axisBuilds, batchBuilds, testResults),
+				getTimelineElement(topLevelBuild, axisBuilds),
+				getBatchReportElement(topLevelBuild, batchBuilds));
+
+		return bodyElement;
+	}
+
 	public static Element getHTMLHeadElement() {
 		Element headElement = Dom4JUtil.getNewElement("head");
 

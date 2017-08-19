@@ -154,20 +154,8 @@ public class TopLevelBuild extends BaseBuild {
 
 			Element headElement = JenkinsReportUtil.getHTMLHeadElement();
 
-			Element bodyElement = Dom4JUtil.getNewElement("body");
-
-			Element h1Element = Dom4JUtil.getNewElement("h1");
-
-			Dom4JUtil.addToElement(
-				h1Element, "Jenkins timeline for ",
-				Dom4JUtil.getNewAnchorElement(getBuildURL(), getBuildURL()));
-
-			Dom4JUtil.addToElement(
-				bodyElement, h1Element,
-				JenkinsReportUtil.getSummaryElement(
-					this, axisBuilds, batchBuilds, testResults),
-				JenkinsReportUtil.getTimelineElement(this, axisBuilds),
-				JenkinsReportUtil.getBatchReportElement(this, batchBuilds));
+			Element bodyElement = JenkinsReportUtil.getHTMLBodyElement(
+				this, batchBuilds, axisBuilds, testResults);
 
 			Element jenkinsReportElement = Dom4JUtil.getNewElement("html");
 
