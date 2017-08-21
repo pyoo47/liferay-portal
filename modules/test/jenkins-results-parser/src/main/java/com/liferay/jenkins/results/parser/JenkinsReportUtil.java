@@ -51,7 +51,7 @@ public class JenkinsReportUtil {
 				topLevelBuild.getBuildURL(), topLevelBuild.getBuildURL()),
 			Dom4JUtil.getNewElement(
 				"p", null, githubReceiverUsername, " - ",
-				githubPullRequestNumber, " - ", "JENKINS REPORT LINK"));
+				"PR#" + githubPullRequestNumber, " - ", "JENKINS REPORT LINK"));
 
 		Dom4JUtil.addToElement(
 			bodyElement, h1Element,
