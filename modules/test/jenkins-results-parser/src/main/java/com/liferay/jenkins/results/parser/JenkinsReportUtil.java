@@ -30,6 +30,7 @@ import org.dom4j.Element;
  * @author Yi-Chen Tsai
  */
 public class JenkinsReportUtil {
+
 	public static Element getHTMLBodyElement(
 		Build topLevelBuild, Map<String, Build> batchBuilds,
 		Map<String, Build> axisBuilds, Map<String, TestResult> testResults) {
@@ -89,11 +90,11 @@ public class JenkinsReportUtil {
 	}
 
 	protected static void addAxisInfoToTableElement(
-			List<Build> axisBuilds, Element tableElement) {
+		List<Build> axisBuilds, Element tableElement) {
 
 		for (Build axisBuild : axisBuilds) {
 			String axisName =
-					"AXIS_VARIABLE=" + ((AxisBuild)axisBuild).getAxisNumber();
+				"AXIS_VARIABLE=" + ((AxisBuild)axisBuild).getAxisNumber();
 
 			String axisBuildURL = axisBuild.getBuildURL();
 
@@ -104,7 +105,7 @@ public class JenkinsReportUtil {
 			long axisDuration = axisBuild.getDuration();
 
 			String axisDurationString =
-					JenkinsResultsParserUtil.toDurationString(axisDuration);
+				JenkinsResultsParserUtil.toDurationString(axisDuration);
 
 			long axisStartTime = axisBuild.getStartTimestamp();
 
@@ -115,13 +116,13 @@ public class JenkinsReportUtil {
 			String result = axisBuild.getResult();
 
 			Element axisNameElement = Dom4JUtil.getNewAnchorElement(
-					axisBuildURL, null, axisName);
+				axisBuildURL, null, axisName);
 
 			Element axisConsoleElement = Dom4JUtil.getNewAnchorElement(
-					axisConsoleURL, null, "Console");
+				axisConsoleURL, null, "Console");
 
 			Element axisTestReportElement = Dom4JUtil.getNewAnchorElement(
-					axisTestReportURL, null, "Test Report");
+				axisTestReportURL, null, "Test Report");
 
 			Element tdAxisNameElement = Dom4JUtil.getNewElement("td");
 
@@ -136,16 +137,16 @@ public class JenkinsReportUtil {
 			tdAxisTestReportElement.add(axisTestReportElement);
 
 			Element tdStartTimeStringElement = Dom4JUtil.getNewElement(
-					"td", null, "START TIME:");
+				"td", null, "START TIME:");
 
 			Element tdStartTimeElement = Dom4JUtil.getNewElement(
-					"td", null, axisStartDate.toLocaleString());
+				"td", null, axisStartDate.toLocaleString());
 
 			Element tdBuildTimeStringElement = Dom4JUtil.getNewElement(
-					"td", null, "BUILD TIME:");
+				"td", null, "BUILD TIME:");
 
 			Element tdBuildTimeElement = Dom4JUtil.getNewElement(
-					"td", null, axisDurationString);
+				"td", null, axisDurationString);
 
 			Element tdStatusResultElement = Dom4JUtil.getNewElement("td");
 
@@ -159,17 +160,97 @@ public class JenkinsReportUtil {
 			Element trAxisInfoElement = Dom4JUtil.getNewElement("tr");
 
 			Dom4JUtil.addToElement(
-					trAxisInfoElement, tdAxisNameElement, tdAxisConsoleElement,
-					tdAxisTestReportElement, tdStartTimeStringElement,
-					tdStartTimeElement, tdBuildTimeStringElement,
-					tdBuildTimeElement, tdStatusResultElement);
+				trAxisInfoElement, tdAxisNameElement, tdAxisConsoleElement,
+				tdAxisTestReportElement, tdStartTimeStringElement,
+				tdStartTimeElement, tdBuildTimeStringElement,
+				tdBuildTimeElement, tdStatusResultElement);
 
 			tableElement.add(trAxisInfoElement);
 		}
 	}
 
+	protected static Element getBatchInfoTableElement(
+		List<Build> batchBuilds, String status) {
+
+		Element tableElement = Dom4JUtil.getNewElement("table");
+
+		tableElement.add(Dom4JUtil.getNewElement("caption", null, status));
+
+		for (Build batchBuild : batchBuilds) {
+			String jobName = batchBuild.getJobName();
+
+			String batchName = batchBuild.getDisplayName();
+
+			batchName = batchName.replace(jobName + "/", "");
+
+			String batchBuildURL = batchBuild.getBuildURL();
+
+			String batchConsoleURL = batchBuildURL + "console";
+
+			String batchTestReportURL = batchBuildURL + "testReport";
+
+			long batchDuration = batchBuild.getDuration();
+
+			String batchDurationString =
+				JenkinsResultsParserUtil.toDurationString(batchDuration);
+
+			long batchStartTime = batchBuild.getStartTimestamp();
+
+			Date batchStartDate = new Date(batchStartTime);
+
+			Element batchNameElement = Dom4JUtil.getNewAnchorElement(
+				batchBuildURL, null, batchName);
+
+			Element batchConsoleElement = Dom4JUtil.getNewAnchorElement(
+				batchConsoleURL, null, "Console");
+
+			Element batchTestReportElement = Dom4JUtil.getNewAnchorElement(
+				batchTestReportURL, null, "Test Report");
+
+			Element thBatchNameElement = Dom4JUtil.getNewElement("th");
+
+			thBatchNameElement.add(batchNameElement);
+
+			Element thBatchConsoleElement = Dom4JUtil.getNewElement("th");
+
+			thBatchConsoleElement.add(batchConsoleElement);
+
+			Element thTestReportElement = Dom4JUtil.getNewElement("th");
+
+			thTestReportElement.add(batchTestReportElement);
+
+			Element thStartTimeStringElement = Dom4JUtil.getNewElement(
+				"th", null, "START TIME:");
+
+			Element thStartTimeElement = Dom4JUtil.getNewElement(
+				"th", null, batchStartDate.toLocaleString());
+
+			Element thBuildTimeStringElement = Dom4JUtil.getNewElement(
+				"th", null, "BUILD TIME:");
+
+			Element thBuildTimeElement = Dom4JUtil.getNewElement(
+				"th", null, batchDurationString);
+
+			Element trBatchElement = Dom4JUtil.getNewElement("tr");
+
+			Dom4JUtil.addToElement(
+				trBatchElement, thBatchNameElement, thBatchConsoleElement,
+				thTestReportElement, thStartTimeStringElement,
+				thStartTimeElement, thBuildTimeStringElement,
+				thBuildTimeElement);
+
+			tableElement.add(trBatchElement);
+
+			List<Build> axisBuilds = batchBuild.getDownstreamBuilds(null);
+
+			addAxisInfoToTableElement(axisBuilds, tableElement);
+		}
+
+		return tableElement;
+	}
+
 	protected static Element getBatchReportElement(
-			Build topLevelBuild, Map<String, Build> batchBuilds) {
+		Build topLevelBuild, Map<String, Build> batchBuilds) {
 
 		Set<String> batchBuildsKeySet = batchBuilds.keySet();
 
@@ -215,7 +296,7 @@ public class JenkinsReportUtil {
 						completedSuccessBuilds.add(build);
 					}
 					else if (result.equals("FAILURE") ||
-							result.equals("UNSTABLE")) {
+							 result.equals("UNSTABLE")) {
 
 						completedFailureBuilds.add(build);
 					}
@@ -232,25 +313,25 @@ public class JenkinsReportUtil {
 		}
 
 		Element queuedBatchElement = getBatchInfoTableElement(
-				queuedBuilds, "Queued: " + queuedBuilds.size());
+			queuedBuilds, "Queued: " + queuedBuilds.size());
 
 		Element startingBatchElement = getBatchInfoTableElement(
-				startingBuilds, "Starting: " + startingBuilds.size());
+			startingBuilds, "Starting: " + startingBuilds.size());
 
 		Element runningBatchElement = getBatchInfoTableElement(
-				runningBuilds, "Running: " + runningBuilds.size());
+			runningBuilds, "Running: " + runningBuilds.size());
 
 		Element completedAbortedBatchElement = getBatchInfoTableElement(
-				completedAbortedBuilds,
-				"Completed - Aborted (Missing): " + completedAbortedBuilds.size());
+			completedAbortedBuilds,
+			"Completed - Aborted (Missing): " + completedAbortedBuilds.size());
 
 		Element completedFailureBatchElement = getBatchInfoTableElement(
-				completedFailureBuilds,
-				"Completed - Failure: " + completedFailureBuilds.size());
+			completedFailureBuilds,
+			"Completed - Failure: " + completedFailureBuilds.size());
 
 		Element completedSuccessBatchElement = getBatchInfoTableElement(
-				completedSuccessBuilds,
-				"Completed - Success: " + completedSuccessBuilds.size());
+			completedSuccessBuilds,
+			"Completed - Success: " + completedSuccessBuilds.size());
 
 		Element divElement = Dom4JUtil.getNewElement("div");
 
@@ -264,88 +345,8 @@ public class JenkinsReportUtil {
 		return divElement;
 	}
 
-	protected static Element getBatchInfoTableElement(
-			List<Build> batchBuilds, String status) {
-
-		Element tableElement = Dom4JUtil.getNewElement("table");
-
-		tableElement.add(Dom4JUtil.getNewElement("caption", null, status));
-
-		for (Build batchBuild : batchBuilds) {
-			String jobName = batchBuild.getJobName();
-
-			String batchName = batchBuild.getDisplayName();
-
-			batchName = batchName.replace(jobName + "/", "");
-
-			String batchBuildURL = batchBuild.getBuildURL();
-
-			String batchConsoleURL = batchBuildURL + "console";
-
-			String batchTestReportURL = batchBuildURL + "testReport";
-
-			long batchDuration = batchBuild.getDuration();
-
-			String batchDurationString =
-					JenkinsResultsParserUtil.toDurationString(batchDuration);
-
-			long batchStartTime = batchBuild.getStartTimestamp();
-
-			Date batchStartDate = new Date(batchStartTime);
-
-			Element batchNameElement = Dom4JUtil.getNewAnchorElement(
-					batchBuildURL, null, batchName);
-
-			Element batchConsoleElement = Dom4JUtil.getNewAnchorElement(
-					batchConsoleURL, null, "Console");
-
-			Element batchTestReportElement = Dom4JUtil.getNewAnchorElement(
-					batchTestReportURL, null, "Test Report");
-
-			Element thBatchNameElement = Dom4JUtil.getNewElement("th");
-
-			thBatchNameElement.add(batchNameElement);
-
-			Element thBatchConsoleElement = Dom4JUtil.getNewElement("th");
-
-			thBatchConsoleElement.add(batchConsoleElement);
-
-			Element thTestReportElement = Dom4JUtil.getNewElement("th");
-
-			thTestReportElement.add(batchTestReportElement);
-
-			Element thStartTimeStringElement = Dom4JUtil.getNewElement(
-					"th", null, "START TIME:");
-
-			Element thStartTimeElement = Dom4JUtil.getNewElement(
-					"th", null, batchStartDate.toLocaleString());
-
-			Element thBuildTimeStringElement = Dom4JUtil.getNewElement(
-					"th", null, "BUILD TIME:");
-
-			Element thBuildTimeElement = Dom4JUtil.getNewElement(
-					"th", null, batchDurationString);
-
-			Element trBatchElement = Dom4JUtil.getNewElement("tr");
-
-			Dom4JUtil.addToElement(
-					trBatchElement, thBatchNameElement, thBatchConsoleElement,
-					thTestReportElement, thStartTimeStringElement,
-					thStartTimeElement, thBuildTimeStringElement,
-					thBuildTimeElement);
-
-			tableElement.add(trBatchElement);
-
-			List<Build> axisBuilds = batchBuild.getDownstreamBuilds(null);
-
-			addAxisInfoToTableElement(axisBuilds, tableElement);
-		}
-
-		return tableElement;
-	}
-
 	protected static Element getChartJSScriptElement(
-			String xData, String y1Data, String y2Data) {
+		String xData, String y1Data, String y2Data) {
 
 		String resource = null;
 
@@ -353,7 +354,7 @@ public class JenkinsReportUtil {
 			Class<?> clazz = JenkinsResultsParserUtil.class;
 
 			resource = JenkinsResultsParserUtil.readInputStream(
-					clazz.getResourceAsStream("chart-template.js"));
+				clazz.getResourceAsStream("chart-template.js"));
 		}
 		catch (IOException ioe) {
 		}
@@ -535,8 +536,8 @@ public class JenkinsReportUtil {
 	}
 
 	protected static Element getSummaryElement(
-			Build topLevelBuild, Map<String, Build> axisBuilds,
-			Map<String, Build> batchBuilds, Map<String, TestResult> testResults) {
+		Build topLevelBuild, Map<String, Build> axisBuilds,
+		Map<String, Build> batchBuilds, Map<String, TestResult> testResults) {
 
 		long startTimeStamp = topLevelBuild.getStartTimestamp();
 
@@ -545,9 +546,9 @@ public class JenkinsReportUtil {
 		Date startTime = new Date(startTimeStamp);
 
 		Element startTimeElement = Dom4JUtil.getNewElement(
-				"p", null, "Start Time: ", startTime.toLocaleString(),
-				" - Build Time: ",
-				JenkinsResultsParserUtil.toDurationString(durationTime));
+			"p", null, "Start Time: ", startTime.toLocaleString(),
+			" - Build Time: ",
+			JenkinsResultsParserUtil.toDurationString(durationTime));
 
 		Element ciUsageElement = getTotalCIUsageElement(axisBuilds);
 
@@ -572,7 +573,7 @@ public class JenkinsReportUtil {
 	}
 
 	protected static Element getTimelineElement(
-			Build topLevelBuild, Map<String, Build> builds) {
+		Build topLevelBuild, Map<String, Build> builds) {
 
 		long topLevelDuration = topLevelBuild.getDuration();
 		long topLevelStartTime = topLevelBuild.getStartTimestamp();
@@ -592,12 +593,12 @@ public class JenkinsReportUtil {
 			long buildEndTime = buildDuration + buildStartTime;
 
 			long dataEnd =
-					(buildEndTime - topLevelStartTime) * dataPoints /
-							topLevelDuration;
+				(buildEndTime - topLevelStartTime) * dataPoints /
+					topLevelDuration;
 
 			long dataStart =
-					(buildStartTime - topLevelStartTime) * dataPoints /
-							topLevelDuration;
+				(buildStartTime - topLevelStartTime) * dataPoints /
+					topLevelDuration;
 
 			for (int i = (int)dataStart; i < dataEnd; i++) {
 				slaveUsageData[i] = ++slaveUsageData[i];
@@ -625,13 +626,13 @@ public class JenkinsReportUtil {
 		scriptElement.addText("");
 
 		Element chartJSScriptElement = getChartJSScriptElement(
-				Arrays.toString(timeData), Arrays.toString(slaveUsageData),
-				Arrays.toString(invocationData));
+			Arrays.toString(timeData), Arrays.toString(slaveUsageData),
+			Arrays.toString(invocationData));
 
 		Element divElement = Dom4JUtil.getNewElement("div");
 
 		Dom4JUtil.addToElement(
-				divElement, canvasElement, scriptElement, chartJSScriptElement);
+			divElement, canvasElement, scriptElement, chartJSScriptElement);
 
 		return divElement;
 	}
