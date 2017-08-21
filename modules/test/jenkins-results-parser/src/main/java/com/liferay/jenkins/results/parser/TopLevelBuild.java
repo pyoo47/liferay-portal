@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -121,53 +120,15 @@ public class TopLevelBuild extends BaseBuild {
 
 	@Override
 	public Element getJenkinsReportElement() {
-		Map<String, Build> axisBuilds = new TreeMap<>();
-		Map<String, Build> batchBuilds = new TreeMap<>();
-		Map<String, TestResult> testResults = new TreeMap<>();
+		Element headElement = JenkinsReportUtil.getHTMLHeadElement();
 
-		try {
-			for (Build batchBuild : getDownstreamBuilds(null)) {
-				batchBuilds.put(batchBuild.getDisplayName(), batchBuild);
+		Element bodyElement = JenkinsReportUtil.getHTMLBodyElement(this);
 
-				for (Build axisBuild : batchBuild.getDownstreamBuilds(null)) {
-					String key = null;
+		Element jenkinsReportElement = Dom4JUtil.getNewElement("html");
 
-					try {
-						key =
-							batchBuild.getDisplayName() + "/" +
-								JenkinsResultsParserUtil.getAxisVariable(
-									axisBuild.getBuildURL());
-					}
-					catch (Exception e) {
-					}
+		Dom4JUtil.addToElement(jenkinsReportElement, headElement, bodyElement);
 
-					axisBuilds.put(key, axisBuild);
-
-					for (TestResult testResult :
-							axisBuild.getTestResults(null)) {
-
-						testResults.put(
-							testResult.getDisplayName(), testResult);
-					}
-				}
-			}
-
-			Element headElement = JenkinsReportUtil.getHTMLHeadElement();
-
-			Element bodyElement = JenkinsReportUtil.getHTMLBodyElement(
-				this, batchBuilds, axisBuilds, testResults);
-
-			Element jenkinsReportElement = Dom4JUtil.getNewElement("html");
-
-			Dom4JUtil.addToElement(
-				jenkinsReportElement, headElement, bodyElement);
-
-			return jenkinsReportElement;
-		}
-		catch (Exception e) {
-		}
-
-		return null;
+		return jenkinsReportElement;
 	}
 
 	public String getJenkinsReportURL() {

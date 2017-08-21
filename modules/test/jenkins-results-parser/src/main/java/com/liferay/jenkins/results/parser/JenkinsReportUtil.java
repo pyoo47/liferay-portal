@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.dom4j.Element;
 
@@ -31,9 +32,35 @@ import org.dom4j.Element;
  */
 public class JenkinsReportUtil {
 
-	public static Element getHTMLBodyElement(
-		Build topLevelBuild, Map<String, Build> batchBuilds,
-		Map<String, Build> axisBuilds, Map<String, TestResult> testResults) {
+	public static Element getHTMLBodyElement(Build topLevelBuild) {
+		Map<String, Build> axisBuilds = new TreeMap<>();
+		Map<String, Build> batchBuilds = new TreeMap<>();
+		Map<String, TestResult> testResults = new TreeMap<>();
+
+		try {
+			for (Build batchBuild : topLevelBuild.getDownstreamBuilds(null)) {
+				batchBuilds.put(batchBuild.getDisplayName(), batchBuild);
+
+				for (Build axisBuild : batchBuild.getDownstreamBuilds(null)) {
+					String key =
+						batchBuild.getDisplayName() + "/" +
+							JenkinsResultsParserUtil.getAxisVariable(
+								axisBuild.getBuildURL());
+
+					axisBuilds.put(key, axisBuild);
+
+					for (TestResult testResult :
+							axisBuild.getTestResults(null)) {
+
+						testResults.put(
+							testResult.getDisplayName(), testResult);
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			return null;
+		}
 
 		Element bodyElement = Dom4JUtil.getNewElement("body");
 
