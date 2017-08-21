@@ -42,12 +42,12 @@ public class JenkinsReportUtil {
 				batchBuilds.put(batchBuild.getDisplayName(), batchBuild);
 
 				for (Build axisBuild : batchBuild.getDownstreamBuilds(null)) {
-					String key =
+					String axisKey =
 						batchBuild.getDisplayName() + "/" +
 							JenkinsResultsParserUtil.getAxisVariable(
 								axisBuild.getBuildURL());
 
-					axisBuilds.put(key, axisBuild);
+					axisBuilds.put(axisKey, axisBuild);
 
 					for (TestResult testResult :
 							axisBuild.getTestResults(null)) {
