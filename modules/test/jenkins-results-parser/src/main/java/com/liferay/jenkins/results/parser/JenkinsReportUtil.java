@@ -356,12 +356,11 @@ public class JenkinsReportUtil {
 
 		Element divElement = Dom4JUtil.getNewElement("div");
 
-		divElement.add(queuedBatchElement);
-		divElement.add(startingBatchElement);
-		divElement.add(runningBatchElement);
-		divElement.add(completedAbortedBatchElement);
-		divElement.add(completedFailureBatchElement);
-		divElement.add(completedSuccessBatchElement);
+		Dom4JUtil.addToElement(
+			divElement, queuedBatchElement, startingBatchElement,
+			runningBatchElement, completedAbortedBatchElement,
+			completedFailureBatchElement, completedSuccessBatchElement
+		);
 
 		return divElement;
 	}
@@ -583,12 +582,9 @@ public class JenkinsReportUtil {
 
 		Element divElement = Dom4JUtil.getNewElement("div");
 
-		divElement.add(startTimeElement);
-		divElement.add(ciUsageElement);
-		divElement.add(vmUsageElement);
-		divElement.add(longestBatchElement);
-		divElement.add(longestAxisElement);
-		divElement.add(longestTestElement);
+		Dom4JUtil.addToElement(
+			divElement, startTimeElement, ciUsageElement, vmUsageElement,
+			longestBatchElement, longestAxisElement, longestTestElement);
 
 		return divElement;
 	}
