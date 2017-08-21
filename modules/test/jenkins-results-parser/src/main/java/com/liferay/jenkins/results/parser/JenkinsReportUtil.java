@@ -85,7 +85,7 @@ public class JenkinsReportUtil {
 			getSummaryElement(
 				topLevelBuild, axisBuilds, batchBuilds, testResults),
 			getTimelineElement(topLevelBuild, axisBuilds),
-			getBatchReportElement(topLevelBuild, batchBuilds));
+			getBatchReportElement(batchBuilds));
 
 		return bodyElement;
 	}
@@ -277,7 +277,7 @@ public class JenkinsReportUtil {
 	}
 
 	protected static Element getBatchReportElement(
-		Build topLevelBuild, Map<String, Build> batchBuilds) {
+		Map<String, Build> batchBuilds) {
 
 		Set<String> batchBuildsKeySet = batchBuilds.keySet();
 
@@ -295,12 +295,6 @@ public class JenkinsReportUtil {
 
 		for (String key : batchBuildsKeySet) {
 			Build build = batchBuilds.get(key);
-
-			long buildDuration = build.getDuration();
-
-			long batchBuildstartTime = build.getStartTimestamp();
-
-			long buildEndTime = buildDuration + batchBuildstartTime;
 
 			switch (build.getStatus()) {
 
