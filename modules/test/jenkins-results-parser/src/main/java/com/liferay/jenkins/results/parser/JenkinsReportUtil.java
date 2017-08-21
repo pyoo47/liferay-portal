@@ -359,8 +359,7 @@ public class JenkinsReportUtil {
 		Dom4JUtil.addToElement(
 			divElement, queuedBatchElement, startingBatchElement,
 			runningBatchElement, completedAbortedBatchElement,
-			completedFailureBatchElement, completedSuccessBatchElement
-		);
+			completedFailureBatchElement, completedSuccessBatchElement);
 
 		return divElement;
 	}
