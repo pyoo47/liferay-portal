@@ -64,6 +64,10 @@ public abstract class BaseBuild implements Build {
 				downstreamBuilds.add(BuildFactory.newBuild(url, this));
 			}
 		}
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			downstreamBuild.setPrerequisiteRules(prerequisiteRules);
+		}
 	}
 
 	@Override
@@ -122,6 +126,36 @@ public abstract class BaseBuild implements Build {
 
 		archiveConsoleLog();
 		archiveJSON();
+	}
+
+	@Override
+	public void deregister(BuildEventListener buildEventListener) {
+		buildEventListeners.remove(buildEventListener);
+	}
+
+	@Override
+	public void discard() {
+		setStatus("discarded");
+	}
+
+	@Override
+	public void evaluate() {
+		PrerequisiteRule.State prerequisiteState = getPrerequisitesState(this);
+
+		String status = getStatus();
+
+		if (status.equals("pending")) {
+			if (prerequisiteState.equals(PrerequisiteRule.State.INVOKE)) {
+				invoke();
+			}
+			else if (prerequisiteState.equals(PrerequisiteRule.State.DISCARD)) {
+				discard();
+			}
+		}
+
+		for (Build build : getDownstreamBuilds("pending")) {
+			build.evaluate();
+		}
 	}
 
 	@Override
@@ -672,6 +706,12 @@ public abstract class BaseBuild implements Build {
 
 		String status = getStatus();
 
+		if (status.equals("discarded")) {
+			sb.append(" was discarded because its prerequisite build failed.");
+
+			return sb.toString();
+		}
+
 		if (status.equals("completed")) {
 			sb.append(" completed at ");
 			sb.append(getBuildURL());
@@ -685,6 +725,12 @@ public abstract class BaseBuild implements Build {
 			sb.append(" is missing ");
 			sb.append(getJobURL());
 			sb.append(".");
+
+			return sb.toString();
+		}
+
+		if (status.equals("pending")) {
+			sb.append(" is pending.");
 
 			return sb.toString();
 		}
@@ -732,13 +778,19 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public String getStatusSummary() {
 		return JenkinsResultsParserUtil.combine(
+			Integer.toString(getDownstreamBuildCount("pending")), " Pending  ",
+			"/ ",
+
+			Integer.toString(getDownstreamBuildCount("discarded")),
+			" Discarded  ", "/ ",
+
 			Integer.toString(getDownstreamBuildCount("starting")),
 			" Starting  ", "/ ",
 
-			Integer.toString(getDownstreamBuildCount("missing")), " Missing  ",
+			Integer.toString(getDownstreamBuildCount("queued")), " Queued  ",
 			"/ ",
 
-			Integer.toString(getDownstreamBuildCount("queued")), " Queued  ",
+			Integer.toString(getDownstreamBuildCount("missing")), " Missing  ",
 			"/ ",
 
 			Integer.toString(getDownstreamBuildCount("running")), " Running  ",
@@ -821,6 +873,38 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return false;
+	}
+
+	@Override
+	public void invoke() {
+		String hostName = JenkinsResultsParserUtil.getHostName("");
+
+		if (!hostName.startsWith("cloud-10-0")) {
+			System.out.println("A build may not be invoked by " + hostName);
+
+			setStatus("discarded");
+
+			return;
+		}
+
+		String invocationURL = getInvocationURL();
+
+		try {
+			JenkinsResultsParserUtil.toString(
+				JenkinsResultsParserUtil.getLocalURL(invocationURL));
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		System.out.println(getInvocationMessage());
+
+		setStatus("starting");
+	}
+
+	@Override
+	public void register(BuildEventListener buildEventListener) {
+		buildEventListeners.add(buildEventListener);
 	}
 
 	@Override
@@ -926,13 +1010,22 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void setPrerequisiteRules(Set<PrerequisiteRule> prerequisiteRules) {
+		this.prerequisiteRules = prerequisiteRules;
+
+		for (Build build : downstreamBuilds) {
+			build.setPrerequisiteRules(prerequisiteRules);
+		}
+	}
+
+	@Override
 	public void update() {
 		String status = getStatus();
 
-		if (!status.equals("completed")) {
+		if (!status.equals("completed") && !status.equals("discarded")) {
 			try {
 				if (status.equals("missing") || status.equals("queued") ||
-					status.equals("starting")) {
+					status.equals("starting") || status.equals("pending")) {
 
 					JSONObject runningBuildJSONObject =
 						getRunningBuildJSONObject();
@@ -944,7 +1037,8 @@ public abstract class BaseBuild implements Build {
 						JSONObject queueItemJSONObject =
 							getQueueItemJSONObject();
 
-						if (status.equals("starting") &&
+						if ((status.equals("pending") ||
+							 status.equals("starting")) &&
 							(queueItemJSONObject != null)) {
 
 							setStatus("queued");
@@ -957,9 +1051,9 @@ public abstract class BaseBuild implements Build {
 					}
 				}
 
-				status = getStatus();
-
 				if (downstreamBuilds != null) {
+					findDownstreamBuilds();
+
 					ExecutorService executorService = getExecutorService();
 
 					for (final Build downstreamBuild : downstreamBuilds) {
@@ -990,14 +1084,26 @@ public abstract class BaseBuild implements Build {
 
 					String result = getResult();
 
-					if ((downstreamBuilds.size() ==
-							getDownstreamBuildCount("completed")) &&
+					int finishedBuildCount =
+						getDownstreamBuildCount("completed") +
+							getDownstreamBuildCount("discarded");
+
+					if ((downstreamBuilds.size() == finishedBuildCount) &&
 						(result != null)) {
 
 						setStatus("completed");
 					}
 
-					findDownstreamBuilds();
+					if (!status.equals(getStatus())) {
+						BuildEvent buildEvent = new BuildEvent(
+							this, getStatus(), status);
+
+						for (BuildEventListener buildEventListener :
+								buildEventListeners) {
+
+							buildEventListener.onBuildEvent(buildEvent);
+						}
+					}
 
 					if (this instanceof AxisBuild ||
 						this instanceof BatchBuild ||
@@ -1023,6 +1129,23 @@ public abstract class BaseBuild implements Build {
 			catch (IOException ioe) {
 				throw new RuntimeException(ioe);
 			}
+		}
+	}
+
+	@Override
+	public void updateBuildTriggers() {
+		List<Build> applicableBuilds = getApplicableBuilds(
+			this, BuildUtil.getAllBuilds(getTopLevelBuild()));
+
+		for (Build build : applicableBuilds) {
+			BuildTriggerEventListener buildTriggerEventListener =
+				new BuildTriggerEventListener(build);
+
+			register(buildTriggerEventListener);
+		}
+
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			downstreamBuild.updateBuildTriggers();
 		}
 	}
 
@@ -1176,6 +1299,8 @@ public abstract class BaseBuild implements Build {
 	protected BaseBuild(String url, Build parentBuild) {
 		_parentBuild = parentBuild;
 
+		prerequisiteRules = new HashSet<>();
+
 		if (url.contains("buildWithParameters")) {
 			setInvocationURL(url);
 		}
@@ -1322,6 +1447,8 @@ public abstract class BaseBuild implements Build {
 
 			downstreamBaseBuild.checkForReinvocation(consoleText);
 		}
+
+		updateBuildTriggers();
 	}
 
 	protected List<String> findDownstreamBuildsInConsoleText(
@@ -1378,6 +1505,21 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return foundDownstreamBuildURLs;
+	}
+
+	protected List<Build> getApplicableBuilds(
+		Build build, List<Build> allBuilds) {
+
+		Set<Build> applicableBuilds = new HashSet<>();
+
+		for (PrerequisiteRule prerequisiteRule : prerequisiteRules) {
+			if (prerequisiteRule.isPrerequisite(build)) {
+				applicableBuilds.addAll(
+					prerequisiteRule.getApplicableBuilds(allBuilds));
+			}
+		}
+
+		return new ArrayList<>(applicableBuilds);
 	}
 
 	protected String getBaseRepositoryType() {
@@ -1438,6 +1580,12 @@ public abstract class BaseBuild implements Build {
 				return sb.toString();
 			}
 
+			if (status.equals("discarded")) {
+				sb.append(" has been discarded.");
+
+				return sb.toString();
+			}
+
 			if (status.equals("missing")) {
 				sb.append(" is missing ");
 				sb.append(getJobURL());
@@ -1470,6 +1618,12 @@ public abstract class BaseBuild implements Build {
 
 				sb.append(getBuildURL());
 				sb.append(".\n");
+
+				return sb.toString();
+			}
+
+			if (status.equals("pending")) {
+				sb.append(" is pending trigger.");
 
 				return sb.toString();
 			}
@@ -1550,6 +1704,17 @@ public abstract class BaseBuild implements Build {
 		return getGitHubMessageJobResultsElement();
 	}
 
+	protected String getInvocationMessage() {
+		StringBuffer sb = new StringBuffer();
+
+		sb.append("Invoked: ");
+		sb.append(getJobName());
+		sb.append(" at ");
+		sb.append(getInvocationURL());
+
+		return sb.toString();
+	}
+
 	protected Set<String> getJobParameterNames() {
 		JSONObject jsonObject;
 
@@ -1625,6 +1790,51 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return new HashMap<>();
+	}
+
+	protected Map<Build, PrerequisiteRule> getPrerequisites(
+		Build build, List<Build> allBuilds) {
+
+		Map<Build, PrerequisiteRule> prerequisites = new HashMap<>();
+
+		for (PrerequisiteRule prerequisiteRule : prerequisiteRules) {
+			if (prerequisiteRule.isApplicable(build)) {
+				List<Build> prerequisiteBuilds =
+					prerequisiteRule.getPrerequisiteBuilds(allBuilds);
+
+				for (Build prerequisiteBuild : prerequisiteBuilds) {
+					prerequisites.put(prerequisiteBuild, prerequisiteRule);
+				}
+			}
+		}
+
+		return prerequisites;
+	}
+
+	protected PrerequisiteRule.State getPrerequisitesState(Build build) {
+		TopLevelBuild topLevelBuild = build.getTopLevelBuild();
+
+		Map<Build, PrerequisiteRule> prerequisites = getPrerequisites(
+			build, BuildUtil.getAllBuilds(topLevelBuild));
+
+		PrerequisiteRule.State state = PrerequisiteRule.State.INVOKE;
+
+		for (Build prerequisiteBuild : prerequisites.keySet()) {
+			PrerequisiteRule prerequisiteRule = prerequisites.get(
+				prerequisiteBuild);
+
+			if (prerequisiteRule.shouldDiscard(prerequisiteBuild)) {
+				return PrerequisiteRule.State.DISCARD;
+			}
+
+			if (!prerequisiteRule.shouldDiscard(prerequisiteBuild) &&
+				!prerequisiteRule.shouldInvoke(prerequisiteBuild)) {
+
+				state = PrerequisiteRule.State.PENDING;
+			}
+		}
+
+		return state;
 	}
 
 	protected JSONObject getQueueItemJSONObject() throws IOException {
@@ -1960,7 +2170,7 @@ public abstract class BaseBuild implements Build {
 
 			loadParametersFromQueryString(invocationURL);
 
-			setStatus("starting");
+			setStatus("pending");
 		}
 	}
 
@@ -2036,10 +2246,12 @@ public abstract class BaseBuild implements Build {
 	protected String archiveName;
 	protected List<Integer> badBuildNumbers = new ArrayList<>();
 	protected String branchName;
+	protected Set<BuildEventListener> buildEventListeners = new HashSet<>();
 	protected List<Build> downstreamBuilds = new ArrayList<>();
 	protected boolean fromArchive;
 	protected String jobName;
 	protected String master;
+	protected Set<PrerequisiteRule> prerequisiteRules = new HashSet<>();
 	protected List<ReinvokeRule> reinvokeRules =
 		ReinvokeRule.getReinvokeRules();
 	protected String repositoryName;
