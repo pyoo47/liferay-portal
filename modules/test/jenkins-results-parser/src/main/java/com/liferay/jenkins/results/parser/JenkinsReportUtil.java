@@ -105,6 +105,87 @@ public class JenkinsReportUtil {
 		return headElement;
 	}
 
+	protected static Element getBatchInfoTableElement(
+		List<Build> batchBuilds, String status) {
+
+		Element tableElement = Dom4JUtil.getNewElement("table");
+
+		tableElement.add(Dom4JUtil.getNewElement("caption", null, status));
+
+		for (Build batchBuild : batchBuilds) {
+			String jobName = batchBuild.getJobName();
+
+			String batchName = batchBuild.getDisplayName();
+
+			if (batchName.contains("-dist(")) {
+				batchName = batchName.replace(jobName, "dist");
+			}
+			else {
+				batchName = batchName.replace(jobName + "/", "");
+			}
+
+			String batchBuildURL = batchBuild.getBuildURL();
+
+			String batchConsoleURL = batchBuildURL + "console";
+
+			String batchTestReportURL = batchBuildURL + "testReport";
+
+			long batchDuration = batchBuild.getDuration();
+
+			String batchDurationString =
+				JenkinsResultsParserUtil.toDurationString(batchDuration);
+
+			long batchStartTime = batchBuild.getStartTimestamp();
+
+			Date batchStartDate = new Date(batchStartTime);
+
+			Element batchNameElement = Dom4JUtil.getNewAnchorElement(
+				batchBuildURL, null, batchName);
+
+			Element batchConsoleElement = Dom4JUtil.getNewAnchorElement(
+				batchConsoleURL, null, "Console");
+
+			Element batchTestReportElement = Dom4JUtil.getNewAnchorElement(
+				batchTestReportURL, null, "Test Report");
+
+			Element thBatchNameElement = Dom4JUtil.getNewElement("th");
+
+			thBatchNameElement.add(batchNameElement);
+
+			Element thBatchConsoleElement = Dom4JUtil.getNewElement("th");
+
+			thBatchConsoleElement.add(batchConsoleElement);
+
+			Element thTestReportElement = Dom4JUtil.getNewElement("th");
+
+			thTestReportElement.add(batchTestReportElement);
+
+			Element thStartTimeStringElement = Dom4JUtil.getNewElement(
+				"th", null, "START TIME:");
+
+			Element thStartTimeElement = Dom4JUtil.getNewElement(
+				"th", null, batchStartDate.toLocaleString());
+
+			Element thBuildTimeStringElement = Dom4JUtil.getNewElement(
+				"th", null, "BUILD TIME:");
+
+			Element thBuildTimeElement = Dom4JUtil.getNewElement(
+				"th", null, batchDurationString);
+
+			Element trBatchElement = Dom4JUtil.getNewElement("tr");
+
+			Dom4JUtil.addToElement(
+				trBatchElement, thBatchNameElement, thBatchConsoleElement,
+				thTestReportElement, thStartTimeStringElement,
+				thStartTimeElement, thBuildTimeStringElement,
+				thBuildTimeElement);
+
+			tableElement.add(trBatchElement);
+		}
+
+		return tableElement;
+	}
+
 	protected static Element getBatchReportElement(
 		Map<String, Build> batchBuilds) {
 
@@ -162,7 +243,33 @@ public class JenkinsReportUtil {
 			}
 		}
 
+		Element queuedBatchElement = getBatchInfoTableElement(
+			queuedBuilds, "Queued: " + queuedBuilds.size());
+
+		Element startingBatchElement = getBatchInfoTableElement(
+			startingBuilds, "Starting: " + startingBuilds.size());
+
+		Element runningBatchElement = getBatchInfoTableElement(
+			runningBuilds, "Running: " + runningBuilds.size());
+
+		Element completedAbortedBatchElement = getBatchInfoTableElement(
+			completedAbortedBuilds,
+			"Completed - Aborted (Missing): " + completedAbortedBuilds.size());
+
+		Element completedFailureBatchElement = getBatchInfoTableElement(
+			completedFailureBuilds,
+			"Completed - Failure: " + completedFailureBuilds.size());
+
+		Element completedSuccessBatchElement = getBatchInfoTableElement(
+			completedSuccessBuilds,
+			"Completed - Success: " + completedSuccessBuilds.size());
+
 		Element divElement = Dom4JUtil.getNewElement("div");
+
+		Dom4JUtil.addToElement(
+			divElement, queuedBatchElement, startingBatchElement,
+			runningBatchElement, completedAbortedBatchElement,
+			completedFailureBatchElement, completedSuccessBatchElement);
 
 		return divElement;
 	}
