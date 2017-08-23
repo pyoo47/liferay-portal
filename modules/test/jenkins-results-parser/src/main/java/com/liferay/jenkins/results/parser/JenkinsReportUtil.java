@@ -104,6 +104,39 @@ public class JenkinsReportUtil {
 	public static Element getHTMLHeadElement() {
 		Element headElement = Dom4JUtil.getNewElement("head");
 
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("caption, table, td, th {");
+
+		sb.append("text-align: left;");
+
+		sb.append("padding: .5em;");
+
+		sb.append("white-space: nowrap;");
+
+		sb.append("}");
+
+		sb.append("th:first-child {");
+
+		sb.append("text-indent: 1em;");
+
+		sb.append("}");
+
+		sb.append("td:first-child {");
+
+		sb.append("text-indent: 4em;");
+
+		sb.append("}");
+
+		sb.append("td {");
+
+		sb.append("border-bottom: 1px solid black;");
+
+		sb.append("}");
+
+		Dom4JUtil.addToElement(
+			headElement, Dom4JUtil.getNewElement("style", null, sb.toString()));
+
 		return headElement;
 	}
 
