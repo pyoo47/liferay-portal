@@ -105,15 +105,17 @@ public class JenkinsReportUtil {
 
 		sb.append("table, th, td { border:'0';}");
 
-		sb.append("th { padding: 5px; text-align: left;");
+		sb.append("th:first-child {text-indent: 2em;}");
 
-		sb.append("border-bottom:1pt solid black;}");
+		sb.append("th { padding: 5px; text-align: left; white-space: nowrap; ");
 
-		sb.append("td { padding: 5px; text-align: left;");
+		sb.append("font-size: 125%;}");
 
-		sb.append("border-bottom:1pt solid black;}");
+		sb.append("td:first-child { text-indent: 6em;}");
 
-		sb.append("td:first-child { text-indent: 4em;} ");
+		sb.append("td { text-align: left; border-bottom:1pt solid black; ");
+
+		sb.append("font-size: 90%;}");
 
 		sb.append("caption { text-align: left; font-size: 150%; ");
 
