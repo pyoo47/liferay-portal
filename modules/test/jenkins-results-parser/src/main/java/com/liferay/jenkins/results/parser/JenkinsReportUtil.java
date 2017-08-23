@@ -88,6 +88,18 @@ public class JenkinsReportUtil {
 		return scriptElement;
 	}
 
+	public static Element getHTMLBodyElement(Build topLevelBuild) {
+		Element bodyElement = Dom4JUtil.getNewElement("body");
+
+		return bodyElement;
+	}
+
+	public static Element getHTMLHeadElement() {
+		Element headElement = Dom4JUtil.getNewElement("head");
+
+		return headElement;
+	}
+
 	public static Element getTimelineElement(
 		Build topLevelBuild, Map<String, Build> builds) {
 
