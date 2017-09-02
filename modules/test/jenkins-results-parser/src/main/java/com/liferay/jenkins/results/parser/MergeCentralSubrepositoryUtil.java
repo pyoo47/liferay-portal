@@ -17,6 +17,7 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jgit.api.ResetCommand.ResetType;
@@ -162,6 +163,28 @@ public class MergeCentralSubrepositoryUtil {
 			"Merging the following commit: [", subrepositoryUpstreamCommit,
 			"](https://github.com/", receiverUserName, "/", subrepositoryName,
 			"/commit/", subrepositoryUpstreamCommit, ")");
+
+		String subrepositoryMentionList = System.getProperty(
+			"subrepo.merge.pull.mention.list[" + subrepositoryName + "]");
+
+		if (subrepositoryMentionList != null) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(body);
+			sb.append("\n\n");
+
+			List<String> subrepositoryMentions = Arrays.asList(
+				subrepositoryMentionList.split(","));
+
+			for (String subrepositoryMention : subrepositoryMentions) {
+				sb.append("@");
+				sb.append(subrepositoryMention);
+				sb.append(" ");
+			}
+
+			body = sb.toString();
+		}
+
 		String title = subrepositoryName + " - Central Merge Pull Request";
 
 		String pullRequestURL = centralGitWorkingDirectory.createPullRequest(
