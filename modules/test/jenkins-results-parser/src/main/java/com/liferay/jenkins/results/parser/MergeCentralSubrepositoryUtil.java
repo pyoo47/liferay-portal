@@ -35,9 +35,9 @@ import org.json.JSONObject;
 public class MergeCentralSubrepositoryUtil {
 
 	public static void createSubrepositoryMergePullRequests(
-			Project project,
-			String centralWorkingDirectory, String centralUpstreamBranchName,
-			String receiverUserName, String topLevelBranchName)
+			Project project, String centralWorkingDirectory,
+			String centralUpstreamBranchName, String receiverUserName,
+			String topLevelBranchName)
 		throws GitAPIException, IOException {
 
 		GitWorkingDirectory centralGitWorkingDirectory =
@@ -143,8 +143,7 @@ public class MergeCentralSubrepositoryUtil {
 	}
 
 	private static void _createMergePullRequest(
-			Project project,
-			GitWorkingDirectory centralGitWorkingDirectory,
+			Project project, GitWorkingDirectory centralGitWorkingDirectory,
 			CentralSubrepository centralSubrepository, String mergeBranchName,
 			String receiverUserName)
 		throws IOException {
