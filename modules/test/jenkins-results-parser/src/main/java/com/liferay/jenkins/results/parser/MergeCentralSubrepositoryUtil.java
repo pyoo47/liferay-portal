@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.tools.ant.Project;
+
 import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.RemoteConfig;
@@ -33,6 +35,7 @@ import org.json.JSONObject;
 public class MergeCentralSubrepositoryUtil {
 
 	public static void createSubrepositoryMergePullRequests(
+			Project project,
 			String centralWorkingDirectory, String centralUpstreamBranchName,
 			String receiverUserName, String topLevelBranchName)
 		throws GitAPIException, IOException {
@@ -86,7 +89,7 @@ public class MergeCentralSubrepositoryUtil {
 				}
 
 				_createMergePullRequest(
-					centralGitWorkingDirectory, centralSubrepository,
+					project, centralGitWorkingDirectory, centralSubrepository,
 					mergeBranchName, receiverUserName);
 			}
 
@@ -140,6 +143,7 @@ public class MergeCentralSubrepositoryUtil {
 	}
 
 	private static void _createMergePullRequest(
+			Project project,
 			GitWorkingDirectory centralGitWorkingDirectory,
 			CentralSubrepository centralSubrepository, String mergeBranchName,
 			String receiverUserName)
@@ -164,7 +168,7 @@ public class MergeCentralSubrepositoryUtil {
 			"](https://github.com/", receiverUserName, "/", subrepositoryName,
 			"/commit/", subrepositoryUpstreamCommit, ")");
 
-		String subrepositoryMentionList = System.getProperty(
+		String subrepositoryMentionList = project.getProperty(
 			"subrepo.merge.pull.mention.list[" + subrepositoryName + "]");
 
 		if (subrepositoryMentionList != null) {
