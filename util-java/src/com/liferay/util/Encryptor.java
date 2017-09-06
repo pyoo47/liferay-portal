@@ -262,5 +262,7 @@ public class Encryptor {
 		new ConcurrentHashMap<>(1, 1F, 1);
 	private static final Map<String, Cipher> _encryptCipherMap =
 		new ConcurrentHashMap<>(1, 1F, 1);
+	private static final Map<String, Cipher> _testCipherMap =
+		new ConcurrentHashMap<>(1, 1F, 1);
 
 }
