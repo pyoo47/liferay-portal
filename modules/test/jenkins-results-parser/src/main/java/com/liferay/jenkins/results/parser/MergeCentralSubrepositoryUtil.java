@@ -17,7 +17,10 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.Arrays;
 import java.util.List;
+
+import org.apache.tools.ant.Project;
 
 import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -32,8 +35,9 @@ import org.json.JSONObject;
 public class MergeCentralSubrepositoryUtil {
 
 	public static void createSubrepositoryMergePullRequests(
-			String centralWorkingDirectory, String centralUpstreamBranchName,
-			String receiverUserName, String topLevelBranchName)
+			Project project, String centralWorkingDirectory,
+			String centralUpstreamBranchName, String receiverUserName,
+			String topLevelBranchName)
 		throws GitAPIException, IOException {
 
 		GitWorkingDirectory centralGitWorkingDirectory =
@@ -85,7 +89,7 @@ public class MergeCentralSubrepositoryUtil {
 				}
 
 				_createMergePullRequest(
-					centralGitWorkingDirectory, centralSubrepository,
+					project, centralGitWorkingDirectory, centralSubrepository,
 					mergeBranchName, receiverUserName);
 			}
 
@@ -139,7 +143,7 @@ public class MergeCentralSubrepositoryUtil {
 	}
 
 	private static void _createMergePullRequest(
-			GitWorkingDirectory centralGitWorkingDirectory,
+			Project project, GitWorkingDirectory centralGitWorkingDirectory,
 			CentralSubrepository centralSubrepository, String mergeBranchName,
 			String receiverUserName)
 		throws IOException {
@@ -162,6 +166,28 @@ public class MergeCentralSubrepositoryUtil {
 			"Merging the following commit: [", subrepositoryUpstreamCommit,
 			"](https://github.com/", receiverUserName, "/", subrepositoryName,
 			"/commit/", subrepositoryUpstreamCommit, ")");
+
+		String subrepositoryMentionList = project.getProperty(
+			"subrepo.merge.pull.mention.list[" + subrepositoryName + "]");
+
+		if (subrepositoryMentionList != null) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(body);
+			sb.append("\n\n");
+
+			List<String> subrepositoryMentions = Arrays.asList(
+				subrepositoryMentionList.split(","));
+
+			for (String subrepositoryMention : subrepositoryMentions) {
+				sb.append("@");
+				sb.append(subrepositoryMention);
+				sb.append(" ");
+			}
+
+			body = sb.toString();
+		}
+
 		String title = subrepositoryName + " - Central Merge Pull Request";
 
 		String pullRequestURL = centralGitWorkingDirectory.createPullRequest(
