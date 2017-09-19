@@ -94,6 +94,7 @@ public class JenkinsReportUtil {
 			getSummaryElement(
 				topLevelBuild, axisBuilds, batchBuilds, testResults),
 			getTimelineElement(topLevelBuild, axisBuilds),
+			getTopLevelTableElement(topLevelBuild),
 			getBatchReportElement(batchBuilds));
 
 		return bodyElement;
@@ -644,6 +645,92 @@ public class JenkinsReportUtil {
 			divElement, canvasElement, scriptElement, chartJSScriptElement);
 
 		return divElement;
+	}
+
+	protected static Element getTopLevelTableElement(Build topLevelBuild) {
+		Element topLevelTableElement = Dom4JUtil.getNewElement("table");
+
+		String status = topLevelBuild.getStatus();
+
+		String result = topLevelBuild.getResult();
+
+		if (result != null) {
+			topLevelTableElement.add(
+				Dom4JUtil.getNewElement(
+					"caption", null,
+					"Top Level Job - <strong>" + result + "</strong>"));
+		}
+		else {
+			topLevelTableElement.add(
+				Dom4JUtil.getNewElement(
+					"caption", null,
+					"Top Level Job - <strong>" + status + "</strong>"));
+		}
+
+		String jobName = topLevelBuild.getJobName();
+
+		String topLevelName = topLevelBuild.getDisplayName();
+
+		topLevelName = topLevelName.replace(jobName + "/", "");
+
+		String topLevelBuildURL = topLevelBuild.getBuildURL();
+
+		String topLevelConsoleURL = topLevelBuildURL + "console";
+
+		String topLevelTestReportURL = topLevelBuildURL + "testReport";
+
+		long topLevelDuration = topLevelBuild.getDuration();
+
+		String topLevelDurationString =
+			JenkinsResultsParserUtil.toDurationString(topLevelDuration);
+
+		long topLevelStartTime = topLevelBuild.getStartTimestamp();
+
+		Date topLevelStartDate = new Date(topLevelStartTime);
+
+		Element topLevelNameElement = Dom4JUtil.getNewAnchorElement(
+			topLevelBuildURL, null, topLevelName);
+
+		Element topLevelConsoleElement = Dom4JUtil.getNewAnchorElement(
+			topLevelConsoleURL, null, "Console");
+
+		Element topLevelTestReportElement = Dom4JUtil.getNewAnchorElement(
+			topLevelTestReportURL, null, "Test Report");
+
+		Element thTopLevelNameElement = Dom4JUtil.getNewElement("th");
+
+		thTopLevelNameElement.add(topLevelNameElement);
+
+		Element thTopLevelConsoleElement = Dom4JUtil.getNewElement("th");
+
+		thTopLevelConsoleElement.add(topLevelConsoleElement);
+
+		Element thTestReportElement = Dom4JUtil.getNewElement("th");
+
+		thTestReportElement.add(topLevelTestReportElement);
+
+		Element thStartTimeStringElement = Dom4JUtil.getNewElement(
+			"th", null, "START TIME:");
+
+		Element thStartTimeElement = Dom4JUtil.getNewElement(
+			"th", null, topLevelStartDate.toLocaleString());
+
+		Element thBuildTimeStringElement = Dom4JUtil.getNewElement(
+			"th", null, "BUILD TIME:");
+
+		Element thBuildTimeElement = Dom4JUtil.getNewElement(
+			"th", null, topLevelDurationString);
+
+		Element trTopLevelElement = Dom4JUtil.getNewElement("tr");
+
+		Dom4JUtil.addToElement(
+			trTopLevelElement, thTopLevelNameElement, thTopLevelConsoleElement,
+			thTestReportElement, thStartTimeStringElement, thStartTimeElement,
+			thBuildTimeStringElement, thBuildTimeElement);
+
+		topLevelTableElement.add(trTopLevelElement);
+
+		return topLevelTableElement;
 	}
 
 	protected static Element getTotalCIUsageElement(
