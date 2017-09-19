@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.dom4j.Element;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -53,6 +54,7 @@ public class JenkinsReportUtil {
 						axisBuilds.put(axisKey, axisBuild);
 					}
 					catch (Exception e) {
+						e.printStackTrace();
 					}
 
 					for (TestResult testResult :
@@ -62,13 +64,16 @@ public class JenkinsReportUtil {
 							testResults.put(
 								testResult.getDisplayName(), testResult);
 						}
-						catch (Exception e) {
+						catch (NullPointerException npe) {
+							npe.printStackTrace();
 						}
 					}
 				}
 			}
 		}
-		catch (Exception e) {
+		catch (NullPointerException npe) {
+			npe.printStackTrace();
+
 			return null;
 		}
 
@@ -82,7 +87,14 @@ public class JenkinsReportUtil {
 
 		JSONObject jobJSONObject = topLevelBuild.getBuildJSONObject();
 
-		String jobDescription = jobJSONObject.getString("description");
+		String jobDescription = "";
+
+		try {
+			jobDescription = jobJSONObject.getString("description");
+		}
+		catch (JSONException jsone) {
+			jsone.printStackTrace();
+		}
 
 		Element h2Element = Dom4JUtil.getNewElement("h2");
 
@@ -144,8 +156,14 @@ public class JenkinsReportUtil {
 		List<Build> axisBuilds, Element tableElement) {
 
 		for (Build axisBuild : axisBuilds) {
-			String axisName =
-				"AXIS_VARIABLE=" + ((AxisBuild)axisBuild).getAxisNumber();
+			String axisName = "AXIS_VARIABLE=";
+
+			try {
+				axisName = axisName + ((AxisBuild)axisBuild).getAxisNumber();
+			}
+			catch (ClassCastException cce) {
+				cce.printStackTrace();
+			}
 
 			Element trAxisInfoElement = Dom4JUtil.getNewElement("tr");
 
