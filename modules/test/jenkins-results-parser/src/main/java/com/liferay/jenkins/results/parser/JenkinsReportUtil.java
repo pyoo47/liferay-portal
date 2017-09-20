@@ -219,74 +219,81 @@ public class JenkinsReportUtil {
 
 		tableElement.add(Dom4JUtil.getNewElement("caption", null, status));
 
-		for (Build batchBuild : batchBuilds) {
-			String jobName = batchBuild.getJobName();
+		try {
+			for (Build batchBuild : batchBuilds) {
+				String jobName = batchBuild.getJobName();
 
-			String batchName = batchBuild.getDisplayName();
+				String batchName = batchBuild.getDisplayName();
 
-			batchName = batchName.replace(jobName + "/", "");
+				batchName = batchName.replace(jobName + "/", "");
 
-			String batchBuildURL = batchBuild.getBuildURL();
+				String batchBuildURL = batchBuild.getBuildURL();
 
-			String batchConsoleURL = batchBuildURL + "console";
+				String batchConsoleURL = batchBuildURL + "console";
 
-			String batchTestReportURL = batchBuildURL + "testReport";
+				String batchTestReportURL = batchBuildURL + "testReport";
 
-			long batchDuration = batchBuild.getDuration();
+				long batchDuration = batchBuild.getDuration();
 
-			String batchDurationString =
-				JenkinsResultsParserUtil.toDurationString(batchDuration);
+				String batchDurationString =
+					JenkinsResultsParserUtil.toDurationString(batchDuration);
 
-			long batchStartTime = batchBuild.getStartTimestamp();
+				long batchStartTime = batchBuild.getStartTimestamp();
 
-			Date batchStartDate = new Date(batchStartTime);
+				Date batchStartDate = new Date(batchStartTime);
 
-			Element batchNameElement = Dom4JUtil.getNewAnchorElement(
-				batchBuildURL, null, batchName);
+				Element batchNameElement = Dom4JUtil.getNewAnchorElement(
+					batchBuildURL, null, batchName);
 
-			Element batchConsoleElement = Dom4JUtil.getNewAnchorElement(
-				batchConsoleURL, null, "Console");
+				Element batchConsoleElement = Dom4JUtil.getNewAnchorElement(
+					batchConsoleURL, null, "Console");
 
-			Element batchTestReportElement = Dom4JUtil.getNewAnchorElement(
-				batchTestReportURL, null, "Test Report");
+				Element batchTestReportElement = Dom4JUtil.getNewAnchorElement(
+					batchTestReportURL, null, "Test Report");
 
-			Element thBatchNameElement = Dom4JUtil.getNewElement("th");
+				Element thBatchNameElement = Dom4JUtil.getNewElement("th");
 
-			thBatchNameElement.add(batchNameElement);
+				thBatchNameElement.add(batchNameElement);
 
-			Element thBatchConsoleElement = Dom4JUtil.getNewElement("th");
+				Element thBatchConsoleElement = Dom4JUtil.getNewElement("th");
 
-			thBatchConsoleElement.add(batchConsoleElement);
+				thBatchConsoleElement.add(batchConsoleElement);
 
-			Element thTestReportElement = Dom4JUtil.getNewElement("th");
+				Element thTestReportElement = Dom4JUtil.getNewElement("th");
 
-			thTestReportElement.add(batchTestReportElement);
+				thTestReportElement.add(batchTestReportElement);
 
-			Element thStartTimeStringElement = Dom4JUtil.getNewElement(
-				"th", null, "START TIME:");
+				Element thStartTimeStringElement = Dom4JUtil.getNewElement(
+					"th", null, "START TIME:");
 
-			Element thStartTimeElement = Dom4JUtil.getNewElement(
-				"th", null, batchStartDate.toLocaleString());
+				Element thStartTimeElement = Dom4JUtil.getNewElement(
+					"th", null, batchStartDate.toLocaleString());
 
-			Element thBuildTimeStringElement = Dom4JUtil.getNewElement(
-				"th", null, "BUILD TIME:");
+				Element thBuildTimeStringElement = Dom4JUtil.getNewElement(
+					"th", null, "BUILD TIME:");
 
-			Element thBuildTimeElement = Dom4JUtil.getNewElement(
-				"th", null, batchDurationString);
+				Element thBuildTimeElement = Dom4JUtil.getNewElement(
+					"th", null, batchDurationString);
 
-			Element trBatchElement = Dom4JUtil.getNewElement("tr");
+				Element trBatchElement = Dom4JUtil.getNewElement("tr");
 
-			Dom4JUtil.addToElement(
-				trBatchElement, thBatchNameElement, thBatchConsoleElement,
-				thTestReportElement, thStartTimeStringElement,
-				thStartTimeElement, thBuildTimeStringElement,
-				thBuildTimeElement);
+				Dom4JUtil.addToElement(
+					trBatchElement, thBatchNameElement, thBatchConsoleElement,
+					thTestReportElement, thStartTimeStringElement,
+					thStartTimeElement, thBuildTimeStringElement,
+					thBuildTimeElement);
 
-			tableElement.add(trBatchElement);
+				tableElement.add(trBatchElement);
 
-			List<Build> axisBuilds = batchBuild.getDownstreamBuilds(null);
+				List<Build> axisBuilds = batchBuild.getDownstreamBuilds(null);
 
-			addAxisInfoToTableElement(axisBuilds, tableElement);
+				addAxisInfoToTableElement(axisBuilds, tableElement);
+			}
+		}
+		catch (Exception e) {
+			System.out.println("***************************");
+
+			e.printStackTrace();
 		}
 
 		return tableElement;
