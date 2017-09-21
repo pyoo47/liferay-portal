@@ -933,27 +933,7 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public void onBuildEvent(BuildEvent buildEvent) {
-		String status = getStatus();
-
-		if (status.equals("pending")) {
-			BaseBuild.PrerequisiteStatus prerequisitesStatus =
-				getPrerequisitesStatus();
-
-			switch (prerequisitesStatus) {
-				case INVOKE:
-					invoke();
-
-					break;
-
-				case DISCARD:
-					discard();
-
-					break;
-
-				default:
-					break;
-			}
-		}
+		trigger();
 	}
 
 	@Override
@@ -1123,6 +1103,35 @@ public abstract class BaseBuild implements Build {
 				throw new RuntimeException(
 					"Unable to send offline slave notification", e);
 			}
+		}
+	}
+
+	@Override
+	public void trigger() {
+		String status = getStatus();
+
+		if (status.equals("pending")) {
+			BaseBuild.PrerequisiteStatus prerequisitesStatus =
+					getPrerequisitesStatus();
+
+			switch (prerequisitesStatus) {
+				case INVOKE:
+					invoke();
+
+					break;
+
+				case DISCARD:
+					discard();
+
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			downstreamBuild.trigger();
 		}
 	}
 

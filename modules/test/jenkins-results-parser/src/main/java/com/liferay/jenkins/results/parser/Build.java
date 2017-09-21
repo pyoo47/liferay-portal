@@ -145,6 +145,8 @@ public interface Build extends BuildEventListener {
 
 	public void takeSlaveOffline(SlaveOfflineRule slaveOfflineRule);
 
+	public void trigger();
+
 	public void update();
 
 	public void updateBuildTriggers();
