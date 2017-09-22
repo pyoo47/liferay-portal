@@ -517,6 +517,11 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public Element getJenkinsReportElement() {
+		return null;
+	}
+
+	@Override
 	public String getJobName() {
 		return jobName;
 	}
@@ -641,6 +646,8 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public Long getStartTimestamp() {
 		JSONObject buildJSONObject = getBuildJSONObject("timestamp");
+
+		//System.out.println(buildJSONObject.toString());
 
 		if (buildJSONObject == null) {
 			return null;
