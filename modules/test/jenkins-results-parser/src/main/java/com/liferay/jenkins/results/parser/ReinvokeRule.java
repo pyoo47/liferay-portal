@@ -14,11 +14,8 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.io.IOException;
-
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +25,8 @@ import java.util.regex.Pattern;
 public class ReinvokeRule {
 
 	public static List<ReinvokeRule> getReinvokeRules() {
+		/*
+
 		if (_reinvokeRules != null) {
 			return _reinvokeRules;
 		}
@@ -56,7 +55,9 @@ public class ReinvokeRule {
 			}
 		}
 
-		return _reinvokeRules;
+		return _reinvokeRules;*/
+
+		return Collections.emptyList();
 	}
 
 	public String getName() {
