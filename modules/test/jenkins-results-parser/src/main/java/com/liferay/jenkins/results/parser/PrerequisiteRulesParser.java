@@ -105,6 +105,12 @@ public class PrerequisiteRulesParser {
 			else if (attributeValue.equals("BatchBuild")) {
 				buildMatcher.setBuildType(BatchBuild.class);
 			}
+			else if (attributeValue.equals("TopLevelBuild")) {
+				buildMatcher.setBuildType(TopLevelBuild.class);
+			}
+			else {
+				throw new RuntimeException("Unknown class " + attributeValue);
+			}
 		}
 
 		for (Element element : jobElement.elements()) {
