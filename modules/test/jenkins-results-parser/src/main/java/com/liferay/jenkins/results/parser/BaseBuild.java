@@ -50,6 +50,11 @@ import org.json.JSONObject;
 public abstract class BaseBuild implements Build {
 
 	@Override
+	public void addBuildEventListener(BuildEventListener buildEventListener) {
+		buildEventListeners.add(buildEventListener);
+	}
+
+	@Override
 	public void addDownstreamBuilds(String... urls) {
 		for (String url : urls) {
 			try {
@@ -986,6 +991,13 @@ public abstract class BaseBuild implements Build {
 		System.out.println(getReinvokedMessage());
 
 		reset();
+	}
+
+	@Override
+	public void removeBuildEventListener(
+		BuildEventListener buildEventListener) {
+
+		buildEventListeners.remove(buildEventListener);
 	}
 
 	@Override
@@ -2237,6 +2249,7 @@ public abstract class BaseBuild implements Build {
 	protected String archiveName;
 	protected List<Integer> badBuildNumbers = new ArrayList<>();
 	protected String branchName;
+	protected Set<BuildEventListener> buildEventListeners = new HashSet<>();
 	protected List<Build> downstreamBuilds = new ArrayList<>();
 	protected boolean fromArchive;
 	protected String jobName;

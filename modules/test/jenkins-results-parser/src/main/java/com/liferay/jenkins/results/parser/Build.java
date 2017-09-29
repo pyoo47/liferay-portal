@@ -25,6 +25,7 @@ import org.json.JSONObject;
  * @author Kevin Yen
  */
 public interface Build {
+	public void addBuildEventListener(BuildEventListener buildEventListener);
 
 	public void addDownstreamBuilds(String... urls);
 
@@ -131,6 +132,8 @@ public interface Build {
 	public void reinvoke();
 
 	public void reinvoke(ReinvokeRule reinvokeRule);
+
+	public void removeBuildEventListener(BuildEventListener buildEventListener);
 
 	public String replaceBuildURL(String text);
 
