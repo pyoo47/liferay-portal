@@ -147,4 +147,6 @@ public interface Build extends BuildEventListener {
 
 	public void update();
 
+	public void updateBuildTriggers();
+
 }

@@ -1163,6 +1163,8 @@ public abstract class BaseBuild implements Build {
 				status = getStatus();
 
 				if (downstreamBuilds != null) {
+					findDownstreamBuilds();
+
 					ExecutorService executorService = getExecutorService();
 
 					for (final Build downstreamBuild : downstreamBuilds) {
@@ -1256,6 +1258,20 @@ public abstract class BaseBuild implements Build {
 			catch (IOException ioe) {
 				throw new RuntimeException(ioe);
 			}
+		}
+	}
+
+	@Override
+	public void updateBuildTriggers() {
+		List<Build> applicableBuilds = getApplicableBuilds(
+			this, BuildUtil.getAllBuilds(getTopLevelBuild()));
+
+		for (Build build : applicableBuilds) {
+			addBuildEventListener(build);
+		}
+
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			downstreamBuild.updateBuildTriggers();
 		}
 	}
 
@@ -1571,6 +1587,8 @@ public abstract class BaseBuild implements Build {
 
 			downstreamBaseBuild.checkForReinvocation(consoleText);
 		}
+
+		updateBuildTriggers();
 	}
 
 	protected List<String> findDownstreamBuildsInConsoleText(
