@@ -1038,6 +1038,15 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void setPrerequisiteRules(Set<PrerequisiteRule> prerequisiteRules) {
+		this.prerequisiteRules = prerequisiteRules;
+
+		for (Build build : downstreamBuilds) {
+			build.setPrerequisiteRules(prerequisiteRules);
+		}
+	}
+
+	@Override
 	public void takeSlaveOffline(SlaveOfflineRule slaveOfflineRule) {
 		if ((slaveOfflineRule == null) || fromArchive) {
 			return;
@@ -1365,6 +1374,8 @@ public abstract class BaseBuild implements Build {
 
 	protected BaseBuild(String url, Build parentBuild) {
 		_parentBuild = parentBuild;
+
+		prerequisiteRules = new HashSet<>();
 
 		if (url.contains("buildWithParameters")) {
 			setInvocationURL(url);
@@ -2254,6 +2265,7 @@ public abstract class BaseBuild implements Build {
 	protected boolean fromArchive;
 	protected String jobName;
 	protected String master;
+	protected Set<PrerequisiteRule> prerequisiteRules = new HashSet<>();
 	protected List<ReinvokeRule> reinvokeRules =
 		ReinvokeRule.getReinvokeRules();
 	protected String repositoryName;

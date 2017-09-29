@@ -16,6 +16,7 @@ package com.liferay.jenkins.results.parser;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dom4j.Element;
 
@@ -138,6 +139,8 @@ public interface Build {
 	public String replaceBuildURL(String text);
 
 	public void setCompareToUpstream(boolean compareToUpstream);
+
+	public void setPrerequisiteRules(Set<PrerequisiteRule> prerequisiteRules);
 
 	public void takeSlaveOffline(SlaveOfflineRule slaveOfflineRule);
 
