@@ -25,7 +25,8 @@ import org.json.JSONObject;
 /**
  * @author Kevin Yen
  */
-public interface Build {
+public interface Build extends BuildEventListener {
+
 	public void addBuildEventListener(BuildEventListener buildEventListener);
 
 	public void addDownstreamBuilds(String... urls);

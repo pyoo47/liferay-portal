@@ -44,6 +44,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.liferay.jenkins.results.parser.BaseBuild.PrerequisiteStatus.INVOKE;
+
 /**
  * @author Kevin Yen
  */
@@ -67,7 +69,13 @@ public abstract class BaseBuild implements Build {
 			}
 
 			if (!hasBuildURL(url)) {
-				downstreamBuilds.add(BuildFactory.newBuild(url, this));
+				Build newBuild = BuildFactory.newBuild(url, this);
+
+				downstreamBuilds.add(newBuild);
+
+				newBuild.setPrerequisiteRules(prerequisiteRules);
+
+				newBuild.update();
 			}
 		}
 	}
@@ -924,6 +932,31 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void onBuildEvent(BuildEvent buildEvent) {
+		String status = getStatus();
+
+		if (status.equals("pending")) {
+			BaseBuild.PrerequisiteStatus prerequisitesStatus =
+				getPrerequisitesStatus();
+
+			switch (prerequisitesStatus) {
+				case INVOKE:
+					invoke();
+
+					break;
+
+				case DISCARD:
+					discard();
+
+					break;
+
+				default:
+					break;
+			}
+		}
+	}
+
+	@Override
 	public void reinvoke() {
 		reinvoke(null);
 	}
@@ -1097,10 +1130,10 @@ public abstract class BaseBuild implements Build {
 	public void update() {
 		String status = getStatus();
 
-		if (!status.equals("completed")) {
+		if (!status.equals("completed") && !status.equals("discarded")) {
 			try {
 				if (status.equals("missing") || status.equals("queued") ||
-					status.equals("starting")) {
+					status.equals("starting") || status.equals("pending")) {
 
 					JSONObject runningBuildJSONObject =
 						getRunningBuildJSONObject();
@@ -1112,7 +1145,8 @@ public abstract class BaseBuild implements Build {
 						JSONObject queueItemJSONObject =
 							getQueueItemJSONObject();
 
-						if (status.equals("starting") &&
+						if ((status.equals("pending") ||
+							 status.equals("starting")) &&
 							(queueItemJSONObject != null)) {
 
 							setStatus("queued");
@@ -1159,14 +1193,28 @@ public abstract class BaseBuild implements Build {
 
 					String result = getResult();
 
-					if ((downstreamBuilds.size() ==
-							getDownstreamBuildCount("completed")) &&
+					int finishedBuildCount =
+						getDownstreamBuildCount("completed") +
+							getDownstreamBuildCount("discarded");
+
+					if ((downstreamBuilds.size() == finishedBuildCount) &&
 						(result != null)) {
 
 						setStatus("completed");
 					}
 
-					findDownstreamBuilds();
+					if (!status.equals(getStatus()) ||
+							"pending".equals(getStatus())) {
+
+						BuildEvent buildEvent = new BuildEvent(
+							this, getStatus(), status);
+
+						for (BuildEventListener buildEventListener :
+								buildEventListeners) {
+
+							buildEventListener.onBuildEvent(buildEvent);
+						}
+					}
 
 					if ((result == null) || result.equals("SUCCESS")) {
 						return;
@@ -1581,6 +1629,21 @@ public abstract class BaseBuild implements Build {
 		return foundDownstreamBuildURLs;
 	}
 
+	protected List<Build> getApplicableBuilds(
+		Build build, List<Build> allBuilds) {
+
+		Set<Build> applicableBuilds = new HashSet<>();
+
+		for (PrerequisiteRule prerequisiteRule : prerequisiteRules) {
+			if (prerequisiteRule.isPrerequisite(build)) {
+				applicableBuilds.addAll(
+					prerequisiteRule.getApplicableBuilds(allBuilds));
+			}
+		}
+
+		return new ArrayList<>(applicableBuilds);
+	}
+
 	protected String getBaseRepositoryType() {
 		if (jobName.startsWith("test-subrepository-acceptance-pullrequest")) {
 			return getBaseRepositoryName();
@@ -1849,6 +1912,67 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return new HashMap<>();
+	}
+
+	protected Map<PrerequisiteRule, List<Build>> getPrerequisites(
+		List<Build> allBuilds) {
+
+		Map<PrerequisiteRule, List<Build>> prerequisites = new HashMap<>();
+
+		for (PrerequisiteRule prerequisiteRule : prerequisiteRules) {
+			if (prerequisiteRule.isApplicable(this)) {
+				prerequisites.put(
+					prerequisiteRule,
+					prerequisiteRule.getPrerequisiteBuilds(allBuilds));
+			}
+		}
+
+		return prerequisites;
+	}
+
+	protected PrerequisiteStatus getPrerequisitesStatus() {
+		TopLevelBuild topLevelBuild = getTopLevelBuild();
+
+		Map<PrerequisiteRule, List<Build>> prerequisites = getPrerequisites(
+			BuildUtil.getAllBuilds(topLevelBuild));
+
+		for (Map.Entry<PrerequisiteRule, List<Build>> entry :
+				prerequisites.entrySet()) {
+
+			PrerequisiteRule prerequisiteRule = entry.getKey();
+
+			PrerequisiteStatus prerequisiteRuleStatus = getPrerequisiteStatus(
+				entry.getValue(), prerequisiteRule);
+
+			if ((prerequisiteRuleStatus == PrerequisiteStatus.DISCARD) ||
+				(prerequisiteRuleStatus == INVOKE)) {
+
+				return prerequisiteRuleStatus;
+			}
+		}
+
+		return PrerequisiteStatus.PENDING;
+	}
+
+	protected PrerequisiteStatus getPrerequisiteStatus(
+		List<Build> prerequisiteBuilds, PrerequisiteRule prerequisiteRule) {
+
+		BuildMatcher discardMatcher = prerequisiteRule.getDiscardMatcher();
+		BuildMatcher invokeMatcher = prerequisiteRule.getInvokeMatcher();
+
+		for (Build prerequisiteBuild : prerequisiteBuilds) {
+			if (invokeMatcher.matches(prerequisiteBuild)) {
+				return INVOKE;
+			}
+
+			if ((discardMatcher != null) &&
+				discardMatcher.matches(prerequisiteBuild)) {
+
+				return PrerequisiteStatus.DISCARD;
+			}
+		}
+
+		return PrerequisiteStatus.PENDING;
 	}
 
 	protected JSONObject getQueueItemJSONObject() throws IOException {
@@ -2184,7 +2308,7 @@ public abstract class BaseBuild implements Build {
 
 			loadParametersFromQueryString(invocationURL);
 
-			setStatus("starting");
+			setStatus("pending");
 		}
 	}
 
@@ -2275,6 +2399,11 @@ public abstract class BaseBuild implements Build {
 		SlaveOfflineRule.getSlaveOfflineRules();
 	protected long statusModifiedTime;
 	protected Element upstreamJobFailureMessageElement;
+
+	protected enum PrerequisiteStatus {
+
+		DISCARD, PENDING, INVOKE
+	}
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
 		{
