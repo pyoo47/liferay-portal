@@ -717,6 +717,12 @@ public abstract class BaseBuild implements Build {
 
 		String status = getStatus();
 
+		if (status.equals("discarded")) {
+			sb.append(" was discarded");
+
+			return sb.toString();
+		}
+
 		if (status.equals("completed")) {
 			sb.append(" completed at ");
 			sb.append(getBuildURL());
@@ -730,6 +736,12 @@ public abstract class BaseBuild implements Build {
 			sb.append(" is missing ");
 			sb.append(getJobURL());
 			sb.append(".");
+
+			return sb.toString();
+		}
+
+		if (status.equals("pending")) {
+			sb.append(" is pending");
 
 			return sb.toString();
 		}
@@ -777,6 +789,12 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public String getStatusSummary() {
 		return JenkinsResultsParserUtil.combine(
+			Integer.toString(getDownstreamBuildCount("pending")), " Pending  ",
+			"/ ",
+
+			Integer.toString(getDownstreamBuildCount("discarded")),
+			" Discarded  ", "/ ",
+
 			Integer.toString(getDownstreamBuildCount("starting")),
 			" Starting  ", "/ ",
 
@@ -1566,6 +1584,12 @@ public abstract class BaseBuild implements Build {
 				return sb.toString();
 			}
 
+			if (status.equals("discarded")) {
+				sb.append(" has been discarded.");
+
+				return sb.toString();
+			}
+
 			if (status.equals("missing")) {
 				sb.append(" is missing ");
 				sb.append(getJobURL());
@@ -1598,6 +1622,12 @@ public abstract class BaseBuild implements Build {
 
 				sb.append(getBuildURL());
 				sb.append(".\n");
+
+				return sb.toString();
+			}
+
+			if (status.equals("pending")) {
+				sb.append(" is pending trigger.");
 
 				return sb.toString();
 			}
