@@ -16,9 +16,13 @@ package com.liferay.jenkins.results.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.Properties;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.RemoteConfig;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,14 +38,74 @@ public class CentralSubrepository {
 
 		_centralUpstreamBranchName = centralUpstreamBranchName;
 
+		_ciProperties = new Properties();
+
 		_gitrepoProperties = new Properties();
 
 		_gitrepoProperties.load(new FileInputStream(gitrepoFile));
 
 		_subrepositoryName = _getSubrepositoryName();
+
+		_subrepositoryDirectory =
+			"/opt/dev/projects/github/" + _subrepositoryName + "-private";
+
 		_subrepositoryUpstreamBranchName =
 			_getSubrepositoryUpstreamBranchName();
 		_subrepositoryUsername = _getSubrepositoryUsername();
+
+		String tempBranchName = "temp-" + System.currentTimeMillis();
+
+		GitWorkingDirectory gitWorkingDirectory = null;
+
+		try {
+			gitWorkingDirectory = new GitWorkingDirectory(
+				"master", _subrepositoryDirectory);
+
+			gitWorkingDirectory.createLocalBranch(tempBranchName);
+
+			gitWorkingDirectory.checkoutBranch(tempBranchName);
+
+			RemoteConfig remoteConfig = gitWorkingDirectory.getRemoteConfig(
+				"upstream");
+
+			gitWorkingDirectory.fetch("master", "master", remoteConfig);
+		}
+		catch (GitAPIException gapie) {
+			throw new RuntimeException(
+				"Unable to refresh master branch in repo " + _subrepositoryName,
+				gapie);
+		}
+		finally {
+			try {
+				if ((gitWorkingDirectory != null) &&
+					gitWorkingDirectory.branchExists(tempBranchName, null)) {
+
+					gitWorkingDirectory.checkoutBranch("master");
+
+					gitWorkingDirectory.deleteLocalBranch(tempBranchName);
+				}
+			}
+			catch (GitAPIException gapie) {
+				throw new RuntimeException(
+					"Unable to delete temporary branch " + tempBranchName,
+					gapie);
+			}
+		}
+
+		try {
+			File ciPropertiesFile = new File(
+				_subrepositoryDirectory, "ci.properties");
+
+			_ciProperties.load(new FileInputStream(ciPropertiesFile));
+		}
+		catch (FileNotFoundException fnfe) {
+			System.out.println(
+				"Unable to find ci.properties in " + _subrepositoryDirectory);
+		}
+	}
+
+	public String getCIProperty(String key) {
+		return _ciProperties.getProperty(key);
 	}
 
 	public String getSubrepositoryName() {
@@ -199,7 +263,9 @@ public class CentralSubrepository {
 
 	private Boolean _centralPullRequestCandidate;
 	private final String _centralUpstreamBranchName;
+	private final Properties _ciProperties;
 	private final Properties _gitrepoProperties;
+	private final String _subrepositoryDirectory;
 	private final String _subrepositoryName;
 	private final String _subrepositoryUpstreamBranchName;
 	private String _subrepositoryUpstreamCommit;
