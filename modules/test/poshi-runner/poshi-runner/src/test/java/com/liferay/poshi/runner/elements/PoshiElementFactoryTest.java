@@ -48,7 +48,7 @@ public class PoshiElementFactoryTest {
 			sb.append(readableSyntax);
 
 			throw new Exception(
-				"Poshi syntax does not translate to readable syntax" +
+				"Poshi syntax does not translate to readable syntax." +
 					sb.toString());
 		}
 	}
@@ -74,7 +74,7 @@ public class PoshiElementFactoryTest {
 			sb.append(Dom4JUtil.format(elementFromReadableSyntax));
 
 			throw new Exception(
-				"Readable syntax does not translate to XML" + sb.toString());
+				"Readable syntax does not translate to XML." + sb.toString());
 		}
 	}
 
