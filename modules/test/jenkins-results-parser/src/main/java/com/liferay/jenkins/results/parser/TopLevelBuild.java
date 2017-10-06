@@ -688,8 +688,7 @@ public class TopLevelBuild extends BaseBuild {
 						StringUtils.upperCase(status) + "</strong>"));
 		}
 
-		topLevelTableElement.add(
-			JenkinsReportUtil.getTableColumnHeaderElement());
+		topLevelTableElement.add(getJenkinsReportTableColumnHeaderElement());
 
 		String jobName = topLevelBuild.getJobName();
 
