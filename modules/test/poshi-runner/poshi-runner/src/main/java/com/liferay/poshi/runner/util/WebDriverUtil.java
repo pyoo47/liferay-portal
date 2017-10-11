@@ -14,6 +14,9 @@
 
 package com.liferay.poshi.runner.util;
 
+import com.liferay.poshi.runner.selenium.LiferaySelenium;
+import com.liferay.poshi.runner.selenium.SeleniumSingleton;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,6 +29,12 @@ import org.openqa.selenium.By;
  * @author Kenji Heigel
  */
 public class WebDriverUtil {
+
+	public static String getAttributeValue(String attribute, String locator) {
+		LiferaySelenium liferaySelenium = SeleniumSingleton.getSelenium();
+
+		return liferaySelenium.getAttribute(locator + "@" + attribute);
+	}
 
 	public static By getBy(String locator) {
 		if (locator.startsWith("//")) {
@@ -90,6 +99,17 @@ public class WebDriverUtil {
 		}
 
 		return sb.toString();
+	}
+
+	public static String getInnerText(String locator) throws Exception {
+		LiferaySelenium liferaySelenium = SeleniumSingleton.getSelenium();
+
+		if (locator.contains("/input")) {
+			return liferaySelenium.getElementValue(locator);
+		}
+		else {
+			return liferaySelenium.getText(locator);
+		}
 	}
 
 	public static void saveWebPage(String fileName, String htmlSource)
