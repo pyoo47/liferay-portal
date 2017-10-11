@@ -12,10 +12,7 @@
  * details.
  */
 
-package com.liferay.poshi.runner.selenium;
-
-import com.liferay.poshi.runner.util.FileUtil;
-import com.liferay.poshi.runner.util.PropsValues;
+package com.liferay.poshi.runner.util;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -28,7 +25,7 @@ import org.openqa.selenium.By;
 /**
  * @author Kenji Heigel
  */
-public class WebDriverHelper {
+public class WebDriverUtil {
 
 	public static By getBy(String locator) {
 		if (locator.startsWith("//")) {

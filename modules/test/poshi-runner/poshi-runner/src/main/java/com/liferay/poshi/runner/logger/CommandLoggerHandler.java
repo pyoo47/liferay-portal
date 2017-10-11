@@ -20,11 +20,11 @@ import com.liferay.poshi.runner.PoshiRunnerStackTraceUtil;
 import com.liferay.poshi.runner.PoshiRunnerVariablesUtil;
 import com.liferay.poshi.runner.exception.PoshiRunnerLoggerException;
 import com.liferay.poshi.runner.selenium.LiferaySeleniumHelper;
-import com.liferay.poshi.runner.selenium.WebDriverHelper;
 import com.liferay.poshi.runner.selenium.WebDriverSingleton;
 import com.liferay.poshi.runner.util.HtmlUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 import com.liferay.poshi.runner.util.Validator;
+import com.liferay.poshi.runner.util.WebDriverUtil;
 
 import java.util.List;
 import java.util.Objects;
@@ -688,7 +688,7 @@ public final class CommandLoggerHandler {
 		testClassCommandName = StringUtil.replace(
 			testClassCommandName, "#", "_");
 
-		WebDriverHelper.saveWebPage(
+		WebDriverUtil.saveWebPage(
 			PoshiRunnerGetterUtil.getCanonicalPath(".") + "/test-results/" +
 				testClassCommandName + "/web-pages/index" + errorLinkId +
 					".html",
