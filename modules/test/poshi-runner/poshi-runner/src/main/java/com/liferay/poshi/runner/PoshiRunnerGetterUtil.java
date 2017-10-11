@@ -15,7 +15,7 @@
 package com.liferay.poshi.runner;
 
 import com.liferay.poshi.runner.elements.PoshiElementFactory;
-import com.liferay.poshi.runner.selenium.SeleniumUtil;
+import com.liferay.poshi.runner.selenium.SeleniumSingleton;
 import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.ExternalMethod;
 import com.liferay.poshi.runner.util.FileUtil;
@@ -410,7 +410,8 @@ public class PoshiRunnerGetterUtil {
 					parameterValue = parameterValue.substring(
 						1, parameterValue.length() - 1);
 				}
-				else if (parameterValue.contains("#")) {
+
+				if (parameterValue.contains("#")) {
 					parameterValue = PoshiRunnerContext.getPathLocator(
 						parameterValue, namespace);
 				}
@@ -426,7 +427,7 @@ public class PoshiRunnerGetterUtil {
 		Object returnObject = null;
 
 		if (className.equals("selenium")) {
-			Object object = SeleniumUtil.getSelenium();
+			Object object = SeleniumSingleton.getSelenium();
 
 			returnObject = getMethodReturnValue(
 				args, className, commandName, object);

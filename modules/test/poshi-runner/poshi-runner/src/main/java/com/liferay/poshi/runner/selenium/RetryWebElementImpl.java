@@ -15,6 +15,7 @@
 package com.liferay.poshi.runner.selenium;
 
 import com.liferay.poshi.runner.util.PropsValues;
+import com.liferay.poshi.runner.util.WebDriverUtil;
 
 import java.util.List;
 
@@ -343,7 +344,7 @@ public class RetryWebElementImpl
 
 	@Override
 	public WebDriver getWrappedDriver() {
-		return WebDriverUtil.getWebDriver();
+		return WebDriverSingleton.getWebDriver();
 	}
 
 	@Override
@@ -464,10 +465,10 @@ public class RetryWebElementImpl
 		catch (Exception e) {
 		}
 
-		WebDriver webDriver = WebDriverUtil.getWebDriver();
+		WebDriver webDriver = WebDriverSingleton.getWebDriver();
 
 		WebElement webElement = webDriver.findElement(
-			WebDriverHelper.getBy(_locator));
+			WebDriverUtil.getBy(_locator));
 
 		if (webElement == _webElement) {
 			System.out.println("Unable to find a new web element");

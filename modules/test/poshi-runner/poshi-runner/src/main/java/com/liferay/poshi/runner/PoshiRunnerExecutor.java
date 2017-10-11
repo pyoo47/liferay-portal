@@ -21,7 +21,7 @@ import com.liferay.poshi.runner.logger.SummaryLoggerHandler;
 import com.liferay.poshi.runner.logger.XMLLoggerHandler;
 import com.liferay.poshi.runner.selenium.LiferaySelenium;
 import com.liferay.poshi.runner.selenium.LiferaySeleniumHelper;
-import com.liferay.poshi.runner.selenium.SeleniumUtil;
+import com.liferay.poshi.runner.selenium.SeleniumSingleton;
 import com.liferay.poshi.runner.util.FileUtil;
 import com.liferay.poshi.runner.util.GetterUtil;
 import com.liferay.poshi.runner.util.PropsUtil;
@@ -846,7 +846,7 @@ public class PoshiRunnerExecutor {
 
 		CommandLoggerHandler.logSeleniumCommand(executeElement, arguments);
 
-		LiferaySelenium liferaySelenium = SeleniumUtil.getSelenium();
+		LiferaySelenium liferaySelenium = SeleniumSingleton.getSelenium();
 
 		Class<?> clazz = liferaySelenium.getClass();
 
@@ -1027,7 +1027,8 @@ public class PoshiRunnerExecutor {
 
 		if (varValue == null) {
 			if (element.attributeValue("attribute") != null) {
-				LiferaySelenium liferaySelenium = SeleniumUtil.getSelenium();
+				LiferaySelenium liferaySelenium =
+					SeleniumSingleton.getSelenium();
 
 				String attribute = element.attributeValue("attribute");
 
@@ -1061,7 +1062,8 @@ public class PoshiRunnerExecutor {
 						PoshiRunnerStackTraceUtil.getCurrentNamespace());
 				}
 
-				LiferaySelenium liferaySelenium = SeleniumUtil.getSelenium();
+				LiferaySelenium liferaySelenium =
+					SeleniumSingleton.getSelenium();
 
 				locator = PoshiRunnerVariablesUtil.replaceCommandVars(locator);
 

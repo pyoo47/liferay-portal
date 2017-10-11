@@ -19,7 +19,7 @@ import com.liferay.poshi.runner.logger.LoggerUtil;
 import com.liferay.poshi.runner.logger.SummaryLoggerHandler;
 import com.liferay.poshi.runner.logger.XMLLoggerHandler;
 import com.liferay.poshi.runner.selenium.LiferaySeleniumHelper;
-import com.liferay.poshi.runner.selenium.SeleniumUtil;
+import com.liferay.poshi.runner.selenium.SeleniumSingleton;
 import com.liferay.poshi.runner.util.PropsValues;
 
 import java.util.ArrayList;
@@ -112,7 +112,7 @@ public class PoshiRunner {
 
 			LoggerUtil.startLogger();
 
-			SeleniumUtil.startSelenium();
+			SeleniumSingleton.startSelenium();
 
 			_runSetUp();
 		}
@@ -161,7 +161,7 @@ public class PoshiRunner {
 		finally {
 			LoggerUtil.stopLogger();
 
-			SeleniumUtil.stopSelenium();
+			SeleniumSingleton.stopSelenium();
 		}
 	}
 
