@@ -343,7 +343,7 @@ public class RetryWebElementImpl
 
 	@Override
 	public WebDriver getWrappedDriver() {
-		return WebDriverUtil.getWebDriver();
+		return WebDriverSingleton.getWebDriver();
 	}
 
 	@Override
@@ -464,7 +464,7 @@ public class RetryWebElementImpl
 		catch (Exception e) {
 		}
 
-		WebDriver webDriver = WebDriverUtil.getWebDriver();
+		WebDriver webDriver = WebDriverSingleton.getWebDriver();
 
 		WebElement webElement = webDriver.findElement(
 			WebDriverHelper.getBy(_locator));

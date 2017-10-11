@@ -21,7 +21,7 @@ import com.liferay.poshi.runner.PoshiRunnerVariablesUtil;
 import com.liferay.poshi.runner.exception.PoshiRunnerLoggerException;
 import com.liferay.poshi.runner.selenium.LiferaySeleniumHelper;
 import com.liferay.poshi.runner.selenium.WebDriverHelper;
-import com.liferay.poshi.runner.selenium.WebDriverUtil;
+import com.liferay.poshi.runner.selenium.WebDriverSingleton;
 import com.liferay.poshi.runner.util.HtmlUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 import com.liferay.poshi.runner.util.Validator;
@@ -628,7 +628,7 @@ public final class CommandLoggerHandler {
 	}
 
 	private static void _setHTMLSource() throws Exception {
-		WebDriver webDriver = WebDriverUtil.getWebDriver();
+		WebDriver webDriver = WebDriverSingleton.getWebDriver();
 
 		_htmlSource = webDriver.getPageSource();
 	}

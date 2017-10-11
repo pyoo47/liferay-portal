@@ -47,7 +47,7 @@ import org.openqa.selenium.safari.SafariDriver;
  * @author Kenji Heigel
  * @author Michael Hashimoto
  */
-public class WebDriverUtil extends PropsValues {
+public class WebDriverSingleton extends PropsValues {
 
 	public static WebDriver getWebDriver() {
 		return _instance._getWebDriver();
@@ -155,7 +155,7 @@ public class WebDriverUtil extends PropsValues {
 
 		try {
 			firefoxProfile.addExtension(
-				WebDriverUtil.class,
+				WebDriverSingleton.class,
 				"/META-INF/resources/firefox/extensions/jserrorcollector.xpi");
 		}
 		catch (Exception e) {
@@ -330,7 +330,8 @@ public class WebDriverUtil extends PropsValues {
 		_webDriver = null;
 	}
 
-	private static final WebDriverUtil _instance = new WebDriverUtil();
+	private static final WebDriverSingleton _instance =
+		new WebDriverSingleton();
 
 	private WebDriver _webDriver;
 

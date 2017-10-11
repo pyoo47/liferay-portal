@@ -210,7 +210,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public void assertAccessible() throws Exception {
-		WebDriver webDriver = WebDriverUtil.getWebDriver();
+		WebDriver webDriver = WebDriverSingleton.getWebDriver();
 
 		String sourceDirFilePath = LiferaySeleniumHelper.getSourceDirFilePath(
 			getTestDependenciesDirName());

@@ -21,7 +21,7 @@ import org.openqa.selenium.WebDriver;
 /**
  * @author Brian Wing Shun Chan
  */
-public class SeleniumUtil extends PropsValues {
+public class SeleniumSingleton extends PropsValues {
 
 	public static LiferaySelenium getSelenium() {
 		return _instance._getSelenium();
@@ -50,9 +50,9 @@ public class SeleniumUtil extends PropsValues {
 			portalURL = "http://localhost:8180/console";
 		}
 
-		WebDriverUtil.startWebDriver();
+		WebDriverSingleton.startWebDriver();
 
-		WebDriver webDriver = WebDriverUtil.getWebDriver();
+		WebDriver webDriver = WebDriverSingleton.getWebDriver();
 
 		if (BROWSER_TYPE.equals("android")) {
 			_selenium = new AndroidMobileDriverImpl(portalURL, webDriver);
@@ -105,7 +105,7 @@ public class SeleniumUtil extends PropsValues {
 	@SuppressWarnings("deprecation")
 	private void _stopSelenium() {
 		if (_selenium != null) {
-			WebDriverUtil.stopWebDriver();
+			WebDriverSingleton.stopWebDriver();
 
 			_selenium.stop();
 
@@ -115,7 +115,7 @@ public class SeleniumUtil extends PropsValues {
 		_selenium = null;
 	}
 
-	private static final SeleniumUtil _instance = new SeleniumUtil();
+	private static final SeleniumSingleton _instance = new SeleniumSingleton();
 
 	private LiferaySelenium _selenium;
 
