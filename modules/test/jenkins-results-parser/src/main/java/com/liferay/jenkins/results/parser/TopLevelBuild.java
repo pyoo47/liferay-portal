@@ -27,12 +27,13 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -463,8 +464,8 @@ public class TopLevelBuild extends BaseBuild {
 	}
 
 	protected Element getJenkinsReportBodyElement() {
-		Map<String, Build> nonBatchBuilds = new TreeMap<>();
-		Map<String, Build> downstreamBuilds = new TreeMap<>();
+		Map<String, Build> nonBatchBuilds = new HashMap<>();
+		Map<String, Build> downstreamBuilds = new HashMap<>();
 
 		nonBatchBuilds.put(getDisplayName(), this);
 
@@ -602,6 +603,34 @@ public class TopLevelBuild extends BaseBuild {
 			}
 		}
 
+		Comparator<Build> buildComparator = new Comparator<Build>() {
+
+			@Override
+			public int compare(Build build1, Build build2) {
+				String displayName1 = build1.getDisplayName();
+				String displayName2 = build2.getDisplayName();
+
+				if (displayName1 != null) {
+					return displayName1.compareTo(displayName2);
+				}
+
+				if (displayName2 == null) {
+					return 0;
+				}
+
+				return 1;
+			}
+
+		};
+
+		Collections.sort(abortedBuilds, buildComparator);
+		Collections.sort(failureBuilds, buildComparator);
+		Collections.sort(missingBuilds, buildComparator);
+		Collections.sort(queuedBuilds, buildComparator);
+		Collections.sort(runningBuilds, buildComparator);
+		Collections.sort(startingBuilds, buildComparator);
+		Collections.sort(successBuilds, buildComparator);
+
 		Element abortedBatchElement = getJenkinsReportDownstreamTableElement(
 			abortedBuilds, "---- Aborted: " + abortedBuilds.size());
 
@@ -685,14 +714,14 @@ public class TopLevelBuild extends BaseBuild {
 	}
 
 	protected Element getJenkinsReportSummaryElement(
-		Map<String, Build> nonBatchBuildss) {
+		Map<String, Build> nonBatchBuilds) {
 
 		Element buildTimeElement = Dom4JUtil.getNewElement(
 			"p", null, "Build Time: ",
 			JenkinsResultsParserUtil.toDurationString(getDuration()));
 
 		Element ciUsageElement = getJenkinsReportTotalCIUsageElement(
-			nonBatchBuildss);
+			nonBatchBuilds);
 
 		Element longestAxisElement = getLongestRunningDownstreamBuildElement();
 
@@ -707,7 +736,7 @@ public class TopLevelBuild extends BaseBuild {
 			JenkinsResultsParserUtil.toDateString(startTime));
 
 		Element vmUsageElement = getJenkinsReportTotalVMUSageElement(
-			nonBatchBuildss);
+			nonBatchBuilds);
 
 		Element divElement = Dom4JUtil.getNewElement("div");
 
