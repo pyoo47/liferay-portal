@@ -66,10 +66,15 @@ public class ExecutePoshiElement extends BasePoshiElement {
 
 		String content = getParentheticalContent(readableSyntax);
 
-		if (content.contains("locator1") || content.contains("locator2") ||
-			content.contains("value1") || content.contains("value2")) {
+		String[] functionAttributeNames =
+			{"locator1", "locator2", "value1", "value2"};
 
-			executeType = "function";
+		for (String functionAttributeName : functionAttributeNames) {
+			if (content.startsWith(functionAttributeName)) {
+				executeType = "function";
+
+				break;
+			}
 		}
 
 		String executeCommandName = RegexUtil.getGroup(
@@ -95,21 +100,24 @@ public class ExecutePoshiElement extends BasePoshiElement {
 			assignments.add(matcher.group());
 		}
 
+		assignmentLoop:
 		for (String assignment : assignments) {
 			assignment = assignment.trim();
 
-			if (executeType.equals("macro")) {
-				assignment = "var " + assignment + ";";
+			for (String functionAttributeName : functionAttributeNames) {
+				if (assignment.startsWith(functionAttributeName)) {
+					String name = getNameFromAssignment(assignment);
+					String value = getQuotedContent(assignment);
 
-				add(PoshiElementFactory.newPoshiElement(this, assignment));
+					addAttribute(name, value);
 
-				continue;
+					continue assignmentLoop;
+				}
 			}
 
-			String name = getNameFromAssignment(assignment);
-			String value = getQuotedContent(assignment);
+			assignment = "var " + assignment + ";";
 
-			addAttribute(name, value);
+			add(PoshiElementFactory.newPoshiElement(this, assignment));
 		}
 	}
 
@@ -129,6 +137,17 @@ public class ExecutePoshiElement extends BasePoshiElement {
 
 				sb.append(poshiElementAttribute.toReadableSyntax());
 				sb.append(", ");
+			}
+
+			for (PoshiElement poshiElement : toPoshiElements(elements())) {
+				String readableSyntax = poshiElement.toReadableSyntax();
+
+				if (poshiElement instanceof VarPoshiElement) {
+					sb.append(readableSyntax.trim());
+					sb.append(", ");
+
+					continue;
+				}
 			}
 
 			if (sb.length() > 2) {
