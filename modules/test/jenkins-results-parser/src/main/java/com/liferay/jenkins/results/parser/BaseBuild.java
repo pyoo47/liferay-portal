@@ -44,8 +44,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.liferay.jenkins.results.parser.BaseBuild.PrerequisiteStatus.INVOKE;
-
 /**
  * @author Kevin Yen
  */
@@ -1112,7 +1110,7 @@ public abstract class BaseBuild implements Build {
 
 		if (status.equals("pending")) {
 			BaseBuild.PrerequisiteStatus prerequisitesStatus =
-					getPrerequisitesStatus();
+				getPrerequisitesStatus();
 
 			switch (prerequisitesStatus) {
 				case INVOKE:
@@ -1215,7 +1213,7 @@ public abstract class BaseBuild implements Build {
 					}
 
 					if (!status.equals(getStatus()) ||
-							"pending".equals(getStatus())) {
+						"pending".equals(getStatus())) {
 
 						BuildEvent buildEvent = new BuildEvent(
 							this, getStatus(), status);
@@ -1972,7 +1970,7 @@ public abstract class BaseBuild implements Build {
 				entry.getValue(), prerequisiteRule);
 
 			if ((prerequisiteRuleStatus == PrerequisiteStatus.DISCARD) ||
-				(prerequisiteRuleStatus == INVOKE)) {
+				(prerequisiteRuleStatus == PrerequisiteStatus.INVOKE)) {
 
 				return prerequisiteRuleStatus;
 			}
@@ -1989,7 +1987,7 @@ public abstract class BaseBuild implements Build {
 
 		for (Build prerequisiteBuild : prerequisiteBuilds) {
 			if (invokeMatcher.matches(prerequisiteBuild)) {
-				return INVOKE;
+				return PrerequisiteStatus.INVOKE;
 			}
 
 			if ((discardMatcher != null) &&
@@ -2428,7 +2426,6 @@ public abstract class BaseBuild implements Build {
 	protected Element upstreamJobFailureMessageElement;
 
 	protected enum PrerequisiteStatus {
-
 		DISCARD, PENDING, INVOKE
 	}
 
