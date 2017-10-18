@@ -528,6 +528,8 @@ public class TopLevelBuild extends BaseBuild {
 				getJenkinsReportDownstreamTableElement(
 					"completed/FAILURE", "---- Failure: "),
 				getJenkinsReportDownstreamTableElement(
+					"completed/UNSTABLE", "---- Unstable: "),
+				getJenkinsReportDownstreamTableElement(
 					"completed/SUCCESS", "---- Success: ")));
 	}
 
