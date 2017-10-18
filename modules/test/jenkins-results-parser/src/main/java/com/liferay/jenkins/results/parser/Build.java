@@ -74,6 +74,15 @@ public interface Build {
 
 	public String getJDK();
 
+	public Element getJenkinsReportBuildInfoElement();
+
+	public Element getJenkinsReportBuildInfoElement(
+		Build build, String buildName, boolean tableHeaderElement);
+
+	public Element getJenkinsReportElement();
+
+	public Element getJenkinsReportTableColumnHeaderElement();
+
 	public String getJobName();
 
 	public String getJobURL();
@@ -85,6 +94,14 @@ public interface Build {
 	public List<Build> getJobVariantsDownstreamBuilds(List<String> jobVariants);
 
 	public Long getLatestStartTimestamp();
+
+	public Build getLongestRunningDownstreamBuild();
+
+	public Element getLongestRunningDownstreamBuildElement();
+
+	public TestResult getLongestRunningTest();
+
+	public Element getLongestRunningTestElement();
 
 	public String getMaster();
 

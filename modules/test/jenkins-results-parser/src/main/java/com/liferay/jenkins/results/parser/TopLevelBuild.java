@@ -25,18 +25,24 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.dom4j.Element;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -140,6 +146,28 @@ public class TopLevelBuild extends BaseBuild {
 		catch (IOException ioe) {
 			throw new RuntimeException("Unable to get Jenkins report", ioe);
 		}
+	}
+
+	@Override
+	public Element getJenkinsReportBuildInfoElement() {
+		String topLevelName = getDisplayName();
+
+		topLevelName = topLevelName.replace(jobName + "/", "");
+
+		return super.getJenkinsReportBuildInfoElement(this, topLevelName, true);
+	}
+
+	@Override
+	public Element getJenkinsReportElement() {
+		Element headElement = getJenkinsReportHeadElement();
+
+		Element bodyElement = getJenkinsReportBodyElement();
+
+		Element jenkinsReportElement = Dom4JUtil.getNewElement("html");
+
+		Dom4JUtil.addToElement(jenkinsReportElement, headElement, bodyElement);
+
+		return jenkinsReportElement;
 	}
 
 	public String getJenkinsReportURL() {
@@ -434,6 +462,398 @@ public class TopLevelBuild extends BaseBuild {
 			topLevelBuild.getJobName(), "/git.", repositoryType, ".properties");
 	}
 
+	protected Element getJenkinsReportBodyElement() {
+		Map<String, Build> nonBatchBuilds = new TreeMap<>();
+		Map<String, Build> downstreamBuilds = new TreeMap<>();
+
+		nonBatchBuilds.put(getDisplayName(), this);
+
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			String downstreamBuildDisplayName =
+				downstreamBuild.getDisplayName();
+
+			if (downstreamBuildDisplayName == null) {
+				return null;
+			}
+
+			downstreamBuilds.put(downstreamBuildDisplayName, downstreamBuild);
+
+			if (downstreamBuild instanceof BatchBuild) {
+				for (Build nonBatchBuild :
+						downstreamBuild.getDownstreamBuilds(null)) {
+
+					nonBatchBuilds.put(
+						nonBatchBuild.getDisplayName(), nonBatchBuild);
+				}
+			}
+			else {
+				nonBatchBuilds.put(
+					downstreamBuild.getDisplayName(), downstreamBuild);
+			}
+		}
+
+		Element h1Element = Dom4JUtil.getNewElement("h1");
+
+		String buildURL = getBuildURL();
+
+		Dom4JUtil.addToElement(
+			h1Element, "Jenkins report for ",
+			Dom4JUtil.getNewAnchorElement(buildURL, buildURL));
+
+		JSONObject jobJSONObject = getBuildJSONObject();
+
+		String jobDescription = "";
+
+		try {
+			jobDescription = jobJSONObject.getString("description");
+		}
+		catch (JSONException jsone) {
+			jsone.printStackTrace();
+		}
+
+		Element h2Element = Dom4JUtil.getNewElement("h2");
+
+		Dom4JUtil.addToElement(h2Element, jobDescription);
+
+		Element bodyElement = Dom4JUtil.getNewElement("body");
+
+		Dom4JUtil.addToElement(
+			bodyElement, h1Element, h2Element,
+			getJenkinsReportSummaryElement(nonBatchBuilds),
+			getJenkinsReportTimelineElement(nonBatchBuilds),
+			getJenkinsReportTopLevelTableElement(),
+			getJenkinsReportDownstreamElement(downstreamBuilds));
+
+		return bodyElement;
+	}
+
+	protected Element getJenkinsReportChartJsScriptElement(
+		String xData, String y1Data, String y2Data) {
+
+		String resource = null;
+
+		try {
+			Class<?> clazz = JenkinsResultsParserUtil.class;
+
+			resource = JenkinsResultsParserUtil.readInputStream(
+				clazz.getResourceAsStream("chart-template.js"));
+		}
+		catch (IOException ioe) {
+		}
+
+		resource = resource.replace("'xData'", xData);
+		resource = resource.replace("'y1Data'", y1Data);
+		resource = resource.replace("'y2Data'", y2Data);
+
+		Element scriptElement = Dom4JUtil.getNewElement("script");
+
+		scriptElement.addText(resource);
+
+		return scriptElement;
+	}
+
+	protected Element getJenkinsReportDownstreamElement(
+		Map<String, Build> downstreamBuilds) {
+
+		List<Build> abortedBuilds = new ArrayList();
+
+		List<Build> failureBuilds = new ArrayList();
+
+		List<Build> missingBuilds = new ArrayList();
+
+		List<Build> queuedBuilds = new ArrayList();
+
+		List<Build> runningBuilds = new ArrayList();
+
+		List<Build> startingBuilds = new ArrayList();
+
+		List<Build> successBuilds = new ArrayList();
+
+		Set<String> downstreamBuildsKeySet = downstreamBuilds.keySet();
+
+		for (String key : downstreamBuildsKeySet) {
+			Build build = downstreamBuilds.get(key);
+
+			switch (build.getStatus()) {
+
+				case "completed":
+					String result = build.getResult();
+
+					if (result.equals("SUCCESS")) {
+						successBuilds.add(build);
+					}
+					else if (result.equals("FAILURE") ||
+							 result.equals("UNSTABLE")) {
+
+						failureBuilds.add(build);
+					}
+					else if (result.equals("ABORTED")) {
+						abortedBuilds.add(build);
+					}
+
+					break;
+
+				case "missing":
+					missingBuilds.add(build);
+					break;
+
+				case "queued":
+					queuedBuilds.add(build);
+					break;
+
+				case "running":
+					runningBuilds.add(build);
+					break;
+
+				case "starting":
+					startingBuilds.add(build);
+					break;
+			}
+		}
+
+		Element abortedBatchElement = getJenkinsReportDownstreamTableElement(
+			abortedBuilds, "---- Aborted: " + abortedBuilds.size());
+
+		Element failureBatchElement = getJenkinsReportDownstreamTableElement(
+			failureBuilds, "---- Failure: " + failureBuilds.size());
+
+		Element successBatchElement = getJenkinsReportDownstreamTableElement(
+			successBuilds, "---- Success: " + successBuilds.size());
+
+		Element completedBatchElement = Dom4JUtil.getNewElement("table");
+
+		completedBatchElement.add(
+			Dom4JUtil.getNewElement("caption", null, "Completed: "));
+
+		Dom4JUtil.addToElement(
+			completedBatchElement, abortedBatchElement, failureBatchElement,
+			successBatchElement);
+
+		Element missingBatchElement = getJenkinsReportDownstreamTableElement(
+			missingBuilds, "Missing: " + missingBuilds.size());
+
+		Element queuedBatchElement = getJenkinsReportDownstreamTableElement(
+			queuedBuilds, "Queued: " + queuedBuilds.size());
+
+		Element runningBatchElement = getJenkinsReportDownstreamTableElement(
+			runningBuilds, "Running: " + runningBuilds.size());
+
+		Element startingBatchElement = getJenkinsReportDownstreamTableElement(
+			startingBuilds, "Starting: " + startingBuilds.size());
+
+		Element divElement = Dom4JUtil.getNewElement("div");
+
+		Dom4JUtil.addToElement(
+			divElement, queuedBatchElement, startingBatchElement,
+			runningBatchElement, missingBatchElement, completedBatchElement);
+
+		return divElement;
+	}
+
+	protected Element getJenkinsReportDownstreamTableElement(
+		List<Build> downstreamBuilds, String statusCountCaption) {
+
+		Element tableElement = Dom4JUtil.getNewElement("table");
+
+		tableElement.add(
+			Dom4JUtil.getNewElement("caption", null, statusCountCaption));
+
+		if (!downstreamBuilds.isEmpty()) {
+			tableElement.add(getJenkinsReportTableColumnHeaderElement());
+		}
+
+		for (Build batchBuild : downstreamBuilds) {
+			Element trBatchElement = Dom4JUtil.getNewElement("tr");
+
+			trBatchElement.add(batchBuild.getJenkinsReportBuildInfoElement());
+
+			tableElement.add(trBatchElement);
+
+			for (Build downstreamBuild : batchBuild.getDownstreamBuilds(null)) {
+				tableElement.add(
+					downstreamBuild.getJenkinsReportBuildInfoElement());
+			}
+		}
+
+		return tableElement;
+	}
+
+	protected Element getJenkinsReportHeadElement() {
+		Element headElement = Dom4JUtil.getNewElement("head");
+
+		String style = JenkinsResultsParserUtil.combine(
+			"caption, table, td, th {", "text-align: left;", "padding: .5em;",
+			"white-space: nowrap;", "}", "th:first-child {",
+			"text-indent: 1em;", "}", "td:first-child {", "text-indent: 4em;",
+			"}", "caption {", "font-size: 150%;", "font-weight: bold;", "}");
+
+		Dom4JUtil.addToElement(
+			headElement, Dom4JUtil.getNewElement("style", null, style));
+
+		return headElement;
+	}
+
+	protected Element getJenkinsReportSummaryElement(
+		Map<String, Build> nonBatchBuildss) {
+
+		Element buildTimeElement = Dom4JUtil.getNewElement(
+			"p", null, "Build Time: ",
+			JenkinsResultsParserUtil.toDurationString(getDuration()));
+
+		Element ciUsageElement = getJenkinsReportTotalCIUsageElement(
+			nonBatchBuildss);
+
+		Element longestAxisElement = getLongestRunningDownstreamBuildElement();
+
+		Element longestBatchElement = getLongestRunningBatchElement();
+
+		Element longestTestElement = getLongestRunningTestElement();
+
+		Date startTime = new Date(getStartTimestamp());
+
+		Element startTimeElement = Dom4JUtil.getNewElement(
+			"p", null, "Start Time: ",
+			JenkinsResultsParserUtil.toDateString(startTime));
+
+		Element vmUsageElement = getJenkinsReportTotalVMUSageElement(
+			nonBatchBuildss);
+
+		Element divElement = Dom4JUtil.getNewElement("div");
+
+		Dom4JUtil.addToElement(
+			divElement, startTimeElement, buildTimeElement, ciUsageElement,
+			vmUsageElement, longestBatchElement, longestAxisElement,
+			longestTestElement);
+
+		return divElement;
+	}
+
+	protected Element getJenkinsReportTimelineElement(
+		Map<String, Build> nonBatchBuilds) {
+
+		long topLevelDuration = getDuration();
+		long topLevelStartTime = getStartTimestamp();
+
+		int dataPoints = 500;
+
+		long[] invocationData = new long[dataPoints];
+		long[] slaveUsageData = new long[dataPoints];
+
+		for (String key : nonBatchBuilds.keySet()) {
+			Build build = nonBatchBuilds.get(key);
+
+			long buildDuration = build.getDuration();
+			long buildStartTime = build.getStartTimestamp();
+
+			long buildEndTime = buildDuration + buildStartTime;
+
+			long dataEnd =
+				(buildEndTime - topLevelStartTime) * dataPoints /
+					topLevelDuration;
+
+			if (dataEnd > dataPoints) {
+				dataEnd = dataPoints;
+			}
+
+			long dataStart =
+				(buildStartTime - topLevelStartTime) * dataPoints /
+					topLevelDuration;
+
+			for (int i = (int)dataStart; i < dataEnd; i++) {
+				slaveUsageData[i] = ++slaveUsageData[i];
+			}
+
+			invocationData[(int)dataStart] = ++invocationData[(int)dataStart];
+		}
+
+		long[] timeData = new long[dataPoints];
+
+		timeData[0] = 0;
+
+		for (int i = 1; i < timeData.length; i++) {
+			timeData[i] = timeData[0] + i * topLevelDuration / dataPoints;
+		}
+
+		Element canvasElement = Dom4JUtil.getNewElement("canvas");
+
+		canvasElement.addAttribute("height", "300");
+		canvasElement.addAttribute("id", "timeline");
+
+		Element scriptElement = Dom4JUtil.getNewElement("script");
+
+		scriptElement.addAttribute("src", _CHART_JS_FILE);
+		scriptElement.addText("");
+
+		Element chartJSScriptElement = getJenkinsReportChartJsScriptElement(
+			Arrays.toString(timeData), Arrays.toString(slaveUsageData),
+			Arrays.toString(invocationData));
+
+		Element divElement = Dom4JUtil.getNewElement("div");
+
+		Dom4JUtil.addToElement(
+			divElement, canvasElement, scriptElement, chartJSScriptElement);
+
+		return divElement;
+	}
+
+	protected Element getJenkinsReportTopLevelTableElement() {
+		Element topLevelTableElement = Dom4JUtil.getNewElement("table");
+
+		String status = getStatus();
+
+		String result = getResult();
+
+		if (result != null) {
+			topLevelTableElement.add(
+				Dom4JUtil.getNewElement(
+					"caption", null,
+					"Top Level Build - <strong>" + result + "</strong>"));
+		}
+		else {
+			topLevelTableElement.add(
+				Dom4JUtil.getNewElement(
+					"caption", null,
+					"Top Level Build - <strong>" +
+						StringUtils.upperCase(status) + "</strong>"));
+		}
+
+		topLevelTableElement.add(getJenkinsReportTableColumnHeaderElement());
+
+		topLevelTableElement.add(getJenkinsReportBuildInfoElement());
+
+		return topLevelTableElement;
+	}
+
+	protected Element getJenkinsReportTotalCIUsageElement(
+		Map<String, Build> nonBatchBuilds) {
+
+		long totalTime = 0;
+
+		for (Build nonBatchBuild : nonBatchBuilds.values()) {
+			long axisDuration = nonBatchBuild.getDuration();
+
+			totalTime = totalTime + axisDuration;
+		}
+
+		long hoursTotalTime = totalTime / 3600000;
+
+		Element totalCIUsageElement = Dom4JUtil.getNewElement(
+			"p", null, "Total CI Usage: " + hoursTotalTime + " server hours");
+
+		return totalCIUsageElement;
+	}
+
+	protected Element getJenkinsReportTotalVMUSageElement(
+		Map<String, Build> nonBatchBuilds) {
+
+		long totalVMUsed = nonBatchBuilds.size();
+
+		Element totalVMUsageElement = Dom4JUtil.getNewElement(
+			"p", null, "Total VM used: " + totalVMUsed + " slaves");
+
+		return totalVMUsageElement;
+	}
+
 	protected Element getJobSummaryListElement() {
 		Element jobSummaryListElement = Dom4JUtil.getNewElement("ul");
 
@@ -476,6 +896,68 @@ public class TopLevelBuild extends BaseBuild {
 		}
 
 		return jobSummaryListElement;
+	}
+
+	protected Build getLongestRunningBatchBuild() {
+		List<Build> downstreamBuilds = getDownstreamBuilds(null);
+
+		long longestBatchDuration = 0;
+
+		Build longestRunningBatchBuild = null;
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			if (downstreamBuild instanceof TopLevelBuild) {
+				downstreamBuild =
+					((TopLevelBuild)
+						downstreamBuild).getLongestRunningBatchBuild();
+			}
+
+			if (downstreamBuild instanceof BatchBuild) {
+				long batchDuration = downstreamBuild.getDuration();
+
+				if (batchDuration > longestBatchDuration) {
+					longestBatchDuration = batchDuration;
+
+					longestRunningBatchBuild = downstreamBuild;
+				}
+			}
+		}
+
+		return longestRunningBatchBuild;
+	}
+
+	protected Element getLongestRunningBatchElement() {
+		String jobName = "Unavailable";
+
+		long longestBatchDuration = 0;
+
+		String longestBatchName = "Unavailable";
+
+		String longestBatchURL = "Unavailable";
+
+		Build longestRunningBatchBuild = getLongestRunningBatchBuild();
+
+		if (!(longestRunningBatchBuild == null)) {
+			jobName = longestRunningBatchBuild.getJobName();
+
+			longestBatchDuration = longestRunningBatchBuild.getDuration();
+
+			longestBatchName = longestRunningBatchBuild.getDisplayName();
+
+			longestBatchURL = longestRunningBatchBuild.getBuildURL();
+		}
+
+		String longestBatchDisplayName = longestBatchName.replace(
+			jobName + "/", "");
+
+		Element longestBatchElement = Dom4JUtil.getNewElement(
+			"p", null, "Longest Batch: ",
+			Dom4JUtil.getNewAnchorElement(
+				longestBatchURL, longestBatchDisplayName),
+			" in: ",
+			JenkinsResultsParserUtil.toDurationString(longestBatchDuration));
+
+		return longestBatchElement;
 	}
 
 	protected Element getMoreDetailsElement() {
@@ -719,6 +1201,9 @@ public class TopLevelBuild extends BaseBuild {
 
 	protected static final Pattern gitRepositoryTempMapNamePattern =
 		Pattern.compile("git\\.(?<repositoryType>.*)\\.properties");
+
+	private static final String _CHART_JS_FILE =
+		"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js";
 
 	private static final long _DOWNSTREAM_BUILDS_LISTING_INTERVAL =
 		1000 * 60 * 5;

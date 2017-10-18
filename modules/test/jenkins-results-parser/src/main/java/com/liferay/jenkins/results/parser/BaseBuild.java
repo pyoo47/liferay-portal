@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 import org.dom4j.Element;
 
@@ -518,6 +521,115 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public Element getJenkinsReportBuildInfoElement() {
+		return getJenkinsReportBuildInfoElement(this, getDisplayName(), true);
+	}
+
+	@Override
+	public Element getJenkinsReportBuildInfoElement(
+		Build build, String buildName, boolean tableHeaderElement) {
+
+		String buildURL = build.getBuildURL();
+
+		String buildConsoleURL = buildURL + "console";
+
+		String tagName = "td";
+
+		if (tableHeaderElement) {
+			tagName = "th";
+		}
+
+		Element trElement = Dom4JUtil.getNewElement("tr");
+
+		trElement.add(
+			Dom4JUtil.getNewElement(
+				tagName, null,
+				Dom4JUtil.getNewAnchorElement(buildURL, null, buildName)));
+
+		trElement.add(
+			Dom4JUtil.getNewElement(
+				tagName, null,
+				Dom4JUtil.getNewAnchorElement(
+					buildConsoleURL, null, "Console")));
+
+		String buildTestReportURL = buildURL + "testReport";
+
+		trElement.add(
+			Dom4JUtil.getNewElement(
+				tagName, null,
+				Dom4JUtil.getNewAnchorElement(
+					buildTestReportURL, null, "Test Report")));
+
+		Date buildStartDate = new Date(build.getStartTimestamp());
+
+		trElement.add(
+			Dom4JUtil.getNewElement(
+				tagName, null,
+				JenkinsResultsParserUtil.toDateString(buildStartDate)));
+
+		trElement.add(
+			Dom4JUtil.getNewElement(
+				tagName, null,
+				JenkinsResultsParserUtil.toDurationString(
+					build.getDuration())));
+
+		String status = build.getStatus();
+
+		if (status != null) {
+			status = StringUtils.upperCase(status);
+		}
+		else {
+			status = "";
+		}
+
+		trElement.add(Dom4JUtil.getNewElement(tagName, null, status));
+
+		String result = build.getResult();
+
+		if (result == null) {
+			result = "";
+		}
+
+		trElement.add(Dom4JUtil.getNewElement(tagName, null, result));
+
+		return trElement;
+	}
+
+	@Override
+	public Element getJenkinsReportElement() {
+		return null;
+	}
+
+	@Override
+	public Element getJenkinsReportTableColumnHeaderElement() {
+		Element nameElement = Dom4JUtil.getNewElement("th", null, "Name");
+
+		Element consoleElement = Dom4JUtil.getNewElement("th", null, "Console");
+
+		Element testReportElement = Dom4JUtil.getNewElement(
+			"th", null, "Test Report");
+
+		Element startTimeElement = Dom4JUtil.getNewElement(
+			"th", null, "Start Time");
+
+		Element buildTimeElement = Dom4JUtil.getNewElement(
+			"th", null, "Build Time");
+
+		Element statusElement = Dom4JUtil.getNewElement("th", null, "Status");
+
+		Element resultElement = Dom4JUtil.getNewElement("th", null, "Result");
+
+		Element tableColumnHeaderElement = Dom4JUtil.getNewElement("tr");
+
+		Dom4JUtil.addToElement(
+			tableColumnHeaderElement, nameElement, consoleElement,
+			testReportElement, startTimeElement, buildTimeElement,
+			statusElement, resultElement);
+
+		return tableColumnHeaderElement;
+	}
+
+	@Override
 	public String getJobName() {
 		return jobName;
 	}
@@ -609,6 +721,168 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public Build getLongestRunningDownstreamBuild() {
+		long longestDuration = 0;
+
+		Build longestRunningDownstreamBuild = null;
+
+		List<Build> downstreamBuilds = getDownstreamBuilds(null);
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			if (downstreamBuild instanceof BatchBuild) {
+				downstreamBuild =
+					downstreamBuild.getLongestRunningDownstreamBuild();
+
+				if (downstreamBuild == null) {
+					continue;
+				}
+			}
+
+			long downstreamDuration = downstreamBuild.getDuration();
+
+			if (downstreamDuration > longestDuration) {
+				longestDuration = downstreamDuration;
+
+				longestRunningDownstreamBuild = downstreamBuild;
+			}
+		}
+
+		return longestRunningDownstreamBuild;
+	}
+
+	@Override
+	public Element getLongestRunningDownstreamBuildElement() {
+		long downstreamBuildDuration = 0;
+
+		String downstreamBuildName = "Unavailable";
+
+		String downstreamBuildParentName = "Unavailable";
+
+		String downstreamBuildURL = "Unavailable";
+
+		Build longestRunningDownstreamBuild =
+			getLongestRunningDownstreamBuild();
+
+		if (!(longestRunningDownstreamBuild == null)) {
+			if (longestRunningDownstreamBuild instanceof AxisBuild) {
+				String axisNumber =
+					((AxisBuild)longestRunningDownstreamBuild).getAxisNumber();
+
+				downstreamBuildName = "AXIS_VARIABLE=" + axisNumber;
+			}
+			else {
+				downstreamBuildName =
+					longestRunningDownstreamBuild.getDisplayName();
+			}
+
+			downstreamBuildDuration =
+				longestRunningDownstreamBuild.getDuration();
+
+			downstreamBuildURL = longestRunningDownstreamBuild.getBuildURL();
+
+			Build parentBuild = longestRunningDownstreamBuild.getParentBuild();
+
+			String parentJobName = parentBuild.getJobName();
+
+			downstreamBuildParentName = parentBuild.getDisplayName();
+
+			downstreamBuildParentName = downstreamBuildParentName.replace(
+				parentJobName + "/", "");
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(downstreamBuildParentName);
+
+		sb.append("/");
+
+		sb.append(downstreamBuildName);
+
+		String longestRunningBuildDisplayName = sb.toString();
+
+		Element longestDownstreamElement = Dom4JUtil.getNewElement(
+			"p", null, "Longest Downstream Build: ",
+			Dom4JUtil.getNewAnchorElement(
+				downstreamBuildURL, longestRunningBuildDisplayName),
+			" in: ",
+			JenkinsResultsParserUtil.toDurationString(downstreamBuildDuration));
+
+		return longestDownstreamElement;
+	}
+
+	@Override
+	public TestResult getLongestRunningTest() {
+		List<TestResult> testResults = getTestResults(null);
+
+		long longestTestDuration = 0;
+
+		TestResult longestRunningTest = null;
+
+		for (TestResult testResult : testResults) {
+			long testDuration = testResult.getDuration();
+
+			if (testDuration > longestTestDuration) {
+				longestTestDuration = testDuration;
+
+				longestRunningTest = testResult;
+			}
+		}
+
+		return longestRunningTest;
+	}
+
+	@Override
+	public Element getLongestRunningTestElement() {
+		String longestTestName = "Unavailable";
+
+		String longestTestParentName = "Unavailable";
+
+		String longestTestURL = "Unavailable";
+
+		long longestTestDuration = 0;
+
+		TestResult longestRunningTest = getLongestRunningTest();
+
+		if (longestRunningTest != null) {
+			longestTestName = longestRunningTest.getDisplayName();
+
+			longestTestURL = longestRunningTest.getTestReportURL();
+
+			Build testAxisBuild = longestRunningTest.getAxisBuild();
+
+			Build testBatchBuild = testAxisBuild.getParentBuild();
+
+			String testBatchBuildName = testBatchBuild.getDisplayName();
+
+			String testBatchJobName = testBatchBuild.getJobName();
+
+			longestTestParentName = testBatchBuildName.replace(
+				testBatchJobName + "/", "");
+
+			longestTestDuration = longestRunningTest.getDuration();
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(longestTestParentName);
+
+		sb.append("/");
+
+		sb.append(longestTestName);
+
+		String longestTestDisplayName = sb.toString();
+
+		Element longestTestElement = Dom4JUtil.getNewElement(
+			"p", null, "Longest Test: ",
+			Dom4JUtil.getNewAnchorElement(
+				longestTestURL, longestTestDisplayName),
+			" in: ",
+			JenkinsResultsParserUtil.toDurationString(longestTestDuration));
+
+		return longestTestElement;
+	}
+
+	@Override
 	public String getMaster() {
 		return master;
 	}
@@ -671,6 +945,8 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public Long getStartTimestamp() {
 		JSONObject buildJSONObject = getBuildJSONObject("timestamp");
+
+		//System.out.println(buildJSONObject.toString());
 
 		if (buildJSONObject == null) {
 			return null;
@@ -819,7 +1095,12 @@ public abstract class BaseBuild implements Build {
 		List<TestResult> testResults = new ArrayList<>();
 
 		for (Build downstreamBuild : getDownstreamBuilds(null)) {
-			testResults.addAll(downstreamBuild.getTestResults(testStatus));
+			List<TestResult> downstreamTestResults =
+				downstreamBuild.getTestResults(testStatus);
+
+			if (!(downstreamTestResults == null)) {
+				testResults.addAll(downstreamTestResults);
+			}
 		}
 
 		return testResults;
