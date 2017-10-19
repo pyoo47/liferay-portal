@@ -14,6 +14,8 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.liferay.jenkins.results.parser.BaseBuild.TimelineData;
+
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -35,6 +37,11 @@ import org.json.JSONObject;
  * @author Kevin Yen
  */
 public class BatchBuild extends BaseBuild {
+
+	@Override
+	public void addTimelineData(BaseBuild.TimelineData timelineData) {
+		addDownstreamBuildsTimelineData(timelineData);
+	}
 
 	@Override
 	public String getAppServer() {
@@ -185,6 +192,18 @@ public class BatchBuild extends BaseBuild {
 		}
 
 		return testResults;
+	}
+
+	@Override
+	public long getTotalDuration() {
+		long totalDuration = super.getTotalDuration();
+
+		return totalDuration - getDuration();
+	}
+
+	@Override
+	public int getTotalSlavesUsedCount() {
+		return super.getTotalSlavesUsedCount() - 1;
 	}
 
 	@Override
@@ -389,6 +408,10 @@ public class BatchBuild extends BaseBuild {
 				JenkinsResultsParserUtil.getNounForm(
 					failCount, " Tests", " Test"),
 				" Failed.", getFailureMessageElement()));
+	}
+
+	protected String getJenkinsReportBuildInfoCellElementTagName() {
+		return "th";
 	}
 
 	protected int getTestCountByStatus(String status) {

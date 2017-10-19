@@ -86,6 +86,10 @@ public interface Build {
 
 	public Long getLatestStartTimestamp();
 
+	public Build getLongestRunningDownstreamBuild();
+
+	public TestResult getLongestRunningTest();
+
 	public String getMaster();
 
 	public String getOperatingSystem();
@@ -121,6 +125,10 @@ public interface Build {
 	public List<TestResult> getTestResults(String testStatus);
 
 	public TopLevelBuild getTopLevelBuild();
+
+	public long getTotalDuration();
+
+	public int getTotalSlavesUsedCount();
 
 	public boolean hasBuildURL(String buildURL);
 
