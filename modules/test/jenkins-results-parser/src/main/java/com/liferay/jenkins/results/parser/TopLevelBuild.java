@@ -199,6 +199,22 @@ public class TopLevelBuild extends BaseBuild {
 		return null;
 	}
 
+	public Element getValidationGitHubMessage() {
+		ValidationBuild validationBuild = null;
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			if (downstreamBuild instanceof ValidationBuild) {
+				validationBuild = (ValidationBuild)downstreamBuild;
+			}
+		}
+
+		if (validationBuild == null) {
+			throw new RuntimeException("Unable to find a validation build");
+		}
+
+		return validationBuild.getGitHubMessageElement();
+	}
+
 	@Override
 	public void setCompareToUpstream(boolean compareToUpstream) {
 		_compareToUpstream = compareToUpstream;
@@ -332,12 +348,6 @@ public class TopLevelBuild extends BaseBuild {
 		}
 
 		return baseBranchDetailsElement;
-	}
-
-	protected Element getBuildTimeElement() {
-		return Dom4JUtil.getNewElement(
-			"p", null, "Build Time: ",
-			JenkinsResultsParserUtil.toDurationString(getDuration()));
 	}
 
 	protected Element getDownstreamGitHubMessageElement() {
