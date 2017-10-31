@@ -19,7 +19,6 @@ import com.liferay.poshi.runner.util.RegexUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.dom4j.Element;
 
@@ -94,7 +93,7 @@ public class ExecutePoshiElement extends BasePoshiElement {
 
 		List<String> assignments = new ArrayList<>();
 
-		Matcher matcher = _assignmentPattern.matcher(content);
+		Matcher matcher = nestedVarAssignmentPattern.matcher(content);
 
 		while (matcher.find()) {
 			assignments.add(matcher.group());
@@ -161,7 +160,7 @@ public class ExecutePoshiElement extends BasePoshiElement {
 				sb.setLength(sb.length() - 2);
 			}
 
-			return createReadableBlock(sb.toString());
+			return createFunctionReadableBlock(sb.toString());
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -178,7 +177,7 @@ public class ExecutePoshiElement extends BasePoshiElement {
 			sb.append(poshiElement.toReadableSyntax());
 		}
 
-		String readableBlock = createReadableBlock(sb.toString());
+		String readableBlock = createMacroReadableBlock(sb.toString());
 
 		if (returnPoshiElement == null) {
 			return readableBlock;
@@ -206,8 +205,7 @@ public class ExecutePoshiElement extends BasePoshiElement {
 		super(name, readableSyntax);
 	}
 
-	@Override
-	protected String createReadableBlock(String content) {
+	protected String createFunctionReadableBlock(String content) {
 		StringBuilder sb = new StringBuilder();
 
 		String blockName = getBlockName();
@@ -218,16 +216,55 @@ public class ExecutePoshiElement extends BasePoshiElement {
 		sb.append(blockName.replace("#", "."));
 		sb.append("(");
 
-		String trimmedContent = content.trim();
-
-		if (!trimmedContent.equals("")) {
+		if (!content.equals("")) {
 			if (content.contains("\n")) {
 				content = content.replaceAll("\n", ",\n" + pad);
 				content = content.replaceFirst(",", "");
 				content = content + "\n" + pad;
 			}
+		}
 
-			sb.append(content);
+		sb.append(content);
+
+		sb.append(");");
+
+		return sb.toString();
+	}
+
+	protected String createMacroReadableBlock(String content) {
+		StringBuilder sb = new StringBuilder();
+
+		String blockName = getBlockName();
+		String pad = getPad();
+
+		sb.append("\n\n");
+		sb.append(pad);
+		sb.append(blockName.replace("#", "."));
+		sb.append("(");
+
+		Matcher matcher = nestedVarAssignmentPattern.matcher(content);
+
+		StringBuffer formattedContent = new StringBuffer();
+
+		while (matcher.find()) {
+			String matcherGroup = matcher.group();
+
+			matcherGroup = matcherGroup.replace("$", "\\$");
+
+			matcher.appendReplacement(
+				formattedContent, pad + matcherGroup + ",");
+		}
+
+		if (formattedContent.length() > 1) {
+			formattedContent.setLength(formattedContent.length() - 1);
+		}
+
+		sb.append(formattedContent.toString());
+
+		if (!content.trim().equals("")) {
+			sb.append("\n");
+
+			sb.append(pad);
 		}
 
 		sb.append(");");
@@ -283,8 +320,5 @@ public class ExecutePoshiElement extends BasePoshiElement {
 	}
 
 	private static final String _ELEMENT_NAME = "execute";
-
-	private static final Pattern _assignmentPattern = Pattern.compile(
-		"([^,]*? = \".*?\")");
 
 }
