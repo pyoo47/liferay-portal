@@ -1772,6 +1772,10 @@ public abstract class BaseBuild implements Build {
 		return getGitHubMessageJobResultsElement();
 	}
 
+	protected String getJenkinsReportBuildInfoCellElementTagName() {
+		return "td";
+	}
+
 	protected Set<String> getJobParameterNames() {
 		JSONObject jsonObject;
 
