@@ -4,7 +4,7 @@
 
 		<execute argument1="5000" selenium="pause" />
 
-		<execute selenium="selectPopUp" />
+		<execute function="Poshi.SelectWindow#selectPopUp" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -38,7 +38,7 @@
 
 		<execute argument1="5000" selenium="pause" />
 
-		<execute argument1="null" selenium="selectWindow" />
+		<execute function="Poshi.SelectWindow#selectWindowTop" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

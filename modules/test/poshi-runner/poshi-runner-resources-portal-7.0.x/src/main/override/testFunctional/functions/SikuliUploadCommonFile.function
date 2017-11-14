@@ -2,7 +2,7 @@
 	<command name="sikuliUploadCommonFile">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="sikuliUploadCommonFile" />
+		<execute function="Poshi.SikuliUploadCommonFile#sikuliUploadCommonFile" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

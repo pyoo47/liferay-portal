@@ -2,10 +2,6 @@
 	<command name="assertValue">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="waitForValue" />
-
-		<execute selenium="assertValue" />
+		<execute function="Poshi.AssertValue#assertValue" />
 	</command>
 </definition>

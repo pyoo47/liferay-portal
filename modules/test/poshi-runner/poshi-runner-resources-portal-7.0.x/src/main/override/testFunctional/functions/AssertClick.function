@@ -2,25 +2,13 @@
 	<command name="assertClick">
 		<execute function="WaitForSPARefresh" />
 
-		<if>
-			<contains string="${locator1}" substring="/input" />
-			<then>
-				<execute function="AssertClick#assertValueClickAt" />
-			</then>
-			<else>
-				<execute function="AssertClick#assertTextClickAt" />
-			</else>
-		</if>
+		<execute function="Poshi.AssertClick#assertClick" />
 	</command>
 
 	<command name="assertPartialTextClickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="AssertTextEquals#assertPartialText" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="clickAt" />
+		<execute function="Poshi.AssertClick#assertPartialTextClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -42,11 +30,7 @@
 	<command name="assertTextClick">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="AssertTextEquals#assertText" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="click" />
+		<execute function="Poshi.AssertClick#assertTextClick" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -56,11 +40,7 @@
 	<command name="assertTextClickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="AssertTextEquals#assertText" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="clickAt" />
+		<execute function="Poshi.AssertClick#assertTextClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -84,11 +64,7 @@
 	<command name="assertTextClickAtAndPause">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="AssertTextEquals#assertText" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="clickAt" />
+		<execute function="Poshi.AssertClick#assertTextClickAtAndPause" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -100,11 +76,7 @@
 	<command name="assertTextClickAtNoJavaScript">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="AssertTextEquals#assertText" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="clickAt" />
+		<execute function="Poshi.AssertClick#assertTextClick" />
 
 		<execute selenium="assertLiferayErrors" />
 	</command>
@@ -126,9 +98,7 @@
 	<command name="assertTextClickNoMouseOver">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="AssertTextEquals#assertText" />
-
-		<execute selenium="click" />
+		<execute function="Poshi.AssertClick#assertTextClickNoMouseOver" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -152,11 +122,7 @@
 	<command name="assertValueClickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="AssertTextEquals#assertValue" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="clickAt" />
+		<execute function="Poshi.AssertClick#assertValueClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -168,7 +134,7 @@
 
 		<execute argument1="1000" selenium="pause" />
 
-		<execute function="AssertClick#assertPartialTextClickAt" />
+		<execute function="Poshi.AssertClick#pauseAssertPartialTextClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -180,7 +146,7 @@
 
 		<execute argument1="1000" selenium="pause" />
 
-		<execute function="AssertClick#assertTextClickAt" />
+		<execute function="Poshi.AssertClick#pauseAssertTextClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -192,17 +158,7 @@
 
 		<execute argument1="1000" selenium="pause" />
 
-		<execute selenium="makeVisible" />
-
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="waitForText" />
-
-		<execute selenium="mouseDown" />
-
-		<execute argument1="1000" selenium="pause" />
-
-		<execute selenium="mouseUp" />
+		<execute function="Poshi.AssertClick#pauseMakeVisibleAssertTextEqualsClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

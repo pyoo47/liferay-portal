@@ -2,44 +2,24 @@
 	<command name="isPartialText">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="isPartialText" />
+		<execute function="Poshi.IsTextEqual#isPartialText" />
 	</command>
 
 	<command name="isText">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="isText" />
+		<<execute function="Poshi.IsTextEqual#isText" />
 	</command>
 
 	<command name="isTextEqual">
 		<execute function="WaitForSPARefresh" />
 
-		<if>
-			<contains string="${locator1}" substring="/input" />
-			<then>
-				<execute function="IsTextEqual#isValue" />
-			</then>
-			<else>
-				<execute function="IsTextEqual#isText" />
-			</else>
-		</if>
+		<execute function="Poshi.IsTextEqual#isTextEqual" />
 	</command>
 
 	<command name="isValue">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="isValue" />
+		<execute function="Poshi.IsTextEqual#isValue" />
 	</command>
 </definition>

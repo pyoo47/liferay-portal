@@ -2,22 +2,12 @@
 	<command name="isElementNotPresent">
 		<execute function="WaitForSPARefresh" />
 
-		<if>
-			<condition selenium="isElementPresent" />
-			<then>
-				<execute selenium="isNotVisible" />
-			</then>
-			<else>
-				<execute selenium="isElementNotPresent" />
-			</else>
-		</if>
+		<execute function="Poshi.IsElementNotPresent#isElementNotPresent" />
 	</command>
 
 	<command name="isNotVisible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute selenium="isNotVisible" />
+		<execute function="Poshi.IsElementNotPresent#isNotVisible" />
 	</command>
 </definition>

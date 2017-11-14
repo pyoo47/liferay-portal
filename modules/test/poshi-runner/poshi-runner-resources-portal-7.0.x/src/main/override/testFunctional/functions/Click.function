@@ -2,11 +2,7 @@
 	<command name="click">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="click" />
+		<execute function="Poshi.Click#click" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -16,11 +12,7 @@
 	<command name="clickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="clickAt" />
+		<execute function="Poshi.Click#clickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -66,9 +58,7 @@
 	<command name="clickNoMouseOver">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="click" />
+		<execute function="Poshi.Click#clickNoMouseOver" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -90,9 +80,7 @@
 	<command name="clickNoWaitForVisible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="mouseOver" />
-
-		<execute selenium="click" />
+		<execute function="Poshi.Click#clickNoWaitForVisible" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -134,17 +122,7 @@
 	<command name="makeVisibleClickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute selenium="mouseOver" />
-
-		<execute argument1="1000" selenium="pause" />
-
-		<execute selenium="makeVisible" />
-
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="clickAt" />
+		<execute function="Poshi.Click#makeVisibleClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -154,13 +132,7 @@
 	<command name="mouseOverClick">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="click" />
+		<execute function="Poshi.Click#mouseOverClick" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -186,9 +158,7 @@
 
 		<execute argument1="1000" selenium="pause" />
 
-		<execute selenium="mouseOver" />
-
-		<execute function="Click#clickAt" />
+		<execute function="Poshi.Click#pauseClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -200,7 +170,7 @@
 
 		<execute argument1="1000" selenium="pause" />
 
-		<execute function="Click#makeVisibleClickAt" />
+		<execute function="Poshi.Click#pauseMakeVisibleClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

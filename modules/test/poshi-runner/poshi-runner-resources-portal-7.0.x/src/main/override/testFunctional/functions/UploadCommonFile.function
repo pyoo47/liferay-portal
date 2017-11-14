@@ -2,11 +2,7 @@
 	<command name="uploadCommonFile">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="uploadCommonFile" />
+		<execute function="Poshi.UploadCommonFile#uploadCommonFile" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -16,9 +12,7 @@
 	<command name="uploadCommonFileHidden">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="mouseOver" />
-
-		<execute selenium="uploadCommonFile" />
+		<execute function="Poshi.UploadCommonFile#uploadCommonFileHidden" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

@@ -4,7 +4,7 @@
 
 		<execute argument1="5000" selenium="pause" />
 
-		<execute function="Select#select" />
+		<execute function="Poshi.Select#pauseSelect" /
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -14,11 +14,7 @@
 	<command name="select">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="select" />
+		<execute function="Poshi.Select#select" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -28,11 +24,7 @@
 	<command name="selectByClick">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForVisible" />
-
-		<execute argument1="${locator1}" selenium="click" />
-
-		<execute argument1="//option[contains(.,'${value1}')]" selenium="click" />
+		<execute function="Poshi.Select#selectByClick" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

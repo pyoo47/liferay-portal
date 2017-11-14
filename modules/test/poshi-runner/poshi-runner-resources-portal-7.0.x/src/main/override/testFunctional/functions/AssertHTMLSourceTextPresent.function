@@ -2,6 +2,6 @@
 	<command name="assertHTMLSourceTextPresent">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="assertHTMLSourceTextPresent" />
+		<execute function="Poshi.AssertHTMLSourceTextPresent#assertHTMLSourceTextPresent" />
 	</command>
 </definition>

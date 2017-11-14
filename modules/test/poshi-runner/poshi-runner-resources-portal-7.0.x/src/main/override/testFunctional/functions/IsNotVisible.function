@@ -2,8 +2,6 @@
 	<command name="isNotVisible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute selenium="isNotVisible" />
+		<execute function="Poshi.IsNotVisible#isNotVisible" />
 	</command>
 </definition>

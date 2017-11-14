@@ -2,9 +2,7 @@
 	<command name="assertNotChecked">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="assertNotChecked" />
+		<execute function="Poshi.AssertNotChecked#assertNotChecked" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -14,9 +12,7 @@
 	<command name="assertNotCheckedHiddenToggleSwitch">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute argument1="xpath=(${locator1})/../../input" selenium="assertNotChecked" />
+		<execute function="Poshi.AssertNotChecked#assertNotCheckedHiddenToggleSwitch" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -26,9 +22,7 @@
 	<command name="assertNotCheckedToggleSwitch">
 		<execute function="WaitForSPARefresh" />
 
-		<execute selenium="waitForElementPresent" />
-
-		<execute selenium="assertNotChecked" />
+		<execute function="Poshi.AssertNotChecked#assertNotCheckedToggleSwitch" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
