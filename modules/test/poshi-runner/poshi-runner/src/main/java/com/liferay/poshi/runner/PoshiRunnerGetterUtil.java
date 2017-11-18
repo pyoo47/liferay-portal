@@ -102,10 +102,17 @@ public class PoshiRunnerGetterUtil {
 	public static String getClassNameFromClassCommandName(
 		String classCommandName) {
 
-		if (classCommandName.contains("#")) {
-			int x = classCommandName.indexOf("#");
+		int x = classCommandName.indexOf("#");
+		int y = classCommandName.indexOf(".");
 
+		if ((x != -1) && (y != -1)) {
+			return classCommandName.substring(y + 1, x);
+		}
+		else if (x != -1) {
 			return classCommandName.substring(0, x);
+		}
+		else if (y != -1) {
+			return classCommandName.substring(y + 1);
 		}
 
 		return classCommandName;
@@ -120,6 +127,18 @@ public class PoshiRunnerGetterUtil {
 		}
 
 		return filePath.substring(x + 1, y);
+	}
+
+	public static String getClassNameFromNamespaceClassName(
+		String namespaceClassName) {
+
+		if (namespaceClassName.contains(".")) {
+			int x = namespaceClassName.indexOf(".");
+
+			return namespaceClassName.substring(x + 1);
+		}
+
+		return namespaceClassName;
 	}
 
 	public static String getClassTypeFromFileExtension(String fileExtension) {
@@ -247,6 +266,18 @@ public class PoshiRunnerGetterUtil {
 		return returnObject;
 	}
 
+	public static String getNamespaceClassNameFromClassCommandName(
+		String classCommandName) {
+
+		int x = classCommandName.indexOf("#");
+
+		if (x != -1) {
+			return classCommandName.substring(0, x);
+		}
+
+		return classCommandName;
+	}
+
 	public static String getNamespaceFromClassCommandName(
 		String classCommandName) {
 
@@ -254,6 +285,18 @@ public class PoshiRunnerGetterUtil {
 
 		if (x != -1) {
 			return classCommandName.substring(0, x);
+		}
+
+		return null;
+	}
+
+	public static String getNamespaceFromNamespaceClassName(
+		String namespaceClassName) {
+
+		if (namespaceClassName.contains(".")) {
+			int x = namespaceClassName.indexOf(".");
+
+			return namespaceClassName.substring(0, x);
 		}
 
 		return null;
@@ -389,7 +432,8 @@ public class PoshiRunnerGetterUtil {
 		int x = classCommandName.indexOf("(");
 		int y = classCommandName.lastIndexOf(")");
 
-		String className = getClassNameFromClassCommandName(classCommandName);
+		String namespaceClassName = getNamespaceClassNameFromClassCommandName(
+			classCommandName);
 		String commandName = getCommandNameFromClassCommandName(
 			classCommandName);
 
@@ -425,17 +469,18 @@ public class PoshiRunnerGetterUtil {
 
 		Object returnObject = null;
 
-		if (className.equals("selenium")) {
+		if (namespaceClassName.equals("selenium")) {
 			Object object = SeleniumUtil.getSelenium();
 
 			returnObject = getMethodReturnValue(
-				args, className, commandName, object);
+				args, namespaceClassName, commandName, object);
 		}
 		else {
-			className = "com.liferay.poshi.runner.util." + className;
+			namespaceClassName =
+				"com.liferay.poshi.runner.util." + namespaceClassName;
 
 			returnObject = getMethodReturnValue(
-				args, className, commandName, null);
+				args, namespaceClassName, commandName, null);
 		}
 
 		return returnObject;

@@ -2,7 +2,18 @@
 	<command name="clickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Uncheck#clickAt" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<if>
+			<condition selenium="isChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
+
+		<execute function="AssertNotChecked#assertNotChecked" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -33,13 +44,35 @@
 	<command name="uncheckNoError">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Uncheck#uncheckNoError" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<if>
+			<condition selenium="isChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
+
+		<execute function="AssertNotChecked#assertNotChecked" />
 	</command>
 
 	<command name="uncheckToggleSwitch">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Uncheck#uncheckToggleSwitch" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<if>
+			<condition selenium="isChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
+
+		<execute function="AssertNotChecked#assertNotCheckedToggleSwitch" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -49,6 +82,15 @@
 	<command name="uncheckToggleSwitchNoErrorNoAssert">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Uncheck#uncheckToggleSwitchNoErrorNoAssert" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<if>
+			<condition selenium="isChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
 	</command>
 </definition>

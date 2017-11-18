@@ -2,6 +2,6 @@
 	<command name="typeScreen">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.TypeScreen#typeScreen" />
+		<execute selenium="typeScreen" />
 	</command>
 </definition>

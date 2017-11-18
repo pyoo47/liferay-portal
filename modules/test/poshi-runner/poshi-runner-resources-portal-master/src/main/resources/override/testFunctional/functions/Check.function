@@ -44,7 +44,18 @@
 	<command name="checkToggleSwitch">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Check#checkToggleSwitch" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<if>
+			<condition selenium="isNotChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
+
+		<execute function="AssertChecked#assertCheckedToggleSwitch" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -54,7 +65,18 @@
 	<command name="clickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Check#clickAt" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<if>
+			<condition selenium="isNotChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
+
+		<execute function="AssertChecked#assertChecked" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -64,7 +86,18 @@
 	<command name="toggleSwitch">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Check#toggleSwitch" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<if>
+			<condition selenium="isNotChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
+
+		<execute function="AssertElementPresent" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

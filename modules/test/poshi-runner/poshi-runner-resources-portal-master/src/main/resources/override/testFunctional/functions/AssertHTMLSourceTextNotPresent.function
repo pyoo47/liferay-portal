@@ -2,6 +2,6 @@
 	<command name="assertHTMLSourceTextNotPresent">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertHTMLSourceTextNotPresent#assertHTMLSourceTextNotPresent" />
+		<execute selenium="assertHTMLSourceTextNotPresent" />
 	</command>
 </definition>

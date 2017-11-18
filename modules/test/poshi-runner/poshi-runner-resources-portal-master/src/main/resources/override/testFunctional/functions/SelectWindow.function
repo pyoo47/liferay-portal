@@ -4,7 +4,7 @@
 
 		<execute argument1="5000" selenium="pause" />
 
-		<execute function="Poshi.SelectWindow#selectPopUp" />
+		<execute selenium="selectPopUp" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -16,7 +16,17 @@
 
 		<execute argument1="5000" selenium="pause" />
 
-		<execute function="Poshi.SelectWindow#selectWindow" />
+		<execute selenium="selectWindow" />
+
+		<execute selenium="assertJavaScriptErrors" />
+
+		<execute selenium="assertLiferayErrors" />
+	</command>
+
+	<command name="selectWindowNoSPARefresh">
+		<execute argument1="5000" selenium="pause" />
+
+		<execute selenium="selectWindow" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -28,7 +38,17 @@
 
 		<execute argument1="5000" selenium="pause" />
 
-		<execute function="Poshi.SelectWindow#selectWindowTop" />
+		<execute argument1="null" selenium="selectWindow" />
+
+		<execute selenium="assertJavaScriptErrors" />
+
+		<execute selenium="assertLiferayErrors" />
+	</command>
+
+	<command name="selectWindowTopNoSPARefresh">
+		<execute argument1="5000" selenium="pause" />
+
+		<execute argument1="null" selenium="selectWindow" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

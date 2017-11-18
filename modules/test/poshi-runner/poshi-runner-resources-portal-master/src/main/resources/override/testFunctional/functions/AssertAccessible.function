@@ -2,7 +2,7 @@
 	<command name="assertAccessible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertAccessible#assertAccessible" />
+		<execute selenium="assertAccessible" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

@@ -2,7 +2,7 @@
 	<command name="refresh">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Refresh#refresh" />
+		<execute selenium="refresh" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

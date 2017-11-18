@@ -2,7 +2,9 @@
 	<command name="assertNotVisible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertNotVisible#assertNotVisible" />
+		<execute selenium="waitForNotVisible" />
+
+		<execute selenium="assertNotVisible" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

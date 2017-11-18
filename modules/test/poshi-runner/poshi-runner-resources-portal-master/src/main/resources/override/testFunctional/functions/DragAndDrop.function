@@ -2,7 +2,7 @@
 	<command name="dragAndDrop">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.DragAndDrop#dragAndDrop" />
+		<execute selenium="dragAndDrop" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -44,7 +44,17 @@
 	<command name="dragAndDropToObject">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.DragAndDrop#dragAndDropToObject" />
+		<execute argument1="${locator1}" selenium="waitForVisible" />
+
+		<execute argument1="${locator1}" selenium="mouseOver" />
+
+		<execute argument1="${locator1}" argument2="${value1}" selenium="waitForPartialText" />
+
+		<execute argument1="${locator2}" selenium="waitForVisible" />
+
+		<execute argument1="${locator2}" selenium="mouseOver" />
+
+		<execute argument1="${locator1}" argument2="${locator2}" selenium="dragAndDropToObject" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -54,7 +64,13 @@
 	<command name="dragAndDropToObjectNotVisible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.DragAndDrop#dragAndDropToObjectNotVisible" />
+		<execute argument1="${locator1}" selenium="waitForVisible" />
+
+		<execute argument1="${locator1}" selenium="mouseOver" />
+
+		<execute argument1="${locator1}" argument2="${value1}" selenium="waitForText" />
+
+		<execute argument1="${locator1}" argument2="${locator2}" selenium="dragAndDropToObject" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

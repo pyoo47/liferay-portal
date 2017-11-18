@@ -2,7 +2,11 @@
 	<command name="addSelection">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AddSelection#addSelection" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="addSelection" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

@@ -2,24 +2,38 @@
 	<command name="isNotPartialText">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.IsTextNotEqual#isNotPartialText" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="isNotPartialText" />
 	</command>
 
 	<command name="isNotText">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.IsTextNotEqual#isNotText" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="isNotText" />
 	</command>
 
 	<command name="isNotValue">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.IsTextNotEqual#isNotValue" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="isNotValue" />
 	</command>
 
 	<command name="isTextNotEqual">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.IsTextNotEqual#isTextNotEqual" />
+		<if>
+			<contains string="${locator1}" substring="/input" />
+			<then>
+				<execute function="IsTextNotEqual#isNotValue" />
+			</then>
+			<else>
+				<execute function="IsTextNotEqual#isNotText" />
+			</else>
+		</if>
 	</command>
 </definition>

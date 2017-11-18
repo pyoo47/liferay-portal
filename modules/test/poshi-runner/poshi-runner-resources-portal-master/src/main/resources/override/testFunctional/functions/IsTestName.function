@@ -2,6 +2,6 @@
 	<command name="isTestName">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.IsTestName#isTestName" />
+		<execute argument1="${value1}" selenium="isTestName" />
 	</command>
 </definition>

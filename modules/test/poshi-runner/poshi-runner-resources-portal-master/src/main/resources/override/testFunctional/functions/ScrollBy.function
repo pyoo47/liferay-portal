@@ -2,6 +2,6 @@
 	<command name="scrollBy">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.ScrollBy#scrollBy" />
+		<execute selenium="scrollBy" />
 	</command>
 </definition>

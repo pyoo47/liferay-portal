@@ -2,7 +2,9 @@
 	<command name="assertElementPresent">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertElementPresent#assertElementPresent" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="assertElementPresent" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -12,7 +14,9 @@
 	<command name="assertVisible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertElementPresent#assertVisible" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="assertVisible" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -24,7 +28,7 @@
 
 		<execute argument1="2000" selenium="pause" />
 
-		<execute function="Poshi.AssertElementPresent#pauseAssertVisible" />
+		<execute function="AssertElementPresent#assertVisible" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

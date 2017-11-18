@@ -2,7 +2,11 @@
 	<command name="uploadTempFile">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.UploadTempFile#uploadTempFile" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="uploadTempFile" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

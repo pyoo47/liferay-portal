@@ -2,6 +2,6 @@
 	<command name="isSikuliImagePresent">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.IsSikuliImagePresent#isSikuliImagePresent" />
+		<execute selenium="isSikuliImagePresent" />
 	</command>
 </definition>

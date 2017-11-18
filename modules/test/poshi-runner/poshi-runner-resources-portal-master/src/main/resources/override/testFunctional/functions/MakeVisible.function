@@ -2,7 +2,11 @@
 	<command name="makeVisible" summary-ignore="true">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.MakeVisible#makeVisible" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="makeVisible" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

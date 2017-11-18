@@ -2,7 +2,9 @@
 	<command name="mouseOver">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.MouseOver#mouseOver" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -28,7 +30,11 @@
 	<command name="mouseOverNotVisible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.MouseOver#mouseOverNotVisible" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="waitForVisible" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -38,7 +44,9 @@
 	<command name="partialTextMouseOver">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.MouseOver#partialTextMouseOver" />
+		<execute function="AssertTextEquals#assertPartialText" />
+
+		<execute selenium="mouseOver" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -48,7 +56,9 @@
 	<command name="textMouseOver">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.MouseOver#textMouseOver" />
+		<execute function="AssertTextEquals#assertText" />
+
+		<execute selenium="mouseOver" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -72,7 +82,9 @@
 	<command name="valueMouseOver">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.MouseOver#valueMouseOver" />
+		<execute function="AssertTextEquals#assertValue" />
+
+		<execute selenium="mouseOver" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

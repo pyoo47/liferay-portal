@@ -2,7 +2,17 @@
 	<command name="assertCKEditorText">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertTextEquals#assertCKEditorText" />
+		<execute argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" selenium="waitForVisible" />
+
+		<execute argument1="1000" selenium="pause" />
+
+		<execute selenium="selectFrame" />
+
+		<execute argument1="//html/body" selenium="waitForVisible" />
+
+		<execute argument1="//html/body" selenium="assertText" />
+
+		<execute argument1="relative=parent" selenium="selectFrame" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -12,7 +22,11 @@
 	<command name="assertPartialText" summary="Assert that '${locator1}' contains the value '${value1}'">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertTextEquals#assertPartialText" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="waitForPartialText" />
+
+		<execute selenium="assertPartialText" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -22,7 +36,11 @@
 	<command name="assertPartialTextAceEditor">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertTextEquals#assertPartialTextAceEditor" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="waitForPartialTextAceEditor" />
+
+		<execute selenium="assertPartialTextAceEditor" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -32,7 +50,11 @@
 	<command name="assertText">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertTextEquals#assertText" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="waitForText" />
+
+		<execute selenium="assertText" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -42,13 +64,23 @@
 	<command name="assertTextEquals">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertTextEquals#assertTextEquals" />
+		<if>
+			<contains string="${locator1}" substring="/input" />
+			<then>
+				<execute function="AssertTextEquals#assertValue" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals#assertText" />
+			</else>
+		</if>
 	</command>
 
 	<command name="assertTextWaitForCKEditor">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertTextEquals#assertTextWaitForCKEditor" />
+		<execute argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" selenium="waitForVisible" />
+
+		<execute function="AssertTextEquals#assertText" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -75,7 +107,11 @@
 	<command name="assertValue">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertTextEquals#assertValue" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="waitForValue" />
+
+		<execute selenium="assertValue" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

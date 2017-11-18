@@ -2,7 +2,11 @@
 	<command name="click">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Click#click" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="click" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -12,7 +16,11 @@
 	<command name="clickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Click#clickAt" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="clickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -34,13 +42,27 @@
 
 		<execute function="Click#clickAt" />
 
-		<execute argument1="//script[contains(@src,'/liferay/dockbar_add_application.js')] | //script[contains( @src,'/js/product_navigation_control_menu_add_content.js')] | //script[contains(@src,'js/product_navigation_control_menu_add_application.js')]" selenium="waitForElementPresent" />
+		<execute argument1="//script[contains(@src,'/liferay/dockbar_add_application.js')] | //script[contains(	@src,'/js/product_navigation_control_menu_add_content.js')] | //script[contains(@src,'js/product_navigation_control_menu_add_application.js')]" selenium="waitForElementPresent" />
 	</command>
 
 	<command name="clickNoMouseOver">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Click#clickNoMouseOver" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="click" />
+
+		<execute selenium="assertJavaScriptErrors" />
+
+		<execute selenium="assertLiferayErrors" />
+	</command>
+
+	<command name="clickNoSPARefresh">
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="click" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -50,7 +72,9 @@
 	<command name="clickNoWaitForVisible">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Click#clickNoWaitForVisible" />
+		<execute selenium="mouseOver" />
+
+		<execute selenium="click" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -79,7 +103,6 @@
 
 		<if>
 			<condition argument1="//div[contains(@class,'cke_editable_inline')]" selenium="isElementPresent" />
-
 			<then>
 				<execute argument1="//script[contains(@src,'http://localhost:8080/o/frontend-editors-web/ckeditor/plugins/wsc/lang/en.js')]" selenium="waitForElementPresent" />
 			</then>
@@ -93,7 +116,17 @@
 	<command name="makeVisibleClickAt">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Click#makeVisibleClickAt" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<execute argument1="1000" selenium="pause" />
+
+		<execute selenium="makeVisible" />
+
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="clickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -103,7 +136,13 @@
 	<command name="mouseOverClick">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Click#mouseOverClick" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="click" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -115,7 +154,9 @@
 
 		<execute argument1="1000" selenium="pause" />
 
-		<execute function="Poshi.Click#pauseClickAt" />
+		<execute selenium="mouseOver" />
+
+		<execute function="Click#clickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -127,7 +168,7 @@
 
 		<execute argument1="1000" selenium="pause" />
 
-		<execute function="Poshi.Click#pauseMakeVisibleClickAt" />
+		<execute function="Click#makeVisibleClickAt" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

@@ -2,7 +2,9 @@
 	<command name="selectFieldText">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.SelectFieldText#selectFieldText" />
+		<execute function="Click" />
+
+		<execute selenium="selectFieldText" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -12,6 +14,8 @@
 	<command name="selectFieldTextNoError">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.SelectFieldText#selectFieldTextNoError" />
+		<execute function="Click" />
+
+		<execute selenium="selectFieldText" />
 	</command>
 </definition>

@@ -2,7 +2,7 @@
 	<command name="sikuliType">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.SikuliType#sikuliType" />
+		<execute selenium="sikuliType" />
 
 		<execute argument1="2000" selenium="pause" />
 

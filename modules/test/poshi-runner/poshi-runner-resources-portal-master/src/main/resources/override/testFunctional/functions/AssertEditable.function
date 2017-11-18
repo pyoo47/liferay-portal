@@ -2,7 +2,9 @@
 	<command name="assertEditable">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertEditable#assertEditable" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="assertEditable" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

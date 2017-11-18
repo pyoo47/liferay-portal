@@ -2,6 +2,6 @@
 	<command name="setWindowSize">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.SetWindowSize#setWindowSize" />
+		<execute selenium="setWindowSize" />
 	</command>
 </definition>

@@ -2,7 +2,19 @@
 	<command name="ckEditorCopy">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Copy#ckEditorCopy" />
+		<execute argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" selenium="waitForVisible" />
+
+		<execute argument1="1000" selenium="pause" />
+
+		<execute selenium="selectFrame" />
+
+		<execute argument1="//html/body" selenium="waitForVisible" />
+
+		<execute argument1="//html/body" selenium="mouseOver" />
+
+		<execute argument1="//html/body" selenium="copyText" />
+
+		<execute argument1="relative=parent" selenium="selectFrame" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -12,13 +24,25 @@
 	<command name="copy">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Copy#copy" />
+		<if>
+			<contains string="${locator1}" substring="/input" />
+			<then>
+				<execute function="Copy#valueCopy" />
+			</then>
+			<else>
+				<execute function="Copy#textCopy" />
+			</else>
+		</if>
 	</command>
 
 	<command name="textCopy">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Copy#textCopy" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="copyText" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -28,7 +52,11 @@
 	<command name="valueCopy">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.Copy#valueCopy" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="copyValue" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

@@ -2,7 +2,9 @@
 	<command name="assertNotEditable">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertNotEditable#assertNotEditable" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="assertNotEditable" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

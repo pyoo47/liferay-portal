@@ -2,7 +2,9 @@
 	<command name="assertPartialSelectedLabel">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertSelectedLabel#assertPartialSelectedLabel" />
+		<execute selenium="waitForVisible" />
+
+		<execute argument1="xpath=(${locator1})/option[@selected='']" argument2="${value1}" selenium="assertPartialText" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -12,7 +14,9 @@
 	<command name="assertSelectedLabel">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertSelectedLabel#assertSelectedLabel" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="assertSelectedLabel" />
 
 		<execute selenium="assertJavaScriptErrors" />
 

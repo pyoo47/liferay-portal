@@ -2,6 +2,6 @@
 	<command name="isHTMLSourceTextPresent">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.IsHTMLSourceTextPresent#isHTMLSourceTextPresent" />
+		<execute selenium="isHTMLSourceTextPresent" />
 	</command>
 </definition>

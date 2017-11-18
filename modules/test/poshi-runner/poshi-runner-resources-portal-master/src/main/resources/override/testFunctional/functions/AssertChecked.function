@@ -2,7 +2,9 @@
 	<command name="assertChecked">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertChecked#assertChecked" />
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="assertChecked" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -24,7 +26,9 @@
 	<command name="assertCheckedToggleSwitch">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertChecked#assertCheckedToggleSwitch" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="assertChecked" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
@@ -34,7 +38,9 @@
 	<command name="waitForElementPresentAssertChecked">
 		<execute function="WaitForSPARefresh" />
 
-		<execute function="Poshi.AssertChecked#waitForElementPresentAssertChecked" />
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="assertChecked" />
 
 		<execute selenium="assertJavaScriptErrors" />
 
