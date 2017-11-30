@@ -91,11 +91,11 @@ public class LegacyDataArchivePortalVersion {
 		return false;
 	}
 
-	public boolean hasStaleArchives() {
+	public boolean hasUnchangedArchives() {
 		for (LegacyDataArchiveGroup legacyDataArchiveGroup :
 				_legacyDataArchiveGroups) {
 
-			if (legacyDataArchiveGroup.hasStaleArchives()) {
+			if (legacyDataArchiveGroup.hasUnchangedArchives()) {
 				return true;
 			}
 		}

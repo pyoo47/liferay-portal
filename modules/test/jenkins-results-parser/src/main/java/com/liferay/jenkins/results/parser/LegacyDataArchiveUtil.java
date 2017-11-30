@@ -61,10 +61,6 @@ public class LegacyDataArchiveUtil {
 	public GitWorkingDirectory.Branch createDataArchiveBranch()
 		throws IOException {
 
-		GitWorkingDirectory.Branch upstreamBranch =
-			_legacyGitWorkingDirectory.getBranch(
-				_legacyGitWorkingDirectory.getUpstreamBranchName(), null);
-
 		String dataArchiveBranchName = JenkinsResultsParserUtil.combine(
 			"data-archive-", String.valueOf(System.currentTimeMillis()));
 
@@ -231,43 +227,44 @@ public class LegacyDataArchiveUtil {
 				}
 			}
 
-			if (legacyDataArchivePortalVersion.hasStaleArchives()) {
+			if (legacyDataArchivePortalVersion.hasUnchangedArchives()) {
 				Dom4JUtil.getNewElement(
-					"h4", rootElement, "Stale Data Archives:");
+					"h4", rootElement, "Unchanged Data Archives:");
 
-				Map<Commit, List<LegacyDataArchive>> staleDataArchivesMap =
+				Map<Commit, List<LegacyDataArchive>> unchangedDataArchivesMap =
 					new HashMap<>();
 
 				for (LegacyDataArchiveGroup legacyDataArchiveGroup :
 						legacyDataArchiveGroups) {
 
-					if (!legacyDataArchiveGroup.hasStaleArchives()) {
+					if (!legacyDataArchiveGroup.hasUnchangedArchives()) {
 						continue;
 					}
 
 					for (LegacyDataArchive legacyDataArchive :
 							legacyDataArchiveGroup.getLegacyDataArchives()) {
 
-						if (legacyDataArchive.isStale()) {
+						if (legacyDataArchive.isUnchanged()) {
 							Commit commit = legacyDataArchive.getCommit();
 
-							List<LegacyDataArchive> staleDataArchives =
-								staleDataArchivesMap.get(commit);
+							List<LegacyDataArchive> unchangedDataArchives =
+								unchangedDataArchivesMap.get(commit);
 
-							if (staleDataArchives == null) {
-								staleDataArchives = new ArrayList<>();
+							if (unchangedDataArchives == null) {
+								unchangedDataArchives = new ArrayList<>();
 							}
 
-							staleDataArchives.add(legacyDataArchive);
+							unchangedDataArchives.add(legacyDataArchive);
 
-							staleDataArchivesMap.put(commit, staleDataArchives);
+							unchangedDataArchivesMap.put(
+								commit, unchangedDataArchives);
 						}
 					}
 				}
 
-				for (Commit commit : staleDataArchivesMap.keySet()) {
-					List<LegacyDataArchive> staleDataArchives =
-						staleDataArchivesMap.get(commit);
+				for (Commit commit : unchangedDataArchivesMap.keySet()) {
+					List<LegacyDataArchive> unchangedDataArchives =
+						unchangedDataArchivesMap.get(commit);
 
 					Element detailsElement = Dom4JUtil.getNewElement(
 						"details", rootElement);
@@ -277,7 +274,7 @@ public class LegacyDataArchiveUtil {
 
 					Dom4JUtil.getNewElement(
 						"b", summaryElement,
-						"(" + staleDataArchives.size() + ")");
+						"(" + unchangedDataArchives.size() + ")");
 
 					Dom4JUtil.getNewAnchorElement(
 						_getCommitURL(commit), summaryElement,
@@ -289,11 +286,11 @@ public class LegacyDataArchiveUtil {
 					Element dataArchivesElement = Dom4JUtil.getNewElement(
 						"ul", detailsElement);
 
-					for (LegacyDataArchive staleDataArchive :
-							staleDataArchives) {
+					for (LegacyDataArchive unchangedDataArchive :
+							unchangedDataArchives) {
 
 						File legacyDataArchiveFile =
-							staleDataArchive.getLegacyDataArchiveFile();
+							unchangedDataArchive.getLegacyDataArchiveFile();
 
 						Element dataArchiveElement = Dom4JUtil.getNewElement(
 							"li", dataArchivesElement);

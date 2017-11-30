@@ -67,7 +67,7 @@ public class LegacyDataArchive {
 		return false;
 	}
 
-	public boolean isStale() {
+	public boolean isUnchanged() {
 		if (!isMissing() && !isUpdated()) {
 			return true;
 		}

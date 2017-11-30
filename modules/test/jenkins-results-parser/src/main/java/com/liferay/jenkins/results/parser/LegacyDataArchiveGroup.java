@@ -99,9 +99,9 @@ public class LegacyDataArchiveGroup {
 		return false;
 	}
 
-	public boolean hasStaleArchives() {
+	public boolean hasUnchangedArchives() {
 		for (LegacyDataArchive legacyDataArchive : _legacyDataArchives) {
-			if (legacyDataArchive.isStale()) {
+			if (legacyDataArchive.isUnchanged()) {
 				return true;
 			}
 		}
