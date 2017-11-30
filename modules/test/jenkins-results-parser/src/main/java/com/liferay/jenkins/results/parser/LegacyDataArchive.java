@@ -17,50 +17,62 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
-import java.util.List;
-
 /**
  * @author Michael Hashimoto
  */
 public class LegacyDataArchive {
 
 	public LegacyDataArchive(
-		LegacyDataArchiveUtil legacyDataArchiveUtil,
-		String legacyDataArchiveType, String databaseName,
-		String portalVersion) {
+		LegacyDataArchiveGroup legacyDataArchiveGroup, String databaseName) {
 
-		_legacyDataArchiveBranch = legacyDataArchiveUtil;
-		_legacyDataArchiveType = legacyDataArchiveType;
+		_legacyDataArchiveGroup = legacyDataArchiveGroup;
 		_databaseName = databaseName;
-		_portalVersion = portalVersion;
 
+		_legacyDataArchivePortalVersion =
+			_legacyDataArchiveGroup.getLegacyDataArchivePortalVersion();
+
+		_legacyDataArchiveUtil =
+			_legacyDataArchivePortalVersion.getLegacyDataArchiveUtil();
+
+		_legacyGitWorkingDirectory =
+			_legacyDataArchiveUtil.getLegacyGitWorkingDirectory();
+
+		String dataArchiveType = _legacyDataArchiveGroup.getDataArchiveType();
+		String portalVersion =
+			_legacyDataArchivePortalVersion.getPortalVersion();
 		File legacyDataWorkingDirectory =
-			legacyDataArchiveUtil.getLegacyDataWorkingDirectory();
+			_legacyGitWorkingDirectory.getWorkingDirectory();
 
-		_committedLegacyDataArchiveFile = new File(
+		_legacyDataArchiveFile = new File(
 			JenkinsResultsParserUtil.combine(
-				legacyDataWorkingDirectory.toString(), "/", _portalVersion,
-				"/data-archive/", _legacyDataArchiveType, "-", _databaseName,
-				".zip"));
-
-		File generatedLegacyDataArchiveDirectory =
-			legacyDataArchiveUtil.getGeneratedLegacyDataArchiveDirectory();
-
-		_generatedLegacyDataArchiveFile = new File(
-			JenkinsResultsParserUtil.combine(
-				generatedLegacyDataArchiveDirectory.toString(), "/",
-				_portalVersion, "/", _legacyDataArchiveType, "-", _databaseName,
-				".zip"));
+				legacyDataWorkingDirectory.toString(), "/", portalVersion,
+				"/data-archive/", dataArchiveType, "-", _databaseName, ".zip"));
 
 		_commit = _getCommit();
 	}
 
-	public String getLegacyDataArchiveType() {
-		return _legacyDataArchiveType;
+	public Commit getCommit() {
+		return _commit;
 	}
 
-	public String getPortalVersion() {
-		return _portalVersion;
+	public File getLegacyDataArchiveFile() {
+		return _legacyDataArchiveFile;
+	}
+
+	public boolean isMissing() {
+		if (_commit == null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isUnchanged() {
+		if (!isMissing() && !isUpdated()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isUpdated() {
@@ -68,50 +80,57 @@ public class LegacyDataArchive {
 			return false;
 		}
 
-		List<Commit> latestLegacyDataArchiveCommits =
-			_legacyDataArchiveBranch.getLatestLegacyDataArchiveCommits();
+		Commit latestTestCommit =
+			_legacyDataArchivePortalVersion.getLatestTestCommit();
 
-		for (Commit latestLegacyDataArchiveCommit :
-				latestLegacyDataArchiveCommits) {
+		String commitMessage = _commit.getMessage();
 
-			if (_commit.equals(latestLegacyDataArchiveCommit)) {
-				return true;
-			}
+		if (commitMessage.contains(latestTestCommit.getAbbreviatedSHA())) {
+			return true;
 		}
 
 		return false;
 	}
 
-	public void updateLegacyDataArchive() throws IOException {
-		if (_generatedLegacyDataArchiveFile.exists()) {
+	public void stageLegacyDataArchive() throws IOException {
+		String dataArchiveType = _legacyDataArchiveGroup.getDataArchiveType();
+		File generatedArchiveDirectory =
+			_legacyDataArchiveUtil.getGeneratedArchiveDirectory();
+		String portalVersion =
+			_legacyDataArchivePortalVersion.getPortalVersion();
+
+		File generatedArchiveFile = new File(
+			JenkinsResultsParserUtil.combine(
+				generatedArchiveDirectory.toString(), "/", portalVersion, "/",
+				dataArchiveType, "-", _databaseName, ".zip"));
+
+		if (generatedArchiveFile.exists()) {
 			JenkinsResultsParserUtil.copy(
-				_generatedLegacyDataArchiveFile,
-				_committedLegacyDataArchiveFile);
+				generatedArchiveFile, _legacyDataArchiveFile);
 
-			String committedLegacyDataArchiveFilePath =
-				_committedLegacyDataArchiveFile.getCanonicalPath();
-			File legacyDataWorkingDirectory =
-				_legacyDataArchiveBranch.getLegacyDataWorkingDirectory();
-
-			committedLegacyDataArchiveFilePath =
-				committedLegacyDataArchiveFilePath.replaceAll(
-					legacyDataWorkingDirectory + "/", "");
-
-			GitWorkingDirectory legacyDataGitWorkingDirectory =
-				_legacyDataArchiveBranch.getLegacyDataGitWorkingDirectory();
-
-			legacyDataGitWorkingDirectory.stageFileInCurrentBranch(
-				committedLegacyDataArchiveFilePath);
+			_legacyGitWorkingDirectory.stageFileInCurrentBranch(
+				_legacyDataArchiveFile.getCanonicalPath());
 		}
 	}
 
-	private Commit _getCommit() {
-		if (_committedLegacyDataArchiveFile.exists()) {
-			GitWorkingDirectory legacyDataGitWorkingDirectory =
-				_legacyDataArchiveBranch.getLegacyDataGitWorkingDirectory();
+	public void updateCommit() {
+		Commit commit = _getCommit();
 
-			String gitLog = legacyDataGitWorkingDirectory.log(
-				1, _committedLegacyDataArchiveFile);
+		if (commit == null) {
+			return;
+		}
+
+		if ((_commit != null) && _commit.equals(commit)) {
+			return;
+		}
+
+		_commit = commit;
+	}
+
+	private Commit _getCommit() {
+		if (_legacyDataArchiveFile.exists()) {
+			String gitLog = _legacyGitWorkingDirectory.log(
+				1, _legacyDataArchiveFile);
 
 			return CommitFactory.newCommit(gitLog);
 		}
@@ -120,11 +139,12 @@ public class LegacyDataArchive {
 	}
 
 	private Commit _commit;
-	private final File _committedLegacyDataArchiveFile;
 	private final String _databaseName;
-	private final File _generatedLegacyDataArchiveFile;
-	private final LegacyDataArchiveUtil _legacyDataArchiveBranch;
-	private final String _legacyDataArchiveType;
-	private final String _portalVersion;
+	private final File _legacyDataArchiveFile;
+	private final LegacyDataArchiveGroup _legacyDataArchiveGroup;
+	private final LegacyDataArchivePortalVersion
+		_legacyDataArchivePortalVersion;
+	private final LegacyDataArchiveUtil _legacyDataArchiveUtil;
+	private final GitWorkingDirectory _legacyGitWorkingDirectory;
 
 }
