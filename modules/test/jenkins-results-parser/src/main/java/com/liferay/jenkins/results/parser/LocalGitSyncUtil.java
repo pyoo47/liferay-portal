@@ -23,9 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -393,7 +395,10 @@ public class LocalGitSyncUtil {
 					gitWorkingDirectory.getRepositoryName(), ".git"));
 		}
 
-		return localGitRemoteURLs;
+		List<String> validURLs = validateURLs(
+			localGitRemoteURLs, gitWorkingDirectory);
+
+		return validURLs;
 	}
 
 	protected static GitWorkingDirectory.Remote getRandomRemote(
@@ -464,6 +469,19 @@ public class LocalGitSyncUtil {
 		}
 
 		return true;
+	}
+
+	protected static String localGitURLToName(
+		String localGitRemoteURL, String username, String reponame, int index) {
+
+		String transformedURL = localGitRemoteURL.replace(
+			"${username}", username);
+
+		transformedURL = transformedURL.replace("${repository-name}", reponame);
+
+		transformedURL = "local-git-remote-" + Integer.toString(index);
+
+		return transformedURL;
 	}
 
 	protected static Map<GitWorkingDirectory.Remote, Boolean> pushToAllRemotes(
@@ -896,6 +914,82 @@ public class LocalGitSyncUtil {
 		}
 
 		return localUpstreamBranch;
+	}
+
+	protected static List<String> validateURLs(
+		List<String> localGitRemoteURLs, GitWorkingDirectory gwd) {
+
+		List<String> validatedURLList = new ArrayList<>();
+
+		List<Callable<String>> callableURLS = new ArrayList<>();
+
+		for (String localGitRemoteURL : localGitRemoteURLs) {
+			final String lgru = localGitRemoteURL;
+			final String reponame = gwd.getRepositoryName();
+			final int urlIndex = localGitRemoteURLs.indexOf(localGitRemoteURL);
+			final String username = gwd.getRepositoryUsername();
+
+			Callable<String> callable = new Callable<String>() {
+
+				@Override
+				public String call() {
+					String lgrName = localGitURLToName(
+						lgru, username, reponame, urlIndex);
+
+					String command = JenkinsResultsParserUtil.combine(
+						"git ls-remote -h ", lgrName);
+
+					Process bashCommandProcess = null;
+
+					try {
+						bashCommandProcess =
+							JenkinsResultsParserUtil.executeBashCommands(
+								command);
+					}
+					catch (InterruptedException | IOException |
+						   TimeoutException e) {
+
+						throw new RuntimeException(
+							"Unable to execute bash command", e);
+					}
+
+					int exitCode = bashCommandProcess.exitValue();
+
+					String standardErr = "";
+
+					try {
+						standardErr = JenkinsResultsParserUtil.readInputStream(
+							bashCommandProcess.getErrorStream());
+					}
+					catch (IOException ioe) {
+						standardErr = "";
+					}
+
+					if ((exitCode != 0) &&
+						standardErr.contains("port 22: No route to host")) {
+
+						return null;
+					}
+					else {
+						return lgru;
+					}
+				}
+
+			};
+
+			callableURLS.add(callable);
+		}
+
+		ParallelExecutor<String> parallelExecutor = new ParallelExecutor<>(
+			callableURLS, null);
+
+		for (String lrgu : parallelExecutor.execute()) {
+			if (lrgu != null) {
+				validatedURLList.add(lrgu);
+			}
+		}
+
+		return validatedURLList;
 	}
 
 	private static final long _BRANCH_EXPIRE_AGE_MILLIS =
