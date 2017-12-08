@@ -246,8 +246,6 @@ public class UpstreamFailureUtil {
 			System.out.println(
 				"Unable to set upstream acceptance failure data.");
 
-			ioe.printStackTrace();
-
 			_upstreamFailuresJobJSONObject = new JSONObject(
 				"{\"SHA\":\"\",\"failedBatches\":[]}");
 		}
