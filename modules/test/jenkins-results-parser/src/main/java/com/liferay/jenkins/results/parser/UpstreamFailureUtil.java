@@ -211,8 +211,10 @@ public class UpstreamFailureUtil {
 				File upstreamJobFailuresJSONFile = new File(
 					jenkinsDir, "upstream-failures.json");
 
-				fileContent = JenkinsResultsParserUtil.read(
-					upstreamJobFailuresJSONFile);
+				if (upstreamJobFailuresJSONFile.exists()) {
+					fileContent = JenkinsResultsParserUtil.read(
+						upstreamJobFailuresJSONFile);
+				}
 
 				if (fileContent != null) {
 					_upstreamFailuresJobJSONObject = new JSONObject(
