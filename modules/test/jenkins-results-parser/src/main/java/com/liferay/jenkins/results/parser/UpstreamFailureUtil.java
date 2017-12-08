@@ -30,6 +30,10 @@ import org.json.JSONObject;
  */
 public class UpstreamFailureUtil {
 
+	public static boolean getCompareToUpstream() {
+		return _compareToUpstream;
+	}
+
 	public static List<String> getUpstreamJobFailures(
 		String type, TopLevelBuild topLevelBuild) {
 
@@ -186,6 +190,13 @@ public class UpstreamFailureUtil {
 	public static void loadUpstreamJobFailuresJSONObject(
 		TopLevelBuild topLevelBuild) {
 
+		if (!_compareToUpstream) {
+			_upstreamFailuresJobJSONObject = new JSONObject(
+				"{\"SHA\":\"\",\"failedBatches\":[]}");
+
+			return;
+		}
+
 		String fileContent = null;
 		String jobName = topLevelBuild.getJobName();
 
@@ -240,9 +251,14 @@ public class UpstreamFailureUtil {
 		}
 	}
 
+	public static void setCompareToUpstream(boolean compareToUpstream) {
+		_compareToUpstream = compareToUpstream;
+	}
+
 	private static final String _UPSTREAM_FAILURES_JOB_BASE_URL =
 		"https://test-1-0.liferay.com/userContent/testResults/";
 
+	private static boolean _compareToUpstream = true;
 	private static JSONObject _upstreamFailuresJobJSONObject;
 
 }
