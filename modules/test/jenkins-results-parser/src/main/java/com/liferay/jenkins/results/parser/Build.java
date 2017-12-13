@@ -142,8 +142,6 @@ public interface Build {
 
 	public String replaceBuildURL(String text);
 
-	public void setCompareToUpstream(boolean compareToUpstream);
-
 	public void takeSlaveOffline(SlaveOfflineRule slaveOfflineRule);
 
 	public void update();

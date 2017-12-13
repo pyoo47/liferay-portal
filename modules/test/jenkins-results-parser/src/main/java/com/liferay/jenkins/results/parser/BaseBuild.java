@@ -1086,10 +1086,6 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
-	public void setCompareToUpstream(boolean compareToUpstream) {
-	}
-
-	@Override
 	public void takeSlaveOffline(SlaveOfflineRule slaveOfflineRule) {
 		if ((slaveOfflineRule == null) || fromArchive) {
 			return;
@@ -1989,12 +1985,6 @@ public abstract class BaseBuild implements Build {
 		}
 
 		throw new IllegalArgumentException("Invalid status: " + status);
-	}
-
-	protected boolean isCompareToUpstream() {
-		TopLevelBuild topLevelBuild = getTopLevelBuild();
-
-		return topLevelBuild.isCompareToUpstream();
 	}
 
 	protected boolean isParentBuildRoot() {
