@@ -51,15 +51,15 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 		sb.append(properties.get("github.sender.branch.name"));
 		sb.append("</a></strong>.</p>");
 
-		int end = consoleText.indexOf(_TOKEN_REBASE_END);
-
-		end = consoleText.lastIndexOf("\n", end);
-
-		int start = consoleText.lastIndexOf(_TOKEN_REBASE_START, end);
+		int start = consoleText.lastIndexOf(_TOKEN_REBASE_START);
 
 		start = consoleText.lastIndexOf("\n", start);
 
-		sb.append(getConsoleTextSnippet(consoleText, true, start, end));
+		int end = consoleText.indexOf(_TOKEN_REBASE_END, start);
+
+		end = consoleText.lastIndexOf("\n", end);
+
+		sb.append(getConsoleTextSnippet(consoleText, false, start, end));
 
 		return sb.toString();
 	}
@@ -68,9 +68,7 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 	public Element getMessageElement(Build build) {
 		String consoleText = build.getConsoleText();
 
-		if (!consoleText.contains(_TOKEN_REBASE_END) ||
-			!consoleText.contains(_TOKEN_REBASE_START)) {
-
+		if (!consoleText.contains(_TOKEN_REBASE_START)) {
 			return null;
 		}
 
@@ -91,11 +89,12 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 				Dom4JUtil.getNewElement(
 					"strong", null,
 					getBaseBranchAnchorElement(build.getTopLevelBuild())),
-				getConsoleTextSnippetElement(consoleText, true, start, end)));
+				getConsoleTextSnippetElement(consoleText, false, start, end)));
 	}
 
-	private static final String _TOKEN_REBASE_END = "git rebase --abort";
+	private static final String _TOKEN_REBASE_END = "[PostBuildScript]";
 
-	private static final String _TOKEN_REBASE_START = "Unable to rebase";
+	private static final String _TOKEN_REBASE_START =
+		"Unable to fetch cache branch with following parameters";
 
 }
