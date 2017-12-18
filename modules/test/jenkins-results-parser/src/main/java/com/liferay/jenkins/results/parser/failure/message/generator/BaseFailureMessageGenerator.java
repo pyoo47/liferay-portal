@@ -179,6 +179,8 @@ public abstract class BaseFailureMessageGenerator
 
 		consoleText = consoleText.substring(start, end);
 
+		consoleText = consoleText.replaceAll("\\n+", "\\\n");
+
 		consoleText = consoleText.replaceFirst("^\\s*\\n", "");
 		consoleText = consoleText.replaceFirst("\\n\\s*$", "");
 
