@@ -369,6 +369,26 @@ public class TopLevelBuild extends BaseBuild {
 				repositoryTypes += "," + getBaseRepositoryName();
 			}
 
+			Map<String, String> startPropertiesTempMap =
+				getStartPropertiesTempMap();
+
+			String subrepositoryPullRequestURLs = startPropertiesTempMap.get(
+				"SUBREPOSITORY_PULL_REQUEST_URLS");
+
+			if (subrepositoryPullRequestURLs != null) {
+				for (String subrepositoryPullRequestURL :
+						subrepositoryPullRequestURLs.split(",")) {
+
+					Matcher matcher = pullRequestURLPattern.matcher(
+						subrepositoryPullRequestURL);
+
+					if (matcher.matches()) {
+						repositoryTypes +=
+							"," + matcher.group("repositoryType");
+					}
+				}
+			}
+
 			for (String repositoryType : repositoryTypes.split(",")) {
 				try {
 					JSONObject gitRepositoryDetailsJSONObject =
