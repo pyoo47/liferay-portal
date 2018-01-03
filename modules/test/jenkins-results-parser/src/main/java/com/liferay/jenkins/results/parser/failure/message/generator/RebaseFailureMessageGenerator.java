@@ -17,7 +17,13 @@ package com.liferay.jenkins.results.parser.failure.message.generator;
 import com.liferay.jenkins.results.parser.Build;
 import com.liferay.jenkins.results.parser.Dom4JUtil;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.dom4j.Element;
 
@@ -80,6 +86,20 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 
 		start = consoleText.lastIndexOf("\n", start);
 
+		Map<String, String> repositoryGitDetails = getRepositoryGitDetails(
+			consoleText.substring(start, end));
+
+		String gitHubPullRequestNumber = repositoryGitDetails.get(
+			"github.pull.request.number");
+
+		Element baseBranchAnchorElement = getBaseBranchAnchorElement(
+			build.getTopLevelBuild());
+
+		if (!gitHubPullRequestNumber.equals("0")) {
+			baseBranchAnchorElement = getBaseBranchAnchorElement(
+				repositoryGitDetails);
+		}
+
 		return Dom4JUtil.getNewElement(
 			"div", null,
 			Dom4JUtil.getNewElement(
@@ -87,9 +107,35 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 				Dom4JUtil.getNewElement("strong", null, "rebase errors"),
 				" on ",
 				Dom4JUtil.getNewElement(
-					"strong", null,
-					getBaseBranchAnchorElement(build.getTopLevelBuild())),
+					"strong", null, baseBranchAnchorElement),
 				getConsoleTextSnippetElement(consoleText, false, start, end)));
+	}
+
+	protected Map<String, String> getRepositoryGitDetails(String consoleText) {
+		try {
+			StringReader stringReader = new StringReader(consoleText);
+
+			BufferedReader bufferedReader = new BufferedReader(stringReader);
+
+			Map<String, String> repositoryGitDetails = new HashMap<>();
+
+			String line = null;
+
+			while ((line = bufferedReader.readLine()) != null) {
+				line = line.trim();
+
+				if (line.startsWith("github.")) {
+					String[] pair = line.split(": ");
+
+					repositoryGitDetails.put(pair[0], pair[1]);
+				}
+			}
+
+			return repositoryGitDetails;
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException("Unable to get repository git details");
+		}
 	}
 
 	private static final String _TOKEN_REBASE_END = "[PostBuildScript]";
