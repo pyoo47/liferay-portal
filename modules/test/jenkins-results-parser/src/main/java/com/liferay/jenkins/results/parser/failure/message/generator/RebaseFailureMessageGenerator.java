@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import org.dom4j.Element;
@@ -31,45 +30,6 @@ import org.dom4j.Element;
  * @author Peter Yoo
  */
 public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
-
-	@Override
-	public String getMessage(
-		String buildURL, String consoleText, Hashtable<?, ?> properties) {
-
-		if (!consoleText.contains(_TOKEN_REBASE_END) ||
-			!consoleText.contains(_TOKEN_REBASE_FLAG) ||
-			!consoleText.contains(_TOKEN_REBASE_START)) {
-
-			return null;
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("<p>Please fix <strong>rebase errors</strong> on <strong>");
-		sb.append("<a href=\"https://github.com/");
-		sb.append(properties.get("github.origin.name"));
-		sb.append("/");
-		sb.append(properties.get("repository"));
-		sb.append("/tree/");
-		sb.append(properties.get("github.sender.branch.name"));
-		sb.append("\">");
-		sb.append(properties.get("github.origin.name"));
-		sb.append("/");
-		sb.append(properties.get("github.sender.branch.name"));
-		sb.append("</a></strong>.</p>");
-
-		int start = consoleText.lastIndexOf(_TOKEN_REBASE_START);
-
-		start = consoleText.lastIndexOf("\n", start);
-
-		int end = consoleText.indexOf(_TOKEN_REBASE_END, start);
-
-		end = consoleText.lastIndexOf("\n", end);
-
-		sb.append(getConsoleTextSnippet(consoleText, false, start, end));
-
-		return sb.toString();
-	}
 
 	@Override
 	public Element getMessageElement(Build build) {
