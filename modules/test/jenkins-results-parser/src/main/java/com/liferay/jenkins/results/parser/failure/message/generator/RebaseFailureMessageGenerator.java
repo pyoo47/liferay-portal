@@ -37,6 +37,7 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 		String buildURL, String consoleText, Hashtable<?, ?> properties) {
 
 		if (!consoleText.contains(_TOKEN_REBASE_END) ||
+			!consoleText.contains(_TOKEN_REBASE_FLAG) ||
 			!consoleText.contains(_TOKEN_REBASE_START)) {
 
 			return null;
@@ -74,7 +75,7 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 	public Element getMessageElement(Build build) {
 		String consoleText = build.getConsoleText();
 
-		if (!consoleText.contains(_TOKEN_REBASE_START)) {
+		if (!consoleText.contains(_TOKEN_REBASE_FLAG)) {
 			return null;
 		}
 
@@ -139,6 +140,8 @@ public class RebaseFailureMessageGenerator extends BaseFailureMessageGenerator {
 	}
 
 	private static final String _TOKEN_REBASE_END = "[PostBuildScript]";
+
+	private static final String _TOKEN_REBASE_FLAG = "Unable to rebase";
 
 	private static final String _TOKEN_REBASE_START =
 		"Unable to fetch cache branch with following parameters";
