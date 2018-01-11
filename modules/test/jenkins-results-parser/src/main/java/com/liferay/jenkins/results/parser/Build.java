@@ -34,6 +34,8 @@ public interface Build {
 
 	public String getArchivePath();
 
+	public long getAverageWaitTime();
+
 	public List<String> getBadBuildURLs();
 
 	public String getBaseRepositoryName();
@@ -76,6 +78,8 @@ public interface Build {
 
 	public String getInvocationURL();
 
+	public Long getInvokedTime();
+
 	public String getJDK();
 
 	public JenkinsMaster getJenkinsMaster();
@@ -93,6 +97,8 @@ public interface Build {
 	public List<Build> getJobVariantsDownstreamBuilds(List<String> jobVariants);
 
 	public Long getLatestStartTimestamp();
+
+	public Build getLongestDelayedDownstreamBuild();
 
 	public Build getLongestRunningDownstreamBuild();
 
@@ -133,6 +139,8 @@ public interface Build {
 	public long getTotalDuration();
 
 	public int getTotalSlavesUsedCount();
+
+	public Long getWaitTime();
 
 	public boolean hasBuildURL(String buildURL);
 
