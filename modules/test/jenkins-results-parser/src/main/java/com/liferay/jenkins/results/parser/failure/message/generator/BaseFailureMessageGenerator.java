@@ -18,6 +18,7 @@ import com.liferay.jenkins.results.parser.Build;
 import com.liferay.jenkins.results.parser.Dom4JUtil;
 import com.liferay.jenkins.results.parser.TopLevelBuild;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -38,34 +39,40 @@ public abstract class BaseFailureMessageGenerator
 	@Override
 	public abstract Element getMessageElement(Build build);
 
-	protected Element getBaseBranchAnchorElement(TopLevelBuild topLevelBuild) {
+	protected Element getBaseBranchAnchorElement(
+		Map<String, String> repositoryGitDetailsMap) {
+
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("https://github.com/");
 
-		String baseRepositoryName = topLevelBuild.getBaseRepositoryName();
-
-		Map<String, String> baseRepositoryGitDetailsTempMap =
-			topLevelBuild.getBaseGitRepositoryDetailsTempMap();
-
-		sb.append(baseRepositoryGitDetailsTempMap.get("github.origin.name"));
+		sb.append(repositoryGitDetailsMap.get("github.origin.name"));
 
 		sb.append("/");
-		sb.append(baseRepositoryName);
+		sb.append(repositoryGitDetailsMap.get("github.base.repository.name"));
 		sb.append("/tree/");
-		sb.append(
-			baseRepositoryGitDetailsTempMap.get("github.sender.branch.name"));
+		sb.append(repositoryGitDetailsMap.get("github.sender.branch.name"));
 
 		String url = sb.toString();
 
 		sb = new StringBuilder();
 
-		sb.append(baseRepositoryGitDetailsTempMap.get("github.origin.name"));
+		sb.append(repositoryGitDetailsMap.get("github.origin.name"));
 		sb.append("/");
-		sb.append(
-			baseRepositoryGitDetailsTempMap.get("github.sender.branch.name"));
+		sb.append(repositoryGitDetailsMap.get("github.sender.branch.name"));
 
 		return Dom4JUtil.getNewAnchorElement(url, sb.toString());
+	}
+
+	protected Element getBaseBranchAnchorElement(TopLevelBuild topLevelBuild) {
+		Map<String, String> gitRepositoryDetailsMap = new HashMap<>(
+			topLevelBuild.getBaseGitRepositoryDetailsTempMap());
+
+		gitRepositoryDetailsMap.put(
+			"github.base.repository.name",
+			topLevelBuild.getBaseRepositoryName());
+
+		return getBaseBranchAnchorElement(gitRepositoryDetailsMap);
 	}
 
 	protected String getConsoleTextSnippet(
@@ -171,6 +178,8 @@ public abstract class BaseFailureMessageGenerator
 		}
 
 		consoleText = consoleText.substring(start, end);
+
+		consoleText = consoleText.replaceAll("\\n+", "\\\n");
 
 		consoleText = consoleText.replaceFirst("^\\s*\\n", "");
 		consoleText = consoleText.replaceFirst("\\n\\s*$", "");
