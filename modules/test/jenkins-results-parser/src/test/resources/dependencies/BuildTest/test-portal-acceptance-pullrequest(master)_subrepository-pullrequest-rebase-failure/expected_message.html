@@ -1,0 +1,115 @@
+
+<html>
+  <h1>Some tests FAILED.</h1>
+  <p>Build Time: 7 minutes 18 seconds 720 ms</p>
+  <h4>Base Branch:</h4>
+  <p>Branch Name:
+    <a href="https://github.com/liferay/liferay-portal/tree/master">master</a>
+    <br/>Branch GIT ID:
+    <a href="https://github.com/liferay/liferay-portal/commit/08342d40f64bd47f1f3879c376577eb708fd9d03">08342d40f64bd47f1f3879c376577eb708fd9d03</a>
+  </p>
+  <h4>Copied in Private Modules Branch:</h4>
+  <p>Branch Name:
+    <a href="https://github.com/liferay/liferay-portal-ee/tree/master-private">master-private</a>
+    <br/>Branch GIT ID:
+    <a href="https://github.com/liferay/liferay-portal-ee/commit/d639ac84277cd46cfac267e278efb155be2f84e3">d639ac84277cd46cfac267e278efb155be2f84e3</a>
+  </p>
+  <h4>Copied in Subrepository Pull Request Changes:</h4>
+  <p>Pull Request Repository:
+    <a href="https://github.com/liferay/com-liferay-journal">com-liferay-journal</a>
+    <br/>Pull Request Branch Name:
+    <a href="https://github.com/lesliewong92/com-liferay-journal/tree/master-qa-break-rebase">lesliewong92/master-qa-break-rebase</a>
+    <br/>Pull Request GIT ID:
+    <a href="https://github.com/lesliewong92/com-liferay-journal/pull/13/commits/6bed56ffc6ce138c352adee01a094e660b1f0863">6bed56ffc6ce138c352adee01a094e660b1f0863</a>
+    <br/>Upstream Branch Name:
+    <a href="https://github.com/liferay/com-liferay-journal/tree/master">master</a>
+    <br/>Upstream GIT ID:
+    <a href="https://github.com/liferay/com-liferay-journal/commit/ba450b9f6b50c280533718858b8196c5131ca7f4">ba450b9f6b50c280533718858b8196c5131ca7f4</a>
+  </p>0 out of 1 jobs PASSED
+  <div>
+    <h4>1 Failed Jobs:</h4>
+    <ul>
+      <li>
+        <a href="${dependencies.url}/BuildTest/test-portal-acceptance-pullrequest(master)_subrepository-pullrequest-rebase-failure/test-5-1/test-portal-acceptance-pullrequest(master)/681/">
+          <strike>
+            <strong>test-portal-acceptance-pullrequest(master)</strong>
+          </strike>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <h5>For more details click
+    <a href="${dependencies.url}/BuildTest/test-portal-acceptance-pullrequest(master)_subrepository-pullrequest-rebase-failure/test-5-1/test-portal-acceptance-pullrequest(master)/681//jenkins-report.html">here</a>.
+  </h5>
+  <hr/>
+  <h4>Failures unique to this pull:</h4>
+  <ol>
+    <li>
+      <div>
+        <h5>
+          <a href="${dependencies.url}/BuildTest/test-portal-acceptance-pullrequest(master)_subrepository-pullrequest-rebase-failure/test-5-1/test-portal-acceptance-pullrequest(master)/681/">test-portal-acceptance-pullrequest(master)</a>
+        </h5>
+        <div>
+          <h6>Job Results:</h6>
+          <p>0 Jobs Passed.
+            <br/>1 Job Failed.
+          </p>
+        </div>
+        <div>
+          <p>Please fix
+            <strong>rebase errors</strong> on
+            <strong>
+              <a href="https://github.com/lesliewong92/com-liferay-journal/tree/master-qa-break-rebase">lesliewong92/master-qa-break-rebase</a>
+            </strong>
+            <pre>
+              <code>Target exception: java.lang.Exception: Unable to fetch cache branch with following parameters:
+github.base.repository.name: com-liferay-journal
+github.origin.name: lesliewong92
+github.pull.request.number: 13
+github.receiver.username: lesliewong92
+github.sender.branch.name: master-qa-break-rebase
+github.sender.branch.sha: 6bed56ffc6ce138c352adee01a094e660b1f0863
+github.sender.username: lesliewong92
+github.upstream.branch.name: master
+github.upstream.branch.sha: ba450b9f6b50c280533718858b8196c5131ca7f4
+	at bsh.BSHThrowStatement.eval(Unknown Source)
+	at bsh.BSHBlock.evalBlock(Unknown Source)
+	at bsh.BSHBlock.eval(Unknown Source)
+	at bsh.BSHBlock.eval(Unknown Source)
+	at bsh.BSHTryStatement.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at com.liferay.ant.beanshell.BeanShellTask.execute(BeanShellTask.java:54)
+	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:292)
+	at sun.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:106)
+	at org.apache.tools.ant.Task.perform(Task.java:348)
+	at org.apache.tools.ant.taskdefs.Sequential.execute(Sequential.java:68)
+	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:292)
+	at sun.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:106)
+	at org.apache.tools.ant.Task.perform(Task.java:348)
+	at org.apache.tools.ant.taskdefs.MacroInstance.execute(MacroInstance.java:396)
+	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:292)
+	at sun.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:106)
+	at org.apache.tools.ant.Task.perform(Task.java:348)
+	at org.apache.tools.ant.taskdefs.Sequential.execute(Sequential.java:68)
+	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:292)</code>
+            </pre>
+          </p>
+        </div>
+      </div>
+    </li>
+  </ol>
+  <h4>For upstream results, click
+    <a href="https://test-1-1.liferay.com/job/test-portal-acceptance-upstream(master)">here</a>.
+  </h4>
+</html>

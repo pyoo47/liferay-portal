@@ -69,6 +69,10 @@ public class BuildTest extends BaseJenkinsResultsParserTestCase {
 		downloadSample(
 			"test-portal-acceptance-pullrequest(master)_source-format-failure",
 			"2209", "test-portal-acceptance-pullrequest(master)", "test-1-2");
+		downloadSample(
+			"test-portal-acceptance-pullrequest(master)_subrepository-" +
+				"pullrequest-rebase-failure",
+			"681", "test-portal-acceptance-pullrequest(master)", "test-5-1");
 	}
 
 	@After
