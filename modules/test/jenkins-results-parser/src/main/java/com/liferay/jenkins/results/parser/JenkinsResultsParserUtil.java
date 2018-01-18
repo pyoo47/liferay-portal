@@ -472,6 +472,7 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String fixURL(String url) {
+		url = url.replace("#", "%23");
 		url = url.replace("(", "%28");
 		url = url.replace(")", "%29");
 		url = url.replace("[", "%5B");
