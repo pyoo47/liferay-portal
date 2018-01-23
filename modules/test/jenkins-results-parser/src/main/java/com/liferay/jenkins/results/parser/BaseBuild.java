@@ -963,7 +963,7 @@ public abstract class BaseBuild implements Build {
 			JSONArray casesJSONArray = suiteJSONObject.getJSONArray("cases");
 
 			for (int j = 0; j < casesJSONArray.length(); j++) {
-				TestResult testResult = new BaseTestResult(
+				TestResult testResult = TestResultFactory.newTestResult(
 					build, casesJSONArray.getJSONObject(j));
 
 				if ((testStatus == null) ||
