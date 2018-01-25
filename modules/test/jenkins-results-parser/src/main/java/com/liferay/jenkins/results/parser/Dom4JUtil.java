@@ -242,6 +242,8 @@ public class Dom4JUtil {
 	}
 
 	public static Element toCodeSnippetElement(String content) {
+		content = content.replace("\n\n", "\n");
+
 		return getNewElement(
 			"pre", null,
 			getNewElement(
