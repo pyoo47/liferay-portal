@@ -270,6 +270,128 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public String getBuildDescription(
+		LinkedHashMap<String, String> buildDescriptionProperties) {
+
+		return null;
+	}
+
+	@Override
+	public String getBuildDescriptionPropertyElementString(
+		String buildDescriptionPropertyKey,
+		String buildDescriptionPropertyValue) {
+
+		StringBuilder sb = new StringBuilder();
+
+		if (buildDescriptionPropertyKey.equals("app.name")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.DATA_ARCHIVE_BRANCH_NAME")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.GITHUB_PULL_REQUEST_NUMBER")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.GITHUB_RECEIVER_USERNAME")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("env.JOB_VARIANT")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("env.MIRRORS_URL")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("env.PORTAL_GIT_COMMIT")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("env.PROJECT_NAMES")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("env.REPOSITORY_NAME")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_BUILD_EXTRAAPPS_ZIP_URL")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_BUILD_FIX_PACK_ZIP_URL")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_BUILD_TICKET_URLS")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_PACKAGE_FILE_NAME")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_PLUGINS_GIT_ID")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_PORTAL_APP_VERSION")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_PORTAL_BRANCH_NAME")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_PORTAL_BUNDLE_VERSION")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_PORTAL_FIX_PACK_VERSION")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_PORTAL_RELEASE_VERSION")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_QA_WEBSITES_BRANCH_NAME")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_QA_WEBSITES_BRANCH_USERNAME")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"env.TEST_QA_WEBSITES_GIT_ID")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"gradle.plugins.test.reports")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("legacy.dump.url")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("plugin.name")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("plugins.repository")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("portal.bundle.version")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("portal.git.commit")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("portal.repository")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("portal.version")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("test.plugins.git.id")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"test.plugins.release.tag")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"test.portal.bundle.version")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"test.portal.fix.pack.version")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"test.qa.websites.branch.name")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"test.qa.websites.branch.username")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"test.qa.websites.git.id")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("testray.poshi.report")) {
+		}
+		else if (buildDescriptionPropertyKey.equals("testray.run.shared.url")) {
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"top.level.user.content.url")) {
+		}
+
+		return sb.toString();
+	}
+
+	@Override
 	public JSONObject getBuildJSONObject() {
 		try {
 			return JenkinsResultsParserUtil.toJSONObject(
