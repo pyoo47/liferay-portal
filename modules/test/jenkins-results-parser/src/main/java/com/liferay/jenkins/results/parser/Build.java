@@ -14,6 +14,7 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,13 @@ public interface Build {
 	public String getBranchName();
 
 	public String getBrowser();
+
+	public String getBuildDescription(
+		LinkedHashMap<String, String> buildDescriptionProperties);
+
+	public String getBuildDescriptionPropertyElementString(
+		String buildDescriptionPropertyKey,
+		String buildDescriptionPropertyValue);
 
 	public JSONObject getBuildJSONObject();
 
