@@ -17,16 +17,16 @@ package com.liferay.jenkins.results.parser.vm.provisioner.amazon.rds;
 /**
  * @author Kiyoshi Lee
  */
-public class PostgresqlAuroraAwsVmProvisioner
-	extends BaseAuroraAwsVmProvisioner {
+public class AuroraPostgreSQLAmazonVMProvisioner
+	extends RDSAmazonVMProvisioner {
 
-	public PostgresqlAuroraAwsVmProvisioner(
+	public AuroraPostgreSQLAmazonVMProvisioner(
 		String awsAccessKeyId, String awsSecretAccessKey, String dbInstanceId) {
 
 		super(awsAccessKeyId, awsSecretAccessKey, dbInstanceId);
 	}
 
-	public PostgresqlAuroraAwsVmProvisioner(
+	public AuroraPostgreSQLAmazonVMProvisioner(
 		String awsAccessKeyId, String awsSecretAccessKey, String dbClusterId,
 		String dbInstanceClass, String dbInstanceId) {
 
@@ -36,7 +36,7 @@ public class PostgresqlAuroraAwsVmProvisioner
 			"password", "root");
 	}
 
-	public PostgresqlAuroraAwsVmProvisioner(
+	public AuroraPostgreSQLAmazonVMProvisioner(
 		String awsAccessKeyId, String awsSecretAccessKey, String dbClusterId,
 		String dbEngineVersion, String dbInstanceClass, String dbInstanceId,
 		String dbPassword, String dbUsername) {

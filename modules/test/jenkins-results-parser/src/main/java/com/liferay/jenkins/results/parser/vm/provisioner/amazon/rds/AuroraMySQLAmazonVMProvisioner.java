@@ -17,15 +17,15 @@ package com.liferay.jenkins.results.parser.vm.provisioner.amazon.rds;
 /**
  * @author Kiyoshi Lee
  */
-public class MysqlAuroraAwsVmProvisioner extends BaseAuroraAwsVmProvisioner {
+public class AuroraMySQLAmazonVMProvisioner extends RDSAmazonVMProvisioner {
 
-	public MysqlAuroraAwsVmProvisioner(
+	public AuroraMySQLAmazonVMProvisioner(
 		String awsAccessKeyId, String awsSecretAccessKey, String dbInstanceId) {
 
 		super(awsAccessKeyId, awsSecretAccessKey, dbInstanceId);
 	}
 
-	public MysqlAuroraAwsVmProvisioner(
+	public AuroraMySQLAmazonVMProvisioner(
 		String awsAccessKeyId, String awsSecretAccessKey, String dbClusterId,
 		String dbInstanceClass, String dbInstanceId) {
 
@@ -34,7 +34,7 @@ public class MysqlAuroraAwsVmProvisioner extends BaseAuroraAwsVmProvisioner {
 			"5.6.10a", dbInstanceClass, dbInstanceId, "password", "root");
 	}
 
-	public MysqlAuroraAwsVmProvisioner(
+	public AuroraMySQLAmazonVMProvisioner(
 		String awsAccessKeyId, String awsSecretAccessKey, String dbClusterId,
 		String dbEngineVersion, String dbInstanceClass, String dbInstanceId,
 		String dbPassword, String dbUsername) {
