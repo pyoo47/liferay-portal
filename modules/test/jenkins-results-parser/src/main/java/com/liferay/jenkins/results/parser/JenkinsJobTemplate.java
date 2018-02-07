@@ -14,24 +14,38 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.File;
+import java.io.IOException;
+
+import java.lang.Exception;
+
+import java.nio.file.Files;
+
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.ProjectHelper;
 
 /**
  * @author Cesar Polanco
  */
-public class Templating {
+public class JenkinsJobTemplate {
 
-	public static Map getEnvironmentSlavesMap() {
+	public static Map getEnvironmentSlavesMap(Map properties) {
 		Map environmentSlavesMap = new TreeMap();
-
-		Map properties = project.getProperties();
 
 		Set propertiesSet = properties.entrySet();
 
@@ -40,7 +54,7 @@ public class Templating {
 		while (propertiesIterator.hasNext()) {
 			Map.Entry entry = (Map.Entry)propertiesIterator.next();
 
-			String key = entry.getKey();
+			String key = (String)entry.getKey();
 
 			if (!key.startsWith("environment.slaves(")) {
 				continue;
@@ -49,7 +63,7 @@ public class Templating {
 			String propertyName = key.substring(
 				key.indexOf("slaves(") + 7, key.indexOf(")"));
 
-			String value = entry.getValue();
+			String value = (String)entry.getValue();
 
 			if (value.contains("..")) {
 				value = JenkinsResultsParserUtil.expandSlaveRange(value);
@@ -91,11 +105,16 @@ public class Templating {
 		return osxEnvironmentVariablesMap;
 	}
 
-	public static String getSlaveConfigXMLContent(String slaveHostname) {
+	public static String getSlaveConfigXMLContent(String slaveHostname, Map properties) {
 		String slaveLabel = slaveHostname;
 
+		Map environmentSlavesMap = getEnvironmentSlavesMap(properties);
+		Map linuxEnvironmentVariablesMap = getLinuxEnvironmentVariablesMap();
+		Map osxEnvironmentVariablesMap = getOSXEnvironmentVariablesMap();
+		Map windowsEnvironmentVariablesMap = getWindowsEnvironmentVariablesMap();
+
 		if (environmentSlavesMap.containsKey(slaveHostname)) {
-			slaveLabel = environmentSlavesMap.get(slaveHostname);
+			slaveLabel = (String)environmentSlavesMap.get(slaveHostname);
 		}
 
 		String slaveConfigXMLContent = JenkinsResultsParserUtil.combine(
@@ -145,16 +164,17 @@ public class Templating {
 
 		String environmentVariablesString = JenkinsResultsParserUtil.combine(
 			"\t\t\t\t\t<int>",
-			String.valueOf(environmentVariablesMap.size(),
-			"</int>\n"));
+			Integer.toString(environmentVariablesMap.size()),
+			"</int>\n");
 
-		Set environmentVariables = environmentVariablesMap.keySet();
+		Set<String> environmentVariables = environmentVariablesMap.keySet();
 
 		for (String environmentVariable : environmentVariables) {
 			environmentVariablesString = JenkinsResultsParserUtil.combine(
 				environmentVariablesString,	"\t\t\t\t\t<string>",
 				environmentVariable, "</string>\n\t\t\t\t\t<string>",
-				environmentVariablesMap.get(environmentVariable), "</string>\n");
+				(String)environmentVariablesMap.get(environmentVariable),
+				"</string>\n");
 		}
 
 		return environmentVariablesString;
@@ -185,13 +205,30 @@ public class Templating {
 		return windowsEnvironmentVariablesMap;
 	}
 
-	public static void template() {
-		Map environmentSlavesMap = getEnvironmentSlavesMap();
+	public static String readFileToString(File fileToRead) {
+		String result = "";
+
+		try{
+			List<String> lines = Files.readAllLines(fileToRead.toPath());
+
+			for (String line : lines) {
+				result = JenkinsResultsParserUtil.combine(result, line, "\n");
+			}
+
+			result = result.substring(0, result.length() - 1);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		return result;
+	}
+
+	public static void createTemplate(Project project) throws Exception {
+		Map environmentSlavesMap = getEnvironmentSlavesMap(project.getProperties());
 		Set globalProperties = new TreeSet();
 		Map jobNamesToJobProperties = new TreeMap();
 		Map jobNamesToMasterJobProperties = new TreeMap();
 		Map linuxEnvironmentVariablesMap = getLinuxEnvironmentVariablesMap();
-		Set masterHostnames = new TreeSet();
+		Set<String> masterHostnames = new TreeSet();
 		Map masterHostnamesToJobNames = new TreeMap();
 		Map masterHostnamesToMasterProperties = new TreeMap();
 		Map osxEnvironmentVariablesMap = getOSXEnvironmentVariablesMap();
@@ -207,8 +244,8 @@ public class Templating {
 		while (propertiesIterator.hasNext()) {
 			Map.Entry entry = (Map.Entry)propertiesIterator.next();
 
-			String key = entry.getKey();
-			String value = entry.getValue();
+			String key = (String)entry.getKey();
+			String value = (String)entry.getValue();
 
 			if (key.startsWith("global.property(")) {
 				String propertyName = key.substring(
@@ -227,8 +264,8 @@ public class Templating {
 				masterHostnamesToJobNames.put(masterHostname, value);
 
 				Map childJobNamesMap = new HashMap();
-				List parentJobNames = new ArrayList();
-				Set topLevelJobNames = new TreeSet();
+				List<String> parentJobNames = new ArrayList();
+				Set<String> topLevelJobNames = new TreeSet();
 
 				String currentParentJobName1 = null;
 				String currentParentJobName2 = null;
@@ -261,16 +298,16 @@ public class Templating {
 
 					String jobShortName = jobName;
 
-					int x = jobShortName.indexOf("(");
+					int j = jobShortName.indexOf("(");
 
-					if (x != -1) {
-						jobShortName = jobShortName.substring(0, x);
+					if (j != -1) {
+						jobShortName = jobShortName.substring(0, j);
 					}
 
 					project.setProperty(
 						"job.short.name(" + jobName + ")", jobShortName);
 
-					String jobContent = FileUtils.readFileToString(
+					String jobContent = readFileToString(
 						new File("template/jobs/" + jobShortName + "/config.xml"));
 
 					String blockableBuildTriggerConfig =
@@ -299,8 +336,8 @@ public class Templating {
 
 						String patternToFind =
 							"hudson\\.plugins\\.parameterizedtrigger\\" +
-							".(TriggerBuilder|BuildTrigger)(.*?)/hudson\\.plugins\\" + "
-							.parameterizedtrigger\\.(TriggerBuilder|BuildTrigger)";
+							".(TriggerBuilder|BuildTrigger)(.*?)/hudson\\.plugins\\" +
+							".parameterizedtrigger\\.(TriggerBuilder|BuildTrigger)";
 
 						triggerBuilderChildJobNames.add(jobName);
 
@@ -313,11 +350,11 @@ public class Templating {
 						while (triggerBuilderMatcher.find()) {
 							String triggerBuilder = triggerBuilderMatcher.group(2);
 
-							int x = triggerBuilder.indexOf("<projects>");
-							int y = triggerBuilder.indexOf("</projects>", x + 1);
+							int z = triggerBuilder.indexOf("<projects>");
+							int y = triggerBuilder.indexOf("</projects>", z + 1);
 
 							String triggerBuilderChildJobName = triggerBuilder.substring(
-								x + 10, y);
+								z + 10, y);
 
 							if (!triggerBuilderChildJobName.equals("@!child.job.names!@")) {
 								triggerBuilderChildJobName =
@@ -406,7 +443,7 @@ public class Templating {
 					if (currentParentJobName != null) {
 						Set childJobNames = new TreeSet();
 
-						String childJobNamesString = childJobNamesMap.get(
+						String childJobNamesString = (String)childJobNamesMap.get(
 							currentParentJobName);
 
 						for (String childJobName : childJobNamesString.split(",")) {
@@ -414,7 +451,7 @@ public class Templating {
 						}
 
 						if (jobName.contains("[component.name]")) {
-							String componentNames = properties.get(
+							String componentNames = (String)properties.get(
 							"job.component.names(" + jobName + ")");
 
 							if (componentNames == null) {
@@ -437,25 +474,25 @@ public class Templating {
 				}
 
 				for (String parentJobName : parentJobNames) {
-					String childJobNames = childJobNamesMap.get(parentJobName);
+					String childJobNames = (String)childJobNamesMap.get(parentJobName);
 
 					if (!childJobNames.contains(",")) {
 						System.out.println(
 							"ERROR: Parent job is missing children jobs: " +
 							parentJobName + "\n");
 
-						throw Exception();
+						throw new Exception();
 					}
 
 					project.setProperty(
 						"child.job.names(" + parentJobName + ")",
-						childJobNamesMap.get(parentJobName));
+						(String)childJobNamesMap.get(parentJobName));
 				}
 
 				StringBuilder sb = new StringBuilder();
 
 				for (String topLevelJobName : topLevelJobNames) {
-					String excludeTopLevelView = properties.get(
+					String excludeTopLevelView = (String)properties.get(
 						"job.property(" + topLevelJobName + "/exclude.top.level.view)");
 
 					if ((excludeTopLevelView == null) ||
@@ -584,7 +621,7 @@ public class Templating {
 								shortChildJobName = shortChildJobName.substring(0, x);
 							}
 
-							int x = shortChildJobName.indexOf("(");
+							x = shortChildJobName.indexOf("(");
 
 							if (x != -1) {
 								shortChildJobName = shortChildJobName.substring(0, x);
@@ -604,7 +641,7 @@ public class Templating {
 								"\\[[a-z\\-]+\\]", "[component.name]");
 						}
 
-						String componentNamesIgnore = properties.get(
+						String componentNamesIgnore = (String)properties.get(
 							"job.component.names.ignore(" + jobName + ")");
 
 						if (componentNamesIgnore != null) {
@@ -631,7 +668,7 @@ public class Templating {
 						sb.append(" = build(\"");
 						sb.append(childJobName);
 
-						String customJobParameters = properties.get(
+						String customJobParameters = (String)properties.get(
 							"job.property(" + jobName + "/custom.job.parameters)");
 
 						if (customJobParameters != null) {
@@ -694,7 +731,7 @@ public class Templating {
 				String masterHostname = key.substring(key.indexOf("(") + 1, x);
 				String propertyName = key.substring(y + 1, key.lastIndexOf(")"));
 
-				Map masterJobProperties = jobNamesToMasterJobProperties.get(jobName);
+				Map masterJobProperties = (Map)jobNamesToMasterJobProperties.get(jobName);
 
 				if (masterJobProperties == null) {
 					masterJobProperties = new TreeMap();
@@ -714,7 +751,7 @@ public class Templating {
 				String propertyName = key.substring(
 					key.indexOf("/") + 1, key.lastIndexOf(")"));
 
-				Map masterProperties = masterHostnamesToMasterProperties.get(
+				Map masterProperties = (Map)masterHostnamesToMasterProperties.get(
 					masterHostname);
 
 				if (masterProperties == null) {
@@ -748,7 +785,7 @@ public class Templating {
 						String environmentSlaveOSType = "";
 
 						if (environmentSlavesMap.containsKey(slaveHostname)) {
-							String environmentSlaveKey = environmentSlavesMap.get(
+							String environmentSlaveKey = (String)environmentSlavesMap.get(
 								slaveHostname);
 
 							environmentSlaveOSType = environmentSlaveKey.substring(
@@ -791,7 +828,7 @@ public class Templating {
 					}
 
 					String slaveConfigXMLContent = getSlaveConfigXMLContent(
-						slaveHostname);
+						slaveHostname, properties);
 
 					project.setProperty(
 						slaveHostname + ".config.xml.content", slaveConfigXMLContent);
@@ -831,7 +868,7 @@ public class Templating {
 				String propertyName = key.substring(
 					key.indexOf("/") + 1, key.lastIndexOf(")"));
 
-				Map jobProperties = jobNamesToJobProperties.get(jobName);
+				Map jobProperties = (Map)jobNamesToJobProperties.get(jobName);
 
 				if (jobProperties == null) {
 					jobProperties = new TreeMap();
