@@ -121,7 +121,7 @@ public class JenkinsJobTemplate {
 			"<slave>\n\t<name>", slaveHostname, "</name>\n\t<description>",
 			"</description>\n\t<remoteFS>/opt/java/jenkins</remoteFS>\n",
 			"\t<numExecutors>1</numExecutors>\n\t<mode>NORMAL</mode>\n",
-			"\t<retentionStrategy",
+			"\t<retentionStrategy ",
 			"class=\"hudson.slaves.RetentionStrategy$Always\"",
 			" />\n\t<launcher class=\"hudson.slaves.JNLPLauncher\" />\n",
 			"\t<label>", slaveLabel, "</label>\n\t<nodeProperties>\n",
@@ -194,7 +194,7 @@ public class JenkinsJobTemplate {
 			"/c/Program Files/Microsoft SQL Server/130/Tools/Binn:",
 			"/c/Program Files/Microsoft SQL Server/Client ",
 			"SDK/ODBC/110/Tools/Binn:",
-			"/c/Program Files/Microsoft SQL Server/Client",
+			"/c/Program Files/Microsoft SQL Server/Client ",
 			"SDK/ODBC/130/Tools/Binn:/c/Windows:/c/Windows/system32");
 
 		windowsEnvironmentVariablesMap.put("HOME", "/c/Users/Administrator");
