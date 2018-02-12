@@ -273,7 +273,24 @@ public abstract class BaseBuild implements Build {
 	public String getBuildDescription(
 		LinkedHashMap<String, String> buildDescriptionProperties) {
 
-		return null;
+		StringBuilder sb = new StringBuilder();
+
+		List<String> keys = new ArrayList<>(
+			buildDescriptionProperties.keySet());
+
+		for (int i = 0; i < keys.size(); i++) {
+			String key = keys.get(i);
+
+			sb.append(
+				getBuildDescriptionPropertyElementString(
+					key, buildDescriptionProperties.get(key)));
+
+			if (i < (keys.size() - 1)) {
+				sb.append(" - ");
+			}
+		}
+
+		return sb.toString();
 	}
 
 	@Override
