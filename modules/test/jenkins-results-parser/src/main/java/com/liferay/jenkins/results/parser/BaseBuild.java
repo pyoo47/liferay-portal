@@ -298,111 +298,290 @@ public abstract class BaseBuild implements Build {
 		String buildDescriptionPropertyKey,
 		String buildDescriptionPropertyValue) {
 
+		String jobName = getJobName();
+
 		StringBuilder sb = new StringBuilder();
 
 		if (buildDescriptionPropertyKey.equals("app.name")) {
+			sb.append("<strong>App Name</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
+		}
+		else if (buildDescriptionPropertyKey.equals(
+					"code.coverage.report.link")) {
+
+			sb.append("<a href=\"");
+			sb.append(buildDescriptionPropertyValue);
+			sb.append("\">Code Coverage Report</a>");
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.DATA_ARCHIVE_BRANCH_NAME")) {
+
+			String dataArchiveBranchName = buildDescriptionPropertyValue;
+
+			sb.append(
+				"<strong><a href=\"https://github.com/liferay" +
+					"/liferay-qa-portal-legacy-ee/commits/");
+			sb.append(dataArchiveBranchName);
+			sb.append("\">");
+			sb.append(dataArchiveBranchName);
+			sb.append("</a></strong>");
 		}
 		else if (buildDescriptionPropertyKey.equals(
-					"env.GITHUB_PULL_REQUEST_NUMBER")) {
+					"env.GITHUB_PULL_REQUEST_LINK")) {
+
+			String githubPullRequestNumber =
+				buildDescriptionPropertyValue.substring(
+					buildDescriptionPropertyValue.lastIndexOf("/"));
+
+			sb.append("<a href=\"");
+			sb.append(buildDescriptionPropertyValue);
+			sb.append("\">PR#");
+			sb.append(githubPullRequestNumber);
+			sb.append("</a>");
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.GITHUB_RECEIVER_USERNAME")) {
+
+			sb.append("<strong>");
+			sb.append(buildDescriptionPropertyValue);
+			sb.append("</strong>");
 		}
 		else if (buildDescriptionPropertyKey.equals("env.JOB_VARIANT")) {
+			sb.append("<strong>Project</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals("env.MIRRORS_URL")) {
+			String mirrorsURL = buildDescriptionPropertyValue;
+
+			String mirrorsFileName = mirrorsURL.substring(
+				mirrorsURL.lastIndexOf("/") + 1);
+
+			sb.append("<a href=\"");
+			sb.append(mirrorsURL);
+			sb.append("\">");
+			sb.append(mirrorsFileName);
+			sb.append("</a>");
 		}
 		else if (buildDescriptionPropertyKey.equals("env.PORTAL_GIT_COMMIT")) {
+			sb.append("<strong>GIT ID</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals("env.PROJECT_NAMES")) {
-		}
-		else if (buildDescriptionPropertyKey.equals("env.REPOSITORY_NAME")) {
+			sb.append("<strong>Projects</strong> - ");
+
+			for (String projectName :
+					buildDescriptionPropertyValue.split(",")) {
+
+				projectName = projectName.replace("-", " ");
+
+				projectName = StringUtils.capitalize(projectName);
+
+				sb.append(projectName);
+
+				sb.append(" - ");
+			}
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_BUILD_EXTRAAPPS_ZIP_URL")) {
+
+			sb.append("<a href=\"");
+			sb.append(buildDescriptionPropertyValue);
+			sb.append("\">extraapps.zip</a>");
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_BUILD_FIX_PACK_ZIP_URL")) {
+
+			if (!jobName.contains("portal-patch-batch")) {
+				sb.append("<li>");
+			}
+
+			String fixPackZipURL = buildDescriptionPropertyValue;
+
+			int x = fixPackZipURL.lastIndexOf("/") + 1;
+			int y = fixPackZipURL.lastIndexOf(".");
+
+			String fixPackZipName = fixPackZipURL.substring(x, y);
+
+			sb.append("<a href=\"");
+			sb.append(fixPackZipURL);
+			sb.append("\">");
+			sb.append(fixPackZipName);
+			sb.append("</a>");
+
+			if (!jobName.contains("portal-patch-batch")) {
+				sb.append("</li>");
+			}
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_BUILD_TICKET_URLS")) {
+
+			String testBuildTicketURLs = buildDescriptionPropertyValue;
+
+			sb.append("<ul>");
+
+			for (String testBuildTicketURL : testBuildTicketURLs.split(",")) {
+				if (!testBuildTicketURL.isEmpty()) {
+					int x = testBuildTicketURL.lastIndexOf('/') + 1;
+
+					String testBuildTicketName = testBuildTicketURL.substring(
+						x);
+
+					sb.append("<li><a href=\"");
+					sb.append(testBuildTicketURL);
+					sb.append("\">");
+					sb.append(testBuildTicketName);
+					sb.append("</a></li>");
+				}
+			}
+
+			sb.append("</ul>");
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_PACKAGE_FILE_NAME")) {
+
+			sb.append("<strong>App Name</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_PLUGINS_GIT_ID")) {
+
+			sb.append("<strong>Plugins GIT ID</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_PORTAL_APP_VERSION")) {
+
+			sb.append("<strong>App Version</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_PORTAL_BRANCH_NAME")) {
+
+			if (jobName.contains("portal-release")) {
+				sb.append("<strong>Portal Release(");
+				sb.append(buildDescriptionPropertyValue);
+				sb.append(")</strong> -");
+			}
+			else if (jobName.contains("portal-training")) {
+				sb.append("<strong>Portal Training(");
+				sb.append(buildDescriptionPropertyValue);
+				sb.append(")</strong> -");
+			}
+			else {
+				sb.append("<strong>Portal Branch</strong> - ");
+				sb.append(buildDescriptionPropertyValue);
+			}
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_PORTAL_BUNDLE_VERSION")) {
-		}
-		else if (buildDescriptionPropertyKey.equals(
-					"env.TEST_PORTAL_FIX_PACK_VERSION")) {
+
+			sb.append("<strong>Portal Bundle Version</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_PORTAL_RELEASE_VERSION")) {
+
+			sb.append("<strong>Portal Bundle Version</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_QA_WEBSITES_BRANCH_NAME")) {
+
+			sb.append("<strong>Branch Name</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_QA_WEBSITES_BRANCH_USERNAME")) {
+
+			sb.append("<strong>Branch Username</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"env.TEST_QA_WEBSITES_GIT_ID")) {
+
+			sb.append("<strong>GIT ID</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"gradle.plugins.test.reports")) {
+
+			sb.append(buildDescriptionPropertyValue);
+		}
+		else if (buildDescriptionPropertyKey.equals("jenkins.report.link")) {
+			sb.append("<a href=\"");
+			sb.append(buildDescriptionPropertyValue);
+			sb.append("\">Jenkins Report</a>");
 		}
 		else if (buildDescriptionPropertyKey.equals("legacy.dump.url")) {
+			sb.append("<strong><a href=\"");
+			sb.append(buildDescriptionPropertyValue);
+			sb.append("\">Legacy Database Dumps</a></strong>");
 		}
 		else if (buildDescriptionPropertyKey.equals("plugin.name")) {
+			sb.append("<strong>Plugin</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals("plugins.repository")) {
 		}
 		else if (buildDescriptionPropertyKey.equals("portal.bundle.version")) {
+			sb.append("<strong>");
+			sb.append(buildDescriptionPropertyValue);
+			sb.append("</strong> - ");
 		}
 		else if (buildDescriptionPropertyKey.equals("portal.git.commit")) {
+			sb.append("<strong>GIT ID</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals("portal.repository")) {
 		}
 		else if (buildDescriptionPropertyKey.equals("portal.version")) {
+			sb.append("<strong>Portal Version</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals("test.plugins.git.id")) {
+			sb.append(" - <strong>Plugins GIT ID</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"test.plugins.release.tag")) {
+
+			sb.append("<strong>Plugins GIT REF</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"test.portal.bundle.version")) {
+
+			sb.append("<strong>Portal Bundle Version</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"test.portal.fix.pack.version")) {
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"test.qa.websites.branch.name")) {
+
+			sb.append("<strong>Branch Name</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"test.qa.websites.branch.username")) {
+
+			sb.append("<strong>Branch Username</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals(
 					"test.qa.websites.git.id")) {
+
+			sb.append("<strong>GIT ID</strong> - ");
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals("testray.poshi.report")) {
+			sb.append(buildDescriptionPropertyValue);
 		}
 		else if (buildDescriptionPropertyKey.equals("testray.run.shared.url")) {
-		}
-		else if (buildDescriptionPropertyKey.equals(
-					"top.level.user.content.url")) {
+			sb.append("<a href=\"");
+			sb.append(buildDescriptionPropertyValue);
+			sb.append("\">Poshi Reports</a>");
 		}
 
 		return sb.toString();
