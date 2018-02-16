@@ -50,6 +50,21 @@ public class LoadBalancerUtilTest extends BaseJenkinsResultsParserTestCase {
 	public void testGetMostAvailableMasterURL() throws Exception {
 		JenkinsMaster.maxRecentBatchAge = 0;
 
+		setJenkinsResultsParserExpectedMessageGenerator(
+			new JenkinsResultsParserExpectedMessageGenerator() {
+
+				@Override
+				public String getMessage(String sampleKey) throws Exception {
+					Properties properties = getTestProperties(sampleKey);
+
+					JenkinsResultsParserUtil.setBuildProperties(properties);
+
+					return LoadBalancerUtil.getMostAvailableMasterURL(
+						properties);
+				}
+
+			});
+
 		assertSamples();
 	}
 
@@ -149,15 +164,6 @@ public class LoadBalancerUtilTest extends BaseJenkinsResultsParserTestCase {
 				JenkinsResultsParserUtil.createURL(jenkinsMaster.getURL()),
 				"/queue/api/json");
 		}
-	}
-
-	@Override
-	protected String getMessage(File sampleDir) throws Exception {
-		Properties properties = getTestProperties(sampleDir.getName());
-
-		JenkinsResultsParserUtil.setBuildProperties(properties);
-
-		return LoadBalancerUtil.getMostAvailableMasterURL(properties);
 	}
 
 	protected Properties getTestProperties(String baseInvocationHostName) {

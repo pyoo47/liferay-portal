@@ -48,6 +48,30 @@ public class JenkinsPerformanceTableUtilTest
 
 	@Test
 	public void testGenerateHTML() throws Exception {
+		setJenkinsResultsParserExpectedMessageGenerator(
+			new JenkinsResultsParserExpectedMessageGenerator() {
+
+				@Override
+				public String getMessage(String sampleKey) throws Exception {
+					String content = JenkinsResultsParserUtil.toString(
+						JenkinsResultsParserUtil.getLocalURL(
+							"${dependencies.url}" + getSimpleClassName() + "/" +
+								sampleKey + "/urls.txt"));
+
+					if (content.length() == 0) {
+						return "";
+					}
+
+					for (String url : content.split("\\|")) {
+						JenkinsPerformanceDataUtil.processPerformanceData(
+							"build", url.trim(), 100);
+					}
+
+					return JenkinsPerformanceTableUtil.generateHTML();
+				}
+
+			});
+
 		assertSamples();
 	}
 
@@ -55,23 +79,6 @@ public class JenkinsPerformanceTableUtilTest
 	protected void downloadSample(File sampleDir, URL url) throws Exception {
 		downloadSampleJobMessages(
 			url.toString() + "/logText/progressiveText", sampleDir);
-	}
-
-	protected void downloadSample(
-			String sampleKey, String buildNumber, String jobName,
-			String hostName)
-		throws Exception {
-
-		String urlString =
-			"https://${hostName}.liferay.com/job/${jobName}/${buildNumber}/";
-
-		urlString = replaceToken(urlString, "buildNumber", buildNumber);
-		urlString = replaceToken(urlString, "hostName", hostName);
-		urlString = replaceToken(urlString, "jobName", jobName);
-
-		URL url = JenkinsResultsParserUtil.createURL(urlString);
-
-		downloadSample(sampleKey, url);
 	}
 
 	protected void downloadSampleJobMessages(
@@ -119,27 +126,6 @@ public class JenkinsPerformanceTableUtilTest
 
 		JenkinsResultsParserUtil.write(
 			new File(sampleDir, "urls.txt"), sb.toString());
-	}
-
-	@Override
-	protected String getMessage(File sampleDir) throws Exception {
-		Class<?> clazz = getClass();
-
-		String content = JenkinsResultsParserUtil.toString(
-			JenkinsResultsParserUtil.getLocalURL(
-				"${dependencies.url}" + clazz.getSimpleName() + "/" +
-					sampleDir.getName() + "/urls.txt"));
-
-		if (content.length() == 0) {
-			return "";
-		}
-
-		for (String url : content.split("\\|")) {
-			JenkinsPerformanceDataUtil.processPerformanceData(
-				"build", url.trim(), 100);
-		}
-
-		return JenkinsPerformanceTableUtil.generateHTML();
 	}
 
 	private static final Pattern _progressiveTextPattern = Pattern.compile(
