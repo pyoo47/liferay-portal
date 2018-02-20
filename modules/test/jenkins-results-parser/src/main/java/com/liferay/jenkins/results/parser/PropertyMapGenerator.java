@@ -34,9 +34,9 @@ import java.util.regex.Pattern;
 /**
  * @author Cesar Polanco
  */
-public class JenkinsJobTemplate {
+public class PropertyMapGenerator {
 
-	public Map generateTemplate(Map<String, String> properties)
+	public Map generatePropertyMaps(Map<String, String> properties)
 		throws Exception {
 
 		Map<String, String> generatedPropertiesMap = new HashMap<>(properties);
