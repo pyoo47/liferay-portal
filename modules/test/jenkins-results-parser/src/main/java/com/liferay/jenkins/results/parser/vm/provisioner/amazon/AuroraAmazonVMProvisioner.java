@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * @author Kiyoshi Lee
  */
-public abstract class AuroraAmazonVMProvisioner extends VMProvisioner {
+public class AuroraAmazonVMProvisioner extends VMProvisioner {
 
 	public void create() {
 		CreateDBClusterRequest createDBClusterRequest =
