@@ -41,6 +41,52 @@ import java.util.List;
  */
 public class AuroraAmazonVMProvisioner extends VMProvisioner {
 
+	public AuroraAmazonVMProvisioner(
+			String awsAccessKeyId, String awsSecretAccessKey, String dbInstanceId) {
+
+		_dbInstanceId = dbInstanceId;
+
+		BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(
+				awsAccessKeyId, awsSecretAccessKey);
+
+		AmazonRDSClientBuilder amazonRDSClientBuilder =
+				AmazonRDSClientBuilder.standard();
+
+		amazonRDSClientBuilder.withCredentials(
+				new AWSStaticCredentialsProvider(basicAWSCredentials));
+		amazonRDSClientBuilder.withRegion(Regions.US_WEST_1);
+
+		_amazonRDS = amazonRDSClientBuilder.build();
+
+		_dbClusterId = _getDbClusterId();
+	}
+
+	public AuroraAmazonVMProvisioner(
+			String awsAccessKeyId, String awsSecretAccessKey, String dbClusterId,
+			String dbEngine, String dbEngineVersion, String dbInstanceClass,
+			String dbInstanceId, String dbPassword, String dbUsername) {
+
+		_dbClusterId = dbClusterId;
+		_dbEngine = dbEngine;
+		_dbEngineVersion = dbEngineVersion;
+		_dbInstanceClass = dbInstanceClass;
+		_dbInstanceId = dbInstanceId;
+		_dbPassword = dbPassword;
+		_dbUsername = dbUsername;
+
+		BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(
+				awsAccessKeyId, awsSecretAccessKey);
+
+		AmazonRDSClientBuilder amazonRDSClientBuilder =
+				AmazonRDSClientBuilder.standard();
+
+		amazonRDSClientBuilder.withCredentials(
+				new AWSStaticCredentialsProvider(basicAWSCredentials));
+		amazonRDSClientBuilder.withRegion(Regions.US_WEST_1);
+
+		_amazonRDS = amazonRDSClientBuilder.build();
+	}
+
 	public void create() {
 		CreateDBClusterRequest createDBClusterRequest =
 			new CreateDBClusterRequest();
@@ -145,52 +191,6 @@ public class AuroraAmazonVMProvisioner extends VMProvisioner {
 
 	public String getDBUsername() {
 		return _dbUsername;
-	}
-
-	protected AuroraAmazonVMProvisioner(
-		String awsAccessKeyId, String awsSecretAccessKey, String dbInstanceId) {
-
-		_dbInstanceId = dbInstanceId;
-
-		BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(
-			awsAccessKeyId, awsSecretAccessKey);
-
-		AmazonRDSClientBuilder amazonRDSClientBuilder =
-			AmazonRDSClientBuilder.standard();
-
-		amazonRDSClientBuilder.withCredentials(
-			new AWSStaticCredentialsProvider(basicAWSCredentials));
-		amazonRDSClientBuilder.withRegion(Regions.US_WEST_1);
-
-		_amazonRDS = amazonRDSClientBuilder.build();
-
-		_dbClusterId = _getDbClusterId();
-	}
-
-	protected AuroraAmazonVMProvisioner(
-		String awsAccessKeyId, String awsSecretAccessKey, String dbClusterId,
-		String dbEngine, String dbEngineVersion, String dbInstanceClass,
-		String dbInstanceId, String dbPassword, String dbUsername) {
-
-		_dbClusterId = dbClusterId;
-		_dbEngine = dbEngine;
-		_dbEngineVersion = dbEngineVersion;
-		_dbInstanceClass = dbInstanceClass;
-		_dbInstanceId = dbInstanceId;
-		_dbPassword = dbPassword;
-		_dbUsername = dbUsername;
-
-		BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(
-			awsAccessKeyId, awsSecretAccessKey);
-
-		AmazonRDSClientBuilder amazonRDSClientBuilder =
-			AmazonRDSClientBuilder.standard();
-
-		amazonRDSClientBuilder.withCredentials(
-			new AWSStaticCredentialsProvider(basicAWSCredentials));
-		amazonRDSClientBuilder.withRegion(Regions.US_WEST_1);
-
-		_amazonRDS = amazonRDSClientBuilder.build();
 	}
 
 	private String _getDbClusterId() {
