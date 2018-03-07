@@ -74,7 +74,8 @@ public class JenkinsJobConfigGenerator {
 			String value = entry.getValue();
 
 			if (key.startsWith("global.property(")) {
-				String propertyName = _getPropertyName(key);
+				String propertyName = key.substring(
+					key.indexOf("(") + 1, key.lastIndexOf(")"));
 
 				globalProperties.add(propertyName);
 
@@ -89,7 +90,8 @@ public class JenkinsJobConfigGenerator {
 					"global.property.names", propertyName);
 			}
 			else if (key.startsWith("master.job.names(")) {
-				String masterHostname = _getMasterHostName(key);
+				String masterHostname = key.substring(
+					key.indexOf("(") + 1, key.indexOf(")"));
 
 				masterHostnames.add(masterHostname);
 				masterHostnamesToJobNames.put(masterHostname, value);
@@ -105,13 +107,21 @@ public class JenkinsJobConfigGenerator {
 					int x = jobName.indexOf("(");
 
 					if (x != -1) {
-						String jobBranchName = _getJobBranchName(jobName);
+						int y = jobName.indexOf("_");
+
+						if (y == -1) {
+							y = jobName.indexOf(")");
+						}
+
+						String jobBranchName = jobName.substring(x + 1, y);
 
 						generatedPropertiesMap.put(
 							"job.portal.branch.name(" + jobName + ")",
 							jobBranchName);
 
-						String jobVariationName = _getJobVariationName(jobName);
+						y = jobName.indexOf(")");
+
+						String jobVariationName = jobName.substring(x + 1, y);
 
 						generatedPropertiesMap.put(
 							"job.variation.name(" + jobName + ")",
@@ -122,7 +132,13 @@ public class JenkinsJobConfigGenerator {
 							"job.variation.name(" + jobName + ")", "");
 					}
 
-					String jobShortName = _getJobShortName(jobName);
+					String jobShortName = jobName;
+
+					int j = jobShortName.indexOf("(");
+
+					if (j != -1) {
+						jobShortName = jobShortName.substring(0, j);
+					}
 
 					generatedPropertiesMap.put(
 						"job.short.name(" + jobName + ")", jobShortName);
@@ -180,7 +196,7 @@ public class JenkinsJobConfigGenerator {
 								2);
 
 							String triggerBuilderChildJobName =
-								_getTriggerBuilderChildJobName(triggerBuilder);
+								triggerBuilder.substring(z + 10, y);
 
 							if (!triggerBuilderChildJobName.equals(
 									"@!child.job.names!@")) {
@@ -427,8 +443,20 @@ public class JenkinsJobConfigGenerator {
 								generatedPropertiesMap.get(
 									"job.short.name(" + parentJobName + ")");
 
-							String shortChildJobName = _getShortChildJobName(
-								childJobName);
+							String shortChildJobName = childJobName;
+
+							int x = shortChildJobName.indexOf("[");
+
+							if (x != -1) {
+								shortChildJobName = shortChildJobName.substring(
+									0, x);
+							}
+
+							x = shortChildJobName.indexOf("(");
+
+							if (x != -1) {
+								shortChildJobName = shortChildJobName.substring(
+									0, x);
 
 							if (!shortChildJobName.contains(
 									shortParentJobName)) {
@@ -541,10 +569,14 @@ public class JenkinsJobConfigGenerator {
 				}
 			}
 			else if (key.startsWith("master.job.property(")) {
-				String jobName = _getJobNameFromProperty(key);
+				int x = key.indexOf("/");
 
-				String masterHostname = _getMasterHostNameFromProperty(key);
-				String propertyName = _getPropertyNameForJobProperty(key);
+				int y = key.indexOf("/", x + 1);
+
+				String jobName = key.substring(x + 1, y);
+				String masterHostname = key.substring(key.indexOf("(") + 1, x);
+				String propertyName = key.substring(
+					y + 1, key.lastIndexOf(")"));
 
 				Map<String, String> masterJobProperties =
 					jobNamesToMasterJobProperties.get(jobName);
@@ -564,8 +596,10 @@ public class JenkinsJobConfigGenerator {
 					_joinStrings(masterJobProperties.keySet(), ","));
 			}
 			else if (key.startsWith("master.property(")) {
-				String masterHostname = _getMasterHostNameFromProperty(key);
-				String propertyName = _getPropertyNameForJobProperty(key);
+				String masterHostname = key.substring(
+					key.indexOf("(") + 1, key.indexOf("/"));
+				String propertyName = key.substring(
+					key.indexOf("/") + 1, key.lastIndexOf(")"));
 
 				Map<String, String> masterProperties =
 					masterHostnamesToMasterProperties.get(masterHostname);
@@ -584,7 +618,8 @@ public class JenkinsJobConfigGenerator {
 					_joinStrings(masterProperties.keySet(), ","));
 			}
 			else if (key.startsWith("master.slaves(")) {
-				String masterHostname = _getMasterHostName(key);
+				String masterHostname = key.substring(
+					key.indexOf("(") + 1, key.indexOf(")"));
 
 				masterHostnames.add(masterHostname);
 
@@ -603,8 +638,8 @@ public class JenkinsJobConfigGenerator {
 							String environmentSlaveKey =
 								environmentSlavesMap.get(slaveHostname);
 
-							environmentSlaveOSType = _getEnvironmentSlaveOSType(
-								environmentSlaveKey);
+							environmentSlaveOSType = environmentSlaveKey.substring(
+								0, environmentSlaveKey.indexOf("."));
 						}
 
 						if (environmentSlaveOSType.contains("osx")) {
@@ -632,20 +667,16 @@ public class JenkinsJobConfigGenerator {
 					"master.slaves.txt(" + masterHostname + ")",
 					value.replaceAll(",", "\n").trim());
 
-				// StringBuilder sb = new StringBuilder();
-
-		//
-
-				// sb.append("<slaves>\n");
-
 				Element slaveBaseElement = Dom4JUtil.getNewElement(
 					"slaves-base");
+
 				Element slaves = Dom4JUtil.getNewElement(
 					"slaves", slaveBaseElement);
 
 				for (String slaveHostname : value.split(",")) {
 					if (slaveHostname.contains("(")) {
-						slaveHostname = _getSlaveHostname(slaveHostname);
+						slaveHostname = slaveHostname.substring(
+							0, slaveHostname.indexOf("("));
 					}
 
 					Element slaveConfigXML = _getSlaveConfigXMLContent(
@@ -655,12 +686,6 @@ public class JenkinsJobConfigGenerator {
 						slaveHostname + ".config.xml.content",
 						_getFormattedXML(slaveConfigXML));
 
-					// sb.append(slaveConfigXMLContent);
-
-		  //
-
-					// sb.append("\n");
-
 					Dom4JUtil.addToElement(slaves, slaveConfigXML);
 
 					slaveHostnames.add(slaveHostname);
@@ -669,31 +694,23 @@ public class JenkinsJobConfigGenerator {
 						"slave.master(" + slaveHostname + ")", masterHostname);
 				}
 
-				// sb.append("\t</slaves>");
-
 				generatedPropertiesMap.put(
 					"master.slaves.xml(" + masterHostname + ")",
 					_getFormattedXML(slaveBaseElement));
-
-				// sb = new StringBuilder();
 
 				Element slaveHostNameBaseElement = Dom4JUtil.getNewElement(
 					"slave_host_name_base");
 
 				for (String slaveHostname : value.split(",")) {
 					if (slaveHostname.contains("(")) {
-						slaveHostname = _getSlaveHostname(slaveHostname);
+						slaveHostname = slaveHostname.substring(
+							0, slaveHostname.indexOf("("));
 					}
 
 					Element slaveHostnameElement = Dom4JUtil.getNewElement(
 						"string", slaveHostNameBaseElement);
 
 					slaveHostnameElement.setText(slaveHostname);
-
-					// sb.append("<string>");
-					// sb.append(slaveHostname);
-					// sb.append("</string>");
-
 				}
 
 				generatedPropertiesMap.put(
@@ -701,19 +718,27 @@ public class JenkinsJobConfigGenerator {
 					_getFormattedXML(slaveHostNameBaseElement));
 			}
 			else if (key.startsWith("job.property(")) {
-				String jobName = _getMasterHostNameFromProperty(key);
-				String propertyName = _getPropertyNameForJobProperty(key);
-
+				String jobName = key.substring(
+					key.indexOf("(") + 1, key.indexOf("/"));
+				String propertyName = key.substring(
+					key.indexOf("/") + 1, key.lastIndexOf(")"));
 				Map<String, String> jobProperties = jobNamesToJobProperties.get(
 					jobName);
 
 				if (jobProperties == null) {
-					jobProperties = new TreeMap<>();
+					jobProperties = new TreeMap<String, String>();
 
 					jobNamesToJobProperties.put(jobName, jobProperties);
 				}
 
+				System.out.println("Job props null ? " +
+					Boolean.toString(jobProperties == null));
+				System.out.println("property name = " + propertyName);
+				System.out.println("propertyValue = " + value);
+
 				jobProperties.put(propertyName, value);
+
+				System.out.println("Successfully put!");
 
 				generatedPropertiesMap.put(
 					"job.properties(" + jobName + ")",
@@ -822,14 +847,6 @@ public class JenkinsJobConfigGenerator {
 		return listViewElement;
 	}
 
-	private String _getEnvironmentSlaveOSType(String property) {
-		Pattern envSlaveOSPattern = Pattern.compile("^(\\w+)\\.");
-
-		Matcher envSlaveOSMatcher = envSlaveOSPattern.matcher(property);
-
-		return envSlaveOSMatcher.group(1);
-	}
-
 	private Map<String, String> _getEnvironmentSlavesMap(
 		Map<String, String> properties) {
 
@@ -849,7 +866,8 @@ public class JenkinsJobConfigGenerator {
 				continue;
 			}
 
-			String propertyName = _getPropertyNameIncludingSlaves(key);
+			String propertyName = key.substring(
+				key.indexOf("slaves(") + 7, key.indexOf(")"));
 
 			String value = entry.getValue();
 
@@ -875,9 +893,9 @@ public class JenkinsJobConfigGenerator {
 				sb.append(Dom4JUtil.format(el));
 
 				sb.append("\n");
-			} catch (IOException ioe) {
+			}
+			catch (IOException ioe) {
 				ioe.printStackTrace();
-				//throw ioe;
 			}
 		}
 
@@ -886,39 +904,6 @@ public class JenkinsJobConfigGenerator {
 		}
 
 		return sb.toString();
-	}
-
-	private String _getJobBranchName(String property) {
-		Pattern jobBranchNamePattern = Pattern.compile("\\((\\w+?)[_|\\)]");
-
-		Matcher jobBranchNameMatcher = jobBranchNamePattern.matcher(property);
-
-		return jobBranchNameMatcher.group(1);
-	}
-
-	private String _getJobNameFromProperty(String property) {
-		Pattern jobNamePattern = Pattern.compile("/(\\w+)/");
-
-		Matcher jobNameMatcher = jobNamePattern.matcher(property);
-
-		return jobNameMatcher.group(1);
-	}
-
-	private String _getJobShortName(String property) {
-		Pattern jobShortNamePattern = Pattern.compile("(\\w+)\\(?");
-
-		Matcher jobShortNameMatcher = jobShortNamePattern.matcher(property);
-
-		return jobShortNameMatcher.group(1);
-	}
-
-	private String _getJobVariationName(String property) {
-		Pattern jobVariationNamePattern = Pattern.compile("\\((\\w+)\\)");
-
-		Matcher jobVariationNameMatcher = jobVariationNamePattern.matcher(
-			property);
-
-		return jobVariationNameMatcher.group(1);
 	}
 
 	private Map<String, String> _getLinuxEnvironmentVariablesMap() {
@@ -936,22 +921,6 @@ public class JenkinsJobConfigGenerator {
 		return linuxEnvironmentVariablesMap;
 	}
 
-	private String _getMasterHostName(String property) {
-		Pattern masterHostNamePattern = Pattern.compile("\\((\\w+)\\)");
-
-		Matcher masterHostNameMatcher = masterHostNamePattern.matcher(property);
-
-		return masterHostNameMatcher.group(1);
-	}
-
-	private String _getMasterHostNameFromProperty(String property) {
-		Pattern masterHostNamePattern = Pattern.compile("\\((\\w+)/");
-
-		Matcher masterHostNameMatcher = masterHostNamePattern.matcher(property);
-
-		return masterHostNameMatcher.group(1);
-	}
-
 	private Map<String, String> _getOSXEnvironmentVariablesMap() {
 		Map<String, String> osxEnvironmentVariablesMap = new TreeMap<>();
 
@@ -963,39 +932,6 @@ public class JenkinsJobConfigGenerator {
 		osxEnvironmentVariablesMap.put("PATH", pathValue);
 
 		return osxEnvironmentVariablesMap;
-	}
-
-	private String _getPropertyName(String property) {
-		Pattern propertyNamePattern = Pattern.compile("\\((.+)\\)");
-
-		Matcher propertyNameMatcher = propertyNamePattern.matcher(property);
-
-		return propertyNameMatcher.group(1);
-	}
-
-	private String _getPropertyNameForJobProperty(String property) {
-		Pattern propertyNamePattern = Pattern.compile("/.+?/(.+)\\)");
-
-		Matcher propertyNameMatcher = propertyNamePattern.matcher(property);
-
-		return propertyNameMatcher.group(1);
-	}
-
-	private String _getPropertyNameIncludingSlaves(String property) {
-		Pattern propNamePattern = Pattern.compile("slaves\\((.+)\\)");
-
-		Matcher propNameMatcher = propNamePattern.matcher(property);
-
-		return propNameMatcher.group(1);
-	}
-
-	private String _getShortChildJobName(String property) {
-		Pattern shortChildJobNamePattern = Pattern.compile("(\\w+)[\\[|\\(]?");
-
-		Matcher shortChildJobNameMatcher = shortChildJobNamePattern.matcher(
-			property);
-
-		return shortChildJobNameMatcher.group(1);
 	}
 
 	private Element _getSlaveConfigXMLContent(
@@ -1120,24 +1056,6 @@ public class JenkinsJobConfigGenerator {
 		}
 
 		return environmentVariableElements;
-	}
-
-	private String _getSlaveHostname(String property) {
-		Pattern slaveHostnamePattern = Pattern.compile("^(\\w+)\\(");
-
-		Matcher slaveHostnameMatcher = slaveHostnamePattern.matcher(property);
-
-		return slaveHostnameMatcher.group(1);
-	}
-
-	private String _getTriggerBuilderChildJobName(String property) {
-		Pattern triggerBuilderChildJobNamePattern = Pattern.compile(
-			"<projects>(.+)</projects>", Pattern.DOTALL);
-
-		Matcher triggerBuilderChildJobNameMatcher =
-			triggerBuilderChildJobNamePattern.matcher(property);
-
-		return triggerBuilderChildJobNameMatcher.group(1);
 	}
 
 	private Map<String, String> _getWindowsEnvironmentVariablesMap() {
