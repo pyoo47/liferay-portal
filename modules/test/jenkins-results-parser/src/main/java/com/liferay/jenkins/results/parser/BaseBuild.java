@@ -1635,6 +1635,12 @@ public abstract class BaseBuild implements Build {
 		return sb.toString();
 	}
 
+	protected Map<String, String> getBuildDataProperties(String mapName) {
+		JSONObject buildDataJSONObject = getBuildDataJSONObject();
+
+		return parseJSONArrayToMap(buildDataJSONObject.getJSONArray(mapName));
+	}
+
 	protected JSONObject getBuildJSONObject(String tree) {
 		if (getBuildURL() == null) {
 			return null;
