@@ -325,6 +325,9 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 			propertyName, _reluctantParenthesesPattern);
 	}
 
+	// This is a bad name because I'm not sure if you're returning the names or the values of a properties object
+	// You're more or less returning job name, master host name, and then a value. Then you should make a complex private class.
+
 	private List<String> _getMasterJobPropertiesList(String basePropertyName) {
 		List<String> regextMatchGroupList = _getRegexMatchGroupList(
 			basePropertyName, _masterJobPropertyPattern);
