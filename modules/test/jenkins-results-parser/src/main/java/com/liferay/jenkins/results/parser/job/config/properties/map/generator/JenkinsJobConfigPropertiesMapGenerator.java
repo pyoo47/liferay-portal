@@ -45,7 +45,7 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 
 		_basePropertiesMap = basePropertiesMap;
 
-		_environmentSlavesPropertiesMap = _getEnvironmentSlavesMap();
+		_environmentSlavesPropertiesMap = _getEnvironmentSlavesPropertiesMap();
 		_generatedJenkinsJobConfigPropertiesMap = new HashMap<>();
 	}
 
@@ -204,7 +204,7 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 		return listViewElement;
 	}
 
-	private Map<String, String> _getEnvironmentSlavesMap() {
+	private Map<String, String> _getEnvironmentSlavesPropertiesMap() {
 		Map<String, String> environmentSlavesMap = new HashMap<>();
 
 		for (Map.Entry<String, String> entry : _basePropertiesMap.entrySet()) {
@@ -371,7 +371,7 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 	private Element _getSlaveConfigElement(String slaveHostName) {
 		String slaveLabel = slaveHostName;
 
-		Map<String, String> environmentSlavesMap = _getEnvironmentSlavesMap();
+		Map<String, String> environmentSlavesMap = _getEnvironmentSlavesPropertiesMap();
 
 		if (environmentSlavesMap.containsKey(slaveHostName)) {
 			slaveLabel = environmentSlavesMap.get(slaveHostName);
