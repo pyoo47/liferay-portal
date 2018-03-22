@@ -203,7 +203,7 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 	}
 
 	private Map<String, String> _getEnvironmentSlavesPropertiesMap() {
-		Map<String, String> environmentSlavesMap = new HashMap<>();
+		Map<String, String> environmentPropertiesSlavesMap = new HashMap<>();
 
 		for (Map.Entry<String, String> entry : _basePropertiesMap.entrySet()) {
 			String key = entry.getKey();
@@ -219,11 +219,12 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 				_basePropertiesMap.get(key));
 
 			for (String slaveHostName : slaveHostNames.split(",")) {
-				environmentSlavesMap.put(slaveHostName, environmentName);
+				environmentPropertiesSlavesMap.put(
+					slaveHostName, environmentName);
 			}
 		}
 
-		return environmentSlavesMap;
+		return environmentPropertiesSlavesMap;
 	}
 
 	private String _getFirstRegexMatchGroup(String string, Pattern regex) {
@@ -369,10 +370,10 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 	private Element _getSlaveConfigElement(String slaveHostName) {
 		String slaveLabel = slaveHostName;
 
-		Map<String, String> environmentSlavesMap = _getEnvironmentSlavesPropertiesMap();
+		Map<String, String> environmentPropertiesSlavesMap = _getEnvironmentSlavesPropertiesMap();
 
-		if (environmentSlavesMap.containsKey(slaveHostName)) {
-			slaveLabel = environmentSlavesMap.get(slaveHostName);
+		if (environmentPropertiesSlavesMap.containsKey(slaveHostName)) {
+			slaveLabel = environmentPropertiesSlavesMap.get(slaveHostName);
 		}
 
 		Element slaveElement = Dom4JUtil.getNewElement(
