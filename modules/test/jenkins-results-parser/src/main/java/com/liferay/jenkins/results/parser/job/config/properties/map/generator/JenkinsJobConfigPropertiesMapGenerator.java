@@ -94,7 +94,6 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 
 		_putGeneratedJenkinsJobConfigProperty(
 			"master.hostnames", masterHostNamesSet);
-
 		_putGeneratedJenkinsJobConfigProperty(
 			"slave.hostnames", _slaveHostNamesSet);
 
@@ -104,7 +103,6 @@ public class JenkinsJobConfigPropertiesMapGenerator {
 			if (masterHostName.startsWith("test-")) {
 				_generatedJenkinsJobConfigPropertiesMap.put(
 					"trigger.day." + masterHostName, Integer.toString(i % 7));
-
 				_generatedJenkinsJobConfigPropertiesMap.put(
 					"trigger.hour." + masterHostName, Integer.toString(i % 24));
 
