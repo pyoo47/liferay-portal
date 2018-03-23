@@ -18,6 +18,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -673,6 +681,46 @@ public class GitWorkingDirectory {
 		return getBranch("HEAD", null);
 	}
 
+	public List<File> getCurrentBranchFiles() {
+		List<File> currentBranchFiles = new ArrayList<>();
+
+		ExecutionResult executionResult = executeBashCommands(
+			JenkinsResultsParserUtil.combine(
+				"git diff --diff-filter=AM --name-only ",
+				_getMergeBaseCommitSHA(), " ", getBranchSHA("HEAD")));
+
+		String gitDiffOutput = executionResult.getStandardOut();
+
+		for (String line : gitDiffOutput.split("\n")) {
+			currentBranchFiles.add(new File(_workingDirectory, line));
+		}
+
+		return currentBranchFiles;
+	}
+
+	public List<File> getCurrentBranchModuleGroupDirs() throws IOException {
+		List<File> currentBranchModuleGroupDirs = new ArrayList<>();
+
+		List<File> currentBranchFiles = getCurrentBranchFiles();
+
+		for (File moduleGroupDir : getModuleGroupDirs()) {
+			String moduleGroupPath = moduleGroupDir.getCanonicalPath();
+
+			for (File currentBranchFile : currentBranchFiles) {
+				String currentBranchFilePath =
+					currentBranchFile.getCanonicalPath();
+
+				if (currentBranchFilePath.startsWith(moduleGroupPath)) {
+					currentBranchModuleGroupDirs.add(moduleGroupDir);
+
+					break;
+				}
+			}
+		}
+
+		return currentBranchModuleGroupDirs;
+	}
+
 	public String getGitConfigProperty(String gitConfigPropertyName) {
 		ExecutionResult executionResult = executeBashCommands(
 			"git config " + gitConfigPropertyName);
@@ -754,6 +802,84 @@ public class GitWorkingDirectory {
 		return JenkinsResultsParserUtil.combine(
 			"https://github.com/", getGitHubUserName(branchRemote), "/",
 			getRepositoryName(), "/tree/", branchName, "/", relativePath);
+	}
+
+	public List<File> getModuleGroupDirs() throws IOException {
+		final File modulesDir = new File(_workingDirectory, "modules");
+
+		if (!modulesDir.exists()) {
+			return new ArrayList<>();
+		}
+
+		final List<File> moduleGroupDirs = new ArrayList<>();
+
+		FileSystem fileSystem = FileSystems.getDefault();
+
+		Files.walkFileTree(
+			modulesDir.toPath(),
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult postVisitDirectory(
+						Path filePath, IOException exc)
+					throws IOException {
+
+					if (_moduleGroup == null) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					ModuleGroup currentModuleGroup = ModuleGroup.getModuleGroup(
+						filePath);
+
+					if (currentModuleGroup == null) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					File currentFile = currentModuleGroup.getFile();
+
+					if (currentFile.equals(_moduleGroup.getFile())) {
+						moduleGroupDirs.add(currentFile);
+
+						_moduleGroup = null;
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult preVisitDirectory(
+						Path filePath, BasicFileAttributes attrs)
+					throws IOException {
+
+					ModuleGroup currentModuleGroup = ModuleGroup.getModuleGroup(
+						filePath);
+
+					if (currentModuleGroup == null) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					if (_moduleGroup == null) {
+						_moduleGroup = currentModuleGroup;
+
+						return FileVisitResult.CONTINUE;
+					}
+
+					int currentPriority = currentModuleGroup.getPriority();
+
+					if (currentPriority < _moduleGroup.getPriority()) {
+						_moduleGroup = currentModuleGroup;
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+				private ModuleGroup _moduleGroup;
+
+			});
+
+		Collections.sort(moduleGroupDirs);
+
+		return moduleGroupDirs;
 	}
 
 	public Remote getRemote(String name) {
@@ -1631,6 +1757,20 @@ public class GitWorkingDirectory {
 		}
 	}
 
+	private String _getMergeBaseCommitSHA() {
+		ExecutionResult executionResult = executeBashCommands(
+			"git merge-base HEAD " + _upstreamBranchName);
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to get merge base commit SHA\n",
+					executionResult.getStandardError()));
+		}
+
+		return executionResult.getStandardOut();
+	}
+
 	private String _log(int num, File file, String format) {
 		StringBuilder sb = new StringBuilder();
 
@@ -1688,5 +1828,62 @@ public class GitWorkingDirectory {
 	private final String _repositoryUsername;
 	private final String _upstreamBranchName;
 	private File _workingDirectory;
+
+	private static class ModuleGroup {
+
+		public static ModuleGroup getModuleGroup(Path path) {
+			File file = path.toFile();
+
+			if (!file.isDirectory()) {
+				return null;
+			}
+
+			for (int i = 0; i < _markerFileNames.size(); i++) {
+				for (String markerFileName : _markerFileNames.get(i)) {
+					File markerFile = new File(file, markerFileName);
+
+					if (markerFile.exists()) {
+						return new ModuleGroup(file, i);
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public File getFile() {
+			return _file;
+		}
+
+		public int getPriority() {
+			return _priority;
+		}
+
+		@Override
+		public String toString() {
+			return JenkinsResultsParserUtil.combine(
+				Integer.toString(_priority), " ", _file.toString());
+		}
+
+		private ModuleGroup(File file, int priority) {
+			_file = file;
+			_priority = priority;
+		}
+
+		private static Map<Integer, String[]> _markerFileNames =
+			new HashMap<>();
+
+		static {
+			_markerFileNames.put(0, new String[] {"subsystem.bnd", ".gitrepo"});
+			_markerFileNames.put(1, new String[] {"app.bnd"});
+			_markerFileNames.put(2, new String[] {"bnd.bnd"});
+			_markerFileNames.put(
+				3, new String[] {"build.gradle", "build.xml", "pom.xml"});
+		}
+
+		private final File _file;
+		private final int _priority;
+
+	}
 
 }
