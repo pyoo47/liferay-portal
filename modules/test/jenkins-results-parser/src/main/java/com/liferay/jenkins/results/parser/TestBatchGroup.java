@@ -1,0 +1,491 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+package com.liferay.jenkins.results.parser;
+
+import com.google.common.collect.Lists;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * @author Michael Hashimoto
+ */
+public class TestBatchGroup {
+
+	public TestBatchGroup(
+			GitWorkingDirectory gitWorkingDirectory, String batchName)
+		throws Exception {
+
+		this(gitWorkingDirectory, batchName, null);
+	}
+
+	public TestBatchGroup(
+			GitWorkingDirectory gitWorkingDirectory, String batchName,
+			String testSuiteName)
+		throws Exception {
+
+		_gitWorkingDirectory = gitWorkingDirectory;
+
+		_batchName = batchName;
+
+		_testSuiteName = testSuiteName;
+
+		_portalTestProperties = JenkinsResultsParserUtil.getProperties(
+			new File(
+				_gitWorkingDirectory.getWorkingDirectory(), "test.properties"));
+
+		_setTestBatchCurrentBranch();
+
+		_setTestClassNamesExcludes();
+		_setTestClassNamesIncludes();
+
+		_setTestClassGroups();
+	}
+
+	public String getBatchName() {
+		return _batchName;
+	}
+
+	public GitWorkingDirectory getGitWorkingDirectory() {
+		return _gitWorkingDirectory;
+	}
+
+	public Properties getPortalTestProperties() {
+		return _portalTestProperties;
+	}
+
+	public int getTestBatchGroupSize() {
+		return _testClassGroups.size();
+	}
+
+	public List<String> getTestClassGroup(int i) throws Exception {
+		return _testClassGroups.get(i);
+	}
+
+	private List<String> _getCurrentBranchTestClassNamesGlobs(
+			List<String> testClassNamesGlobs)
+		throws IOException {
+
+		List<String> currentBranchTestClassNameGlobs = new ArrayList<>();
+
+		File workingDirectory = _gitWorkingDirectory.getWorkingDirectory();
+
+		PortalGitWorkingDirectory portalGitWorkingDirectory =
+			(PortalGitWorkingDirectory)_gitWorkingDirectory;
+
+		List<File> moduleGroupDirs =
+			portalGitWorkingDirectory.getCurrentBranchModuleGroupDirs();
+
+		for (File moduleGroupDir : moduleGroupDirs) {
+			String moduleGroupDirPath = moduleGroupDir.getCanonicalPath();
+
+			moduleGroupDirPath = moduleGroupDirPath.replace(
+				workingDirectory.getCanonicalPath() + "/", "");
+
+			for (String testClassNamesGlob : testClassNamesGlobs) {
+				currentBranchTestClassNameGlobs.add(
+					moduleGroupDirPath + "/" + testClassNamesGlob);
+
+				if (testClassNamesGlob.startsWith("**/")) {
+					currentBranchTestClassNameGlobs.add(
+						moduleGroupDirPath + "/" +
+							testClassNamesGlob.substring(3));
+				}
+			}
+		}
+
+		return currentBranchTestClassNameGlobs;
+	}
+
+	private int _getMaxClassGroupSize() {
+		List<String> orderedPropertyNames = new ArrayList<>();
+
+		if (_testSuiteName != null) {
+			orderedPropertyNames.add(
+				JenkinsResultsParserUtil.combine(
+					"test.batch.max.class.group.size[", _batchName, "][",
+					_testSuiteName, "]"));
+			orderedPropertyNames.add(
+				_getWildcardPropertyName(
+					_portalTestProperties, "test.batch.max.class.group.size",
+					_batchName, _testSuiteName));
+			orderedPropertyNames.add(
+				JenkinsResultsParserUtil.combine(
+					"test.batch.max.class.group.size[", _testSuiteName, "]"));
+		}
+
+		orderedPropertyNames.add(
+			JenkinsResultsParserUtil.combine(
+				"test.batch.max.class.group.size[", _batchName, "]"));
+		orderedPropertyNames.add(
+			_getWildcardPropertyName(
+				_portalTestProperties, "test.batch.max.class.group.size",
+				_batchName));
+		orderedPropertyNames.add("test.batch.max.class.group.size");
+
+		String propertyValue = _getPropertyValueFromOrderedPropertyNames(
+			_portalTestProperties, orderedPropertyNames);
+
+		if (propertyValue != null) {
+			return Integer.parseInt(propertyValue);
+		}
+
+		return _DEFAULT_MAX_CLASS_GROUP_SIZE;
+	}
+
+	private String _getPropertyValueFromOrderedPropertyNames(
+		Properties properties, List<String> orderedPropertyNames) {
+
+		for (String propertyName : orderedPropertyNames) {
+			if (propertyName == null) {
+				continue;
+			}
+
+			if (properties.containsKey(propertyName)) {
+				String propertyValue = properties.getProperty(propertyName);
+
+				if ((propertyValue != null) && !propertyValue.isEmpty()) {
+					return propertyValue;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private Set<String> _getTestClassFileNames() throws Exception {
+		File workingDirectory = _gitWorkingDirectory.getWorkingDirectory();
+
+		final Set<String> testClassFileNames = new HashSet<>();
+
+		Files.walkFileTree(
+			workingDirectory.toPath(),
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult preVisitDirectory(
+						Path filePath, BasicFileAttributes attrs)
+					throws IOException {
+
+					if (_pathExcluded(filePath)) {
+						return FileVisitResult.SKIP_SUBTREE;
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes attrs)
+					throws IOException {
+
+					if (_pathIncluded(filePath) && !_pathExcluded(filePath)) {
+						testClassFileNames.add(
+							_getPackagePath(filePath.toString()));
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+				private String _getPackagePath(String filePath) {
+					Matcher matcher = _packagePathPattern.matcher(filePath);
+
+					if (matcher.find()) {
+						String packagePath = matcher.group("packagePath");
+
+						packagePath = packagePath.replace(".java", ".class");
+
+						return packagePath;
+					}
+
+					return filePath.replace(".java", ".class");
+				}
+
+			});
+
+		return testClassFileNames;
+	}
+
+	private List<PathMatcher> _getTestClassNamesPathMatchers(
+		List<String> testClassNamesGlobs) {
+
+		List<PathMatcher> pathMatchers = new ArrayList<>();
+
+		File workingDirectory = _gitWorkingDirectory.getWorkingDirectory();
+
+		String workingDirectoryPath = workingDirectory.getAbsolutePath();
+
+		for (String testClassNamesGlob : testClassNamesGlobs) {
+			FileSystem fileSystem = FileSystems.getDefault();
+
+			pathMatchers.add(
+				fileSystem.getPathMatcher(
+					"glob:" + workingDirectoryPath + "/" + testClassNamesGlob));
+		}
+
+		return pathMatchers;
+	}
+
+	private String _getWildcardPropertyName(
+		Properties properties, String propertyName, String batchName) {
+
+		return _getWildcardPropertyName(
+			properties, propertyName, batchName, null);
+	}
+
+	private String _getWildcardPropertyName(
+		Properties properties, String propertyName, String batchName,
+		String testSuiteName) {
+
+		for (String wildcardPropertyName : properties.stringPropertyNames()) {
+			if (!wildcardPropertyName.startsWith(propertyName)) {
+				continue;
+			}
+
+			Matcher matcher = _propertyNamePattern.matcher(
+				wildcardPropertyName);
+
+			if (matcher.find()) {
+				String batchNameMatcher = matcher.group("batchName");
+
+				batchNameMatcher = batchNameMatcher.replace("*", ".+");
+
+				if (!batchName.matches(batchNameMatcher)) {
+					continue;
+				}
+
+				String testSuiteNameMatcher = matcher.group("testSuiteName");
+
+				if (testSuiteName != testSuiteNameMatcher) {
+					continue;
+				}
+
+				return wildcardPropertyName;
+			}
+		}
+
+		return null;
+	}
+
+	private boolean _pathExcluded(Path path) {
+		return _pathMatches(path, _testClassNamesExcludesPathMatchers);
+	}
+
+	private boolean _pathIncluded(Path path) {
+		return _pathMatches(path, _testClassNamesIncludesPathMatchers);
+	}
+
+	private boolean _pathMatches(Path path, List<PathMatcher> pathMatchers) {
+		for (PathMatcher pathMatcher : pathMatchers) {
+			if (pathMatcher.matches(path)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private void _setTestBatchCurrentBranch() {
+		List<String> orderedPropertyNames = new ArrayList<>();
+
+		if (_testSuiteName != null) {
+			orderedPropertyNames.add(
+				JenkinsResultsParserUtil.combine(
+					"test.batch.current.branch[", _testSuiteName, "]"));
+		}
+
+		orderedPropertyNames.add("test.batch.current.branch");
+
+		String propertyValue = _getPropertyValueFromOrderedPropertyNames(
+			_portalTestProperties, orderedPropertyNames);
+
+		if (propertyValue != null) {
+			_testBatchCurrentBranch = Boolean.parseBoolean(propertyValue);
+
+			return;
+		}
+
+		_testBatchCurrentBranch = _DEFAULT_TEST_BATCH_CURRENT_BRANCH;
+	}
+
+	private void _setTestClassGroups() throws Exception {
+		List<String> testClassFileNames = new ArrayList<>(
+			_getTestClassFileNames());
+
+		Collections.sort(testClassFileNames);
+
+		int testClassFileNamesCount = testClassFileNames.size();
+
+		if (testClassFileNamesCount == 0) {
+			return;
+		}
+
+		int maxClassGroupSize = _getMaxClassGroupSize();
+
+		int testBatchGroupSize = (int)Math.ceil(
+			(double)testClassFileNamesCount / maxClassGroupSize);
+
+		int classGroupSize = (int)Math.ceil(
+			(double)testClassFileNamesCount / testBatchGroupSize);
+
+		_testClassGroups.addAll(
+			Lists.partition(testClassFileNames, classGroupSize));
+	}
+
+	private void _setTestClassNamesExcludes() throws IOException {
+		List<String> orderedPropertyNames = new ArrayList<>();
+
+		if (_testSuiteName != null) {
+			orderedPropertyNames.add(
+				JenkinsResultsParserUtil.combine(
+					"test.batch.class.names.excludes[", _batchName, "][",
+					_testSuiteName, "]"));
+			orderedPropertyNames.add(
+				_getWildcardPropertyName(
+					_portalTestProperties, "test.batch.class.names.excludes",
+					_batchName, _testSuiteName));
+			orderedPropertyNames.add(
+				JenkinsResultsParserUtil.combine(
+					"test.batch.class.names.excludes[", _testSuiteName, "]"));
+		}
+
+		orderedPropertyNames.add(
+			_getWildcardPropertyName(
+				_portalTestProperties, "test.batch.class.names.excludes",
+				_batchName));
+		orderedPropertyNames.add(
+			JenkinsResultsParserUtil.combine(
+				"test.batch.class.names.excludes[", _batchName, "]"));
+		orderedPropertyNames.add("test.batch.class.names.excludes");
+		orderedPropertyNames.add("test.class.names.excludes");
+
+		String testClassNamesExcludes =
+			_getPropertyValueFromOrderedPropertyNames(
+				_portalTestProperties, orderedPropertyNames);
+
+		if ((testClassNamesExcludes != null) &&
+			!testClassNamesExcludes.isEmpty()) {
+
+			List<String> testClassNamesExcludesGlobs = Arrays.asList(
+				testClassNamesExcludes.split(","));
+
+			if (_testBatchCurrentBranch) {
+				_testClassNamesExcludesGlobs.addAll(
+					_getCurrentBranchTestClassNamesGlobs(
+						testClassNamesExcludesGlobs));
+			}
+			else {
+				_testClassNamesExcludesGlobs.addAll(
+					testClassNamesExcludesGlobs);
+			}
+		}
+
+		_testClassNamesExcludesPathMatchers.addAll(
+			_getTestClassNamesPathMatchers(_testClassNamesExcludesGlobs));
+	}
+
+	private void _setTestClassNamesIncludes() throws IOException {
+		List<String> orderedPropertyNames = new ArrayList<>();
+
+		if (_testSuiteName != null) {
+			orderedPropertyNames.add(
+				JenkinsResultsParserUtil.combine(
+					"test.batch.class.names.includes[", _batchName, "][",
+					_testSuiteName, "]"));
+			orderedPropertyNames.add(
+				_getWildcardPropertyName(
+					_portalTestProperties, "test.batch.class.names.includes",
+					_batchName, _testSuiteName));
+			orderedPropertyNames.add(
+				JenkinsResultsParserUtil.combine(
+					"test.batch.class.names.includes[", _testSuiteName, "]"));
+		}
+
+		orderedPropertyNames.add(
+			JenkinsResultsParserUtil.combine(
+				"test.batch.class.names.includes[", _batchName, "]"));
+		orderedPropertyNames.add(
+			_getWildcardPropertyName(
+				_portalTestProperties, "test.batch.class.names.includes",
+				_batchName));
+		orderedPropertyNames.add("test.batch.class.names.includes");
+		orderedPropertyNames.add("test.class.names.includes");
+
+		String testClassNamesIncludes =
+			_getPropertyValueFromOrderedPropertyNames(
+				_portalTestProperties, orderedPropertyNames);
+
+		if ((testClassNamesIncludes != null) &&
+			!testClassNamesIncludes.isEmpty()) {
+
+			List<String> testClassNamesIncludesGlobs = Arrays.asList(
+				testClassNamesIncludes.split(","));
+
+			if (_testBatchCurrentBranch) {
+				_testClassNamesIncludesGlobs.addAll(
+					_getCurrentBranchTestClassNamesGlobs(
+						testClassNamesIncludesGlobs));
+			}
+			else {
+				_testClassNamesIncludesGlobs.addAll(
+					testClassNamesIncludesGlobs);
+			}
+		}
+
+		_testClassNamesIncludesPathMatchers.addAll(
+			_getTestClassNamesPathMatchers(_testClassNamesIncludesGlobs));
+	}
+
+	private static final int _DEFAULT_MAX_CLASS_GROUP_SIZE = 5000;
+
+	private static final boolean _DEFAULT_TEST_BATCH_CURRENT_BRANCH = false;
+
+	private final String _batchName;
+	private final GitWorkingDirectory _gitWorkingDirectory;
+	private final Pattern _packagePathPattern = Pattern.compile(
+		".*/(?<packagePath>com/.*)");
+	private final Properties _portalTestProperties;
+	private final Pattern _propertyNamePattern = Pattern.compile(
+		"[^\\]]+\\[(?<batchName>[^\\]]+)\\](\\[(?<testSuiteName>[^\\]]+)\\])?");
+	private boolean _testBatchCurrentBranch;
+	private final List<List<String>> _testClassGroups = new ArrayList<>();
+	private final List<String> _testClassNamesExcludesGlobs = new ArrayList<>();
+	private final List<PathMatcher> _testClassNamesExcludesPathMatchers =
+		new ArrayList<>();
+	private final List<String> _testClassNamesIncludesGlobs = new ArrayList<>();
+	private final List<PathMatcher> _testClassNamesIncludesPathMatchers =
+		new ArrayList<>();
+	private final String _testSuiteName;
+
+}
