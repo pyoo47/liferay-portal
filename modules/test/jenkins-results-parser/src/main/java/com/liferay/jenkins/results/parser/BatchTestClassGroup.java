@@ -34,8 +34,6 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 	}
 
 	public AxisTestClassGroup getAxisTestClassGroup(int axisId) {
-		AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(this, 0);
-
 		return axisTestClassGroups.get(axisId);
 	}
 
