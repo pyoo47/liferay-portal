@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 /**
  * @author Michael Hashimoto
  * @author Peter Yoo
@@ -64,6 +66,18 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 
 					break;
 				}
+			}
+		}
+
+		return modifiedModuleDirsList;
+	}
+
+	public List<File> getModifiedNPMTestModuleDirsList() throws IOException {
+		List<File> modifiedModuleDirsList = new ArrayList<>();
+
+		for (File modifiedModuleDir : getModifiedModuleDirsList()) {
+			if (_isNPMTestModuleDir(modifiedModuleDir)) {
+				modifiedModuleDirsList.add(modifiedModuleDir);
 			}
 		}
 
@@ -142,6 +156,63 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		Collections.sort(moduleDirsList);
 
 		return moduleDirsList;
+	}
+
+	private boolean _isNPMTestModuleDir(File moduleDir) throws IOException {
+		final List<Path> npmTestMarkers = new ArrayList<>();
+
+		Files.walkFileTree(
+			moduleDir.toPath(),
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes attrs)
+					throws IOException {
+
+					if (_isNPMTestMarker(filePath)) {
+						npmTestMarkers.add(filePath);
+
+						return FileVisitResult.TERMINATE;
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+				private boolean _isNPMTestMarker(Path path) {
+					File file = path.toFile();
+
+					String fileName = file.getName();
+
+					if (!fileName.equals("package.json")) {
+						return false;
+					}
+
+					try {
+						JSONObject jsonObject = new JSONObject(
+							new String(Files.readAllBytes(path)));
+
+						if (!jsonObject.has("scripts")) {
+							return false;
+						}
+
+						JSONObject scriptsJSONObject = jsonObject.getJSONObject(
+							"scripts");
+
+						if (!scriptsJSONObject.has("test")) {
+							return false;
+						}
+
+						return true;
+					}
+					catch (IOException ioe) {
+						throw new RuntimeException(ioe);
+					}
+				}
+
+			});
+
+		return !npmTestMarkers.isEmpty();
 	}
 
 	private static class Module {
