@@ -16,6 +16,7 @@ package com.liferay.jenkins.results.parser;
 
 import java.io.File;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 	}
 
 	public AxisTestClassGroup getAxisTestClassGroup(int axisId) {
+		AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(this, 0);
+
 		return axisTestClassGroups.get(axisId);
 	}
 
@@ -60,6 +63,8 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 			new File(
 				this.gitWorkingDirectory.getWorkingDirectory(),
 				"test.properties"));
+
+		testRelevantChanges = _getTestRelevantChanges();
 	}
 
 	protected String getFirstPropertyValue(
@@ -128,7 +133,31 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 	protected final String batchName;
 	protected final GitWorkingDirectory gitWorkingDirectory;
 	protected final Properties portalTestProperties;
+	protected final boolean testRelevantChanges;
 	protected final String testSuiteName;
+
+	private boolean _getTestRelevantChanges() {
+		List<String> propertyNames = new ArrayList<>();
+
+		if (testSuiteName != null) {
+			propertyNames.add(
+				JenkinsResultsParserUtil.combine(
+					"test.relevant.changes[", testSuiteName, "]"));
+		}
+
+		propertyNames.add("test.relevant.changes");
+
+		String propertyValue = getFirstPropertyValue(
+			portalTestProperties, propertyNames);
+
+		if (propertyValue != null) {
+			return Boolean.parseBoolean(propertyValue);
+		}
+
+		return _DEFAULT_TEST_RELEVANT_CHANGES;
+	}
+
+	private static final boolean _DEFAULT_TEST_RELEVANT_CHANGES = false;
 
 	private final Pattern _propertyNamePattern = Pattern.compile(
 		"[^\\]]+\\[(?<batchName>[^\\]]+)\\](\\[(?<testSuiteName>[^\\]]+)\\])?");
