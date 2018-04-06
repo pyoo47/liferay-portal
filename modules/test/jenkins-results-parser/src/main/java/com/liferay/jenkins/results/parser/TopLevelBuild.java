@@ -42,6 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -132,6 +133,11 @@ public class TopLevelBuild extends BaseBuild {
 		String tempMapName = "git." + repositoryType + ".properties";
 
 		return getTempMap(tempMapName);
+	}
+
+	@Override
+	public String getBaseRepositoryName() {
+		return _pullRequest.getRepositoryName();
 	}
 
 	public String getCompanionBranchName() {
@@ -226,6 +232,10 @@ public class TopLevelBuild extends BaseBuild {
 			"https://", jenkinsMaster.getName(), ".liferay.com/",
 			"userContent/jobs/", getJobName(), "/builds/",
 			Integer.toString(getBuildNumber()), "/jenkins-report.html");
+	}
+
+	public PullRequest getPullRequest() {
+		return _pullRequest;
 	}
 
 	@Override
@@ -351,6 +361,8 @@ public class TopLevelBuild extends BaseBuild {
 
 	protected TopLevelBuild(String url, TopLevelBuild topLevelBuild) {
 		super(url, topLevelBuild);
+
+		_pullRequest = new PullRequest(_getPullRequestString());
 	}
 
 	@Override
@@ -516,6 +528,121 @@ public class TopLevelBuild extends BaseBuild {
 		}
 
 		return baseBranchDetailsElement;
+	}
+
+	protected Element[] getBuildFailureElements() {
+		Map<Build, Element> downstreamBuildFailureMessages =
+			getDownstreamBuildMessages("ABORTED", "FAILURE", "UNSTABLE");
+
+		List<Element> failureElements = new ArrayList<>();
+		List<Element> upstreamJobFailureElements = new ArrayList<>();
+
+		int maxFailureCount = 5;
+
+		for (Map.Entry<Build, Element> entry :
+				downstreamBuildFailureMessages.entrySet()) {
+
+			Build failedDownstreamBuild = entry.getKey();
+
+			Element failureElement = entry.getValue();
+
+			if (failureElement != null) {
+				if (UpstreamFailureUtil.isBuildFailingInUpstreamJob(
+						failedDownstreamBuild)) {
+
+					upstreamJobFailureElements.add(failureElement);
+
+					continue;
+				}
+
+				if (isHighPriorityBuildFailureElement(failureElement)) {
+					failureElements.add(0, failureElement);
+
+					continue;
+				}
+
+				failureElements.add(failureElement);
+			}
+
+			Element upstreamJobFailureElement =
+				failedDownstreamBuild.
+					getGitHubMessageUpstreamJobFailureElement();
+
+			if (upstreamJobFailureElement != null) {
+				upstreamJobFailureElements.add(upstreamJobFailureElement);
+			}
+		}
+
+		List<Element> githubMessageFailureElements = new ArrayList<>();
+
+		githubMessageFailureElements.add(Dom4JUtil.getNewElement("hr"));
+
+		if (failureElements.isEmpty() && upstreamJobFailureElements.isEmpty()) {
+			failureElements.add(0, super.getGitHubMessageElement());
+		}
+
+		if (failureElements.isEmpty() &&
+			!upstreamJobFailureElements.isEmpty()) {
+
+			githubMessageFailureElements.add(
+				Dom4JUtil.getNewElement(
+					"h4", null, "This pull contains no unique failures."));
+		}
+		else {
+			githubMessageFailureElements.add(
+				Dom4JUtil.getNewElement(
+					"h4", null, "Failures unique to this pull:"));
+
+			githubMessageFailureElements.add(
+				Dom4JUtil.getOrderedListElement(
+					failureElements, maxFailureCount));
+		}
+
+		String acceptanceUpstreamJobURL = getAcceptanceUpstreamURL();
+
+		if ((failureElements.size() < maxFailureCount) &&
+			!upstreamJobFailureElements.isEmpty()) {
+
+			Element acceptanceUpstreamJobLinkElement =
+				Dom4JUtil.getNewAnchorElement(
+					acceptanceUpstreamJobURL, "acceptance upstream results");
+
+			Element upstreamJobFailureElement = Dom4JUtil.getNewElement(
+				"details", null,
+				Dom4JUtil.getNewElement(
+					"summary", null,
+					Dom4JUtil.getNewElement(
+						"strong", null, "Failures in common with ",
+						acceptanceUpstreamJobLinkElement, " at ",
+						UpstreamFailureUtil.getUpstreamJobFailuresSHA(this),
+						":")));
+
+			int remainingFailureCount =
+				maxFailureCount - failureElements.size();
+
+			Dom4JUtil.getOrderedListElement(
+				upstreamJobFailureElements, upstreamJobFailureElement,
+				remainingFailureCount);
+
+			githubMessageFailureElements.add(Dom4JUtil.getNewElement("hr"));
+			githubMessageFailureElements.add(upstreamJobFailureElement);
+		}
+
+		if (jobName.contains("pullrequest") &&
+			upstreamJobFailureElements.isEmpty() &&
+			(acceptanceUpstreamJobURL != null)) {
+
+			Element upstreamResultElement = Dom4JUtil.getNewElement("h4");
+
+			Dom4JUtil.addToElement(
+				upstreamResultElement, "For upstream results, click ",
+				Dom4JUtil.getNewAnchorElement(
+					acceptanceUpstreamJobURL, "here"));
+
+			githubMessageFailureElements.add(upstreamResultElement);
+		}
+
+		return githubMessageFailureElements.toArray(new Element[0]);
 	}
 
 	protected Element getCompanionBranchDetailsElement() {
@@ -1168,118 +1295,7 @@ public class TopLevelBuild extends BaseBuild {
 		Dom4JUtil.addToElement(detailsElement, getMoreDetailsElement());
 
 		if (!result.equals("SUCCESS")) {
-			Map<Build, Element> downstreamBuildFailureMessages =
-				getDownstreamBuildMessages("ABORTED", "FAILURE", "UNSTABLE");
-
-			List<Element> failureElements = new ArrayList<>();
-			List<Element> upstreamJobFailureElements = new ArrayList<>();
-
-			int maxFailureCount = 5;
-
-			for (Map.Entry<Build, Element> entry :
-					downstreamBuildFailureMessages.entrySet()) {
-
-				Build failedDownstreamBuild = entry.getKey();
-
-				Element failureElement = entry.getValue();
-
-				if (failureElement != null) {
-					if (UpstreamFailureUtil.isBuildFailingInUpstreamJob(
-							failedDownstreamBuild)) {
-
-						upstreamJobFailureElements.add(failureElement);
-
-						continue;
-					}
-
-					if (isHighPriorityBuildFailureElement(failureElement)) {
-						failureElements.add(0, failureElement);
-
-						continue;
-					}
-
-					failureElements.add(failureElement);
-				}
-
-				Element upstreamJobFailureElement =
-					failedDownstreamBuild.
-						getGitHubMessageUpstreamJobFailureElement();
-
-				if (upstreamJobFailureElement != null) {
-					upstreamJobFailureElements.add(upstreamJobFailureElement);
-				}
-			}
-
-			Dom4JUtil.addToElement(
-				detailsElement, Dom4JUtil.getNewElement("hr"));
-
-			if (failureElements.isEmpty() &&
-				upstreamJobFailureElements.isEmpty()) {
-
-				failureElements.add(0, super.getGitHubMessageElement());
-			}
-
-			if (failureElements.isEmpty() &&
-				!upstreamJobFailureElements.isEmpty()) {
-
-				Dom4JUtil.addToElement(
-					detailsElement,
-					Dom4JUtil.getNewElement(
-						"h4", null, "This pull contains no unique failures."));
-			}
-			else {
-				Dom4JUtil.addToElement(
-					detailsElement,
-					Dom4JUtil.getNewElement(
-						"h4", null, "Failures unique to this pull:"));
-
-				Dom4JUtil.getOrderedListElement(
-					failureElements, detailsElement, maxFailureCount);
-			}
-
-			String acceptanceUpstreamJobURL = getAcceptanceUpstreamURL();
-
-			if ((failureElements.size() < maxFailureCount) &&
-				!upstreamJobFailureElements.isEmpty()) {
-
-				Element acceptanceUpstreamJobLinkElement =
-					Dom4JUtil.getNewAnchorElement(
-						acceptanceUpstreamJobURL,
-						"acceptance upstream results");
-
-				Element upstreamJobFailureElement = Dom4JUtil.getNewElement(
-					"details", null,
-					Dom4JUtil.getNewElement(
-						"summary", null,
-						Dom4JUtil.getNewElement(
-							"strong", null, "Failures in common with ",
-							acceptanceUpstreamJobLinkElement, " at ",
-							UpstreamFailureUtil.getUpstreamJobFailuresSHA(this),
-							":")));
-
-				int remainingFailureCount =
-					maxFailureCount - failureElements.size();
-
-				Dom4JUtil.getOrderedListElement(
-					upstreamJobFailureElements, upstreamJobFailureElement,
-					remainingFailureCount);
-
-				Dom4JUtil.addToElement(
-					detailsElement, Dom4JUtil.getNewElement("hr"),
-					upstreamJobFailureElement);
-			}
-
-			if (jobName.contains("pullrequest") &&
-				upstreamJobFailureElements.isEmpty() &&
-				(acceptanceUpstreamJobURL != null)) {
-
-				Dom4JUtil.addToElement(
-					Dom4JUtil.getNewElement("h4", detailsElement),
-					"For upstream results, click ",
-					Dom4JUtil.getNewAnchorElement(
-						acceptanceUpstreamJobURL, "here"),
-					".");
-			}
+			Dom4JUtil.addToElement(detailsElement, getBuildFailureElements());
 		}
 
 		return rootElement;
@@ -1308,6 +1324,22 @@ public class TopLevelBuild extends BaseBuild {
 	protected static final Pattern gitRepositoryTempMapNamePattern =
 		Pattern.compile("git\\.(?<repositoryType>.*)\\.properties");
 
+	private String _getPullRequestString() {
+		JSONObject buildJSONObject = getBuildJSONObject();
+
+		JSONArray actionsJSONArray = buildJSONObject.getJSONArray("actions");
+
+		JSONObject parametersJSONObject = actionsJSONArray.getJSONObject(0);
+
+		JSONArray parametersJSONArray = parametersJSONObject.getJSONArray(
+			"parameters");
+
+		JSONObject pullRequestURLJSONObject = parametersJSONArray.getJSONObject(
+			2);
+
+		return pullRequestURLJSONObject.getString("value");
+	}
+
 	private static final long _DOWNSTREAM_BUILDS_LISTING_INTERVAL =
 		1000 * 60 * 5;
 
@@ -1330,6 +1362,7 @@ public class TopLevelBuild extends BaseBuild {
 
 	private boolean _compareToUpstream = true;
 	private long _lastDownstreamBuildsListingTimestamp = -1L;
+	private PullRequest _pullRequest;
 	private long _updateDuration;
 
 }
