@@ -71,7 +71,6 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 	protected PortalRepositoryJob(String jobName) {
 		super(jobName);
 
-		branchName = _getBranchName();
 		gitWorkingDirectory = _getPortalGitWorkingDirectory();
 
 		portalTestProperties = JenkinsResultsParserUtil.getProperties(
@@ -120,16 +119,6 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 
 	protected final Properties portalTestProperties;
 
-	private String _getBranchName() {
-		Matcher matcher = _jobNamePattern.matcher(jobName);
-
-		if (matcher.find()) {
-			return matcher.group("branchName");
-		}
-
-		return "master";
-	}
-
 	private PortalGitWorkingDirectory _getPortalGitWorkingDirectory() {
 		if ((gitWorkingDirectory != null) &&
 			gitWorkingDirectory instanceof PortalGitWorkingDirectory) {
@@ -137,7 +126,6 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 			return (PortalGitWorkingDirectory)gitWorkingDirectory;
 		}
 
-		String branchName = _getBranchName();
 		String workingDirectoryPath = "/opt/dev/projects/github/liferay-portal";
 
 		if (!branchName.equals("master")) {
@@ -161,8 +149,6 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 		return portalGitWorkingDirectory;
 	}
 
-	private static final Pattern _jobNamePattern = Pattern.compile(
-		"[^\\(]+\\((?<branchName>[^\\)]+)\\)");
 	private static final Pattern _propertiesPattern = Pattern.compile(
 		"\\$\\{([^\\}]+)\\}");
 
