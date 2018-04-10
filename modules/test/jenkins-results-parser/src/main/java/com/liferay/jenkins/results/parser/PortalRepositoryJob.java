@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -98,25 +96,6 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 		return list;
 	}
 
-	protected String getProperty(Properties properties, String name) {
-		if (!properties.containsKey(name)) {
-			return null;
-		}
-
-		String value = properties.getProperty(name);
-
-		Matcher matcher = _propertiesPattern.matcher(value);
-
-		String newValue = value;
-
-		while (matcher.find()) {
-			newValue = newValue.replace(
-				matcher.group(0), getProperty(properties, matcher.group(1)));
-		}
-
-		return newValue;
-	}
-
 	protected final Properties portalTestProperties;
 
 	private PortalGitWorkingDirectory _getPortalGitWorkingDirectory() {
@@ -148,8 +127,5 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 
 		return portalGitWorkingDirectory;
 	}
-
-	private static final Pattern _propertiesPattern = Pattern.compile(
-		"\\$\\{([^\\}]+)\\}");
 
 }
