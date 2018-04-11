@@ -1128,7 +1128,7 @@ public class TopLevelBuild extends BaseBuild {
 			sb.append(":x: ");
 		}
 
-		sb.append(getTestSuiteReportString());
+		sb.append(getTestSuiteString());
 
 		sb.append(" - ");
 		sb.append(Integer.toString(successCount));
@@ -1224,7 +1224,7 @@ public class TopLevelBuild extends BaseBuild {
 		return testCount;
 	}
 
-	protected String getTestSuiteReportString() {
+	protected String getTestSuiteString() {
 		String testSuiteReportString = "ci:test";
 
 		String ciTestSuite = getParameterValue("CI_TEST_SUITE");
