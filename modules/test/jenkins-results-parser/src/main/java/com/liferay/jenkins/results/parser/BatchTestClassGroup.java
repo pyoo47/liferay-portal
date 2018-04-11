@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -111,15 +112,13 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 					continue;
 				}
 
-				if (testSuiteName == null) {
-					continue;
+				String targetTestSuiteName = matcher.group("testSuiteName");
+
+				if (Objects.equals(testSuiteName, targetTestSuiteName)) {
+					return wildcardPropertyName;
 				}
 
-				if (!testSuiteName.equals(matcher.group("testSuiteName"))) {
-					continue;
-				}
-
-				return wildcardPropertyName;
+				continue;
 			}
 		}
 
