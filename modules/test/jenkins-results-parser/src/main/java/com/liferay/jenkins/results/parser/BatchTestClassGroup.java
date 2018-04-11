@@ -111,15 +111,19 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 					continue;
 				}
 
-				if (testSuiteName == null) {
-					continue;
+				String targetTestSuiteName = matcher.group("testSuiteName");
+
+				if ((testSuiteName == null) && (targetTestSuiteName == null)) {
+					return wildcardPropertyName;
 				}
 
-				if (!testSuiteName.equals(matcher.group("testSuiteName"))) {
-					continue;
+				if ((testSuiteName != null) &&
+					testSuiteName.equals(targetTestSuiteName)) {
+
+					return wildcardPropertyName;
 				}
 
-				return wildcardPropertyName;
+				continue;
 			}
 		}
 
