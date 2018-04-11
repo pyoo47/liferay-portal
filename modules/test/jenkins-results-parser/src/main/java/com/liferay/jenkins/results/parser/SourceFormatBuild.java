@@ -139,7 +139,7 @@ public class SourceFormatBuild extends TopLevelBuild {
 	}
 
 	@Override
-	protected String getTestSuiteReportString() {
+	protected String getTestSuiteString() {
 		return "ci:test:sf";
 	}
 
