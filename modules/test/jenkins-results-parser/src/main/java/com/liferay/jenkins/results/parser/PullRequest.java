@@ -133,6 +133,12 @@ public class PullRequest {
 		return baseJSONObject.getString("ref");
 	}
 
+	public String getUpstreamBranchSHA() {
+		JSONObject baseJSONObject = _jsonObject.getJSONObject("base");
+
+		return baseJSONObject.getString("sha");
+	}
+
 	public void refresh() {
 		try {
 			_jsonObject = JenkinsResultsParserUtil.toJSONObject(getURL());
