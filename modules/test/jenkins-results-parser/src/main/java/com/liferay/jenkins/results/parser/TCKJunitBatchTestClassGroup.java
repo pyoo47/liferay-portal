@@ -17,6 +17,8 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +26,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -32,24 +35,39 @@ import java.util.regex.Pattern;
 /**
  * @author Michael Hashimoto
  */
-public class TCKJunitBatchTestClassGroup extends JUnitBatchTestClassGroup {
+public class TCKJunitBatchTestClassGroup extends BatchTestClassGroup {
 
 	protected TCKJunitBatchTestClassGroup(
 		String batchName, PortalGitWorkingDirectory portalGitWorkingDirectory,
 		String testSuiteName) {
 
 		super(batchName, portalGitWorkingDirectory, testSuiteName);
-	}
 
-	@Override
-	protected void setTestClassFiles() {
 		File workingDirectory = portalGitWorkingDirectory.getWorkingDirectory();
 
 		File tckHomeDirectory = new File(workingDirectory, "tools/tck");
 
+		if (!tckHomeDirectory.exists()) {
+			tckHomeDirectory = new File(
+				portalTestProperties.getProperty("tck.home"));
+		}
+
+		_tckHomeDirectory = tckHomeDirectory;
+
+		_testClassNameExcludePathMatchers = _getTestClassNamesPathMatchers(
+			"test.batch.class.names.excludes");
+		_testClassNameIncludePathMatchers = _getTestClassNamesPathMatchers(
+			"test.batch.class.names.includes");
+
+		setTestClassFiles();
+
+		setAxisTestClassGroups();
+	}
+
+	protected void setTestClassFiles() {
 		try {
 			Files.walkFileTree(
-				tckHomeDirectory.toPath(),
+				_tckHomeDirectory.toPath(),
 				new SimpleFileVisitor<Path>() {
 
 					@Override
@@ -85,12 +103,12 @@ public class TCKJunitBatchTestClassGroup extends JUnitBatchTestClassGroup {
 
 					private boolean _pathExcluded(Path path) {
 						return _pathMatches(
-							path, testClassNamesExcludesPathMatchers);
+							path, _testClassNameExcludePathMatchers);
 					}
 
 					private boolean _pathIncluded(Path path) {
 						return _pathMatches(
-							path, testClassNamesIncludesPathMatchers);
+							path, _testClassNameIncludePathMatchers);
 					}
 
 					private boolean _pathMatches(
@@ -113,11 +131,46 @@ public class TCKJunitBatchTestClassGroup extends JUnitBatchTestClassGroup {
 		catch (IOException ioe) {
 			throw new RuntimeException(
 				"Unable to search for test file names in " +
-					workingDirectory.getPath(),
+					_tckHomeDirectory.getPath(),
 				ioe);
 		}
 
 		Collections.sort(testClassFiles);
 	}
+
+	private List<PathMatcher> _getTestClassNamesPathMatchers(
+		String propertyName) {
+
+		String testClassNamesRelativeGlobs = getFirstPropertyValue(
+			propertyName);
+
+		if ((testClassNamesRelativeGlobs == null) ||
+			testClassNamesRelativeGlobs.isEmpty()) {
+
+			return new ArrayList<>();
+		}
+
+		List<PathMatcher> pathMatchers = new ArrayList<>();
+
+		String workingDirectoryPath = _tckHomeDirectory.getAbsolutePath();
+
+		for (String testClassNamesRelativeGlob :
+				testClassNamesRelativeGlobs.split(",")) {
+
+			FileSystem fileSystem = FileSystems.getDefault();
+
+			pathMatchers.add(
+				fileSystem.getPathMatcher(
+					JenkinsResultsParserUtil.combine(
+						"glob:", workingDirectoryPath, "/",
+						testClassNamesRelativeGlob)));
+		}
+
+		return pathMatchers;
+	}
+
+	private final File _tckHomeDirectory;
+	private final List<PathMatcher> _testClassNameExcludePathMatchers;
+	private final List<PathMatcher> _testClassNameIncludePathMatchers;
 
 }
