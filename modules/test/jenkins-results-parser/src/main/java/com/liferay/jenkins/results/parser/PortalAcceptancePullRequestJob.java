@@ -14,7 +14,9 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Michael Hashimoto
@@ -32,7 +34,7 @@ public class PortalAcceptancePullRequestJob extends PortalRepositoryJob {
 	}
 
 	@Override
-	public List<String> getBatchNames() {
+	public Set<String> getBatchNames() {
 		String testBatchNames = getProperty(
 			portalTestProperties, "test.batch.names[" + _testSuiteName + "]");
 
@@ -41,11 +43,29 @@ public class PortalAcceptancePullRequestJob extends PortalRepositoryJob {
 				portalTestProperties, "test.batch.names");
 		}
 
-		return getListFromString(testBatchNames);
+		Set<String> testBatchNamesSet = getSetFromString(testBatchNames);
+
+		if (_isPortalWebOnly()) {
+			Set<String> irrelevantBatchNamesSet = new TreeSet<>();
+
+			for (String testBatchName : testBatchNamesSet) {
+				if (!testBatchName.contains("compile-jsp") &&
+					!testBatchName.contains("functional") &&
+					!testBatchName.contains("portal-web") &&
+					!testBatchName.contains("source-format")) {
+
+					irrelevantBatchNamesSet.add(testBatchName);
+				}
+			}
+
+			testBatchNamesSet.removeAll(irrelevantBatchNamesSet);
+		}
+
+		return testBatchNamesSet;
 	}
 
 	@Override
-	public List<String> getDistTypes() {
+	public Set<String> getDistTypes() {
 		String testBatchDistAppServers = getProperty(
 			portalTestProperties,
 			"test.batch.dist.app.servers[" + _testSuiteName + "]");
@@ -55,7 +75,7 @@ public class PortalAcceptancePullRequestJob extends PortalRepositoryJob {
 				portalTestProperties, "test.batch.dist.app.servers");
 		}
 
-		return getListFromString(testBatchDistAppServers);
+		return getSetFromString(testBatchDistAppServers);
 	}
 
 	@Override
@@ -84,6 +104,32 @@ public class PortalAcceptancePullRequestJob extends PortalRepositoryJob {
 
 	public String getTestSuiteName() {
 		return _testSuiteName;
+	}
+
+	private boolean _isPortalWebOnly() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("git diff-tree --no-commit-id --name-only -r ");
+		sb.append(System.getenv("TOP_LEVEL_BRANCH_NAME"));
+		sb.append(" ");
+		sb.append(System.getenv("GITHUB_UPSTREAM_BRANCH_SHA"));
+
+		GitWorkingDirectory gitWorkingDirectory = getGitWorkingDirectory();
+
+		GitWorkingDirectory.ExecutionResult executionResult =
+			gitWorkingDirectory.executeBashCommands(sb.toString());
+
+		String standardOut = executionResult.getStandardOut();
+
+		if (!Objects.isNull(standardOut)) {
+			for (String diffFilePath : standardOut.split("\n")) {
+				if (!diffFilePath.contains("portal-web/")) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	private final String _testSuiteName;

@@ -17,12 +17,10 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -32,19 +30,19 @@ import org.apache.commons.lang.StringUtils;
 public abstract class PortalRepositoryJob extends RepositoryJob {
 
 	@Override
-	public List<String> getBatchNames() {
+	public Set<String> getBatchNames() {
 		String testBatchNames = getProperty(
 			portalTestProperties, "test.batch.names");
 
-		return getListFromString(testBatchNames);
+		return getSetFromString(testBatchNames);
 	}
 
 	@Override
-	public List<String> getDistTypes() {
+	public Set<String> getDistTypes() {
 		String testBatchDistAppServers = getProperty(
 			portalTestProperties, "test.batch.dist.app.servers");
 
-		return getListFromString(testBatchDistAppServers);
+		return getSetFromString(testBatchDistAppServers);
 	}
 
 	@Override
@@ -59,7 +57,6 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 			return (PortalGitWorkingDirectory)gitWorkingDirectory;
 		}
 
-		String branchName = _getBranchName();
 		String workingDirectoryPath = "/opt/dev/projects/github/liferay-portal";
 
 		if (!branchName.equals("master")) {
@@ -102,7 +99,6 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 	protected PortalRepositoryJob(String jobName) {
 		super(jobName);
 
-		branchName = _getBranchName();
 		gitWorkingDirectory = getPortalGitWorkingDirectory();
 
 		portalTestProperties = JenkinsResultsParserUtil.getProperties(
@@ -110,60 +106,26 @@ public abstract class PortalRepositoryJob extends RepositoryJob {
 				gitWorkingDirectory.getWorkingDirectory(), "test.properties"));
 	}
 
-	protected List<String> getListFromString(String string) {
+	protected Set<String> getSetFromString(String string) {
 		if (string == null) {
-			return Collections.emptyList();
+			return Collections.emptySet();
 		}
 
-		List<String> list = new ArrayList<>();
+		Set<String> set = new TreeSet<>();
 
 		for (String item : StringUtils.split(string, ",")) {
-			if (list.contains(item) || item.startsWith("#")) {
+			item = item.trim();
+
+			if (item.startsWith("#")) {
 				continue;
 			}
 
-			list.add(item);
+			set.add(item);
 		}
 
-		Collections.sort(list);
-
-		return list;
-	}
-
-	protected String getProperty(Properties properties, String name) {
-		if (!properties.containsKey(name)) {
-			return null;
-		}
-
-		String value = properties.getProperty(name);
-
-		Matcher matcher = _propertiesPattern.matcher(value);
-
-		String newValue = value;
-
-		while (matcher.find()) {
-			newValue = newValue.replace(
-				matcher.group(0), getProperty(properties, matcher.group(1)));
-		}
-
-		return newValue;
+		return set;
 	}
 
 	protected final Properties portalTestProperties;
-
-	private String _getBranchName() {
-		Matcher matcher = _jobNamePattern.matcher(jobName);
-
-		if (matcher.find()) {
-			return matcher.group("branchName");
-		}
-
-		return "master";
-	}
-
-	private static final Pattern _jobNamePattern = Pattern.compile(
-		"[^\\(]+\\((?<branchName>[^\\)]+)\\)");
-	private static final Pattern _propertiesPattern = Pattern.compile(
-		"\\$\\{([^\\}]+)\\}");
 
 }

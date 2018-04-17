@@ -14,17 +14,15 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Set;
-
 /**
  * @author Michael Hashimoto
  */
-public interface Job {
+public class SubrepositoryAcceptancePullRequestJob extends SubrepositoryJob {
 
-	public Set<String> getBatchNames();
+	public SubrepositoryAcceptancePullRequestJob(
+		String jobName, String repositoryName) {
 
-	public Set<String> getDistTypes();
-
-	public String getJobName();
+		super(jobName, repositoryName);
+	}
 
 }
