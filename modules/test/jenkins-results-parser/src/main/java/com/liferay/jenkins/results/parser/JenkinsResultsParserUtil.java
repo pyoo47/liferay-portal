@@ -36,8 +36,15 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -645,6 +652,63 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
+	public static List<URL> getIncludedResourceURLs(
+			String[] resourceIncludesRelativeGlobs, File rootDir)
+		throws IOException {
+
+		final List<PathMatcher> pathMatchers = new ArrayList<>();
+
+		FileSystem fileSystem = FileSystems.getDefault();
+
+		for (String resourceIncludesRelativeGlob :
+				resourceIncludesRelativeGlobs) {
+
+			pathMatchers.add(
+				fileSystem.getPathMatcher(
+					combine(
+						"glob:", rootDir.getAbsolutePath(), File.separator,
+						resourceIncludesRelativeGlob)));
+		}
+
+		final List<URL> includedResourceURLs = new ArrayList<>();
+
+		Path rootDirPath = rootDir.toPath();
+
+		if (!Files.exists(rootDirPath)) {
+			System.out.println(
+				combine(
+					"Directory ", rootDirPath.toString(), " does not exist."));
+
+			return includedResourceURLs;
+		}
+
+		Files.walkFileTree(
+			rootDirPath,
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					for (PathMatcher pathMatcher : pathMatchers) {
+						if (pathMatcher.matches(filePath)) {
+							URI uri = filePath.toUri();
+
+							includedResourceURLs.add(uri.toURL());
+
+							break;
+						}
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
+
+		return includedResourceURLs;
+	}
+
 	public static float getJavaVersionNumber() {
 		Matcher matcher = _javaVersionPattern.matcher(
 			System.getProperty("java.version"));
@@ -891,6 +955,18 @@ public class JenkinsResultsParserUtil {
 				"Unable to load properties file " +
 					basePropertiesFile.getPath(),
 				ioe);
+		}
+
+		return properties;
+	}
+
+	public static Properties getProperties(File... propertiesFiles) {
+		Properties properties = new Properties();
+
+		for (File propertiesFile : propertiesFiles) {
+			if ((propertiesFile != null) && propertiesFile.exists()) {
+				properties.putAll(getProperties(propertiesFile));
+			}
 		}
 
 		return properties;
