@@ -18,7 +18,7 @@ package com.liferay.source.formatter;
  * @author Hugo Huijser
  */
 public enum ProgressStatus {
-
+	// Test
 	CHECK_FILE_COMPLETED, CHECKS_INITIALIZED, SOURCE_FORMAT_COMPLETED
 
 }
