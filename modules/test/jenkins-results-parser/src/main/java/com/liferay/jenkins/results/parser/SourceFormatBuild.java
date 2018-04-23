@@ -46,7 +46,7 @@ public class SourceFormatBuild extends TopLevelBuild {
 	}
 
 	@Override
-	public Element getGitHubMessageElement() {
+	public Element getTopGithubMessageElement() {
 		update();
 
 		Element rootElement = Dom4JUtil.getNewElement(
@@ -70,8 +70,7 @@ public class SourceFormatBuild extends TopLevelBuild {
 		}
 
 		Dom4JUtil.addToElement(
-			detailsElement, String.valueOf(successCount),
-			" out of 1 jobs PASSED");
+			detailsElement, successCount, " out of 1 jobs PASSED");
 
 		if (!result.equals("SUCCESS")) {
 			Dom4JUtil.addToElement(
@@ -116,33 +115,39 @@ public class SourceFormatBuild extends TopLevelBuild {
 		String senderBranchName = _pullRequest.getSenderBranchName();
 		String senderUsername = _pullRequest.getSenderUsername();
 
-		String senderBranchURL =
-			"https://github.com/" + senderUsername + "/" + repositoryName +
-				"/tree/" + senderBranchName;
+		String senderBranchURL = JenkinsResultsParserUtil.combine(
+			"https://github.com/",
+			senderUsername,
+			"/",
+			repositoryName,
+			"/tree/",
+			senderBranchName);
 
 		String senderSHA = _pullRequest.getSenderSHA();
 
-		String senderCommitURL =
-			"https://github.com/" + senderUsername + "/" + repositoryName +
-				"/commit/" + senderSHA;
+		String senderCommitURL = JenkinsResultsParserUtil.combine(
+			"https://github.com/",
+			senderUsername,
+			"/",
+			repositoryName,
+			"/commit/",
+			senderSHA);
 
 		Element senderBranchDetailsElement = Dom4JUtil.getNewElement(
 			"p", null, "Branch Name: ",
-			Dom4JUtil.getNewAnchorElement(senderBranchURL, senderBranchName));
-
-		Dom4JUtil.addToElement(
-			senderBranchDetailsElement, Dom4JUtil.getNewElement("br"),
-			"Branch GIT ID: ",
+			Dom4JUtil.getNewAnchorElement(senderBranchURL, senderBranchName),
+			Dom4JUtil.getNewElement("br"), "Branch GIT ID: ",
 			Dom4JUtil.getNewAnchorElement(senderCommitURL, senderSHA));
 
 		return senderBranchDetailsElement;
 	}
 
 	@Override
-	protected String getTestSuiteString() {
-		return "ci:test:sf";
+	protected String getTestSuiteName() {
+		return TEST_SUITE_NAME;
 	}
 
 	private PullRequest _pullRequest;
+	private static final String TEST_SUITE_NAME = "ci:test:sf";
 
 }
