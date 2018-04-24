@@ -46,6 +46,15 @@ public class SourceFormatBuild extends TopLevelBuild {
 	}
 
 	@Override
+	public List<Build> getDownstreamBuilds(String result, String status) {
+		List<Build> downstreamBuilds = super(result, status);
+
+		downstreamBuilds.add(this);
+
+		return downstreamBuilds;
+	}
+
+	@Override
 	public Element getTopGithubMessageElement() {
 		update();
 
