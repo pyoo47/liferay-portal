@@ -70,7 +70,7 @@ public class SourceFormatBuild extends TopLevelBuild {
 		}
 
 		Dom4JUtil.addToElement(
-			detailsElement, successCount, " out of 1 jobs PASSED");
+			detailsElement, String.valueOf(successCount), " out of 1 jobs PASSED");
 
 		if (!result.equals("SUCCESS")) {
 			Dom4JUtil.addToElement(
@@ -99,6 +99,57 @@ public class SourceFormatBuild extends TopLevelBuild {
 		super(url, topLevelBuild);
 
 		_pullRequest = new PullRequest(getParameterValue("PULL_REQUEST_URL"));
+	}
+
+	protected Element getCompanionBranchDetailsElement() {
+		String companionBranchName = getCompanionBranchName(
+			_pullRequest.getUpstreamBranchName());
+		String repositoryName = _pullRequest.getRepositoryName();
+		String upstreamUsername = _pullRequest.getOwnerUsername();
+
+		String companionBranchURL = JenkinsResultsParserUtil.combine(
+			"https://github.com/",
+			upstreamUsername,
+			"/",
+			repositoryName,
+			"/tree/",
+			companionBranchName);
+
+		String companionBranchSHA = getCompanionBranchSHA();
+
+		Element companionBranchDetailsElement = Dom4JUtil.getNewElement(
+			"p", null, "Branch Name: ",
+			Dom4JUtil.getNewAnchorElement(companionBranchURL, companionBranchName),
+			Dom4JUtil.getNewElement("br"), "Branch GIT ID: ",
+			Dom4JUtil.getNewAnchorElement(
+				companionBranchCommitURL, companionBranchSHA));
+
+		return companionBranchDetailsElement;
+	}
+
+	protected String getCompanionBranchName(String currentBranchName) {
+		String companionBranchName = currentBranchName.substring(
+			0, currentBranchName.indexOf("-private"));
+
+		return companionBranchName;
+	}
+
+	protected Element getDetailsElement() {
+		Element detailsElement = Dom4JUtil.getNewElement(
+			"details", null,
+			Dom4JUtil.getNewElement(
+				"summary", null, "Click here for more details."),
+			Dom4JUtil.getNewElement("h4", null, "Base Branch:"),
+			getBaseBranchDetailsElement(),
+			Dom4JUtil.getNewElement("h4", null, "Sender Branch:"),
+			getSenderBranchDetailsElement());
+
+		if (_pullRequest.getUpstreamBranchName().contains("-private")) {
+			Dom4JUtil.addToElement(
+				detailsElement,
+				Dom4JUtil.getNewElement("h4", null, "Companion Branch:"),
+				getCompanionBranchDetailsElement());
+		}
 	}
 
 	@Override
