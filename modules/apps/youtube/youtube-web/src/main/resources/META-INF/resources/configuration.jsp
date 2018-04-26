@@ -31,7 +31,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 	<liferay-frontend:edit-form-body>
 		<liferay-frontend:fieldset-group>
-			<liferay-frontend:fieldset>
+			<liferay-frontend:fieldset  >
 				<aui:input label="video-id" name="preferences--url--" value="<%= youTubeDisplayContext.getURL() %>" />
 
 				<aui:select inlineField="<%= true %>" label="preset-frame-size" name="preferences--presetSize--" onChange='<%= renderResponse.getNamespace() + "updateFrameSize(this.value);" %>' value="<%= youTubeDisplayContext.getPresetSize() %>">
