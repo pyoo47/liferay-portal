@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -1128,16 +1129,7 @@ public class TopLevelBuild extends BaseBuild {
 			sb.append(":x: ");
 		}
 
-		sb.append("ci:test");
-
-		String ciTestSuite = getParameterValue("CI_TEST_SUITE");
-
-		if ((ciTestSuite != null) && !ciTestSuite.isEmpty() &&
-			!ciTestSuite.equals("default")) {
-
-			sb.append(":");
-			sb.append(ciTestSuite);
-		}
+		sb.append(getTestSuiteString());
 
 		sb.append(" - ");
 		sb.append(Integer.toString(successCount));
@@ -1231,6 +1223,22 @@ public class TopLevelBuild extends BaseBuild {
 		}
 
 		return testCount;
+	}
+
+	protected String getTestSuiteName() {
+		String testSuiteName = "ci:test";
+
+		String ciTestSuite = getParameterValue("CI_TEST_SUITE");
+
+		if (Objects.equals(ciTestSuite, "default")) {
+
+			testSuiteName = JenkinsResultsParserUtil.combine(
+				testSuiteName,
+				":",
+				ciTestSuite);
+		}
+
+		return testSuiteName;
 	}
 
 	protected Element getTopGitHubMessageElement() {
