@@ -34,6 +34,13 @@ import java.util.regex.Pattern;
 public class LoadBalancerUtil {
 
 	public static String getMostAvailableMasterURL(Properties properties) {
+		return getMostAvailableMasterURL(properties, true);
+	}
+
+	public static String getMostAvailableMasterURL(
+		Properties properties, boolean verbose) {
+
+		_verbose = verbose;
 		long start = System.currentTimeMillis();
 
 		int retries = 0;
@@ -77,7 +84,7 @@ public class LoadBalancerUtil {
 					sb.append("\n");
 				}
 
-				System.out.print(sb);
+				_logToJenkinsConsole(sb.toString());
 
 				sb = new StringBuilder();
 
@@ -87,7 +94,7 @@ public class LoadBalancerUtil {
 				sb.append(mostAvailableJenkinsMaster.getAvailableSlavesCount());
 				sb.append(" available slaves.");
 
-				System.out.println(sb);
+				_logToJenkinsConsole(sb.toString());
 
 				int invokedBatchSize = 0;
 
@@ -113,7 +120,7 @@ public class LoadBalancerUtil {
 				throw e;
 			}
 			finally {
-				System.out.println(
+				_logToJenkinsConsole(
 					"Got most available master URL in " +
 						JenkinsResultsParserUtil.toDurationString(
 							System.currentTimeMillis() - start));
@@ -218,7 +225,7 @@ public class LoadBalancerUtil {
 		String blacklistString = properties.getProperty(
 			"jenkins.load.balancer.blacklist", "");
 
-		System.out.println("Blacklist: " + blacklistString);
+		_logToJenkinsConsole("Blacklist: " + blacklistString);
 
 		if (blacklistString.isEmpty()) {
 			return Collections.emptyList();
@@ -239,6 +246,12 @@ public class LoadBalancerUtil {
 		}
 
 		return _nextUpdateTimestampMap.get(masterPrefix);
+	}
+
+	private static void _logToJenkinsConsole(String output) {
+		if (_verbose) {
+			System.out.println(output);
+		}
 	}
 
 	private static void _setNextUpdateTimestamp(
@@ -300,5 +313,6 @@ public class LoadBalancerUtil {
 	private static long _updateInterval = 1000 * 10;
 	private static final Pattern _urlPattern = Pattern.compile(
 		"http://(?<masterPrefix>.+-\\d?).liferay.com");
+	private static boolean _verbose;
 
 }
