@@ -45,44 +45,48 @@ public class NPMTestBatchTestClassGroup extends BatchTestClassGroup {
 
 		super(batchName, portalGitWorkingDirectory, testSuiteName);
 
-		_setTestClassFiles();
+		_setTestClasses();
 
 		_setAxisTestClassGroups();
 	}
 
 	private void _setAxisTestClassGroups() {
-		if (!testClassFiles.isEmpty()) {
+		if (!testClasses.isEmpty()) {
 			AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(
 				this, 0);
 
-			for (File testClassFile : testClassFiles) {
-				axisTestClassGroup.addTestClassFile(testClassFile);
+			for (TestClass testClass : testClasses) {
+				axisTestClassGroup.addTestClass(testClass);
 			}
 
 			axisTestClassGroups.put(0, axisTestClassGroup);
 		}
 	}
 
-	private void _setTestClassFiles() {
-		if (testRelevantChanges) {
-			try {
-				List<File> moduleDirs =
+	private void _setTestClasses() {
+		try {
+			List<File> moduleDirs;
+
+			if (testRelevantChanges) {
+				moduleDirs =
 					portalGitWorkingDirectory.
 						getModifiedNPMTestModuleDirsList();
-
-				for (File moduleDir : moduleDirs) {
-					testClassFiles.add(moduleDir);
-				}
 			}
-			catch (IOException ioe) {
-				throw new RuntimeException(ioe);
+			else {
+				moduleDirs =
+					portalGitWorkingDirectory.getNPMTestModuleDirsList();
+			}
+
+			for (File moduleDir : moduleDirs) {
+				TestClass testClass = new TestClass(moduleDir);
+
+				testClass.addTestMethod(batchName);
+
+				testClasses.add(testClass);
 			}
 		}
-		else {
-			testClassFiles.add(
-				new File(
-					portalGitWorkingDirectory.getWorkingDirectory(),
-					"modules"));
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
 		}
 	}
 

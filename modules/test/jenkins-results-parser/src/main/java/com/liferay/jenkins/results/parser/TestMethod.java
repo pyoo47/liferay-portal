@@ -14,34 +14,21 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.io.File;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * @author Peter Yoo
+ * @author Michael Hashimoto
  */
-public abstract class BaseTestClassGroup implements TestClassGroup {
+public class TestMethod {
 
-	public List<TestClass> getTestClasses() {
-		return testClasses;
+	public TestMethod(String name, TestClass testClass) {
+		_name = name;
+		_testClass = testClass;
 	}
 
-	public List<File> getTestClassFiles() {
-		List<File> testClassFiles = new ArrayList<>();
-
-		for (TestClass testClass : testClasses) {
-			testClassFiles.add(testClass.getFile());
-		}
-
-		return testClassFiles;
+	public String getName() {
+		return _name;
 	}
 
-	protected void addTestClass(TestClass testClass) {
-		testClasses.add(testClass);
-	}
-
-	protected final List<TestClass> testClasses = new ArrayList<>();
+	private final String _name;
+	private final TestClass _testClass;
 
 }

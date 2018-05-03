@@ -14,8 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.io.File;
-
 /**
  * @author Michael Hashimoto
  */
@@ -38,10 +36,6 @@ public class AxisTestClassGroup extends BaseTestClassGroup {
 
 		_batchTestClassGroup = batchTestClassGroup;
 		_id = id;
-	}
-
-	protected void addTestClassFile(File testClassFile) {
-		testClassFiles.add(testClassFile);
 	}
 
 	private final BatchTestClassGroup _batchTestClassGroup;

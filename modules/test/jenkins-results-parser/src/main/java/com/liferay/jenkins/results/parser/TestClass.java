@@ -20,28 +20,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Peter Yoo
+ * @author Michael Hashimoto
  */
-public abstract class BaseTestClassGroup implements TestClassGroup {
+public class TestClass implements Comparable {
 
-	public List<TestClass> getTestClasses() {
-		return testClasses;
+	public TestClass(File file) {
+		_file = file;
 	}
 
-	public List<File> getTestClassFiles() {
-		List<File> testClassFiles = new ArrayList<>();
-
-		for (TestClass testClass : testClasses) {
-			testClassFiles.add(testClass.getFile());
-		}
-
-		return testClassFiles;
+	public void addTestMethod(String methodName) {
+		addTestMethod(new TestMethod(methodName, this));
 	}
 
-	protected void addTestClass(TestClass testClass) {
-		testClasses.add(testClass);
+	public void addTestMethod(TestMethod testMethod) {
+		_testMethods.add(testMethod);
 	}
 
-	protected final List<TestClass> testClasses = new ArrayList<>();
+	@Override
+	public int compareTo(Object o) {
+		TestClass testClass = (TestClass)o;
+
+		return _file.compareTo(testClass.getFile());
+	}
+
+	public File getFile() {
+		return _file;
+	}
+
+	public List<TestMethod> getTestMethods() {
+		return _testMethods;
+	}
+
+	private final File _file;
+	private final List<TestMethod> _testMethods = new ArrayList<>();
 
 }
