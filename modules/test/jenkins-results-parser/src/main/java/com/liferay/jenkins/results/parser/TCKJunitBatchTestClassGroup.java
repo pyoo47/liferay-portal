@@ -35,6 +35,22 @@ import java.util.List;
  */
 public class TCKJunitBatchTestClassGroup extends BatchTestClassGroup {
 
+	public static class TCKBatchTestClass extends TestClass {
+
+		protected static TestClass getInstance(File warFile, String batchName) {
+			TestClass testClass = new TCKBatchTestClass(warFile, batchName);
+
+			return testClass;
+		}
+
+		protected TCKBatchTestClass(File file, String batchName) {
+			super(file);
+
+			addTestMethod(batchName);
+		}
+
+	}
+
 	protected TCKJunitBatchTestClassGroup(
 		String batchName, PortalGitWorkingDirectory portalGitWorkingDirectory,
 		String testSuiteName) {
@@ -58,12 +74,12 @@ public class TCKJunitBatchTestClassGroup extends BatchTestClassGroup {
 		_testClassNameIncludePathMatchers = _getTestClassNamesPathMatchers(
 			"test.batch.class.names.includes");
 
-		setTestClassFiles();
+		setTestClasses();
 
 		setAxisTestClassGroups();
 	}
 
-	protected void setTestClassFiles() {
+	protected void setTestClasses() {
 		try {
 			Files.walkFileTree(
 				_tckHomeDirectory.toPath(),
@@ -79,7 +95,9 @@ public class TCKJunitBatchTestClassGroup extends BatchTestClassGroup {
 						}
 
 						if (_pathIncluded(filePath)) {
-							testClassFiles.add(filePath.toFile());
+							testClasses.add(
+								TCKBatchTestClass.getInstance(
+									filePath.toFile(), batchName));
 						}
 
 						return FileVisitResult.CONTINUE;
@@ -116,7 +134,7 @@ public class TCKJunitBatchTestClassGroup extends BatchTestClassGroup {
 				ioe);
 		}
 
-		Collections.sort(testClassFiles);
+		Collections.sort(testClasses);
 	}
 
 	private List<PathMatcher> _getTestClassNamesPathMatchers(

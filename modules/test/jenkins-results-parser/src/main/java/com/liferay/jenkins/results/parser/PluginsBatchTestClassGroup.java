@@ -36,6 +36,25 @@ import java.util.Properties;
  */
 public class PluginsBatchTestClassGroup extends BatchTestClassGroup {
 
+	public static class PluginsBatchTestClass extends TestClass {
+
+		protected static TestClass getInstance(
+			File pluginDir, String batchName) {
+
+			TestClass testClass = new PluginsBatchTestClass(
+				pluginDir, batchName);
+
+			return testClass;
+		}
+
+		protected PluginsBatchTestClass(File file, String batchName) {
+			super(file);
+
+			addTestMethod(batchName);
+		}
+
+	}
+
 	protected PluginsBatchTestClassGroup(
 		String batchName, PortalGitWorkingDirectory portalGitWorkingDirectory,
 		String testSuiteName) {
@@ -59,7 +78,7 @@ public class PluginsBatchTestClassGroup extends BatchTestClassGroup {
 			_pluginNamesIncludePathMatchers = _getPluginNamesPathMatchers(
 				"test.batch.plugin.names.includes");
 
-			setTestClassFiles();
+			setTestClasses();
 
 			setAxisTestClassGroups();
 		}
@@ -68,7 +87,7 @@ public class PluginsBatchTestClassGroup extends BatchTestClassGroup {
 		}
 	}
 
-	protected void setTestClassFiles() {
+	protected void setTestClasses() {
 		File workingDirectory =
 			_pluginsGitWorkingDirectory.getWorkingDirectory();
 
@@ -99,7 +118,9 @@ public class PluginsBatchTestClassGroup extends BatchTestClassGroup {
 
 							File file = filePath.toFile();
 
-							testClassFiles.add(file.getParentFile());
+							testClasses.add(
+								PluginsBatchTestClass.getInstance(
+									file.getParentFile(), batchName));
 						}
 
 						return FileVisitResult.CONTINUE;
@@ -136,7 +157,7 @@ public class PluginsBatchTestClassGroup extends BatchTestClassGroup {
 				ioe);
 		}
 
-		Collections.sort(testClassFiles);
+		Collections.sort(testClasses);
 	}
 
 	private List<PathMatcher> _getPluginNamesPathMatchers(String propertyName) {

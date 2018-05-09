@@ -39,51 +39,64 @@ public class NPMTestBatchTestClassGroup extends BatchTestClassGroup {
 		return new AxisTestClassGroup(this, axisId);
 	}
 
+	public static class NPMTestBatchTestClass extends TestClass {
+
+		protected static NPMTestBatchTestClass getInstance(
+			File moduleDir, String batchName) {
+
+			NPMTestBatchTestClass npmTestBatchTestClass =
+				new NPMTestBatchTestClass(moduleDir, batchName);
+
+			return npmTestBatchTestClass;
+		}
+
+		protected NPMTestBatchTestClass(File file, String batchName) {
+			super(file);
+
+			addTestMethod(batchName);
+		}
+
+	}
+
 	protected NPMTestBatchTestClassGroup(
 		String batchName, PortalGitWorkingDirectory portalGitWorkingDirectory,
 		String testSuiteName) {
 
 		super(batchName, portalGitWorkingDirectory, testSuiteName);
 
-		_setTestClassFiles();
+		List<File> moduleDirs;
 
-		_setAxisTestClassGroups();
-	}
-
-	private void _setAxisTestClassGroups() {
-		if (!testClassFiles.isEmpty()) {
-			AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(
-				this, 0);
-
-			for (File testClassFile : testClassFiles) {
-				axisTestClassGroup.addTestClassFile(testClassFile);
-			}
-
-			axisTestClassGroups.put(0, axisTestClassGroup);
-		}
-	}
-
-	private void _setTestClassFiles() {
-		if (testRelevantChanges) {
-			try {
-				List<File> moduleDirs =
+		try {
+			if (testRelevantChanges) {
+				moduleDirs =
 					portalGitWorkingDirectory.
 						getModifiedNPMTestModuleDirsList();
+			}
+			else {
+				moduleDirs =
+					portalGitWorkingDirectory.getNPMTestModuleDirsList();
+			}
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
 
-				for (File moduleDir : moduleDirs) {
-					testClassFiles.add(moduleDir);
-				}
-			}
-			catch (IOException ioe) {
-				throw new RuntimeException(ioe);
-			}
+		if (moduleDirs.isEmpty()) {
+			return;
 		}
-		else {
-			testClassFiles.add(
-				new File(
-					portalGitWorkingDirectory.getWorkingDirectory(),
-					"modules"));
+
+		AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(this, 0);
+
+		for (File moduleDir : moduleDirs) {
+			NPMTestBatchTestClass npmTestBatchTestClass =
+				NPMTestBatchTestClass.getInstance(moduleDir, batchName);
+
+			testClasses.add(npmTestBatchTestClass);
+
+			axisTestClassGroup.addTestClass(npmTestBatchTestClass);
 		}
+
+		axisTestClassGroups.put(0, axisTestClassGroup);
 	}
 
 }

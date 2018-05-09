@@ -14,6 +14,8 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.google.common.collect.Lists;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -29,7 +31,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,16 +42,247 @@ import java.util.regex.Pattern;
  */
 public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
+	public static class JunitBatchTestClass extends TestClass {
+
+		protected static JunitBatchTestClass getInstance(
+			GitWorkingDirectory gitWorkingDirectory, File file, File srcFile) {
+
+			if (_junitTestClasses.containsKey(file)) {
+				return _junitTestClasses.get(file);
+			}
+
+			JunitBatchTestClass junitTestClass = new JunitBatchTestClass(
+				gitWorkingDirectory, file, srcFile);
+
+			_junitTestClasses.put(file, junitTestClass);
+
+			return junitTestClass;
+		}
+
+		protected static JunitBatchTestClass getInstance(
+			GitWorkingDirectory gitWorkingDirectory, String fullClassName) {
+
+			String filePath = fullClassName.substring(
+				0, fullClassName.lastIndexOf("."));
+
+			filePath = filePath.replace(".", "/");
+
+			String simpleClassName = fullClassName.substring(
+				fullClassName.lastIndexOf(".") + 1);
+
+			File file = new File(filePath, simpleClassName + ".class");
+
+			if (_junitTestClasses.containsKey(file)) {
+				return _junitTestClasses.get(file);
+			}
+
+			String srcFileName = simpleClassName + ".java";
+
+			List<File> srcFiles = JenkinsResultsParserUtil.findFiles(
+				gitWorkingDirectory.getWorkingDirectory(), srcFileName);
+
+			File matchingSrcFile = null;
+
+			for (File srcFile : srcFiles) {
+				String srcFilePath = srcFile.toString();
+
+				if (srcFilePath.contains(filePath)) {
+					matchingSrcFile = srcFile;
+
+					break;
+				}
+			}
+
+			if (matchingSrcFile == null) {
+				throw new RuntimeException("No matching files found.");
+			}
+
+			if (srcFiles.size() > 1) {
+			}
+
+			return getInstance(gitWorkingDirectory, file, matchingSrcFile);
+		}
+
+		protected JunitBatchTestClass(
+			GitWorkingDirectory gitWorkingDirectory, File file, File srcFile) {
+
+			super(file);
+
+			String srcFileName = srcFile.getName();
+
+			_gitWorkingDirectory = gitWorkingDirectory;
+			_srcFile = srcFile;
+
+			_className = _getClassName();
+			_packageName = _getPackageName();
+
+			if (!srcFileName.endsWith(".java")) {
+				_srcFileContent = "";
+
+				return;
+			}
+
+			try {
+				_srcFileContent = JenkinsResultsParserUtil.read(_srcFile);
+
+				_initTestMethods();
+			}
+			catch (IOException ioe) {
+				throw new RuntimeException(ioe);
+			}
+		}
+
+		private String _getClassName() {
+			String srcFileName = _srcFile.getName();
+
+			return srcFileName.substring(0, srcFileName.lastIndexOf("."));
+		}
+
+		private String _getPackageName() {
+			String srcFilePath = _srcFile.toString();
+
+			int x = srcFilePath.indexOf("/com/");
+			int y = srcFilePath.lastIndexOf("/");
+
+			srcFilePath = srcFilePath.substring(x + 1, y);
+
+			return srcFilePath.replaceAll("/", ".");
+		}
+
+		private String _getParentClassName() {
+			Pattern classHeaderPattern = Pattern.compile(
+				JenkinsResultsParserUtil.combine(
+					"public\\s+(abstract\\s+)?class\\s+", _className,
+					"(\\<[^\\<]+\\>)?(?<classHeaderEntities>[^\\{]+)\\{"));
+
+			Matcher classHeaderMatcher = classHeaderPattern.matcher(
+				_srcFileContent);
+
+			if (!classHeaderMatcher.find()) {
+				throw new RuntimeException(
+					"No class header found in " + _srcFile);
+			}
+
+			String classHeaderEntities = classHeaderMatcher.group(
+				"classHeaderEntities");
+
+			Pattern parentClassPattern = Pattern.compile(
+				JenkinsResultsParserUtil.combine(
+					"extends\\s+(?<parentClassName>[^\\s\\<]+)"));
+
+			Matcher parentClassMatcher = parentClassPattern.matcher(
+				classHeaderEntities);
+
+			if (parentClassMatcher.find()) {
+				return parentClassMatcher.group("parentClassName");
+			}
+
+			return null;
+		}
+
+		private String _getParentFullClassName() {
+			String parentClassName = _getParentClassName();
+
+			if (parentClassName == null) {
+				return null;
+			}
+
+			if (parentClassName.contains(".") &&
+				parentClassName.matches("[a-z].*")) {
+
+				return parentClassName;
+			}
+
+			String parentPackageName = _getParentPackageName(parentClassName);
+
+			if (parentPackageName == null) {
+				return null;
+			}
+
+			return parentPackageName + "." + parentClassName;
+		}
+
+		private String _getParentPackageName(String parentClassName) {
+			Pattern parentImportClassPattern = Pattern.compile(
+				JenkinsResultsParserUtil.combine(
+					"import\\s+(?<parentPackageName>[^;]+)\\.", parentClassName,
+					";"));
+
+			Matcher parentImportClassMatcher = parentImportClassPattern.matcher(
+				_srcFileContent);
+
+			if (parentImportClassMatcher.find()) {
+				String parentPackageName = parentImportClassMatcher.group(
+					"parentPackageName");
+
+				if (!parentPackageName.startsWith("com.liferay")) {
+					return null;
+				}
+
+				return parentPackageName;
+			}
+
+			return _packageName;
+		}
+
+		private void _initTestMethods() throws IOException {
+			Matcher methodHeaderMatcher = _methodHeaderPattern.matcher(
+				_srcFileContent);
+
+			while (methodHeaderMatcher.find()) {
+				String annotations = methodHeaderMatcher.group("annotations");
+				String methodName = methodHeaderMatcher.group("methodName");
+
+				if (annotations.contains("@Test")) {
+					addTestMethod(methodName);
+				}
+			}
+
+			String parentFullClassName = _getParentFullClassName();
+
+			if (parentFullClassName == null) {
+				return;
+			}
+
+			JunitBatchTestClass parentJunitBatchTestClass = getInstance(
+				_gitWorkingDirectory, parentFullClassName);
+
+			for (TestMethod testMethod :
+					parentJunitBatchTestClass.getTestMethods()) {
+
+				addTestMethod(testMethod);
+			}
+		}
+
+		private static final Map<File, JunitBatchTestClass> _junitTestClasses =
+			new HashMap<>();
+		private static Pattern _methodHeaderPattern = Pattern.compile(
+			JenkinsResultsParserUtil.combine(
+				"\\t(?<annotations>(@[\\s\\S]+?))public\\s+void\\s+",
+				"(?<methodName>[^\\(\\s]+)"));
+		private static Pattern _packageNamePattern = Pattern.compile(
+			"package (?<packageName>[^;]+);");
+
+		private final String _className;
+		private final GitWorkingDirectory _gitWorkingDirectory;
+		private final String _packageName;
+		private final File _srcFile;
+		private final String _srcFileContent;
+
+	}
+
 	protected JUnitBatchTestClassGroup(
 		String batchName, PortalGitWorkingDirectory portalGitWorkingDirectory,
 		String testSuiteName) {
 
 		super(batchName, portalGitWorkingDirectory, testSuiteName);
 
+		_setAutoBalanceTestFiles();
+
 		_setTestClassNamesExcludesRelativeGlobs();
 		_setTestClassNamesIncludesRelativeGlobs();
 
-		setTestClassFiles();
+		setTestClasses();
 
 		_setIncludeAutoBalanceTests();
 
@@ -104,7 +339,71 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 		return relevantTestClassNameRelativeGlobs;
 	}
 
-	protected void setTestClassFiles() {
+	protected void setAxisTestClassGroups() {
+		int testClassCount = testClasses.size();
+
+		if (testClassCount == 0) {
+			if (_includeAutoBalanceTests && !_autoBalanceTestFiles.isEmpty()) {
+				int id = 0;
+
+				AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(
+					this, id);
+
+				axisTestClassGroups.put(id, axisTestClassGroup);
+
+				for (File autoBalanceTestFile : _autoBalanceTestFiles) {
+					String filePath = autoBalanceTestFile.toString();
+
+					filePath = filePath.replace(".java", ".class");
+
+					axisTestClassGroup.addTestClass(
+						JunitBatchTestClass.getInstance(
+							portalGitWorkingDirectory, new File(filePath),
+							autoBalanceTestFile));
+				}
+			}
+
+			return;
+		}
+
+		int axisMaxSize = getAxisMaxSize();
+
+		int axisCount = (int)Math.ceil((double)testClassCount / axisMaxSize);
+
+		int axisSize = (int)Math.ceil((double)testClassCount / axisCount);
+
+		int id = 0;
+
+		for (List<TestClass> axisTestClasses :
+				Lists.partition(testClasses, axisSize)) {
+
+			AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(
+				this, id);
+
+			axisTestClassGroups.put(id, axisTestClassGroup);
+
+			for (TestClass axisTestClass : axisTestClasses) {
+				axisTestClassGroup.addTestClass(axisTestClass);
+			}
+
+			if (_includeAutoBalanceTests) {
+				for (File autoBalanceTestFile : _autoBalanceTestFiles) {
+					String filePath = autoBalanceTestFile.toString();
+
+					filePath = filePath.replace(".java", ".class");
+
+					axisTestClassGroup.addTestClass(
+						JunitBatchTestClass.getInstance(
+							portalGitWorkingDirectory, new File(filePath),
+							autoBalanceTestFile));
+				}
+			}
+
+			id++;
+		}
+	}
+
+	protected void setTestClasses() {
 		File workingDirectory = portalGitWorkingDirectory.getWorkingDirectory();
 
 		try {
@@ -132,14 +431,13 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 						if (_pathIncluded(filePath) &&
 							!_pathExcluded(filePath)) {
 
-							testClassFiles.add(
-								_getPackagePathClassFile(filePath));
+							testClasses.add(_getPackagePathClassFile(filePath));
 						}
 
 						return FileVisitResult.CONTINUE;
 					}
 
-					private File _getPackagePathClassFile(Path path) {
+					private TestClass _getPackagePathClassFile(Path path) {
 						String filePath = path.toString();
 
 						Matcher matcher = _packagePathPattern.matcher(filePath);
@@ -150,10 +448,15 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 							packagePath = packagePath.replace(
 								".java", ".class");
 
-							return new File(packagePath);
+							return JunitBatchTestClass.getInstance(
+								portalGitWorkingDirectory,
+								new File(packagePath), path.toFile());
 						}
 
-						return new File(filePath.replace(".java", ".class"));
+						return JunitBatchTestClass.getInstance(
+							portalGitWorkingDirectory,
+							new File(filePath.replace(".java", ".class")),
+							path.toFile());
 					}
 
 					private boolean _pathExcluded(Path path) {
@@ -187,7 +490,7 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 				ioe);
 		}
 
-		Collections.sort(testClassFiles);
+		Collections.sort(testClasses);
 	}
 
 	protected final List<PathMatcher> testClassNamesExcludesPathMatchers =
@@ -241,9 +544,23 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 		return pathMatchers;
 	}
 
+	private void _setAutoBalanceTestFiles() {
+		String propertyName = "test.class.names.auto.balance";
+
+		String autoBalanceTestNames = getFirstPropertyValue(propertyName);
+
+		if ((autoBalanceTestNames != null) &&
+			!autoBalanceTestNames.equals("")) {
+
+			for (String autoBalanceTestName : autoBalanceTestNames.split(",")) {
+				_autoBalanceTestFiles.add(new File(autoBalanceTestName));
+			}
+		}
+	}
+
 	private void _setIncludeAutoBalanceTests() {
-		if (!testClassFiles.isEmpty()) {
-			includeAutoBalanceTests = true;
+		if (!testClasses.isEmpty()) {
+			_includeAutoBalanceTests = true;
 
 			return;
 		}
@@ -252,12 +569,12 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 			portalGitWorkingDirectory.getModifiedFilesList(".java");
 
 		if (!modifiedJavaFilesList.isEmpty()) {
-			includeAutoBalanceTests = true;
+			_includeAutoBalanceTests = true;
 
 			return;
 		}
 
-		includeAutoBalanceTests = _DEFAULT_INCLUDE_AUTO_BALANCE_TESTS;
+		_includeAutoBalanceTests = _DEFAULT_INCLUDE_AUTO_BALANCE_TESTS;
 	}
 
 	private void _setTestClassNamesExcludesRelativeGlobs() {
@@ -310,6 +627,8 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 	private static final boolean _DEFAULT_INCLUDE_AUTO_BALANCE_TESTS = false;
 
+	private final List<File> _autoBalanceTestFiles = new ArrayList<>();
+	private boolean _includeAutoBalanceTests;
 	private final Pattern _packagePathPattern = Pattern.compile(
 		".*/(?<packagePath>com/.*)");
 

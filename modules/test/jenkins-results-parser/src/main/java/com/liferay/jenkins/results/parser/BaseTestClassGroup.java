@@ -22,12 +22,26 @@ import java.util.List;
 /**
  * @author Peter Yoo
  */
-public abstract class BaseTestClassGroup implements TestClassGroup {
+public abstract class BaseTestClassGroup extends TestClassGroup {
+
+	public List<TestClass> getTestClasses() {
+		return testClasses;
+	}
 
 	public List<File> getTestClassFiles() {
+		List<File> testClassFiles = new ArrayList<>();
+
+		for (TestClass testClass : testClasses) {
+			testClassFiles.add(testClass.getFile());
+		}
+
 		return testClassFiles;
 	}
 
-	protected final List<File> testClassFiles = new ArrayList<>();
+	protected void addTestClass(TestClass testClass) {
+		testClasses.add(testClass);
+	}
+
+	protected final List<TestClass> testClasses = new ArrayList<>();
 
 }

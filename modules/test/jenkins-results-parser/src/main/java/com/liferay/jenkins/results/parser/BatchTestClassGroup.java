@@ -52,6 +52,27 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 		return portalTestProperties;
 	}
 
+	public static class BatchTestClass extends TestClass {
+
+		protected static TestClass getInstance(
+			PortalGitWorkingDirectory portalGitWorkingDirectory,
+			String batchName) {
+
+			File file = new File(
+				portalGitWorkingDirectory.getWorkingDirectory(),
+				"build-test-batch.xml");
+
+			return new BatchTestClass(file, batchName);
+		}
+
+		protected BatchTestClass(File file, String batchName) {
+			super(file);
+
+			addTestMethod(batchName);
+		}
+
+	}
+
 	protected BatchTestClassGroup(
 		String batchName, PortalGitWorkingDirectory portalGitWorkingDirectory,
 		String testSuiteName) {
@@ -65,7 +86,6 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 				this.portalGitWorkingDirectory.getWorkingDirectory(),
 				"test.properties"));
 
-		_setAutoBalanceTestFiles();
 		_setTestRelevantChanges();
 	}
 
@@ -164,61 +184,39 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 	}
 
 	protected void setAxisTestClassGroups() {
-		int testClassFileCount = testClassFiles.size();
+		int testClassCount = testClasses.size();
 
-		if (testClassFileCount == 0) {
-			if (includeAutoBalanceTests && !autoBalanceTestFiles.isEmpty()) {
-				int id = 0;
-
-				AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(
-					this, id);
-
-				axisTestClassGroups.put(id, axisTestClassGroup);
-
-				for (File autoBalanceTestFile : autoBalanceTestFiles) {
-					axisTestClassGroup.addTestClassFile(autoBalanceTestFile);
-				}
-			}
-
+		if (testClassCount == 0) {
 			return;
 		}
 
 		int axisMaxSize = getAxisMaxSize();
 
-		int axisCount = (int)Math.ceil(
-			(double)testClassFileCount / axisMaxSize);
+		int axisCount = (int)Math.ceil((double)testClassCount / axisMaxSize);
 
-		int axisSize = (int)Math.ceil((double)testClassFileCount / axisCount);
+		int axisSize = (int)Math.ceil((double)testClassCount / axisCount);
 
 		int id = 0;
 
-		for (List<File> axisTestClassFiles :
-				Lists.partition(testClassFiles, axisSize)) {
+		for (List<TestClass> axisTestClasses :
+				Lists.partition(testClasses, axisSize)) {
 
 			AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(
 				this, id);
 
 			axisTestClassGroups.put(id, axisTestClassGroup);
 
-			for (File axisTestClassFile : axisTestClassFiles) {
-				axisTestClassGroup.addTestClassFile(axisTestClassFile);
-			}
-
-			if (includeAutoBalanceTests) {
-				for (File autoBalanceTestFile : autoBalanceTestFiles) {
-					axisTestClassGroup.addTestClassFile(autoBalanceTestFile);
-				}
+			for (TestClass axisTestClass : axisTestClasses) {
+				axisTestClassGroup.addTestClass(axisTestClass);
 			}
 
 			id++;
 		}
 	}
 
-	protected List<File> autoBalanceTestFiles = new ArrayList<>();
 	protected final Map<Integer, AxisTestClassGroup> axisTestClassGroups =
 		new HashMap<>();
 	protected final String batchName;
-	protected boolean includeAutoBalanceTests;
 	protected final PortalGitWorkingDirectory portalGitWorkingDirectory;
 	protected final Properties portalTestProperties;
 	protected boolean testRelevantChanges;
@@ -226,20 +224,6 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 	private String _getAxisMaxSizePropertyValue() {
 		return getFirstPropertyValue("test.batch.axis.max.size");
-	}
-
-	private void _setAutoBalanceTestFiles() {
-		String propertyName = "test.class.names.auto.balance";
-
-		String autoBalanceTestNames = getFirstPropertyValue(propertyName);
-
-		if ((autoBalanceTestNames != null) &&
-			!autoBalanceTestNames.equals("")) {
-
-			for (String autoBalanceTestName : autoBalanceTestNames.split(",")) {
-				autoBalanceTestFiles.add(new File(autoBalanceTestName));
-			}
-		}
 	}
 
 	private void _setTestRelevantChanges() {

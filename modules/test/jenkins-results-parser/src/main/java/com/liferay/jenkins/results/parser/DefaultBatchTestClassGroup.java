@@ -25,7 +25,12 @@ public class DefaultBatchTestClassGroup extends BatchTestClassGroup {
 
 		super(batchName, portalGitWorkingDirectory, testSuiteName);
 
-		axisTestClassGroups.put(0, new AxisTestClassGroup(this, 0));
+		AxisTestClassGroup axisTestClassGroup = new AxisTestClassGroup(this, 0);
+
+		axisTestClassGroup.addTestClass(
+			BatchTestClass.getInstance(portalGitWorkingDirectory, batchName));
+
+		axisTestClassGroups.put(0, axisTestClassGroup);
 	}
 
 }
