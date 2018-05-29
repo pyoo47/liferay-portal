@@ -17,7 +17,10 @@ package com.liferay.jenkins.results.parser.test.clazz.group;
 import com.google.common.collect.Lists;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.Job;
 import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
+import com.liferay.jenkins.results.parser.PortalTestClassJob;
+import com.liferay.jenkins.results.parser.TestSuiteJob;
 
 import java.io.File;
 
@@ -74,10 +77,6 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 		return portalGitWorkingDirectory;
 	}
 
-	public Properties getPortalTestProperties() {
-		return portalTestProperties;
-	}
-
 	public static class BatchTestClass extends BaseTestClass {
 
 		protected static BatchTestClass getInstance(
@@ -99,18 +98,29 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 	}
 
-	protected BatchTestClassGroup(
-		String batchName, PortalGitWorkingDirectory portalGitWorkingDirectory,
-		String testSuiteName) {
-
+	protected BatchTestClassGroup(String batchName, Job job) {
 		this.batchName = batchName;
-		this.portalGitWorkingDirectory = portalGitWorkingDirectory;
-		this.testSuiteName = testSuiteName;
 
-		portalTestProperties = JenkinsResultsParserUtil.getProperties(
-			new File(
-				this.portalGitWorkingDirectory.getWorkingDirectory(),
-				"test.properties"));
+		if (job instanceof PortalTestClassJob) {
+			PortalTestClassJob portalTestClassJob = (PortalTestClassJob)job;
+
+			portalGitWorkingDirectory =
+				portalTestClassJob.getPortalGitWorkingDirectory();
+		}
+		else {
+			throw new RuntimeException("Must use a PortalTestClassJob");
+		}
+
+		if (job instanceof TestSuiteJob) {
+			TestSuiteJob testSuiteJob = (TestSuiteJob)job;
+
+			testSuiteName = testSuiteJob.getTestSuiteName();
+		}
+		else {
+			testSuiteName = null;
+		}
+
+		jobProperties = job.getJobProperties();
 
 		_setTestRelevantChanges();
 	}
@@ -174,7 +184,7 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 			propertyNames.add(
 				getFirstMatchingPropertyName(
-					basePropertyName, portalTestProperties, testSuiteName));
+					basePropertyName, jobProperties, testSuiteName));
 
 			propertyNames.add(
 				JenkinsResultsParserUtil.combine(
@@ -186,8 +196,7 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 				basePropertyName, "[", batchName, "]"));
 
 		propertyNames.add(
-			getFirstMatchingPropertyName(
-				basePropertyName, portalTestProperties));
+			getFirstMatchingPropertyName(basePropertyName, jobProperties));
 
 		propertyNames.add(basePropertyName);
 
@@ -196,9 +205,9 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 				continue;
 			}
 
-			if (portalTestProperties.containsKey(propertyName)) {
+			if (jobProperties.containsKey(propertyName)) {
 				String propertyValue = JenkinsResultsParserUtil.getProperty(
-					portalTestProperties, propertyName);
+					jobProperties, propertyName);
 
 				if ((propertyValue != null) && !propertyValue.isEmpty()) {
 					return propertyValue;
@@ -271,8 +280,8 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 	protected final String batchName;
 	protected final List<PathMatcher> excludesPathMatchers = new ArrayList<>();
 	protected final List<PathMatcher> includesPathMatchers = new ArrayList<>();
+	protected final Properties jobProperties;
 	protected final PortalGitWorkingDirectory portalGitWorkingDirectory;
-	protected final Properties portalTestProperties;
 	protected boolean testRelevantChanges;
 	protected final String testSuiteName;
 

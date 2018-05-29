@@ -18,7 +18,7 @@ import com.google.common.collect.Lists;
 
 import com.liferay.jenkins.results.parser.GitWorkingDirectory;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
+import com.liferay.jenkins.results.parser.Job;
 
 import java.io.File;
 import java.io.IOException;
@@ -278,11 +278,8 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 	}
 
-	protected JUnitBatchTestClassGroup(
-		String batchName, PortalGitWorkingDirectory portalGitWorkingDirectory,
-		String testSuiteName) {
-
-		super(batchName, portalGitWorkingDirectory, testSuiteName);
+	protected JUnitBatchTestClassGroup(String batchName, Job job) {
+		super(batchName, job);
 
 		_setAutoBalanceTestFiles();
 
@@ -506,7 +503,7 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 		}
 
 		return JenkinsResultsParserUtil.getProperty(
-			portalTestProperties, "test.class.names.excludes");
+			jobProperties, "test.class.names.excludes");
 	}
 
 	private String _getTestClassNamesIncludesPropertyValue() {
@@ -518,7 +515,7 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 		}
 
 		return JenkinsResultsParserUtil.getProperty(
-			portalTestProperties, "test.class.names.includes");
+			jobProperties, "test.class.names.includes");
 	}
 
 	private List<PathMatcher> _getTestClassNamesPathMatchers(

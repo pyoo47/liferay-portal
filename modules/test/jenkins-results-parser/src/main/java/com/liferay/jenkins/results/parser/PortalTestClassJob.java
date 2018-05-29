@@ -12,22 +12,13 @@
  * details.
  */
 
-package com.liferay.jenkins.results.parser.test.clazz.group;
-
-import com.liferay.jenkins.results.parser.Job;
+package com.liferay.jenkins.results.parser;
 
 /**
- * @author Yi-Chen Tsai
+ * @author Michael Hashimoto
  */
-public class DefaultBatchTestClassGroup extends BatchTestClassGroup {
+public interface PortalTestClassJob {
 
-	protected DefaultBatchTestClassGroup(String batchName, Job job) {
-		super(batchName, job);
-
-		addTestClass(
-			BatchTestClass.getInstance(batchName, portalGitWorkingDirectory));
-
-		setAxisTestClassGroups();
-	}
+	public PortalGitWorkingDirectory getPortalGitWorkingDirectory();
 
 }
