@@ -689,12 +689,21 @@ Please run the following command from ${source.formatter.modules.dir.absolute.pa
 			</then>
 		</if>
 
+		<pathconvert property="classpathProp" refid="source.formatter.classpath" />
+
+		<echo>PDY
+			classpath: ${classpathProp}
+			dir: ${source.formatter.dir}
+			failonerror: ${source.fail.on.error}
+		</echo>
+
 		<java
 			classname="com.liferay.source.formatter.SourceFormatter"
 			classpathref="source.formatter.classpath"
 			dir="${source.formatter.dir}"
 			failonerror="${source.fail.on.error}"
 			fork="true"
+			logError="true"
 			newenvironment="true"
 		>
 			<jvmarg if:true="${jvm.debug}" value="${jpda.settings}" />
