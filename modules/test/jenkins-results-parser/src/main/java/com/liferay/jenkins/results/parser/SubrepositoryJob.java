@@ -31,7 +31,8 @@ import java.util.TreeSet;
 /**
  * @author Michael Hashimoto
  */
-public abstract class SubrepositoryJob extends RepositoryJob {
+public abstract class SubrepositoryJob
+	extends RepositoryJob implements SubrepositoryDependentJob {
 
 	@Override
 	public Set<String> getBatchNames() {
@@ -75,6 +76,11 @@ public abstract class SubrepositoryJob extends RepositoryJob {
 		}
 
 		return gitWorkingDirectory;
+	}
+
+	@Override
+	public File getSubrepositoryWorkingDirectory() {
+		return repositoryDir;
 	}
 
 	@Override
