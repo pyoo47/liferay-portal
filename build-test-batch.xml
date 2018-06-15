@@ -3684,25 +3684,68 @@ app.server.type=@{app.server.type}]]></echo>
 	<target name="modules-semantic-versioning-jdk8">
 		<run-batch-test>
 			<test-action>
-				<loadresource property="modules.baseline.task.groups">
-					<filterchain>
-						<tokenfilter>
-							<replaceregex flags="g" pattern="(\S+ ){${test.module.groups.size}}" replace="\0," />
-						</tokenfilter>
-					</filterchain>
-					<propertyresource name="modules.test.class.group" />
-				</loadresource>
+				<if>
+					<and>
+						<isset property="modules.base.dir.names.with.changes" />
+						<not>
+							<equals arg1="${env.CI_TEST_SUITE}" arg2="relevant" />
+						</not>
+					</and>
+					<then>
+						<for list="${modules.base.dir.names.with.changes}" param="module.base.dir.name">
+							<sequential>
+								<local name="modules.base.dir.name" />
 
-				<for list="${modules.baseline.task.groups}" param="modules.baseline.task.group" trim="true">
-					<sequential>
-						<echo>Executing Gradle tasks: @{modules.baseline.task.group}.</echo>
+								<propertyregex
+									input="@{module.base.dir.name}"
+									property="modules.base.dir.name"
+									regexp="(.*/modules)(/.*)"
+									replace="\1"
+								/>
 
-						<gradle-execute dir="modules" task="@{modules.baseline.task.group}">
-							<arg value="--continue" />
-							<arg value="--parallel" />
-						</gradle-execute>
-					</sequential>
-				</for>
+								<propertyregex
+									input="@{module.base.dir.name}"
+									override="true"
+									property="module.baseline.task.name"
+									regexp="(.*/modules)(/.*)"
+									replace="\2"
+								/>
+
+								<antelope:stringutil property="module.baseline.task.name" string="${module.baseline.task.name}">
+									<antelope:replace regex="/" replacement=":" />
+								</antelope:stringutil>
+
+								<echo>Executing ${module.baseline.task.name}:baseline on ${modules.base.dir.name}.</echo>
+
+								<gradle-execute dir="${modules.base.dir.name}" forcedcacheenabled="false" task="${module.baseline.task.name}:baseline" />
+							</sequential>
+						</for>
+					</then>
+					<elseif>
+						<isset property="modules.test.class.group" />
+						<then>
+							<loadresource property="modules.baseline.task.groups">
+								<filterchain>
+									<tokenfilter>
+										<replaceregex flags="g" pattern="(\S+ ){${test.module.groups.size}}" replace="\0," />
+									</tokenfilter>
+								</filterchain>
+								<propertyresource name="modules.test.class.group" />
+							</loadresource>
+
+							<for list="${modules.baseline.task.groups}" param="modules.baseline.task.group" trim="true">
+								<sequential>
+									<echo>Executing Gradle tasks: @{modules.baseline.task.group}.</echo>
+
+									<gradle-execute dir="modules" task="@{modules.baseline.task.group}">
+										<arg value="--continue" />
+										<arg value="--parallel" />
+									</gradle-execute>
+								</sequential>
+							</for>
+						</then>
+					</elseif>
+				</if>
 
 				<echo>Checking for baseline log files.</echo>
 
@@ -3736,8 +3779,6 @@ app.server.type=@{app.server.type}]]></echo>
 			</test-action>
 
 			<test-set-up>
-				<fail message="Please set the property ${modules.test.class.group}" unless="modules.test.class.group" />
-
 				<echo>unzip -p liferay-portal-source.zip modules/core/portal-bootstrap/build/system.packages.extra.mf > modules/core/portal-bootstrap/system.packages.extra.mf</echo>
 
 				<execute>
