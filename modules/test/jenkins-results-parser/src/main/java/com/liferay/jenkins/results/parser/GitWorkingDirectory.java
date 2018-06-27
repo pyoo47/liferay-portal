@@ -1117,6 +1117,10 @@ public class GitWorkingDirectory {
 		return _repositoryName;
 	}
 
+	public String getRepositoryType() {
+		return _repositoryName;
+	}
+
 	public String getRepositoryUsername() {
 		return _repositoryUsername;
 	}
@@ -1143,6 +1147,22 @@ public class GitWorkingDirectory {
 		}
 
 		System.out.println(remoteURL + " is alive");
+
+		return true;
+	}
+
+	public boolean isSHAAvailable(String sha) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("git log -n 1 ");
+		sb.append(sha);
+
+		ExecutionResult result = executeBashCommands(
+			5, 1000, 30 * 1000, sb.toString());
+
+		if (result.getExitValue() != 0) {
+			return false;
+		}
 
 		return true;
 	}
