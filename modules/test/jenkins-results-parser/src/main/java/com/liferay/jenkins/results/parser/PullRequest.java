@@ -38,7 +38,7 @@ import org.json.JSONObject;
 /**
  * @author Michael Hashimoto
  */
-public class PullRequest {
+public class PullRequest implements GitHubAPI {
 
 	public PullRequest(String htmlURL) {
 		this(htmlURL, _TEST_SUITE_NAME_DEFAULT);
@@ -200,12 +200,18 @@ public class PullRequest {
 		return _gitHubRemoteRepositoryName;
 	}
 
+	@Override
 	public String getHtmlURL() {
 		return _jsonObject.getString("html_url");
 	}
 
 	public String getJSON() {
 		return _jsonObject.toString(4);
+	}
+
+	@Override
+	public JSONObject getJSONObject() {
+		return _jsonObject;
 	}
 
 	public List<Label> getLabels() {
@@ -223,6 +229,18 @@ public class PullRequest {
 
 	public String getOwnerUsername() {
 		return _ownerUsername;
+	}
+
+	public String getReceiverUsername() {
+		JSONObject baseJSONObject = _jsonObject.getJSONObject("base");
+
+		JSONObject userJSONObject = baseJSONObject.getJSONObject("user");
+
+		return userJSONObject.getString("login");
+	}
+
+	public String getRepositoryName() {
+		return getGitHubRemoteRepositoryName();
 	}
 
 	public String getSenderBranchName() {
@@ -266,9 +284,34 @@ public class PullRequest {
 	}
 
 	public String getUpstreamBranchSHA() {
-		JSONObject baseJSONObject = _jsonObject.getJSONObject("base");
+		Ref upstreamRef = getUpstreamRef();
 
-		return baseJSONObject.getString("sha");
+		return upstreamRef.getSHA();
+	}
+
+	public Ref getUpstreamRef() {
+		if (_upstreamRef != null) {
+			return _upstreamRef;
+		}
+
+		GitHubAPI gitHubAPI = GitHubAPIFactory.newGitHubAPI(
+			JenkinsResultsParserUtil.combine(
+				"https://github.com/liferay/", getRepositoryName(), "/tree/",
+				getUpstreamBranchName()));
+
+		if (!(gitHubAPI instanceof Ref)) {
+			throw new RuntimeException("Invalid ref");
+		}
+
+		_upstreamRef = (Ref)gitHubAPI;
+
+		return _upstreamRef;
+	}
+
+	@Override
+	public String getURL() {
+		return JenkinsResultsParserUtil.getGitHubApiUrl(
+			_gitHubRemoteRepositoryName, _ownerUsername, "pulls/" + _number);
 	}
 
 	public boolean hasLabel(String labelName) {
@@ -513,11 +556,6 @@ public class PullRequest {
 		return _jsonObject.getString("issue_url");
 	}
 
-	protected String getURL() {
-		return JenkinsResultsParserUtil.getGitHubApiUrl(
-			_gitHubRemoteRepositoryName, _ownerUsername, "pulls/" + _number);
-	}
-
 	protected void updateGithub() {
 		JSONObject jsonObject = new JSONObject();
 
@@ -553,5 +591,6 @@ public class PullRequest {
 	private String _ownerUsername;
 	private final String _testSuiteName;
 	private TestSuiteStatus _testSuiteStatus = TestSuiteStatus.MISSING;
+	private Ref _upstreamRef;
 
 }
