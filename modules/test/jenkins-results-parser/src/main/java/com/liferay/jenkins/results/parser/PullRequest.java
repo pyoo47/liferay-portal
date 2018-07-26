@@ -40,6 +40,16 @@ import org.json.JSONObject;
  */
 public class PullRequest implements GitHubAPI {
 
+	public static boolean isValidHtmlURL(String htmlURL) {
+		Matcher matcher = _htmlURLPattern.matcher(htmlURL);
+
+		if (matcher.find()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public PullRequest(String htmlURL) {
 		this(htmlURL, _TEST_SUITE_NAME_DEFAULT);
 	}

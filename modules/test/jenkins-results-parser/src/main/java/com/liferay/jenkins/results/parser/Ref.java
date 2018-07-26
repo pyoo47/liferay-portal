@@ -28,6 +28,16 @@ import org.json.JSONObject;
  */
 public class Ref implements GitHubAPI {
 
+	public static boolean isValidHtmlURL(String htmlURL) {
+		Matcher matcher = _htmlURLPattern.matcher(htmlURL);
+
+		if (matcher.find()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public Ref(String htmlURL) {
 		Matcher matcher = _htmlURLPattern.matcher(htmlURL);
 
