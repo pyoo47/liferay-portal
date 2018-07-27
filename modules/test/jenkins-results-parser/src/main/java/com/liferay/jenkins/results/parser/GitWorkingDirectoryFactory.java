@@ -78,8 +78,13 @@ public class GitWorkingDirectoryFactory {
 	public static GitWorkingDirectory newGitWorkingDirectory(
 		String upstreamBranchName, String repositoryDirPath) {
 
-		return newGitWorkingDirectory(
-			upstreamBranchName, new File(repositoryDirPath), null);
+		try {
+			return new GitWorkingDirectory(
+				upstreamBranchName, repositoryDirPath, null);
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
 	}
 
 	public static GitWorkingDirectory newGitWorkingDirectory(
