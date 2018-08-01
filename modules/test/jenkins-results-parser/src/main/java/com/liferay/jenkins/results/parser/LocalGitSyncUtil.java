@@ -777,11 +777,6 @@ public class LocalGitSyncUtil {
 
 			System.out.println(
 				JenkinsResultsParserUtil.combine(
-					"\nUpdating cache branch timestamp from ",
-					cacheRemoteGitBranchName, "to ", newTimestampBranchName));
-
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
 					"Updating existing timestamp for branch ",
 					cacheRemoteGitBranchName, " to ", newTimestampBranchName));
 
@@ -797,7 +792,7 @@ public class LocalGitSyncUtil {
 				gitWorkingDirectory.createLocalGitBranch(
 					newTimestampBranchName);
 
-			gitWorkingDirectory.fetch(
+			newTimestampLocalGitBranch = gitWorkingDirectory.fetch(
 				newTimestampLocalGitBranch, cacheRemoteGitBranch);
 
 			try {
