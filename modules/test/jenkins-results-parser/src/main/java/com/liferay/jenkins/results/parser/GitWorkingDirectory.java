@@ -1418,7 +1418,7 @@ public class GitWorkingDirectory {
 		String remoteGitBranchName, String remoteURL) {
 
 		if (localGitBranch == null) {
-			throw new IllegalArgumentException("Local Git branch is null");
+			localGitBranch = getCurrentLocalGitBranch();
 		}
 
 		if (remoteURL == null) {
