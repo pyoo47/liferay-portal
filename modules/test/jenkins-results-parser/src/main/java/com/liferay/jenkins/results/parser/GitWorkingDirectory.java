@@ -575,7 +575,7 @@ public class GitWorkingDirectory {
 			throw new IllegalArgumentException("Remote URL is null");
 		}
 
-		Matcher remoteURLMatcher = _remoteURLPattern.matcher(remoteURL);
+		Matcher remoteURLMatcher = Remote.remoteURLPattern.matcher(remoteURL);
 
 		if (!remoteURLMatcher.find()) {
 			throw new IllegalArgumentException(
@@ -1141,7 +1141,7 @@ public class GitWorkingDirectory {
 	public List<RemoteGitBranch> getRemoteGitBranches(
 		String remoteGitBranchName, String remoteURL) {
 
-		Matcher remoteURLMatcher = _remoteURLPattern.matcher(remoteURL);
+		Matcher remoteURLMatcher = Remote.remoteURLPattern.matcher(remoteURL);
 
 		if (!remoteURLMatcher.find()) {
 			throw new IllegalArgumentException(
@@ -1180,7 +1180,9 @@ public class GitWorkingDirectory {
 				remoteURLMatcher.group("username"));
 
 		for (String line : input.split("\n")) {
-			Matcher gitLsRemoteMatcher = _gitLsRemotePattern.matcher(line);
+			Pattern gitLsRemotePattern = Remote.gitLsRemotePattern;
+
+			Matcher gitLsRemoteMatcher = gitLsRemotePattern.matcher(line);
 
 			if (gitLsRemoteMatcher.find()) {
 				remoteGitBranches.add(
@@ -1245,7 +1247,8 @@ public class GitWorkingDirectory {
 			throw new IllegalArgumentException("Remote URL is null");
 		}
 
-		Matcher remoteURLMatcher = _remoteURLPattern.matcher(remoteURL);
+		Matcher remoteURLMatcher = BaseGitRemote.remoteURLPattern.matcher(
+			remoteURL);
 
 		if (!remoteURLMatcher.find()) {
 			throw new IllegalArgumentException(
@@ -1269,7 +1272,7 @@ public class GitWorkingDirectory {
 		String input = executionResult.getStandardOut();
 
 		for (String line : input.split("\n")) {
-			Matcher matcher = _gitLsRemotePattern.matcher(line);
+			Matcher matcher = BaseGitRemote.gitLsRemotePattern.matcher(line);
 
 			if (matcher.find()) {
 				return matcher.group("sha");
@@ -1487,7 +1490,8 @@ public class GitWorkingDirectory {
 			throw new IllegalArgumentException("Remote URL is null");
 		}
 
-		Matcher remoteURLMatcher = _remoteURLPattern.matcher(remoteURL);
+		Matcher remoteURLMatcher = BaseGitRemote.remoteURLPattern.matcher(
+			remoteURL);
 
 		if (!remoteURLMatcher.find()) {
 			throw new IllegalArgumentException(
@@ -2092,18 +2096,12 @@ public class GitWorkingDirectory {
 		"gitdir\\: (.*)\\s*");
 	private static final Pattern _gitLogEntityPattern = Pattern.compile(
 		"(?<sha>[0-9a-f]{40}) (?<message>.*)");
-	private static final Pattern _gitLsRemotePattern = Pattern.compile(
-		"(?<sha>[^\\s]{40}+)[\\s]+refs/heads/(?<name>[^\\s]+)");
 	private static final List<String> _privateOnlyRepositoryNames =
 		_getBuildPropertyAsList(
 			"git.working.directory.private.only.repository.names");
 	private static final List<String> _publicOnlyRepositoryNames =
 		_getBuildPropertyAsList(
 			"git.working.directory.public.only.repository.names");
-	private static final Pattern _remoteURLPattern = Pattern.compile(
-		JenkinsResultsParserUtil.combine(
-			"git@(?<hostname>[^:]+):(?<username>[^/]+)/",
-			"(?<repositoryName>[^\\.]+)(.git)?"));
 
 	private File _gitDirectory;
 	private Set<String> _javaDirPaths;
