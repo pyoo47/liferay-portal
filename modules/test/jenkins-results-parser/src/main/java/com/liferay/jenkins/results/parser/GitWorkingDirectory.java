@@ -1387,6 +1387,13 @@ public class GitWorkingDirectory {
 		return _upstreamBranchName;
 	}
 
+	public RemoteGitBranch getUpstreamRemoteGitBranch() {
+		return getRemoteGitBranch(
+			getUpstreamBranchName(),
+			JenkinsResultsParserUtil.combine(
+				"git@github.com:liferay/", getRepositoryName()));
+	}
+
 	public File getWorkingDirectory() {
 		return _workingDirectory;
 	}
