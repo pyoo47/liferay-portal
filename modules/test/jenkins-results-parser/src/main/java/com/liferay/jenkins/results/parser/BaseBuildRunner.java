@@ -14,53 +14,114 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Michael Hashimoto
  */
 public abstract class BaseBuildRunner {
 
-	public Job getJob() {
-		return job;
-	}
-
 	public void setup() {
-		primaryLocalRepository.setup();
+		for (LocalGitBranch localGitBranch : _localGitBranches) {
+			localGitBranch.setupWorkspace();
+
+			LocalRepository localRepository =
+				localGitBranch.getLocalRepository();
+
+			localRepository.writeRepositoryPropertiesFiles();
+		}
 	}
 
 	protected BaseBuildRunner(Job job) {
-		this.job = job;
+		_job = job;
 	}
 
-	protected Properties getPortalJobBuildProperties() {
-		Properties properties = new Properties();
+	protected void addLocalGitBranch(LocalGitBranch localGitBranch) {
+		if (localGitBranch != null) {
+			_localGitBranches.add(localGitBranch);
+		}
+	}
 
-		Properties jobProperties = job.getJobProperties();
+	protected Job getJob() {
+		return _job;
+	}
 
-		for (String jobPropertyName : jobProperties.stringPropertyNames()) {
-			Matcher matcher = _pattern.matcher(jobPropertyName);
+	protected PortalLocalGitBranch getPortalLocalGitBranch() {
+		return _portalLocalGitBranch;
+	}
 
-			if (matcher.find()) {
-				String portalBuildPropertyName = matcher.group(
-					"portalBuildPropertyName");
+	protected PortalLocalGitBranch getPortalLocalGitBranch(
+		String portalHtmlURL) {
 
-				properties.put(
-					portalBuildPropertyName,
-					JenkinsResultsParserUtil.getProperty(
-						jobProperties, jobPropertyName));
-			}
+		if (_portalLocalGitBranch != null) {
+			return _portalLocalGitBranch;
 		}
 
-		return properties;
+		PortalTestClassJob portalTestClassJob = (PortalTestClassJob)_job;
+
+		PortalGitWorkingDirectory portalGitWorkingDirectory =
+			portalTestClassJob.getPortalGitWorkingDirectory();
+
+		LocalRepository localRepository = RepositoryFactory.getLocalRepository(
+			portalGitWorkingDirectory.getRepositoryName(),
+			portalGitWorkingDirectory.getUpstreamBranchName());
+
+		if (!(localRepository instanceof PortalLocalRepository)) {
+			throw new RuntimeException(
+				"Invalid local repository " + localRepository);
+		}
+
+		_portalLocalRepository = (PortalLocalRepository)localRepository;
+
+		LocalGitBranch localGitBranch;
+
+		if (PullRequest.isValidHtmlURL(portalHtmlURL)) {
+			PullRequest pullRequest = new PullRequest(
+				portalHtmlURL, getTestSuiteName());
+
+			localGitBranch = LocalGitSyncUtil.createCachedLocalGitBranch(
+				_portalLocalRepository, pullRequest, synchronizeBranches());
+		}
+		else if (Ref.isValidHtmlURL(portalHtmlURL)) {
+			Ref ref = new Ref(portalHtmlURL);
+
+			localGitBranch = LocalGitSyncUtil.createCachedLocalGitBranch(
+				_portalLocalRepository, ref, synchronizeBranches());
+		}
+		else {
+			throw new RuntimeException("Invalid html url " + portalHtmlURL);
+		}
+
+		if (!(localGitBranch instanceof PortalLocalGitBranch)) {
+			throw new RuntimeException(
+				"Invalid local git branch " + localGitBranch);
+		}
+
+		_portalLocalGitBranch = (PortalLocalGitBranch)localGitBranch;
+
+		return _portalLocalGitBranch;
 	}
 
-	protected final Job job;
-	protected LocalRepository primaryLocalRepository;
+	protected PortalLocalRepository getPortalLocalRepository() {
+		return _portalLocalRepository;
+	}
 
-	private static final Pattern _pattern = Pattern.compile(
-		"portal.build.properties\\[(?<portalBuildPropertyName>[^\\]]+)\\]");
+	protected String getTestSuiteName() {
+		if (_job instanceof TestSuiteJob) {
+			TestSuiteJob testSuiteJob = (TestSuiteJob)_job;
+
+			return testSuiteJob.getTestSuiteName();
+		}
+
+		return null;
+	}
+
+	protected abstract boolean synchronizeBranches();
+
+	private final Job _job;
+	private final List<LocalGitBranch> _localGitBranches = new ArrayList<>();
+	private PortalLocalGitBranch _portalLocalGitBranch;
+	private PortalLocalRepository _portalLocalRepository;
 
 }

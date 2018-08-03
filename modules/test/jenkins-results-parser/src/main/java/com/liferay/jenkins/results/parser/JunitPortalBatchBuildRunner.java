@@ -14,8 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.io.File;
-
 import java.util.Properties;
 
 /**
@@ -23,56 +21,34 @@ import java.util.Properties;
  */
 public class JunitPortalBatchBuildRunner extends PortalBatchBuildRunner {
 
-	protected JunitPortalBatchBuildRunner(Job job, String batchName) {
-		super(job, batchName);
+	protected JunitPortalBatchBuildRunner(
+		Job job, String batchName, String htmlURL) {
+
+		super(job, batchName, htmlURL);
 
 		_setPortalBuildProperties();
 	}
 
 	private void _setPortalBuildProperties() {
-		String portalUpstreamBranchName =
-			primaryLocalRepository.getUpstreamBranchName();
+		PortalLocalGitBranch portalLocalGitBranch = getPortalLocalGitBranch();
 
-		if (portalUpstreamBranchName.contains("7.0.x") ||
-			portalUpstreamBranchName.contains("7.1.x") ||
-			portalUpstreamBranchName.contains("master")) {
+		PortalLocalGitBranch otherPortalLocalGitBranch =
+			portalLocalGitBranch.getOtherPortalLocalGitBranch();
 
-			String otherPortalBranchName = null;
-
-			if (portalUpstreamBranchName.contains("7.0.x")) {
-				otherPortalBranchName = portalUpstreamBranchName.replace(
-					"7.0.x", "master");
-			}
-			else if (portalUpstreamBranchName.contains("7.1.x")) {
-				otherPortalBranchName = portalUpstreamBranchName.replace(
-					"7.1.x", "7.0.x");
-			}
-			else {
-				otherPortalBranchName = portalUpstreamBranchName.replace(
-					"master", "7.0.x");
-			}
-
-			String otherPortalRepositoryName = "liferay-portal";
-
-			if (!otherPortalBranchName.equals("master")) {
-				otherPortalRepositoryName += "-ee";
-			}
-
-			LocalRepository otherPortalLocalRepository =
-				RepositoryFactory.getLocalRepository(
-					otherPortalRepositoryName, otherPortalBranchName);
-
-			File otherPortalRepositoryDir =
-				otherPortalLocalRepository.getDirectory();
-
-			Properties properties = new Properties();
-
-			properties.put(
-				"release.versions.test.other.dir",
-				otherPortalRepositoryDir.toString());
-
-			portalLocalRepository.setBuildProperties(properties);
+		if (otherPortalLocalGitBranch == null) {
+			return;
 		}
+
+		Properties properties = new Properties();
+
+		properties.put(
+			"release.versions.test.other.dir",
+			String.valueOf(otherPortalLocalGitBranch.getDirectory()));
+
+		PortalLocalRepository portalLocalRepository =
+			getPortalLocalRepository();
+
+		portalLocalRepository.setBuildProperties(properties);
 	}
 
 }
