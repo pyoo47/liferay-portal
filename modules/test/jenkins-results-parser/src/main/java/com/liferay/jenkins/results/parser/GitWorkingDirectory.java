@@ -78,7 +78,7 @@ public class GitWorkingDirectory {
 		}
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT,
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
 			JenkinsResultsParserUtil.combine(
 				"git remote add ", remoteName, " ", remoteURL));
 
@@ -115,7 +115,8 @@ public class GitWorkingDirectory {
 		sb.append(branchName);
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, sb.toString());
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10,
+			sb.toString());
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -178,7 +179,8 @@ public class GitWorkingDirectory {
 			"git cherry-pick " + commit.getSHA());
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, cherryPickCommand);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+			cherryPickCommand);
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -190,7 +192,8 @@ public class GitWorkingDirectory {
 
 	public void clean() {
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, "git clean -dfx");
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10,
+			"git clean -dfx");
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -205,7 +208,8 @@ public class GitWorkingDirectory {
 			"git commit -m \"", message, "\" ", fileName);
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, commitCommand);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+			commitCommand);
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -220,7 +224,8 @@ public class GitWorkingDirectory {
 			"git commit -m \"", message, "\" ");
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, commitCommand);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+			commitCommand);
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -285,7 +290,8 @@ public class GitWorkingDirectory {
 			}
 
 			ExecutionResult executionResult = executeBashCommands(
-				_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, sb.toString());
+				GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+				sb.toString());
 
 			if (executionResult.getExitValue() != 0) {
 				throw new RuntimeException(
@@ -423,7 +429,7 @@ public class GitWorkingDirectory {
 		String command = "git log -n " + logNumber;
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 3, command);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 3, command);
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException("Unable to display log");
@@ -468,7 +474,7 @@ public class GitWorkingDirectory {
 		if (JenkinsResultsParserUtil.isCINode()) {
 			if (remoteURL.contains("github-dev.liferay.com")) {
 				executeBashCommands(
-					_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT,
+					GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
 					"rm -f ~/.ssh/known_hosts");
 			}
 
@@ -520,7 +526,7 @@ public class GitWorkingDirectory {
 		long start = System.currentTimeMillis();
 
 		ExecutionResult executionResult = executeBashCommands(
-			3, _RETRY_DELAY, 1000 * 60 * 30, sb.toString());
+			3, GitUtil.RETRY_DELAY, 1000 * 60 * 30, sb.toString());
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -590,7 +596,7 @@ public class GitWorkingDirectory {
 		long start = System.currentTimeMillis();
 
 		ExecutionResult executionResult = executeBashCommands(
-			3, _RETRY_DELAY, 1000 * 60 * 30, sb.toString());
+			3, GitUtil.RETRY_DELAY, 1000 * 60 * 30, sb.toString());
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -627,7 +633,7 @@ public class GitWorkingDirectory {
 		long start = System.currentTimeMillis();
 
 		ExecutionResult executionResult = executeBashCommands(
-			3, _RETRY_DELAY, 1000 * 60 * 30, sb.toString());
+			3, GitUtil.RETRY_DELAY, 1000 * 60 * 30, sb.toString());
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -648,7 +654,7 @@ public class GitWorkingDirectory {
 
 	public List<String> getBranchNamesContainingSHA(String sha) {
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 2,
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 2,
 			"git branch --contains " + sha);
 
 		if (executionResult.getExitValue() != 0) {
@@ -699,7 +705,8 @@ public class GitWorkingDirectory {
 		waitForIndexLock();
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, "git branch | grep \\*");
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+			"git branch | grep \\*");
 
 		if (executionResult.getExitValue() != 0) {
 			System.out.println(executionResult.getStandardError());
@@ -739,7 +746,7 @@ public class GitWorkingDirectory {
 
 	public String getGitConfigProperty(String gitConfigPropertyName) {
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT,
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
 			"git config " + gitConfigPropertyName);
 
 		if (executionResult.getExitValue() != 0) {
@@ -887,7 +894,7 @@ public class GitWorkingDirectory {
 		}
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 2,
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 2,
 			"git rev-parse " + localGitBranchName);
 
 		if (executionResult.getExitValue() != 0) {
@@ -944,7 +951,8 @@ public class GitWorkingDirectory {
 		}
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, sb.toString());
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+			sb.toString());
 
 		if (executionResult.getExitValue() == 1) {
 			return modifiedFiles;
@@ -1152,7 +1160,7 @@ public class GitWorkingDirectory {
 		}
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, command);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10, command);
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -1248,7 +1256,7 @@ public class GitWorkingDirectory {
 			"git ls-remote -h ", remoteURL, " ", remoteGitBranchName);
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, command);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10, command);
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -1290,7 +1298,8 @@ public class GitWorkingDirectory {
 			}
 
 			ExecutionResult executionResult = executeBashCommands(
-				_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, "git remote -v");
+				GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+				"git remote -v");
 
 			if (executionResult.getExitValue() != 0) {
 				throw new RuntimeException(
@@ -1395,7 +1404,7 @@ public class GitWorkingDirectory {
 			"git ls-remote -h ", remoteURL, " HEAD");
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, command);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10, command);
 
 		if (executionResult.getExitValue() != 0) {
 			System.out.println("Unable to connect to " + remoteURL);
@@ -1420,7 +1429,7 @@ public class GitWorkingDirectory {
 		String command = "git cat-file -t " + sha;
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 3, command);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 3, command);
 
 		if (executionResult.getExitValue() == 0) {
 			return true;
@@ -1504,7 +1513,8 @@ public class GitWorkingDirectory {
 
 		try {
 			executeBashCommands(
-				_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, sb.toString());
+				GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10,
+				sb.toString());
 		}
 		catch (RuntimeException re) {
 			return null;
@@ -1535,7 +1545,8 @@ public class GitWorkingDirectory {
 			localGitBranch.getName());
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, rebaseCommand);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10,
+			rebaseCommand);
 
 		if (executionResult.getExitValue() != 0) {
 			if (abortOnFail) {
@@ -1558,7 +1569,8 @@ public class GitWorkingDirectory {
 
 	public void rebaseAbort(boolean ignoreFailure) {
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, "git rebase --abort");
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+			"git rebase --abort");
 
 		if (!ignoreFailure && (executionResult.getExitValue() != 0)) {
 			throw new RuntimeException(
@@ -1601,7 +1613,7 @@ public class GitWorkingDirectory {
 		}
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT,
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
 			"git remote rm " + remote.getName());
 
 		if (executionResult.getExitValue() != 0) {
@@ -1622,7 +1634,7 @@ public class GitWorkingDirectory {
 		String command = "git reset " + options;
 
 		ExecutionResult executionResult = executeBashCommands(
-			2, _RETRY_DELAY, 1000 * 60 * 2, command);
+			2, GitUtil.RETRY_DELAY, 1000 * 60 * 2, command);
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -1635,7 +1647,7 @@ public class GitWorkingDirectory {
 		String command = "git stage " + fileName;
 
 		ExecutionResult result = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, command);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT, command);
 
 		if (result.getExitValue() != 0) {
 			throw new RuntimeException("Unable to stage file " + fileName);
@@ -1887,7 +1899,7 @@ public class GitWorkingDirectory {
 
 	protected List<String> getLocalGitBranchNames() {
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT,
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
 			"git for-each-ref refs/heads --format=\"%(refname)\"");
 
 		if (executionResult.getExitValue() != 0) {
@@ -2069,7 +2081,8 @@ public class GitWorkingDirectory {
 
 		try {
 			executionResult = executeBashCommands(
-				_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, sb.toString());
+				GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10,
+				sb.toString());
 		}
 		catch (RuntimeException re) {
 			exceptionThrown = true;
@@ -2113,7 +2126,8 @@ public class GitWorkingDirectory {
 
 		try {
 			executionResult = executeBashCommands(
-				_MAX_RETRIES, _RETRY_DELAY, 1000 * 60 * 10, sb.toString());
+				GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, 1000 * 60 * 10,
+				sb.toString());
 		}
 		catch (RuntimeException re) {
 			exceptionThrown = true;
@@ -2151,7 +2165,8 @@ public class GitWorkingDirectory {
 		}
 
 		ExecutionResult executionResult = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, sb.toString());
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT,
+			sb.toString());
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
@@ -2197,7 +2212,7 @@ public class GitWorkingDirectory {
 		String command = "git status";
 
 		ExecutionResult result = executeBashCommands(
-			_MAX_RETRIES, _RETRY_DELAY, _TIMEOUT, command);
+			GitUtil.MAX_RETRIES, GitUtil.RETRY_DELAY, GitUtil.TIMEOUT, command);
 
 		if (result.getExitValue() != 0) {
 			throw new RuntimeException("Unable to run: git status");
@@ -2207,12 +2222,6 @@ public class GitWorkingDirectory {
 	}
 
 	private static final int _DELETE_BRANCHES_BATCH_SIZE = 5;
-
-	private static final int _MAX_RETRIES = 1;
-
-	private static final long _RETRY_DELAY = 1000;
-
-	private static final long _TIMEOUT = 30 * 1000;
 
 	private static final Pattern _gitDirectoryPathPattern = Pattern.compile(
 		"gitdir\\: (.*)\\s*");
