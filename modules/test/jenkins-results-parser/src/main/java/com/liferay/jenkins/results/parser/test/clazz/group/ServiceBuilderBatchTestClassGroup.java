@@ -117,36 +117,37 @@ public class ServiceBuilderBatchTestClassGroup
 				_buildType = BuildType.FULL;
 
 				moduleDirsList.add(portalModulesBaseDir);
-
-				return;
-			}
-
-			List<File> modifiedPortalImplFiles =
-				portalGitWorkingDirectory.getModifiedFilesList("portal-impl/");
-
-			if (!modifiedPortalImplFiles.isEmpty()) {
-				_buildType = BuildType.CORE;
 			}
 			else {
-				List<File> modifiedPortalKernelFiles =
+				List<File> modifiedPortalImplFiles =
 					portalGitWorkingDirectory.getModifiedFilesList(
-						"portal-kernel/");
+						"portal-impl/");
 
-				if (!modifiedPortalKernelFiles.isEmpty()) {
+				if (!modifiedPortalImplFiles.isEmpty()) {
 					_buildType = BuildType.CORE;
 				}
-			}
+				else {
+					List<File> modifiedPortalKernelFiles =
+						portalGitWorkingDirectory.getModifiedFilesList(
+							"portal-kernel/");
 
-			List<File> modifiedModuleDirsList =
-				portalGitWorkingDirectory.getModifiedModuleDirsList(
-					excludesPathMatchers, includesPathMatchers);
+					if (!modifiedPortalKernelFiles.isEmpty()) {
+						_buildType = BuildType.CORE;
+					}
+				}
 
-			for (File modifiedModuleDir : modifiedModuleDirsList) {
-				List<File> serviceXmlFiles = JenkinsResultsParserUtil.findFiles(
-					modifiedModuleDir, "service.xml");
+				List<File> modifiedModuleDirsList =
+					portalGitWorkingDirectory.getModifiedModuleDirsList(
+						excludesPathMatchers, includesPathMatchers);
 
-				if (!serviceXmlFiles.isEmpty()) {
-					moduleDirsList.add(modifiedModuleDir);
+				for (File modifiedModuleDir : modifiedModuleDirsList) {
+					List<File> serviceXmlFiles =
+						JenkinsResultsParserUtil.findFiles(
+							modifiedModuleDir, "service.xml");
+
+					if (!serviceXmlFiles.isEmpty()) {
+						moduleDirsList.add(modifiedModuleDir);
+					}
 				}
 			}
 		}
