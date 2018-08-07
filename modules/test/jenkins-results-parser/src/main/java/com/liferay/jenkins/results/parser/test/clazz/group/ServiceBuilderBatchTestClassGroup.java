@@ -32,7 +32,9 @@ public class ServiceBuilderBatchTestClassGroup
 
 	@Override
 	public int getAxisCount() {
-		if (testClasses.isEmpty() && (_buildType == BuildType.CORE)) {
+		if ((_buildType == BuildType.FULL) ||
+			(testClasses.isEmpty() && (_buildType == BuildType.CORE))) {
+
 			return 1;
 		}
 
@@ -69,27 +71,19 @@ public class ServiceBuilderBatchTestClassGroup
 			initTestMethods(modulesProjectDirs, modulesDir, "buildService");
 		}
 
-		@Override
-		protected void initTestMethods(
-			List<File> modulesProjectDirs, File modulesDir, String taskName) {
-
-			for (File modulesProjectDir : modulesProjectDirs) {
-				String path = JenkinsResultsParserUtil.getPathRelativeTo(
-					modulesProjectDir, modulesDir);
-
-				String moduleTaskCall = JenkinsResultsParserUtil.combine(
-					path, ":", taskName);
-
-				addTestMethod(moduleTaskCall);
-			}
-		}
-
 	}
 
-	protected static List<File> getModulesProjectDirs(File modulesDir) {
+	protected static List<File> getModulesProjectDirs(File moduleBaseDir) {
 		final List<File> modulesProjectDirs = new ArrayList<>();
 
-		modulesProjectDirs.add(modulesDir);
+		for (File modulesSubDir : moduleBaseDir.listFiles()) {
+			List<File> serviceXmlFiles = JenkinsResultsParserUtil.findFiles(
+				modulesSubDir, "service.xml");
+
+			if (!serviceXmlFiles.isEmpty()) {
+				modulesProjectDirs.add(modulesSubDir);
+			}
+		}
 
 		return modulesProjectDirs;
 	}
@@ -116,8 +110,6 @@ public class ServiceBuilderBatchTestClassGroup
 			if (!modifiedPortalToolsServiceBuilderFiles.isEmpty()) {
 				_buildType = BuildType.FULL;
 
-				moduleDirsList.add(portalModulesBaseDir);
-
 				return;
 			}
 
@@ -137,23 +129,14 @@ public class ServiceBuilderBatchTestClassGroup
 				}
 			}
 
-			List<File> modifiedModuleDirsList =
+			moduleDirsList.addAll(
 				portalGitWorkingDirectory.getModifiedModuleDirsList(
-					excludesPathMatchers, includesPathMatchers);
-
-			for (File modifiedModuleDir : modifiedModuleDirsList) {
-				List<File> serviceXmlFiles = JenkinsResultsParserUtil.findFiles(
-					modifiedModuleDir, "service.xml");
-
-				if (!serviceXmlFiles.isEmpty()) {
-					moduleDirsList.add(modifiedModuleDir);
-				}
-			}
+					excludesPathMatchers, includesPathMatchers));
 		}
 		else {
 			_buildType = BuildType.FULL;
 
-			moduleDirsList.add(portalModulesBaseDir);
+			return;
 		}
 
 		for (File moduleDir : moduleDirsList) {
