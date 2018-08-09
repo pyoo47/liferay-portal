@@ -14,16 +14,20 @@
 
 package com.liferay.jenkins.results.parser.test.clazz.group;
 
-import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
 
 import java.io.File;
 import java.io.IOException;
 
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * @author Yi-Chen Tsai
@@ -76,18 +80,62 @@ public class ServiceBuilderBatchTestClassGroup
 
 	protected static List<File> getModulesProjectDirs(File moduleBaseDir) {
 		final List<File> modulesProjectDirs = new ArrayList<>();
+		final Path moduleBaseDirPath = moduleBaseDir.toPath();
 
-		for (File modulesSubDir : moduleBaseDir.listFiles()) {
-			if (!modulesSubDir.isDirectory()) {
-				continue;
-			}
+		try {
+			Files.walkFileTree(
+				moduleBaseDirPath,
+				new SimpleFileVisitor<Path>() {
 
-			List<File> serviceXmlFiles = JenkinsResultsParserUtil.findFiles(
-				modulesSubDir, Pattern.quote("service.xml"));
+					@Override
+					public FileVisitResult preVisitDirectory(
+						Path filePath, BasicFileAttributes attrs) {
 
-			if (!serviceXmlFiles.isEmpty()) {
-				modulesProjectDirs.add(modulesSubDir);
-			}
+						String filePathString = filePath.toString();
+
+						File currentDirectory = filePath.toFile();
+
+						if (filePathString.endsWith("-service")) {
+							File buildFile = new File(
+								currentDirectory, "build.gradle");
+
+							File serviceXmlFile = new File(
+								currentDirectory, "service.xml");
+
+							if (buildFile.exists() && serviceXmlFile.exists()) {
+								modulesProjectDirs.add(currentDirectory);
+
+								return FileVisitResult.SKIP_SUBTREE;
+							}
+						}
+						else if (filePathString.endsWith("-portlet")) {
+							File portletXmlFile = new File(
+								currentDirectory,
+								"docroot/WEB-INF/portlet.xml");
+
+							File serviceXmlFile = new File(
+								currentDirectory,
+								"docroot/WEB-INF/service.xml");
+
+							if (portletXmlFile.exists() &&
+								serviceXmlFile.exists()) {
+
+								modulesProjectDirs.add(currentDirectory);
+
+								return FileVisitResult.SKIP_SUBTREE;
+							}
+						}
+
+						return FileVisitResult.CONTINUE;
+					}
+
+				});
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				"Unable to get module marker files from " +
+					moduleBaseDir.getPath(),
+				ioe);
 		}
 
 		return modulesProjectDirs;
