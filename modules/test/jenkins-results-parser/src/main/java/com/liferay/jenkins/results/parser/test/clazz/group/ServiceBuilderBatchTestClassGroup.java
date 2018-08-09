@@ -148,6 +148,21 @@ public class ServiceBuilderBatchTestClassGroup
 	}
 
 	@Override
+	protected void setAxisTestClassGroups() {
+		int testClassCount = testClasses.size();
+
+		int axisCount = getAxisCount();
+
+		if ((testClassCount == 0) && (axisCount == 1)) {
+			axisTestClassGroups.put(0, new AxisTestClassGroup(this, 0));
+
+			return;
+		}
+
+		super.setAxisTestClassGroups();
+	}
+
+	@Override
 	protected void setTestClasses() throws IOException {
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			getPortalGitWorkingDirectory();
