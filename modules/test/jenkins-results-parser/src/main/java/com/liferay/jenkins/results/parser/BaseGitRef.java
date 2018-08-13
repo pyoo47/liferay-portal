@@ -17,26 +17,34 @@ package com.liferay.jenkins.results.parser;
 /**
  * @author Michael Hashimoto
  */
-public class PortalBatchBuildRunner extends BatchBuildRunner {
+public abstract class BaseGitRef {
 
-	protected PortalBatchBuildRunner(
-		Job job, String batchName, String portalGitHubURL) {
+	public String getName() {
+		return _name;
+	}
 
-		super(job, batchName);
+	public String getSHA() {
+		return _sha;
+	}
 
-		if (!(job instanceof PortalTestClassJob)) {
-			throw new RuntimeException("Invalid job type");
+	protected BaseGitRef(String name, String sha) {
+		if ((name == null) || name.isEmpty()) {
+			throw new IllegalArgumentException("Name is null");
 		}
 
-		PortalLocalGitBranch portalLocalGitBranch = getPortalLocalGitBranch(
-			portalGitHubURL);
+		if ((sha == null) || sha.isEmpty()) {
+			throw new IllegalArgumentException("SHA is null");
+		}
 
-		addLocalGitBranch(portalLocalGitBranch);
+		if (!sha.matches("[0-9a-f]{7,40}")) {
+			throw new IllegalArgumentException("SHA is invalid");
+		}
 
-		PortalLocalRepository portalLocalRepository =
-			getPortalLocalRepository();
-
-		portalLocalRepository.setJobProperties(getJob());
+		_name = name;
+		_sha = sha;
 	}
+
+	private final String _name;
+	private final String _sha;
 
 }

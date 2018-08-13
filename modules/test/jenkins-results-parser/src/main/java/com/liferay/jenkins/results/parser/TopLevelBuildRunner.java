@@ -14,37 +14,27 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Michael Hashimoto
  */
-public abstract class BaseGitBranch {
+public abstract class TopLevelBuildRunner extends BaseBuildRunner {
 
-	public String getName() {
-		return _name;
+	public List<String> getBatchNames() {
+		return _batchNames;
 	}
 
-	public String getSHA() {
-		return _sha;
+	protected TopLevelBuildRunner(Job job) {
+		super(job);
 	}
 
-	protected BaseGitBranch(String name, String sha) {
-		if ((name == null) || name.isEmpty()) {
-			throw new IllegalArgumentException("Name is null");
-		}
-
-		if ((sha == null) || sha.isEmpty()) {
-			throw new IllegalArgumentException("SHA is null");
-		}
-
-		if (!sha.matches("[0-9a-f]{7,40}")) {
-			throw new IllegalArgumentException("SHA is invalid");
-		}
-
-		_name = name;
-		_sha = sha;
+	@Override
+	protected boolean synchronizeBranches() {
+		return true;
 	}
 
-	private final String _name;
-	private final String _sha;
+	private final List<String> _batchNames = new ArrayList<>();
 
 }

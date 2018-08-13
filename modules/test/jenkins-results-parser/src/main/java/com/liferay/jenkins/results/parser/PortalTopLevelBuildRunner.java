@@ -17,12 +17,10 @@ package com.liferay.jenkins.results.parser;
 /**
  * @author Michael Hashimoto
  */
-public class PortalBatchBuildRunner extends BatchBuildRunner {
+public class PortalTopLevelBuildRunner extends TopLevelBuildRunner {
 
-	protected PortalBatchBuildRunner(
-		Job job, String batchName, String portalGitHubURL) {
-
-		super(job, batchName);
+	protected PortalTopLevelBuildRunner(Job job, String portalGitHubURL) {
+		super(job);
 
 		if (!(job instanceof PortalTestClassJob)) {
 			throw new RuntimeException("Invalid job type");
