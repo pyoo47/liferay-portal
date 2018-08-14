@@ -14,29 +14,28 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.Properties;
+
 /**
  * @author Michael Hashimoto
  */
-public class BuildRunnerFactory {
+public class FunctionalBatchPortalWorkspace extends PortalWorkspace {
 
-	public static BatchBuildRunner newBatchBuildRunner(
-		Job job, String gitHubURL, String batchName) {
+	protected FunctionalBatchPortalWorkspace(
+		String portalGitHubURL, String portalUpstreamBranchName) {
 
-		if (!PortalWorkspace.isPortalGitHubURL(gitHubURL)) {
-			throw new RuntimeException("Unsupported github url " + gitHubURL);
-		}
+		super(portalGitHubURL, portalUpstreamBranchName, false);
 
-		return new PortalBatchBuildRunner(job, gitHubURL, batchName);
+		_setPortalBuildProperties();
 	}
 
-	public static TopLevelBuildRunner newTopLevelBuildRunner(
-		Job job, String gitHubURL) {
+	private void _setPortalBuildProperties() {
+		Properties properties = new Properties();
 
-		if (!PortalWorkspace.isPortalGitHubURL(gitHubURL)) {
-			throw new RuntimeException("Unsupported github url " + gitHubURL);
-		}
+		properties.put("jsp.precompile", "on");
+		properties.put("jsp.precompile.parallel", "on");
 
-		return new PortalTopLevelBuildRunner(job, gitHubURL);
+		portalLocalRepository.setBuildProperties(properties);
 	}
 
 }

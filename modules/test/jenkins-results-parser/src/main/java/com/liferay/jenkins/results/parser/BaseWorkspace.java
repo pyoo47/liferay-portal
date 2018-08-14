@@ -14,37 +14,31 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Michael Hashimoto
  */
-public abstract class BaseGitBranch {
+public abstract class BaseWorkspace {
 
-	public String getName() {
-		return _name;
+	public void setup() {
+		for (LocalGitBranch localGitBranch : _localGitBranches) {
+			localGitBranch.setupWorkspace();
+
+			LocalRepository localRepository =
+				localGitBranch.getLocalRepository();
+
+			localRepository.writeRepositoryPropertiesFiles();
+		}
 	}
 
-	public String getSHA() {
-		return _sha;
+	protected void addLocalGitBranch(LocalGitBranch localGitBranch) {
+		if (localGitBranch != null) {
+			_localGitBranches.add(localGitBranch);
+		}
 	}
 
-	protected BaseGitBranch(String name, String sha) {
-		if ((name == null) || name.isEmpty()) {
-			throw new IllegalArgumentException("Name is null");
-		}
-
-		if ((sha == null) || sha.isEmpty()) {
-			throw new IllegalArgumentException("SHA is null");
-		}
-
-		if (!sha.matches("[0-9a-f]{7,40}")) {
-			throw new IllegalArgumentException("SHA is invalid");
-		}
-
-		_name = name;
-		_sha = sha;
-	}
-
-	private final String _name;
-	private final String _sha;
+	private final List<LocalGitBranch> _localGitBranches = new ArrayList<>();
 
 }

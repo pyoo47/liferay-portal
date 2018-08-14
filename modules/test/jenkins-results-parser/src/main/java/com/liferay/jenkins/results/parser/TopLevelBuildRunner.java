@@ -14,26 +14,22 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Michael Hashimoto
  */
-public class FunctionalPortalBatchBuildRunner extends PortalBatchBuildRunner {
+public abstract class TopLevelBuildRunner extends BaseBuildRunner {
 
-	protected FunctionalPortalBatchBuildRunner(Job job, String batchName) {
-		super(job, batchName);
-
-		_setPortalBuildProperties();
+	public List<String> getBatchNames() {
+		return _batchNames;
 	}
 
-	private void _setPortalBuildProperties() {
-		Properties properties = new Properties();
-
-		properties.put("jsp.precompile", "on");
-		properties.put("jsp.precompile.parallel", "on");
-
-		portalLocalRepository.setBuildProperties(properties);
+	protected TopLevelBuildRunner(Job job) {
+		super(job);
 	}
+
+	private final List<String> _batchNames = new ArrayList<>();
 
 }

@@ -17,26 +17,24 @@ package com.liferay.jenkins.results.parser;
 /**
  * @author Michael Hashimoto
  */
-public class BuildRunnerFactory {
+public class PortalTopLevelBuildRunner extends TopLevelBuildRunner {
 
-	public static BatchBuildRunner newBatchBuildRunner(
-		Job job, String gitHubURL, String batchName) {
+	protected PortalTopLevelBuildRunner(Job job, String portalGitHubURL) {
+		super(job);
 
-		if (!PortalWorkspace.isPortalGitHubURL(gitHubURL)) {
-			throw new RuntimeException("Unsupported github url " + gitHubURL);
+		String portalUpstreamBranchName =
+			JenkinsResultsParserUtil.getPortalUpstreamBranchName(job);
+
+		baseWorkspace = WorkspaceFactory.newTopLevelWorkspace(
+			portalGitHubURL, portalUpstreamBranchName);
+
+		if (!(baseWorkspace instanceof PortalWorkspace)) {
+			throw new RuntimeException("Invalid workspace");
 		}
 
-		return new PortalBatchBuildRunner(job, gitHubURL, batchName);
-	}
+		PortalWorkspace portalWorkspace = (PortalWorkspace)baseWorkspace;
 
-	public static TopLevelBuildRunner newTopLevelBuildRunner(
-		Job job, String gitHubURL) {
-
-		if (!PortalWorkspace.isPortalGitHubURL(gitHubURL)) {
-			throw new RuntimeException("Unsupported github url " + gitHubURL);
-		}
-
-		return new PortalTopLevelBuildRunner(job, gitHubURL);
+		portalWorkspace.setPortalJobProperties(getJob());
 	}
 
 }
