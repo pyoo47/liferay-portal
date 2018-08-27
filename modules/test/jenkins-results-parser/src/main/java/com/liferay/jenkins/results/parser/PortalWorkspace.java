@@ -36,11 +36,6 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 	}
 
 	@Override
-	public void setGitRepositoryJobProperties(Job job) {
-		_primaryPortalLocalGitRepository.setJobProperties(job);
-	}
-
-	@Override
 	public void checkoutLocalGitBranches() {
 		checkoutJenkinsLocalGitBranch();
 
@@ -53,6 +48,11 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 		_checkoutOtherPortalLocalGitBranch();
 
 		_checkoutPluginsLocalGitBranch();
+	}
+
+	@Override
+	public void setGitRepositoryJobProperties(Job job) {
+		_primaryPortalLocalGitRepository.setJobProperties(job);
 	}
 
 	@Override
@@ -304,40 +304,6 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 		checkoutLocalGitBranch(_primaryPortalLocalGitBranch);
 	}
 
-	private PortalLocalGitBranch _getPortalLocalGitBranch(
-		PortalLocalGitRepository portalLocalGitRepository,
-		String portalGitHubURL) {
-
-		LocalGitBranch localGitBranch;
-
-		if (PullRequest.isValidGitHubPullRequestURL(portalGitHubURL)) {
-			PullRequest pullRequest = new PullRequest(portalGitHubURL);
-
-			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
-				portalLocalGitRepository, pullRequest,
-				synchronizeGitBranches());
-		}
-		else if (GitUtil.isValidGitHubRefURL(portalGitHubURL)) {
-			RemoteGitRef remoteGitRef = GitUtil.getRemoteGitRef(
-				portalGitHubURL);
-
-			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
-				portalLocalGitRepository, remoteGitRef,
-				synchronizeGitBranches());
-		}
-		else {
-			throw new RuntimeException(
-				"Invalid portal GitHub URL " + portalGitHubURL);
-		}
-
-		if (!(localGitBranch instanceof PortalLocalGitBranch)) {
-			throw new RuntimeException(
-				"Invalid local Git branch " + localGitBranch);
-		}
-
-		return (PortalLocalGitBranch)localGitBranch;
-	}
-
 	private LocalGitBranch _getLocalGitBranchFromGitCommit(
 		String gitCommitFileName, LocalGitRepository localGitRepository) {
 
@@ -376,6 +342,51 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 		return localGitBranch;
 	}
 
+	private String _getPortalGitRepositoryName(String portalGitHubURL) {
+		Matcher matcher = _portalGitHubURLPattern.matcher(portalGitHubURL);
+
+		if (!matcher.find()) {
+			throw new RuntimeException(
+				"Invalid portal GitHub URL " + portalGitHubURL);
+		}
+
+		return matcher.group("repositoryName");
+	}
+
+	private PortalLocalGitBranch _getPortalLocalGitBranch(
+		PortalLocalGitRepository portalLocalGitRepository,
+		String portalGitHubURL) {
+
+		LocalGitBranch localGitBranch;
+
+		if (PullRequest.isValidGitHubPullRequestURL(portalGitHubURL)) {
+			PullRequest pullRequest = new PullRequest(portalGitHubURL);
+
+			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
+				portalLocalGitRepository, pullRequest,
+				synchronizeGitBranches());
+		}
+		else if (GitUtil.isValidGitHubRefURL(portalGitHubURL)) {
+			RemoteGitRef remoteGitRef = GitUtil.getRemoteGitRef(
+				portalGitHubURL);
+
+			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
+				portalLocalGitRepository, remoteGitRef,
+				synchronizeGitBranches());
+		}
+		else {
+			throw new RuntimeException(
+				"Invalid portal GitHub URL " + portalGitHubURL);
+		}
+
+		if (!(localGitBranch instanceof PortalLocalGitBranch)) {
+			throw new RuntimeException(
+				"Invalid local Git branch " + localGitBranch);
+		}
+
+		return (PortalLocalGitBranch)localGitBranch;
+	}
+
 	private PortalLocalGitRepository _getPortalLocalGitRepository(
 		String portalGitRepositoryName, String portalUpstreamBranchName) {
 
@@ -403,17 +414,6 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 		catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
-	}
-
-	private String _getPortalGitRepositoryName(String portalGitHubURL) {
-		Matcher matcher = _portalGitHubURLPattern.matcher(portalGitHubURL);
-
-		if (!matcher.find()) {
-			throw new RuntimeException(
-				"Invalid portal GitHub URL " + portalGitHubURL);
-		}
-
-		return matcher.group("repositoryName");
 	}
 
 	private static final Pattern _portalGitHubURLPattern = Pattern.compile(
