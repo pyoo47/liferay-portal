@@ -62,15 +62,6 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 	protected PortalWorkspace(
 		String portalGitHubURL, String portalUpstreamBranchName) {
 
-		this(portalGitHubURL, portalUpstreamBranchName, false);
-	}
-
-	protected PortalWorkspace(
-		String portalGitHubURL, String portalUpstreamBranchName,
-		boolean synchronizeBranches) {
-
-		_synchronizeBranches = synchronizeBranches;
-
 		String portalRepositoryName = _getPortalRepositoryName(portalGitHubURL);
 
 		_primaryPortalLocalGitRepository = _getPortalLocalGitRepository(
@@ -105,7 +96,7 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 				repositoryName, branchName);
 
 		LocalGitBranch localGitBranch = _getLocalGitBranchFromGitCommit(
-			"git-commit-portal", localGitRepository, _synchronizeBranches);
+			"git-commit-portal", localGitRepository);
 
 		_basePortalLocalGitBranch = (PortalLocalGitBranch)localGitBranch;
 
@@ -134,8 +125,7 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 				"liferay-portal-ee", branchName);
 
 		LocalGitBranch localGitBranch = _getLocalGitBranchFromGitCommit(
-			"git-commit-portal-private", localGitRepository,
-			_synchronizeBranches);
+			"git-commit-portal-private", localGitRepository);
 
 		_companionPortalLocalGitBranch = (PortalLocalGitBranch)localGitBranch;
 
@@ -180,7 +170,7 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 
 		LocalGitBranch localGitBranch =
 			GitHubDevSyncUtil.createCachedLocalGitBranch(
-				localGitRepository, remoteGitRef, _synchronizeBranches);
+				localGitRepository, remoteGitRef, synchronizeGitBranches());
 
 		_otherPortalLocalGitBranch = (PortalLocalGitBranch)localGitBranch;
 
@@ -206,7 +196,7 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 				"liferay-plugins-ee", branchName);
 
 		LocalGitBranch localGitBranch = _getLocalGitBranchFromGitCommit(
-			"git-commit-plugins", localGitRepository, _synchronizeBranches);
+			"git-commit-plugins", localGitRepository);
 
 		_pluginsLocalGitBranch = (PluginsLocalGitBranch)localGitBranch;
 
@@ -307,14 +297,16 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 			PullRequest pullRequest = new PullRequest(portalGitHubURL);
 
 			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
-				portalLocalGitRepository, pullRequest, _synchronizeBranches);
+				portalLocalGitRepository, pullRequest,
+				synchronizeGitBranches());
 		}
 		else if (GitUtil.isValidGitHubRefURL(portalGitHubURL)) {
 			RemoteGitRef remoteGitRef = GitUtil.getRemoteGitRef(
 				portalGitHubURL);
 
 			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
-				portalLocalGitRepository, remoteGitRef, _synchronizeBranches);
+				portalLocalGitRepository, remoteGitRef,
+				synchronizeGitBranches());
 		}
 		else {
 			throw new RuntimeException(
@@ -330,8 +322,7 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 	}
 
 	private LocalGitBranch _getLocalGitBranchFromGitCommit(
-		String gitCommitFileName, LocalGitRepository localGitRepository,
-		boolean synchronizeBranches) {
+		String gitCommitFileName, LocalGitRepository localGitRepository) {
 
 		String gitCommitFileContent = _getPortalRepositoryFileContent(
 			gitCommitFileName);
@@ -341,7 +332,7 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 		if (gitCommitFileContent.matches("[0-9a-f]{5,40}")) {
 			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
 				localGitRepository, localGitRepository.getUpstreamBranchName(),
-				gitCommitFileContent, synchronizeBranches);
+				gitCommitFileContent, synchronizeGitBranches());
 		}
 		else if (PullRequest.isValidGitHubPullRequestURL(
 					 gitCommitFileContent)) {
@@ -349,14 +340,14 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 			PullRequest pullRequest = new PullRequest(gitCommitFileContent);
 
 			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
-				localGitRepository, pullRequest, synchronizeBranches);
+				localGitRepository, pullRequest, synchronizeGitBranches());
 		}
 		else if (GitUtil.isValidGitHubRefURL(gitCommitFileContent)) {
 			RemoteGitRef remoteGitRef = GitUtil.getRemoteGitRef(
 				gitCommitFileContent);
 
 			localGitBranch = GitHubDevSyncUtil.createCachedLocalGitBranch(
-				localGitRepository, remoteGitRef, synchronizeBranches);
+				localGitRepository, remoteGitRef, synchronizeGitBranches());
 		}
 
 		if (localGitBranch == null) {
@@ -420,6 +411,5 @@ public abstract class PortalWorkspace extends BaseWorkspace {
 	private PluginsLocalGitBranch _pluginsLocalGitBranch;
 	private final PortalLocalGitBranch _primaryPortalLocalGitBranch;
 	private final PortalLocalGitRepository _primaryPortalLocalGitRepository;
-	private final boolean _synchronizeBranches;
 
 }
