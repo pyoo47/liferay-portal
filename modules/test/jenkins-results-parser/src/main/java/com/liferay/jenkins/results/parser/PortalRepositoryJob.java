@@ -16,6 +16,7 @@ package com.liferay.jenkins.results.parser;
 
 import java.io.File;
 
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -27,7 +28,7 @@ public abstract class PortalRepositoryJob
 	@Override
 	public Set<String> getBatchNames() {
 		String testBatchNames = JenkinsResultsParserUtil.getProperty(
-			jobProperties, "test.batch.names");
+			getJobProperties(), "test.batch.names");
 
 		return getSetFromString(testBatchNames);
 	}
@@ -35,7 +36,7 @@ public abstract class PortalRepositoryJob
 	@Override
 	public Set<String> getDistTypes() {
 		String testBatchDistAppServers = JenkinsResultsParserUtil.getProperty(
-			jobProperties, "test.batch.dist.app.servers");
+			getJobProperties(), "test.batch.dist.app.servers");
 
 		return getSetFromString(testBatchDistAppServers);
 	}
@@ -52,6 +53,8 @@ public abstract class PortalRepositoryJob
 	}
 
 	public String getPoshiQuery(String testBatchName) {
+		Properties jobProperties = getJobProperties();
+
 		String propertyName = JenkinsResultsParserUtil.combine(
 			"test.batch.run.property.query[", testBatchName, "]");
 
@@ -78,9 +81,7 @@ public abstract class PortalRepositoryJob
 
 		checkRepositoryDir();
 
-		jobProperties.putAll(
-			JenkinsResultsParserUtil.getProperties(
-				new File(repositoryDir, "test.properties")));
+		jobPropertiesFiles.add(new File(repositoryDir, "test.properties"));
 	}
 
 }
