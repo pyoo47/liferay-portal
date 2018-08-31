@@ -22,29 +22,62 @@ public abstract class BaseBuildRunner implements BuildRunner {
 	public static final String DIST_ROOT_PATH = "/tmp/dist";
 
 	@Override
-	public void setup() {
+	public void run() {
+		initWorkspace();
+
 		setUpWorkspace();
 	}
 
 	@Override
-	public void setUpWorkspace() {
+	public void setUp() {
+	}
+
+	@Override
+	public void tearDown() {
+		tearDownWorkspace();
+	}
+
+	protected BaseBuildRunner(BuildData buildData) {
+		_buildData = buildData;
+	}
+
+	protected BuildData getBuildData() {
+		return _buildData;
+	}
+
+	protected Job getJob() {
+		if (_job != null) {
+			_job.readJobProperties();
+
+			return _job;
+		}
+
+		_job = JobFactory.newJob(getBuildData());
+
+		return _job;
+	}
+
+	protected abstract void initWorkspace();
+
+	protected void setUpWorkspace() {
 		if (workspace == null) {
 			throw new RuntimeException("Workspace is null");
 		}
 
-		workspace.setUpWorkspace();
+		workspace.setUp(getJob());
 	}
 
-	protected BaseBuildRunner(Job job) {
-		_job = job;
-	}
+	protected void tearDownWorkspace() {
+		if (workspace == null) {
+			throw new RuntimeException("Workspace is null");
+		}
 
-	protected Job getJob() {
-		return _job;
+		workspace.tearDown();
 	}
 
 	protected Workspace workspace;
 
-	private final Job _job;
+	private final BuildData _buildData;
+	private Job _job;
 
 }
