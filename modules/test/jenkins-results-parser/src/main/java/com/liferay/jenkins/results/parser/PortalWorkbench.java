@@ -14,19 +14,15 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.Properties;
+
 /**
  * @author Michael Hashimoto
  */
-public interface Workspace {
+public interface PortalWorkbench extends Workbench {
 
-	public void addJenkinsWorkbench(String jenkinsGitHubURL);
+	public void setPortalBuildProperties(Properties properties);
 
-	public JenkinsWorkbench getJenkinsWorkbench();
-
-	public void setUp();
-
-	public void setUp(Job job);
-
-	public void tearDown();
+	public void setPortalJobProperties(Job job);
 
 }

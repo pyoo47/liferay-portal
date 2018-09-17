@@ -17,16 +17,12 @@ package com.liferay.jenkins.results.parser;
 /**
  * @author Michael Hashimoto
  */
-public interface Workspace {
+public class DefaultPortalWorkbench extends BasePortalWorkbench {
 
-	public void addJenkinsWorkbench(String jenkinsGitHubURL);
+	protected DefaultPortalWorkbench(
+		String gitHubURL, String upstreamBranchName, String branchSHA) {
 
-	public JenkinsWorkbench getJenkinsWorkbench();
-
-	public void setUp();
-
-	public void setUp(Job job);
-
-	public void tearDown();
+		super(gitHubURL, upstreamBranchName, branchSHA);
+	}
 
 }

@@ -17,16 +17,20 @@ package com.liferay.jenkins.results.parser;
 /**
  * @author Michael Hashimoto
  */
-public interface Workspace {
+public interface Workbench {
 
-	public void addJenkinsWorkbench(String jenkinsGitHubURL);
+	public String getFileContent(String filePath);
 
-	public JenkinsWorkbench getJenkinsWorkbench();
+	public String getGitHubDevBranchName();
+
+	public LocalGitRepository getLocalGitRepository();
+
+	public String getUpstreamBranchName();
 
 	public void setUp();
 
-	public void setUp(Job job);
-
 	public void tearDown();
+
+	public void writePropertiesFiles();
 
 }
