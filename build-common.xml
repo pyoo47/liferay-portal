@@ -104,6 +104,11 @@
 	/>
 	<taskdef
 		classpathref="lib.classpath"
+		resource="org/apache/ant/compress/antlib.xml"
+		uri="antlib:org.apache.ant.compress"
+	/>
+	<taskdef
+		classpathref="lib.classpath"
 		resource="ise/antelope/tasks/antlib.xml"
 		uri="antlib:ise.antelope.tasks"
 	/>
