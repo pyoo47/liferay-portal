@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * @author Michael Hashimoto
  */
-public abstract class PortalGitRepositoryJob
+public class PortalGitRepositoryJob
 	extends GitRepositoryJob implements PortalTestClassJob {
 
 	@Override
@@ -73,9 +73,16 @@ public abstract class PortalGitRepositoryJob
 	protected PortalGitRepositoryJob(String jobName) {
 		super(jobName);
 
-		gitWorkingDirectory =
-			JenkinsResultsParserUtil.getPortalGitWorkingDirectory(
-				getBranchName());
+		if (JenkinsResultsParserUtil.isCINode()) {
+			gitWorkingDirectory =
+				JenkinsResultsParserUtil.getPortalGitWorkingDirectory(
+					getBranchName());
+		}
+		else {
+			gitWorkingDirectory =
+				GitWorkingDirectoryFactory.newGitWorkingDirectory(
+					getBranchName(), System.getProperty("user.dir"));
+		}
 
 		setGitRepositoryDir(gitWorkingDirectory.getWorkingDirectory());
 
