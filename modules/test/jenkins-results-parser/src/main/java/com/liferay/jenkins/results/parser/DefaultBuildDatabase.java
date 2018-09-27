@@ -14,21 +14,15 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.File;
+
 /**
  * @author Michael Hashimoto
  */
-public class DefaultWorkspaceGitRepository extends BaseWorkspaceGitRepository {
+public class DefaultBuildDatabase extends BaseBuildDatabase {
 
-	protected DefaultWorkspaceGitRepository(
-		PullRequest pullRequest, String upstreamBranchName) {
-
-		super(pullRequest, upstreamBranchName);
-	}
-
-	protected DefaultWorkspaceGitRepository(
-		RemoteGitRef remoteGitRef, String upstreamBranchName) {
-
-		super(remoteGitRef, upstreamBranchName);
+	public DefaultBuildDatabase(File basedir) {
+		super(basedir);
 	}
 
 }
