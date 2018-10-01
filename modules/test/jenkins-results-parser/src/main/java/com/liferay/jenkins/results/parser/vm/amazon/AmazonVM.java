@@ -106,12 +106,6 @@ public abstract class AmazonVM extends VM {
 		_amazonEC2.terminateInstances(terminateInstancesRequest);
 
 		_waitForInstanceState("terminated");
-
-		DeleteVolumeRequest deleteVolumeRequest = new DeleteVolumeRequest();
-
-		deleteVolumeRequest.withVolumeId(_volumeId);
-
-		_amazonEC2.deleteVolume(deleteVolumeRequest);
 	}
 
 	public String getInstanceId() {
