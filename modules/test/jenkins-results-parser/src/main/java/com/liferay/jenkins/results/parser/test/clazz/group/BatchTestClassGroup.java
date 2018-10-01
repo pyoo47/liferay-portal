@@ -299,7 +299,7 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 				throw new IllegalArgumentException("headerRow is null");
 			}
 
-			addRow(headerRow);
+			_csvReportRows.add(headerRow);
 		}
 
 		public void addRow(Row csvReportRow) {
@@ -349,7 +349,7 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 		}
 
-		private List<Row> _csvReportRows;
+		private List<Row> _csvReportRows = new ArrayList<>();
 
 	}
 
