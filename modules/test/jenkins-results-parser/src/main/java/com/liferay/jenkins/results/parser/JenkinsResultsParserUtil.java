@@ -1022,25 +1022,7 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getProperty(Properties properties, String name) {
-		if (!properties.containsKey(name)) {
-			return null;
-		}
-
-		String value = properties.getProperty(name);
-
-		Matcher matcher = _nestedPropertyPattern.matcher(value);
-
-		String newValue = value;
-
-		while (matcher.find()) {
-			if (properties.containsKey(matcher.group(1))) {
-				newValue = newValue.replace(
-					matcher.group(0),
-					getProperty(properties, matcher.group(1)));
-			}
-		}
-
-		return newValue;
+		return _getProperty(properties, new ArrayList<String>(), name);
 	}
 
 	public static String getProperty(
@@ -2059,6 +2041,39 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return properties;
+	}
+
+	private static String _getProperty(
+		Properties properties, List<String> referencedNames, String name) {
+
+		if (referencedNames.contains(name)) {
+			return "${" + name + "}";
+		}
+
+		referencedNames.add(name);
+
+		if (!properties.containsKey(name)) {
+			return null;
+		}
+
+		String value = properties.getProperty(name);
+
+		Matcher matcher = _nestedPropertyPattern.matcher(value);
+
+		String newValue = value;
+
+		while (matcher.find()) {
+			String propertyGroup = matcher.group(0);
+			String propertyName = matcher.group(1);
+
+			if (properties.containsKey(propertyName)) {
+				newValue = newValue.replace(
+					propertyGroup,
+					_getProperty(properties, referencedNames, propertyName));
+			}
+		}
+
+		return newValue;
 	}
 
 	private static String _getRedactTokenKey(int index) {
