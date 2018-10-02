@@ -559,13 +559,8 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 							packagePath = packagePath.replace(
 								".java", ".class");
 
-							String parentPath = matcher.group("parentPath");
-
-							parentPath = parentPath.replace(
-								workingDirectory.getAbsolutePath(), "");
-
 							return JunitBatchTestClass.getInstance(
-								new File(parentPath, packagePath),
+								new File(packagePath),
 								portalGitWorkingDirectory, path.toFile());
 						}
 
