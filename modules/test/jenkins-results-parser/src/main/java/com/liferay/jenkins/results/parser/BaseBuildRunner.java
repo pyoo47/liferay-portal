@@ -56,6 +56,28 @@ public abstract class BaseBuildRunner<T extends BuildData>
 
 	protected abstract void initWorkspace();
 
+	protected void setBuildDescription(String buildDescription) {
+		buildDescription = buildDescription.replaceAll("\"", "\\\\\"");
+		buildDescription = buildDescription.replaceAll("\'", "\\\\\'");
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("def job = Jenkins.instance.getItemByFullName(\"");
+		sb.append(_buildData.getJobName());
+		sb.append("\"); ");
+
+		sb.append("def build = job.getBuildByNumber(");
+		sb.append(_buildData.getBuildNumber());
+		sb.append("); ");
+
+		sb.append("build.description = \"");
+		sb.append(buildDescription);
+		sb.append("\";");
+
+		JenkinsResultsParserUtil.executeJenkinsScript(
+			_buildData.getMasterHostname(), "script=" + sb.toString());
+	}
+
 	protected void setUpWorkspace() {
 		if (workspace == null) {
 			throw new RuntimeException("Workspace is null");
