@@ -14,21 +14,38 @@
 
 package com.liferay.jenkins.results.parser;
 
+import org.json.JSONObject;
+
 /**
  * @author Michael Hashimoto
  */
-public class DefaultWorkspaceGitRepository extends BaseWorkspaceGitRepository {
+public class JenkinsWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 
-	protected DefaultWorkspaceGitRepository(
+	public static boolean isValidJSONObject(JSONObject jsonObject) {
+		return isValidJSONObject(jsonObject, _TYPE);
+	}
+
+	@Override
+	public String getType() {
+		return _TYPE;
+	}
+
+	protected JenkinsWorkspaceGitRepository(JSONObject jsonObject) {
+		super(jsonObject);
+	}
+
+	protected JenkinsWorkspaceGitRepository(
 		PullRequest pullRequest, String upstreamBranchName) {
 
 		super(pullRequest, upstreamBranchName);
 	}
 
-	protected DefaultWorkspaceGitRepository(
+	protected JenkinsWorkspaceGitRepository(
 		RemoteGitRef remoteGitRef, String upstreamBranchName) {
 
 		super(remoteGitRef, upstreamBranchName);
 	}
+
+	private static final String _TYPE = "jenkins";
 
 }

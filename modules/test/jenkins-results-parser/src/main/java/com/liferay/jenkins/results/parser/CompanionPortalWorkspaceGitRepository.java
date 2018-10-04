@@ -17,11 +17,22 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
+import org.json.JSONObject;
+
 /**
  * @author Michael Hashimoto
  */
 public class CompanionPortalWorkspaceGitRepository
 	extends BasePortalWorkspaceGitRepository {
+
+	public static boolean isValidJSONObject(JSONObject jsonObject) {
+		return isValidJSONObject(jsonObject, _TYPE);
+	}
+
+	@Override
+	public String getType() {
+		return _TYPE;
+	}
 
 	@Override
 	public void setUp() {
@@ -56,6 +67,15 @@ public class CompanionPortalWorkspaceGitRepository
 		}
 	}
 
+	protected CompanionPortalWorkspaceGitRepository(JSONObject jsonObject) {
+		super(jsonObject);
+
+		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
+
+		_parentWorkspaceGitRepository = buildDatabase.getWorkspaceGitRepository(
+			"portal");
+	}
+
 	protected CompanionPortalWorkspaceGitRepository(
 		PullRequest pullRequest, String upstreamBranchName,
 		WorkspaceGitRepository parentWorkspaceGitRepository) {
@@ -73,6 +93,8 @@ public class CompanionPortalWorkspaceGitRepository
 
 		_parentWorkspaceGitRepository = parentWorkspaceGitRepository;
 	}
+
+	private static final String _TYPE = "portal.companion";
 
 	private final WorkspaceGitRepository _parentWorkspaceGitRepository;
 

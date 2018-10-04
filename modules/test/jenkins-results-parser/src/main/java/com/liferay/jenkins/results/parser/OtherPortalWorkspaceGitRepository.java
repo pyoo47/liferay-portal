@@ -19,7 +19,8 @@ import org.json.JSONObject;
 /**
  * @author Michael Hashimoto
  */
-public class PluginsWorkspaceGitRepository extends BaseWorkspaceGitRepository {
+public class OtherPortalWorkspaceGitRepository
+	extends BasePortalWorkspaceGitRepository {
 
 	public static boolean isValidJSONObject(JSONObject jsonObject) {
 		return isValidJSONObject(jsonObject, _TYPE);
@@ -30,36 +31,22 @@ public class PluginsWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 		return _TYPE;
 	}
 
-	protected PluginsWorkspaceGitRepository(JSONObject jsonObject) {
+	protected OtherPortalWorkspaceGitRepository(JSONObject jsonObject) {
 		super(jsonObject);
 	}
 
-	protected PluginsWorkspaceGitRepository(
+	protected OtherPortalWorkspaceGitRepository(
 		PullRequest pullRequest, String upstreamBranchName) {
 
 		super(pullRequest, upstreamBranchName);
 	}
 
-	protected PluginsWorkspaceGitRepository(
+	protected OtherPortalWorkspaceGitRepository(
 		RemoteGitRef remoteGitRef, String upstreamBranchName) {
 
 		super(remoteGitRef, upstreamBranchName);
 	}
 
-	@Override
-	protected String getDefaultRelativeGitRepositoryDirPath(
-		String upstreamBranchName) {
-
-		String name = getName();
-
-		if (upstreamBranchName.equals("master")) {
-			return name.replace("-ee", "");
-		}
-
-		return JenkinsResultsParserUtil.combine(
-			name.replace("-ee", ""), "-", upstreamBranchName);
-	}
-
-	private static final String _TYPE = "plugins";
+	private static final String _TYPE = "portal.other";
 
 }
