@@ -3920,13 +3920,10 @@ log.sanitizer.enabled=false</echo>
 						depend on a different version of the JSF Showcase tests.
 						-->
 
-						<xmltask
-							dest="${liferay.faces.alloy.dir}/demo/alloy-showcase-webapp/pom.xml"
-							source="${liferay.faces.alloy.dir}/demo/alloy-showcase-webapp/pom.xml"
-						>
-							<replace
-								path="//*[local-name()='artifactId'][text()='com.liferay.faces.test.selenium']/../*[local-name()='version']/text()"
-								withText="${liferay.faces.test.selenium.version}"
+						<xmltask source="${liferay.faces.showcase.dir}/pom.xml">
+							<copy
+								path="/*[local-name()='project']/*[local-name()='version']/text()"
+								property="liferay.faces.showcase.version"
 							/>
 						</xmltask>
 
@@ -3944,10 +3941,13 @@ log.sanitizer.enabled=false</echo>
 							/>
 						</xmltask>
 
-						<xmltask source="${liferay.faces.showcase.dir}/pom.xml">
-							<copy
-								path="/*[local-name()='project']/*[local-name()='version']/text()"
-								property="liferay.faces.showcase.version"
+						<xmltask
+							dest="${liferay.faces.alloy.dir}/demo/alloy-showcase-webapp/pom.xml"
+							source="${liferay.faces.alloy.dir}/demo/alloy-showcase-webapp/pom.xml"
+						>
+							<replace
+								path="//*[local-name()='artifactId'][text()='com.liferay.faces.test.selenium']/../*[local-name()='version']/text()"
+								withText="${liferay.faces.test.selenium.version}"
 							/>
 						</xmltask>
 
