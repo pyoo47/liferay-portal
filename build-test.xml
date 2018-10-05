@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project basedir="." default="test" name="portal-test" xmlns:antelope="antlib:ise.antelope.tasks" xmlns:if="ant:if" xmlns:unless="ant:unless">
+<project basedir="." default="test" name="portal-test" xmlns:antelope="antlib:ise.antelope.tasks" xmlns:comp="antlib:org.apache.ant.compress" xmlns:if="ant:if" xmlns:unless="ant:unless">
 	<import file="build.xml" />
 
 	<if>
@@ -176,6 +176,60 @@ module.framework.properties.osgi.console=11312</echo>
 				<then>
 					<fail>Please set "database.type" to one of the following:${line.separator}auroramysql, aurorapostgresql, db2, hypersonic, mariadb, mysql, oracle, postgresql, sqlserver, sybase.</fail>
 				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="decompress">
+		<attribute name="dest" />
+		<attribute default="true" name="overwrite" />
+		<attribute name="src" />
+
+		<element implicit="true" name="patternset-and-mapper" optional="true" />
+
+		<sequential>
+			<local name="archive.basename" />
+
+			<basename file="@{src}" property="archive.basename" />
+
+			<if>
+				<matches pattern=".*\.7z$" string="${archive.basename}" />
+				<then>
+					<comp:un7z
+						dest="@{dest}"
+						overwrite="@{overwrite}"
+						src="@{src}"
+					>
+						<patternset-and-mapper />
+					</comp:un7z>
+				</then>
+				<elseif>
+					<matches pattern=".*\.tar\.gz$" string="${archive.basename}" />
+					<then>
+						<untar
+							dest="@{dest}"
+							overwrite="@{overwrite}"
+							src="@{src}"
+						>
+							<patternset-and-mapper />
+						</untar>
+					</then>
+				</elseif>
+				<elseif>
+					<matches pattern=".*\.zip$" string="${archive.basename}" />
+					<then>
+						<unzip
+							dest="@{dest}"
+							overwrite="@{overwrite}"
+							src="@{src}"
+						>
+							<patternset-and-mapper />
+						</unzip>
+					</then>
+				</elseif>
+				<else>
+					<fail message="Unable to decompress ${archive.basename}." />
+				</else>
 			</if>
 		</sequential>
 	</macrodef>
@@ -8516,18 +8570,18 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 			<then>
 				<mkdir dir="${app.server.parent.dir}" />
 
-				<tstamp>
-					<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
-				</tstamp>
+				<local name="bundle.file.name" />
+
+				<basename file="${test.build.bundle.zip.url}" property="bundle.file.name" />
 
 				<mirrors-get
-					dest="${tstamp.value}.zip"
+					dest="${bundle.file.name}"
 					src="${test.build.bundle.zip.url}"
 				/>
 
-				<unzip
+				<decompress
 					dest="${app.server.parent.dir}"
-					src="${tstamp.value}.zip"
+					src="${bundle.file.name}"
 				>
 					<patternset
 						includes="liferay-*/**"
@@ -8537,17 +8591,17 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 						to="\1"
 						type="regexp"
 					/>
-				</unzip>
+				</decompress>
 
-				<delete file="${tstamp.value}.zip" />
+				<delete file="${bundle.file.name}" />
 
 				<chmod
 					perm="a+x"
 				>
 					<fileset
-						dir="${test.app.server.bin.dir}"
+						dir="${app.server.parent.dir}"
 					>
-						<include name="*.sh" />
+						<include name="**/*.sh" />
 					</fileset>
 				</chmod>
 			</then>
@@ -8556,26 +8610,6 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 					<equals arg1="${app.server.type}" arg2="weblogic" />
 					<then>
 						<ant antfile="build-dist.xml" inheritAll="false" target="unzip-weblogic-custom" />
-
-						<chmod
-							perm="a+x"
-						>
-							<fileset
-								dir="${app.server.weblogic.bin.dir}"
-							>
-								<include name="**/*.sh" />
-							</fileset>
-						</chmod>
-
-						<chmod
-							perm="a+x"
-						>
-							<fileset
-								dir="${app.server.weblogic.instance.dir}"
-							>
-								<include name="**/*.sh" />
-							</fileset>
-						</chmod>
 					</then>
 					<else>
 						<ant antfile="build-dist.xml" inheritAll="false" target="unzip-${app.server.type}" />
@@ -8690,14 +8724,18 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 					</elseif>
 				</if>
 
+				<local name="bundle.file.name" />
+
+				<basename file="${bundle.zip.url}" property="bundle.file.name" />
+
 				<mirrors-get
-					dest="liferay-portal-bundle.zip"
+					dest="${bundle.file.name}"
 					src="${bundle.zip.url}"
 				/>
 
-				<unzip
+				<decompress
 					dest="${project.dir}/sql/"
-					src="liferay-portal-bundle.zip"
+					src="${bundle.file.name}"
 				>
 					<patternset
 						includes="liferay-*/data/hypersonic/*"
@@ -8707,9 +8745,9 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 						to="\1"
 						type="regexp"
 					/>
-				</unzip>
+				</decompress>
 
-				<delete file="liferay-portal-bundle.zip" />
+				<delete file="${bundle.file.name}" />
 			</then>
 		</if>
 
