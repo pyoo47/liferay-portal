@@ -1293,7 +1293,7 @@ public class JenkinsResultsParserUtil {
 			return false;
 		}
 
-		if ((includesPathMatchers != null) && !includesPathMatchers.isEmpty()) {
+		if (includesPathMatchers != null) {
 			for (PathMatcher includesPathMatcher : includesPathMatchers) {
 				if (includesPathMatcher.matches(path)) {
 					return true;
