@@ -382,8 +382,9 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 		_setAutoBalanceTestFiles();
 
-		_setTestClassNamesExcludesRelativeGlobs();
 		_setTestClassNamesIncludesRelativeGlobs();
+
+		_setTestClassNamesExcludesRelativeGlobs();
 
 		setTestClasses();
 
@@ -646,9 +647,16 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 	}
 
 	private void _setTestClassNamesExcludesRelativeGlobs() {
+		String excludesPropertyValue =
+			_getTestClassNamesExcludesPropertyValue();
+
+		if (testClassNamesIncludesPathMatchers.isEmpty()) {
+			excludesPropertyValue = "**";
+		}
+
 		testClassNamesExcludesPathMatchers.addAll(
 			getPathMatchers(
-				_getTestClassNamesExcludesPropertyValue(),
+				excludesPropertyValue,
 				portalGitWorkingDirectory.getWorkingDirectory()));
 	}
 
@@ -664,11 +672,9 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 		List<String> testClassNamesIncludesRelativeGlobs = new ArrayList<>();
 
-		File workingDirectory = portalGitWorkingDirectory.getWorkingDirectory();
-
-		testClassNamesIncludesPathMatchers.addAll(
-			getPathMatchers(
-				testClassNamesIncludesPropertyValue, workingDirectory));
+		Collections.addAll(
+			testClassNamesIncludesRelativeGlobs,
+			testClassNamesIncludesPropertyValue.split(","));
 
 		if (testReleaseBundle) {
 			testClassNamesIncludesRelativeGlobs =
@@ -691,6 +697,8 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 				testClassNamesIncludesRelativeGlobs,
 				testBatchClassNamesIncludesRequiredPropertyValue.split(","));
 		}
+
+		File workingDirectory = portalGitWorkingDirectory.getWorkingDirectory();
 
 		testClassNamesIncludesPathMatchers.addAll(
 			JenkinsResultsParserUtil.toPathMatchers(
