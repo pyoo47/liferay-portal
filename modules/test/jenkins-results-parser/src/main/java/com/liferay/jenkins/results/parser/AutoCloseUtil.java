@@ -42,8 +42,13 @@ public class AutoCloseUtil {
 		String gitHubReceiverUsername = pullRequest.getOwnerUsername();
 		String gitHubSenderUsername = pullRequest.getSenderUsername();
 
+		List<String> autoCloseReceiverUsernames =
+			JenkinsResultsParserUtil.getBuildPropertyAsList(
+				"auto.close.receiver.usernames");
+
 		if ((gitHubReceiverUsername == null) ||
 			(gitHubSenderUsername == null) ||
+			!autoCloseReceiverUsernames.contains(gitHubReceiverUsername) ||
 			gitHubReceiverUsername.equals(gitHubSenderUsername)) {
 
 			return false;
@@ -155,6 +160,23 @@ public class AutoCloseUtil {
 				}
 			}
 
+			List<String> autoCloseGithubCommentMentionUsernames =
+				JenkinsResultsParserUtil.getBuildPropertyAsList(
+					"auto.close.github.comment.mention.usernames");
+
+			if (!autoCloseGithubCommentMentionUsernames.isEmpty()) {
+				sb.append("<div>cc");
+
+				for (String autoCloseGithubCommentMentionUsername :
+						autoCloseGithubCommentMentionUsernames) {
+
+					sb.append(" @");
+					sb.append(autoCloseGithubCommentMentionUsername);
+				}
+
+				sb.append("</div>");
+			}
+
 			pullRequest.addComment(sb.toString());
 
 			return true;
@@ -176,8 +198,13 @@ public class AutoCloseUtil {
 		String gitHubReceiverUsername = pullRequest.getOwnerUsername();
 		String gitHubSenderUsername = pullRequest.getSenderUsername();
 
+		List<String> autoCloseReceiverUsernames =
+			JenkinsResultsParserUtil.getBuildPropertyAsList(
+				"auto.close.receiver.usernames");
+
 		if ((gitHubReceiverUsername == null) ||
 			(gitHubSenderUsername == null) ||
+			!autoCloseReceiverUsernames.contains(gitHubReceiverUsername) ||
 			gitHubReceiverUsername.equals(gitHubSenderUsername)) {
 
 			return false;
@@ -311,6 +338,23 @@ public class AutoCloseUtil {
 				e.printStackTrace();
 
 				throw e;
+			}
+
+			List<String> autoCloseGithubCommentMentionUsernames =
+				JenkinsResultsParserUtil.getBuildPropertyAsList(
+					"auto.close.github.comment.mention.usernames");
+
+			if (!autoCloseGithubCommentMentionUsernames.isEmpty()) {
+				sb.append("<div>cc");
+
+				for (String autoCloseGithubCommentMentionUsername :
+						autoCloseGithubCommentMentionUsernames) {
+
+					sb.append(" @");
+					sb.append(autoCloseGithubCommentMentionUsername);
+				}
+
+				sb.append("</div>");
 			}
 
 			pullRequest.addComment(sb.toString());
