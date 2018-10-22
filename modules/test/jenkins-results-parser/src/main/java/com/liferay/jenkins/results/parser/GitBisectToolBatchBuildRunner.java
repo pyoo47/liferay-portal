@@ -93,7 +93,7 @@ public class GitBisectToolBatchBuildRunner extends PortalBatchBuildRunner {
 		sb.append(portalBatchBuildData.getTopLevelMasterHostname());
 		sb.append(".liferay.com/userContent/");
 		sb.append(portalBatchBuildData.getUserContentRelativePath());
-		sb.append("jenkins-report.html\">Jenkins Report</a>");
+		sb.append("jenkins_report.html\">Jenkins Report</a>");
 
 		sb.append("<ul>");
 

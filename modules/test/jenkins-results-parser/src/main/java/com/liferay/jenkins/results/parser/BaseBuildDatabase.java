@@ -35,7 +35,7 @@ public abstract class BaseBuildDatabase implements BuildDatabase {
 	@Override
 	public File getBuildDatabaseJSFile() {
 		File buildDatabaseJSFile = new File(
-			_jsonObjectFile.getParent(), "build-database.js");
+			_jsonObjectFile.getParent(), "build_database.js");
 
 		try {
 			JenkinsResultsParserUtil.write(

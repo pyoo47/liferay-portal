@@ -327,7 +327,7 @@ public abstract class BaseBuildData implements BuildData {
 		return JenkinsResultsParserUtil.combine(
 			"<a href=\"https://", getTopLevelMasterHostname(),
 			".liferay.com/userContent/", getUserContentRelativePath(),
-			"jenkins-report.html\">Jenkins Report</a>");
+			"jenkins_report.html\">Jenkins Report</a>");
 	}
 
 	private String _getHostname() {
