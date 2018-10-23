@@ -105,20 +105,38 @@ public abstract class BaseWorkspaceGitRepository
 
 		GitWorkingDirectory gitWorkingDirectory = getGitWorkingDirectory();
 
-		List<Commit> commits = gitWorkingDirectory.log(_MAX_COMMIT_HISTORY);
+		int index = 0;
 
-		for (Commit commit : commits) {
-			commitsJSONArray.put(commit.toJSONObject());
+		while (index < _MAX_COMMIT_HISTORY) {
+			int currentGroupSize = _COMMIT_HISTORY_GROUP_SIZE;
 
-			String sha = commit.getSHA();
+			if (index > (_MAX_COMMIT_HISTORY - _COMMIT_HISTORY_GROUP_SIZE)) {
+				currentGroupSize =
+					_MAX_COMMIT_HISTORY % _COMMIT_HISTORY_GROUP_SIZE;
+			}
 
-			if (requiredCommitSHAs.contains(sha)) {
-				requiredCommitSHAs.remove(sha);
+			List<Commit> commits = gitWorkingDirectory.log(
+				index, currentGroupSize);
+
+			for (Commit commit : commits) {
+				commitsJSONArray.put(commit.toJSONObject());
+
+				String sha = commit.getSHA();
+
+				if (requiredCommitSHAs.contains(sha)) {
+					requiredCommitSHAs.remove(sha);
+				}
+
+				if (requiredCommitSHAs.isEmpty()) {
+					break;
+				}
 			}
 
 			if (requiredCommitSHAs.isEmpty()) {
 				break;
 			}
+
+			index += _COMMIT_HISTORY_GROUP_SIZE;
 		}
 
 		if (!requiredCommitSHAs.isEmpty()) {
@@ -317,7 +335,9 @@ public abstract class BaseWorkspaceGitRepository
 		put("type", getType());
 	}
 
-	private static final Integer _MAX_COMMIT_HISTORY = 100;
+	private static final Integer _COMMIT_HISTORY_GROUP_SIZE = 100;
+
+	private static final Integer _MAX_COMMIT_HISTORY = 1000;
 
 	private static final String[] _REQUIRED_CI_KEYS =
 		{"git_hub_dev_branch_name"};

@@ -1459,9 +1459,17 @@ public class GitWorkingDirectory {
 	}
 
 	public List<Commit> log(int num, File file) {
+		return log(0, num, file);
+	}
+
+	public List<Commit> log(int start, int num) {
+		return log(start, num, null);
+	}
+
+	public List<Commit> log(int start, int num, File file) {
 		List<Commit> commits = new ArrayList<>(num);
 
-		String gitLog = _log(num, file, "%H %s");
+		String gitLog = _log(start, num, file, "%H %s");
 
 		gitLog = gitLog.replaceAll("Finished executing Bash commands.", "");
 
@@ -2059,10 +2067,17 @@ public class GitWorkingDirectory {
 	}
 
 	private String _log(int num, File file, String format) {
+		return _log(0, num, file, format);
+	}
+
+	private String _log(int start, int num, File file, String format) {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("git log -n ");
-		sb.append(num);
+		sb.append("git log ");
+		sb.append("HEAD~");
+		sb.append(start + num);
+		sb.append("..HEAD~");
+		sb.append(start);
 		sb.append(" --pretty=format:'");
 		sb.append(format);
 		sb.append("'");
