@@ -94,7 +94,7 @@ public class GitBisectToolTopLevelBuildRunner
 		sb.append(portalTopLevelBuildData.getTopLevelMasterHostname());
 		sb.append(".liferay.com/userContent/");
 		sb.append(portalTopLevelBuildData.getUserContentRelativePath());
-		sb.append("jenkins-report.html\">Jenkins Report</a>");
+		sb.append("jenkins_report.html\">Jenkins Report</a>");
 
 		sb.append("<ul>");
 

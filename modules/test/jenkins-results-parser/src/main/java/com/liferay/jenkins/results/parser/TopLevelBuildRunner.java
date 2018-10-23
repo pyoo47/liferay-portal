@@ -23,10 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-
-import org.dom4j.Element;
 
 /**
  * @author Michael Hashimoto
@@ -36,7 +33,7 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 
 	@Override
 	public void run() {
-		publishJenkinsReport();
+		publishJenkinsReportFiles();
 
 		updateBuildDescription();
 
@@ -50,14 +47,7 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 
 		waitForDownstreamBuildsToComplete();
 
-		publishJenkinsReport();
-	}
-
-	@Override
-	public void tearDown() {
-		tearDownWorkspace();
-
-		publishJenkinsReport();
+		publishJenkinsReportData();
 	}
 
 	protected TopLevelBuildRunner(T topLevelBuildData) {
@@ -108,32 +98,42 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 		filePropagator.start(_FILE_PROPAGATOR_THREAD_COUNT);
 	}
 
-	protected void publishJenkinsReport() {
+	protected void publishJenkinsReportData() {
 		_updateBuildData();
 
-		Element jenkinsReportElement = _topLevelBuild.getJenkinsReportElement();
+		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
+
+		publishToUserContentDir(buildDatabase.getBuildDatabaseJSFile());
+	}
+
+	protected void publishJenkinsReportFiles() {
+		TopLevelBuildData topLevelBuildData = getBuildData();
+
+		File workspaceDir = topLevelBuildData.getWorkspaceDir();
+
+		String[] reportFileNames = {
+			"jenkins_report.html", "jenkins_report_data.js",
+			"jenkins_report_table.js", "jenkins_report_timeline.js"
+		};
 
 		try {
-			BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
+			for (String reportFileName : reportFileNames) {
+				String reportFileContent =
+					JenkinsResultsParserUtil.getResourceFileContent(
+						"dependencies/" + reportFileName);
 
-			publishToUserContentDir(buildDatabase.getBuildDatabaseJSFile());
+				File reportFile = new File(workspaceDir, reportFileName);
 
-			TopLevelBuildData topLevelBuildData = getBuildData();
+				JenkinsResultsParserUtil.write(reportFile, reportFileContent);
 
-			String jenkinsReportString = StringEscapeUtils.unescapeXml(
-				Dom4JUtil.format(jenkinsReportElement, true));
-
-			File jenkinsReportFile = new File(
-				topLevelBuildData.getWorkspaceDir(), "jenkins-report.html");
-
-			JenkinsResultsParserUtil.write(
-				jenkinsReportFile, jenkinsReportString);
-
-			publishToUserContentDir(jenkinsReportFile);
+				publishToUserContentDir(reportFile);
+			}
 		}
 		catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
+
+		publishJenkinsReportData();
 	}
 
 	protected void updateJenkinsReport() {
@@ -148,7 +148,7 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 		if (_lastGeneratedReportTime == -1) {
 			_lastGeneratedReportTime = System.currentTimeMillis();
 
-			publishJenkinsReport();
+			publishJenkinsReportData();
 
 			return;
 		}
@@ -161,7 +161,7 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 
 		_lastGeneratedReportTime = System.currentTimeMillis();
 
-		publishJenkinsReport();
+		publishJenkinsReportData();
 	}
 
 	protected void waitForDownstreamBuildsToComplete() {
