@@ -94,9 +94,9 @@ public class GitBisectToolBuild extends TopLevelBuild {
 		sb.append("}\n\n");
 
 		sb.append("td {\n");
-		sb.append("max-width:500px;\n");
+		sb.append("max-width: 500px;\n");
 		sb.append("overflow: hidden;\n");
-		sb.append("text-overflow:ellipsis;\n");
+		sb.append("text-overflow: ellipsis;\n");
 		sb.append("white-space: nowrap;\n");
 		sb.append("}\n\n");
 
