@@ -14,6 +14,7 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.liferay.jenkins.results.parser.failure.message.generator.CIFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.FailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.GenericFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.RebaseFailureMessageGenerator;
@@ -118,6 +119,7 @@ public class SourceFormatBuild extends TopLevelBuild {
 			new RebaseFailureMessageGenerator(),
 			new SourceFormatFailureMessageGenerator(),
 
+			new CIFailureMessageGenerator(),
 			new GenericFailureMessageGenerator()
 		};
 	}
