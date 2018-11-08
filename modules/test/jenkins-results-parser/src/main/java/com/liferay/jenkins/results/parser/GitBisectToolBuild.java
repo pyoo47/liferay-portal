@@ -108,21 +108,22 @@ public class GitBisectToolBuild extends TopLevelBuild {
 			"td", null, portalBuildData.getBuildStatus());
 	}
 
-	protected List<CommitGroup> getCommitGroups() {
+	protected List<GitCommitGroup> getCommitGroups() {
 		List<BuildData> buildDataList = Lists.newArrayList(
 			_downstreamBuildDataList);
 
-		List<CommitGroup> commitGroups = new ArrayList<>(
+		List<GitCommitGroup> gitCommitGroups = new ArrayList<>(
 			_downstreamBuildDataList.size());
 
-		CommitGroup commitGroup = null;
+		GitCommitGroup gitCommitGroup = null;
 
-		List<Commit> commits = _workspaceGitRepository.getHistoricalCommits();
+		List<LocalGitCommit> localGitCommits =
+			_workspaceGitRepository.getHistoricalLocalGitCommits();
 
-		for (int i = 0; i < commits.size(); i++) {
-			Commit commit = commits.get(i);
+		for (int i = 0; i < localGitCommits.size(); i++) {
+			LocalGitCommit localGitCommit = localGitCommits.get(i);
 
-			String sha = commit.getSHA();
+			String sha = localGitCommit.getSHA();
 
 			PortalBuildData portalBuildData = null;
 
@@ -144,54 +145,65 @@ public class GitBisectToolBuild extends TopLevelBuild {
 			if (portalBuildData != null) {
 				buildDataList.remove(portalBuildData);
 
-				commitGroup = new CommitGroup(portalBuildData);
+				gitCommitGroup = new GitCommitGroup(portalBuildData);
 
-				commitGroups.add(commitGroup);
+				gitCommitGroups.add(gitCommitGroup);
 			}
 			else if (i == 0) {
-				commitGroup = new CommitGroup(null);
+				gitCommitGroup = new GitCommitGroup(null);
 
-				commitGroups.add(commitGroup);
+				gitCommitGroups.add(gitCommitGroup);
 			}
 
-			commitGroup.addCommit(commit);
+			gitCommitGroup.addLocalGitCommit(localGitCommit);
 		}
 
-		return commitGroups;
+		return gitCommitGroups;
 	}
 
-	protected Element getCommitLinkCellElement(Commit commit, boolean header) {
+	protected Element getCommitLinkCellElement(
+		LocalGitCommit localGitCommit, boolean header) {
+
 		String prefix = "";
 
 		if (header) {
 			prefix = "*";
 		}
 
+		String gitHubCommitURL = _workspaceGitRepository.getGitHubURL();
+
+		gitHubCommitURL = gitHubCommitURL.replaceAll(
+			"/tree/.+", "/commit/" + localGitCommit.getSHA());
+
 		return Dom4JUtil.getNewElement(
 			"td", null,
 			Dom4JUtil.getNewAnchorElement(
-				commit.getGitHubCommitURL(),
-				prefix + commit.getAbbreviatedSHA()));
+				gitHubCommitURL, prefix + localGitCommit.getAbbreviatedSHA()));
 	}
 
-	protected Element getCommitMessageCellElement(Commit commit) {
+	protected Element getCommitMessageCellElement(
+		LocalGitCommit localGitCommit) {
+
 		return Dom4JUtil.getNewElement(
-			"td", null, StringEscapeUtils.escapeXml(commit.getMessage()));
+			"td", null,
+			StringEscapeUtils.escapeXml(localGitCommit.getMessage()));
 	}
 
 	protected Element getDiffLinkCellElement(
-		Commit commit, CommitGroup currentCommitGroup,
-		CommitGroup nextCommitGroup) {
+		LocalGitCommit localGitCommit, GitCommitGroup currentGitCommitGroup,
+		GitCommitGroup nextGitCommitGroup) {
 
-		if (nextCommitGroup == null) {
+		if (nextGitCommitGroup == null) {
 			return getEmptyCell();
 		}
 
-		List<Commit> currentCommits = currentCommitGroup.getCommits();
+		List<LocalGitCommit> currentLocalGitCommits =
+			currentGitCommitGroup.getLocalGitCommits();
 
-		List<Commit> nextCommits = nextCommitGroup.getCommits();
+		List<LocalGitCommit> nextLocalGitCommits =
+			nextGitCommitGroup.getLocalGitCommits();
 
-		Commit firstNextCommit = nextCommits.get(0);
+		LocalGitCommit firstNextLocalGitCommit = nextLocalGitCommits.get(0);
 
 		String gitHubCommitDiffURL = _workspaceGitRepository.getGitHubURL();
 
@@ -202,15 +214,16 @@ public class GitBisectToolBuild extends TopLevelBuild {
 			"td", null,
 			Dom4JUtil.getNewAnchorElement(
 				JenkinsResultsParserUtil.combine(
-					gitHubCommitDiffURL, firstNextCommit.getSHA(), "...",
-					commit.getSHA()),
+					gitHubCommitDiffURL, firstNextLocalGitCommit.getSHA(),
+					"...", localGitCommit.getSHA()),
 				JenkinsResultsParserUtil.combine(
-					firstNextCommit.getAbbreviatedSHA(), "...",
-					commit.getAbbreviatedSHA())),
+					firstNextLocalGitCommit.getAbbreviatedSHA(), "...",
+					localGitCommit.getAbbreviatedSHA())),
 			Dom4JUtil.getNewElement(
 				"span", null,
 				JenkinsResultsParserUtil.combine(
-					"(", String.valueOf(currentCommits.size()), " commits)")));
+					"(", String.valueOf(currentLocalGitCommits.size()),
+					" localGitCommits)")));
 	}
 
 	protected Element getEmptyCell() {
@@ -218,55 +231,61 @@ public class GitBisectToolBuild extends TopLevelBuild {
 	}
 
 	protected Element getGroupedCommitHeaderToggleCellElement(
-		Commit commit, CommitGroup currentCommitGroup) {
+		LocalGitCommit localGitCommit, GitCommitGroup currentGitCommitGroup) {
 
-		if (currentCommitGroup == null) {
+		if (currentGitCommitGroup == null) {
 			return getEmptyCell();
 		}
 
-		List<Commit> currentCommits = currentCommitGroup.getCommits();
+		List<LocalGitCommit> currentLocalGitCommits =
+			currentGitCommitGroup.getLocalGitCommits();
 
-		if (currentCommits.size() <= 1) {
+		if (currentLocalGitCommits.size() <= 1) {
 			return getEmptyCell();
 		}
 
 		Element labelElement = Dom4JUtil.getNewElement("label", null, "+");
 
-		labelElement.addAttribute("for", commit.getSHA());
+		labelElement.addAttribute("for", localGitCommit.getSHA());
 
 		Element inputElement = Dom4JUtil.getNewElement("input", null);
 
 		inputElement.addAttribute("data-toggle", "toggle");
-		inputElement.addAttribute("id", commit.getSHA());
-		inputElement.addAttribute("name", commit.getSHA());
+		inputElement.addAttribute("id", localGitCommit.getSHA());
+		inputElement.addAttribute("name", localGitCommit.getSHA());
 		inputElement.addAttribute("type", "checkbox");
 
 		return Dom4JUtil.getNewElement("td", null, labelElement, inputElement);
 	}
 
 	protected Element getGroupedCommitsHeaderRowElement(
-		Commit commit, PortalBuildData portalBuildData,
-		CommitGroup currentCommitGroup, CommitGroup nextCommitGroup,
+		LocalGitCommit localGitCommit, PortalBuildData portalBuildData,
+		GitCommitGroup currentGitCommitGroup, GitCommitGroup nextGitCommitGroup,
 		boolean firstCommit) {
 
 		return Dom4JUtil.getNewElement(
 			"tr", null,
-			getGroupedCommitHeaderToggleCellElement(commit, currentCommitGroup),
-			getCommitLinkCellElement(commit, firstCommit),
-			getCommitMessageCellElement(commit),
-			getDiffLinkCellElement(commit, currentCommitGroup, nextCommitGroup),
+			getGroupedCommitHeaderToggleCellElement(
+				localGitCommit, currentGitCommitGroup),
+			getCommitLinkCellElement(localGitCommit, firstCommit),
+			getCommitMessageCellElement(localGitCommit),
+			getDiffLinkCellElement(
+				localGitCommit, currentGitCommitGroup, nextGitCommitGroup),
 			getBuildDurationCell(portalBuildData),
 			getBuildLinkCell(portalBuildData),
 			getBuildStatusCell(portalBuildData),
 			getBuildResultCell(portalBuildData));
 	}
 
-	protected Element getGroupedCommitsRowElement(Commit commit) {
+	protected Element getGroupedCommitsRowElement(
+		LocalGitCommit localGitCommit) {
+
 		return Dom4JUtil.getNewElement(
-			"tr", null, getGroupedCommitHeaderToggleCellElement(commit, null),
-			getCommitLinkCellElement(commit, false),
-			getCommitMessageCellElement(commit), getEmptyCell(), getEmptyCell(),
-			getEmptyCell(), getEmptyCell(), getEmptyCell());
+			"tr", null,
+			getGroupedCommitHeaderToggleCellElement(localGitCommit, null),
+			getCommitLinkCellElement(localGitCommit, false),
+			getCommitMessageCellElement(localGitCommit), getEmptyCell(),
+			getEmptyCell(), getEmptyCell(), getEmptyCell(), getEmptyCell());
 	}
 
 	protected Element getJenkinsReportBodyElement() {
@@ -411,23 +430,25 @@ public class GitBisectToolBuild extends TopLevelBuild {
 	protected Element getJenkinsReportTableBodyElement() {
 		Element tableBodyElement = Dom4JUtil.getNewElement("tbody");
 
-		List<CommitGroup> commitGroups = getCommitGroups();
+		List<GitCommitGroup> gitCommitGroups = getCommitGroups();
 
-		for (int i = 0; i < commitGroups.size(); i++) {
-			CommitGroup commitGroup = commitGroups.get(i);
+		for (int i = 0; i < gitCommitGroups.size(); i++) {
+			GitCommitGroup gitCommitGroup = gitCommitGroups.get(i);
 
-			List<Commit> commits = commitGroup.getCommits();
-			PortalBuildData portalBuildData = commitGroup.getPortalBuildData();
+			List<LocalGitCommit> localGitCommits =
+				gitCommitGroup.getLocalGitCommits();
+			PortalBuildData portalBuildData =
+				gitCommitGroup.getPortalBuildData();
 
 			Element groupedCommitsHeaderElement = Dom4JUtil.getNewElement(
 				"tbody", tableBodyElement);
 
 			groupedCommitsHeaderElement.addAttribute("class", "result-row");
 
-			CommitGroup nextCommitGroup = null;
+			GitCommitGroup nextGitCommitGroup = null;
 
-			if (commitGroups.size() > (i + 1)) {
-				nextCommitGroup = commitGroups.get(i + 1);
+			if (gitCommitGroups.size() > (i + 1)) {
+				nextGitCommitGroup = gitCommitGroups.get(i + 1);
 			}
 
 			boolean firstCommit = false;
@@ -439,19 +460,19 @@ public class GitBisectToolBuild extends TopLevelBuild {
 			Dom4JUtil.addToElement(
 				groupedCommitsHeaderElement,
 				getGroupedCommitsHeaderRowElement(
-					commits.get(0), portalBuildData, commitGroup,
-					nextCommitGroup, firstCommit));
+					localGitCommits.get(0), portalBuildData, gitCommitGroup,
+					nextGitCommitGroup, firstCommit));
 
-			if (commits.size() > 1) {
+			if (localGitCommits.size() > 1) {
 				Element groupedCommitsElement = Dom4JUtil.getNewElement(
 					"tbody", tableBodyElement);
 
 				groupedCommitsElement.addAttribute("class", "hidden-row");
 
-				for (int j = 1; j < commits.size(); j++) {
+				for (int j = 1; j < localGitCommits.size(); j++) {
 					Dom4JUtil.addToElement(
 						groupedCommitsElement,
-						getGroupedCommitsRowElement(commits.get(j)));
+						getGroupedCommitsRowElement(localGitCommits.get(j)));
 				}
 			}
 		}
@@ -515,27 +536,27 @@ public class GitBisectToolBuild extends TopLevelBuild {
 		return topLevelTableElement;
 	}
 
-	protected static class CommitGroup {
+	protected static class GitCommitGroup {
 
-		public CommitGroup(PortalBuildData portalBuildData) {
+		public GitCommitGroup(PortalBuildData portalBuildData) {
 			this.portalBuildData = portalBuildData;
 
-			commits = new ArrayList<>();
+			localGitCommits = new ArrayList<>();
 		}
 
-		public void addCommit(Commit commit) {
-			commits.add(commit);
+		public void addLocalGitCommit(LocalGitCommit localGitCommit) {
+			localGitCommits.add(localGitCommit);
 		}
 
-		public List<Commit> getCommits() {
-			return commits;
+		public List<LocalGitCommit> getLocalGitCommits() {
+			return localGitCommits;
 		}
 
 		public PortalBuildData getPortalBuildData() {
 			return portalBuildData;
 		}
 
-		protected List<Commit> commits;
+		protected List<LocalGitCommit> localGitCommits;
 		protected PortalBuildData portalBuildData;
 
 	}
