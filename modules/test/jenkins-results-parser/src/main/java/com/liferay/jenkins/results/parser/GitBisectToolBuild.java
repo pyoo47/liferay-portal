@@ -223,7 +223,7 @@ public class GitBisectToolBuild extends TopLevelBuild {
 				"span", null,
 				JenkinsResultsParserUtil.combine(
 					"(", String.valueOf(currentLocalGitCommits.size()),
-					" localGitCommits)")));
+					" commits)")));
 	}
 
 	protected Element getEmptyCell() {
