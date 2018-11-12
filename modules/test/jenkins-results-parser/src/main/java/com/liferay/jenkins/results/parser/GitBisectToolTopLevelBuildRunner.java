@@ -195,6 +195,18 @@ public class GitBisectToolTopLevelBuildRunner
 
 		List<String> list = new ArrayList<>();
 
+		if ((portalBranchSHAs == null) || portalBranchSHAs.isEmpty()) {
+			GitWorkingDirectory gitWorkingDirectory = _getGitWorkingDirectory();
+
+			List<LocalGitCommit> localGitCommits = gitWorkingDirectory.log(1);
+
+			LocalGitCommit localGitCommit = localGitCommits.get(0);
+
+			list.add(localGitCommit.getSHA());
+
+			return list;
+		}
+
 		for (String portalBranchSHA : portalBranchSHAs.split(",")) {
 			list.add(portalBranchSHA.trim());
 		}
@@ -296,7 +308,7 @@ public class GitBisectToolTopLevelBuildRunner
 		String portalBranchSHAs = getBuildParameter(_PORTAL_BRANCH_SHAS);
 
 		if ((portalBranchSHAs == null) || portalBranchSHAs.isEmpty()) {
-			failBuildRunner(_PORTAL_BRANCH_SHAS + " is null");
+			return;
 		}
 
 		Integer allowedPortalBranchSHAs = _getAllowedPortalBranchSHAs();
