@@ -205,11 +205,11 @@ public abstract class BaseWorkspaceGitRepository
 		int index = 0;
 
 		while (index < MAX_COMMIT_HISTORY) {
-			int currentGroupSize = _COMMIT_HISTORY_GROUP_SIZE;
+			int currentGroupSize = COMMIT_HISTORY_GROUP_SIZE;
 
-			if (index > (MAX_COMMIT_HISTORY - _COMMIT_HISTORY_GROUP_SIZE)) {
+			if (index > (MAX_COMMIT_HISTORY - COMMIT_HISTORY_GROUP_SIZE)) {
 				currentGroupSize =
-					MAX_COMMIT_HISTORY % _COMMIT_HISTORY_GROUP_SIZE;
+					MAX_COMMIT_HISTORY % COMMIT_HISTORY_GROUP_SIZE;
 			}
 
 			List<LocalGitCommit> localGitCommits = gitWorkingDirectory.log(
@@ -235,7 +235,7 @@ public abstract class BaseWorkspaceGitRepository
 				break;
 			}
 
-			index += _COMMIT_HISTORY_GROUP_SIZE;
+			index += COMMIT_HISTORY_GROUP_SIZE;
 		}
 
 		if (!requiredCommitSHAs.isEmpty()) {
@@ -468,8 +468,6 @@ public abstract class BaseWorkspaceGitRepository
 	private void _setType() {
 		put("type", getType());
 	}
-
-	private static final Integer _COMMIT_HISTORY_GROUP_SIZE = 100;
 
 	private static final String[] _REQUIRED_CI_KEYS =
 		{"git_hub_dev_branch_name"};

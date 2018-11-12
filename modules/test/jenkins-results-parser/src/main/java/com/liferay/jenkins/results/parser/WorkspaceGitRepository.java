@@ -22,6 +22,8 @@ import java.util.Properties;
  */
 public interface WorkspaceGitRepository extends LocalGitRepository {
 
+	public static final Integer COMMIT_HISTORY_GROUP_SIZE = 100;
+
 	public static final Integer MAX_COMMIT_HISTORY = 25000;
 
 	public String getFileContent(String filePath);
