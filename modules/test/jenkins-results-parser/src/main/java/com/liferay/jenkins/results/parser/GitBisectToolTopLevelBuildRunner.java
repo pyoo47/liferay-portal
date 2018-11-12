@@ -14,9 +14,14 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -128,6 +133,19 @@ public class GitBisectToolTopLevelBuildRunner
 		_validateBuildParameterPortalUpstreamBranchName();
 	}
 
+	private Integer _getAllowedPortalBranchSHAs() {
+		String allowedPortalBranchSHAs = getJobProperty(
+			"allowed.portal.branch.shas");
+
+		if ((allowedPortalBranchSHAs == null) ||
+			allowedPortalBranchSHAs.isEmpty()) {
+
+			return -1;
+		}
+
+		return Integer.valueOf(allowedPortalBranchSHAs);
+	}
+
 	private String _getBatchName() {
 		BuildData buildData = getBuildData();
 
@@ -161,6 +179,15 @@ public class GitBisectToolTopLevelBuildRunner
 		sb.append("</ul>");
 
 		return sb.toString();
+	}
+
+	private GitWorkingDirectory _getGitWorkingDirectory() {
+		PortalWorkspace portalWorkspace = getWorkspace();
+
+		WorkspaceGitRepository workspaceGitRepository =
+			portalWorkspace.getPrimaryPortalWorkspaceGitRepository();
+
+		return workspaceGitRepository.getGitWorkingDirectory();
 	}
 
 	private List<String> _getPortalBranchSHAs() {
@@ -272,25 +299,21 @@ public class GitBisectToolTopLevelBuildRunner
 			failBuildRunner(_PORTAL_BRANCH_SHAS + " is null");
 		}
 
-		String allowedPortalBranchSHAs = getJobProperty(
-			"allowed.portal.branch.shas");
+		Integer allowedPortalBranchSHAs = _getAllowedPortalBranchSHAs();
 
-		if ((allowedPortalBranchSHAs == null) ||
-			allowedPortalBranchSHAs.isEmpty()) {
-
+		if (allowedPortalBranchSHAs == -1) {
 			return;
 		}
 
 		Integer portalBranchSHACount = StringUtils.countMatches(
 			portalBranchSHAs, ",") + 1;
 
-		if (portalBranchSHACount >
-				Integer.valueOf(allowedPortalBranchSHAs)) {
-
+		if (portalBranchSHACount > allowedPortalBranchSHAs) {
 			failBuildRunner(
 				JenkinsResultsParserUtil.combine(
 					_PORTAL_BRANCH_SHAS, " can only reference ",
-					allowedPortalBranchSHAs, " portal branch SHAs"));
+					String.valueOf(allowedPortalBranchSHAs),
+					" portal branch SHAs"));
 		}
 	}
 
