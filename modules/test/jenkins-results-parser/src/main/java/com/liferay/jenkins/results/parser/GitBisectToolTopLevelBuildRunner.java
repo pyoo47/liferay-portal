@@ -289,7 +289,7 @@ public class GitBisectToolTopLevelBuildRunner
 
 		int totalCommitsInRange = localGitCommitsInRange.size();
 
-		int commitGroupSize = totalCommitsInRange / maxCommitGroupCount;
+		int commitGroupSize = totalCommitsInRange / (maxCommitGroupCount - 1);
 
 		for (int i = 0; i < totalCommitsInRange; i += commitGroupSize) {
 			LocalGitCommit localGitCommit = localGitCommitsInRange.get(i);
