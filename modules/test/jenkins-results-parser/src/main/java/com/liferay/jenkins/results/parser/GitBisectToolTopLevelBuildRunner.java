@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -190,6 +189,49 @@ public class GitBisectToolTopLevelBuildRunner
 		return workspaceGitRepository.getGitWorkingDirectory();
 	}
 
+	private List<LocalGitCommit> _getLocalGitCommitsInRange(
+		String earliestSHA, String latestSHA) {
+
+		List<LocalGitCommit> localGitCommitsInRange = new ArrayList<>();
+
+		PortalWorkspace portalWorkspace = getWorkspace();
+
+		WorkspaceGitRepository workspaceGitRepository =
+			portalWorkspace.getPrimaryPortalWorkspaceGitRepository();
+
+		GitWorkingDirectory gitWorkingDirectory =
+			workspaceGitRepository.getGitWorkingDirectory();
+
+		int commitHistoryGroupSize =
+			WorkspaceGitRepository.COMMIT_HISTORY_GROUP_SIZE;
+		int maxCommitHistory = WorkspaceGitRepository.MAX_COMMIT_HISTORY;
+
+		int index = 0;
+
+		while (index < maxCommitHistory) {
+			int currentGroupSize = commitHistoryGroupSize;
+
+			if (index > (maxCommitHistory - commitHistoryGroupSize)) {
+				currentGroupSize = maxCommitHistory % commitHistoryGroupSize;
+			}
+
+			List<LocalGitCommit> localGitCommits = gitWorkingDirectory.log(
+				index, currentGroupSize, latestSHA);
+
+			for (LocalGitCommit localGitCommit : localGitCommits) {
+				localGitCommitsInRange.add(localGitCommit);
+
+				if (earliestSHA.equals(localGitCommit.getSHA())) {
+					return localGitCommitsInRange;
+				}
+			}
+
+			index += commitHistoryGroupSize;
+		}
+
+		return localGitCommitsInRange;
+	}
+
 	private List<String> _getPortalBranchSHAs() {
 		String portalBranchSHAs = getBuildParameter(_PORTAL_BRANCH_SHAS);
 
@@ -207,11 +249,60 @@ public class GitBisectToolTopLevelBuildRunner
 			return list;
 		}
 
+		Matcher matcher = _compareURLPattern.matcher(portalBranchSHAs);
+
+		if (matcher.find()) {
+			return _getSelectedCommitSHAsInRange(
+				matcher.group("earliestSHA"), matcher.group("latestSHA"));
+		}
+
 		for (String portalBranchSHA : portalBranchSHAs.split(",")) {
 			list.add(portalBranchSHA.trim());
 		}
 
 		return list;
+	}
+
+	private List<String> _getSelectedCommitSHAsInRange(
+		String earliestSHA, String latestSHA) {
+
+		List<LocalGitCommit> localGitCommitsInRange =
+			_getLocalGitCommitsInRange(earliestSHA, latestSHA);
+
+		int maxCommitGroupCount = _getAllowedPortalBranchSHAs();
+
+		if (maxCommitGroupCount == -1) {
+			maxCommitGroupCount = _DEFAULT_MAX_COMMIT_GROUP_COUNT;
+		}
+
+		if (maxCommitGroupCount >= localGitCommitsInRange.size()) {
+			List<String> selectedCommitSHAs = new ArrayList<>();
+
+			for (LocalGitCommit localGitCommit : localGitCommitsInRange) {
+				selectedCommitSHAs.add(localGitCommit.getSHA());
+			}
+
+			return selectedCommitSHAs;
+		}
+
+		Set<String> selectedCommitSHAs = new HashSet<>();
+
+		int totalCommitsInRange = localGitCommitsInRange.size();
+
+		int commitGroupSize = totalCommitsInRange / maxCommitGroupCount;
+
+		for (int i = 0; i < totalCommitsInRange; i += commitGroupSize) {
+			LocalGitCommit localGitCommit = localGitCommitsInRange.get(i);
+
+			selectedCommitSHAs.add(localGitCommit.getSHA());
+		}
+
+		LocalGitCommit lastLocalGitCommit = localGitCommitsInRange.get(
+			totalCommitsInRange - 1);
+
+		selectedCommitSHAs.add(lastLocalGitCommit.getSHA());
+
+		return Lists.newArrayList(selectedCommitSHAs);
 	}
 
 	private List<String> _getTestList() {
@@ -401,6 +492,8 @@ public class GitBisectToolTopLevelBuildRunner
 		}
 	}
 
+	private static final Integer _DEFAULT_MAX_COMMIT_GROUP_COUNT = 5;
+
 	private static final String _JENKINS_GITHUB_URL = "JENKINS_GITHUB_URL";
 
 	private static final String _PORTAL_BATCH_NAME = "PORTAL_BATCH_NAME";
@@ -415,6 +508,11 @@ public class GitBisectToolTopLevelBuildRunner
 	private static final String _PORTAL_UPSTREAM_BRANCH_NAME =
 		"PORTAL_UPSTREAM_BRANCH_NAME";
 
+	private static final Pattern _compareURLPattern = Pattern.compile(
+		JenkinsResultsParserUtil.combine(
+			"https://github.com/(?<username>[^/]+)/(?<repositoryName>[^/]+)",
+			"/compare/(?<earliestSHA>[0-9a-f]{5,40})\\.{3}",
+			"(?<latestSHA>[0-9a-f]{5,40})"));
 	private static final Pattern _pattern = Pattern.compile(
 		"https://github.com/[^/]+/(?<repositoryName>[^/]+)/tree/.+");
 
