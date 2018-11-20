@@ -673,7 +673,8 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 		Collections.addAll(
 			testClassNamesIncludesRelativeGlobs,
-			testClassNamesIncludesPropertyValue.split(","));
+			JenkinsResultsParserUtil.toGlobPatternArray(
+				testClassNamesIncludesPropertyValue.split(",")));
 
 		if (testReleaseBundle) {
 			testClassNamesIncludesRelativeGlobs =
@@ -694,7 +695,9 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 			Collections.addAll(
 				testClassNamesIncludesRelativeGlobs,
-				testBatchClassNamesIncludesRequiredPropertyValue.split(","));
+				JenkinsResultsParserUtil.toGlobPatternArray(
+					testBatchClassNamesIncludesRequiredPropertyValue.split(
+						",")));
 		}
 
 		File workingDirectory = portalGitWorkingDirectory.getWorkingDirectory();

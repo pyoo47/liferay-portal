@@ -240,7 +240,8 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 		return JenkinsResultsParserUtil.toPathMatchers(
 			workingDirectory.getAbsolutePath() + File.separator,
-			relativeGlobs.split(","));
+			JenkinsResultsParserUtil.toGlobPatternArray(
+				relativeGlobs.split(",")));
 	}
 
 	protected void setAxisTestClassGroups() {

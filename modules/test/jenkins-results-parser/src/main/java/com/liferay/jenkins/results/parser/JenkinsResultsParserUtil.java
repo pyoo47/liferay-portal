@@ -861,7 +861,7 @@ public class JenkinsResultsParserUtil {
 
 		final List<PathMatcher> pathMatchers = toPathMatchers(
 			rootDir.getAbsolutePath() + File.separator,
-			resourceIncludesRelativeGlobs);
+			toGlobPatternArray(resourceIncludesRelativeGlobs));
 
 		final List<URL> includedResourceURLs = new ArrayList<>();
 
