@@ -1735,6 +1735,35 @@ public class JenkinsResultsParserUtil {
 		return durationString;
 	}
 
+	public static String[] toGlobPatternArray(String... globPatterns) {
+		List<String> globPatternList = new ArrayList<>();
+
+		for (int i = 0; i < globPatterns.length; i++) {
+			String globPattern = globPatterns[i];
+
+			if (globPattern.contains("{") && !globPattern.contains("}")) {
+				StringBuilder sb = new StringBuilder();
+
+				while (globPatterns[i].contains("{") ||
+					   !globPatterns[i].contains("}")) {
+
+					sb.append(globPatterns[i]);
+					sb.append(",");
+
+					i++;
+				}
+
+				sb.append(globPatterns[i]);
+
+				globPattern = sb.toString();
+			}
+
+			globPatternList.add(globPattern);
+		}
+
+		return globPatternList.toArray(new String[globPatternList.size()]);
+	}
+
 	public static JSONArray toJSONArray(String url) throws IOException {
 		return toJSONArray(
 			url, true, _MAX_RETRIES_DEFAULT, null, _RETRY_PERIOD_DEFAULT,
