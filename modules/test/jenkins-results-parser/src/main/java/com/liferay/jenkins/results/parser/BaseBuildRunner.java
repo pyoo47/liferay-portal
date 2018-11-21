@@ -48,6 +48,12 @@ public abstract class BaseBuildRunner<T extends BuildData, S extends Workspace>
 
 	@Override
 	public void tearDown() {
+		cleanUpDatabaseProcesses();
+
+		cleanUpBrowserProcesses();
+
+		cleanUpJavaProcesses();
+
 		tearDownWorkspace();
 	}
 
@@ -57,6 +63,168 @@ public abstract class BaseBuildRunner<T extends BuildData, S extends Workspace>
 		_job = JobFactory.newJob(_buildData);
 
 		_job.readJobProperties();
+	}
+
+	protected void cleanUpBrowserProcesses() {
+		Host host = _buildData.getHost();
+
+		if (host.hasChrome()) {
+			try {
+				JenkinsResultsParserUtil.executeBashCommands("killall chrome");
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (host.hasFirefox()) {
+			try {
+				JenkinsResultsParserUtil.executeBashCommands("killall firefox");
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	protected void cleanUpDatabaseProcesses() {
+		Host host = _buildData.getHost();
+
+		if (host.hasDB2()) {
+			try {
+				JenkinsResultsParserUtil.executeBashCommands(
+					"db2 db2stop force");
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (host.hasMariaDB()) {
+			try {
+				JenkinsResultsParserUtil.executeBashCommands(
+					"service mariadb stop");
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (host.hasMySQL55()) {
+			try {
+				JenkinsResultsParserUtil.executeBashCommands(
+					"service mysql55 stop");
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (host.hasMySQL56()) {
+			try {
+				JenkinsResultsParserUtil.executeBashCommands(
+					"service mysqld stop");
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (host.hasMySQL57()) {
+			try {
+				JenkinsResultsParserUtil.executeBashCommands(
+					"service mysql57 stop");
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (host.hasOracle()) {
+			try {
+				JenkinsResultsParserUtil.executeBashCommands(
+					"service oracledb stop");
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (host.hasPostgreSQL()) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("#!/bin/bash\n");
+			sb.append("for i in `ls /var/lib/pgsql/`\n");
+			sb.append("do\n");
+			sb.append("service postgresql-$i stop\n");
+			sb.append("done");
+
+			File bashFile = new File("clean_up_postgresql.sh");
+
+			try {
+				JenkinsResultsParserUtil.write(bashFile, sb.toString());
+
+				JenkinsResultsParserUtil.executeBashFile(bashFile);
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+			finally {
+				bashFile.delete();
+			}
+		}
+
+		if (host.hasSybase()) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("#!/bin/bash\n");
+			sb.append("service sybase stop");
+			sb.append("for i in `ps -o pid,args -e | grep /opt/sybase | ");
+			sb.append("grep -v grep | cut -c1-5`\n");
+			sb.append("do\n");
+			sb.append("kill -9 $i\n");
+			sb.append("done");
+
+			File bashFile = new File("clean_up_sybase.sh");
+
+			try {
+				JenkinsResultsParserUtil.write(bashFile, sb.toString());
+
+				JenkinsResultsParserUtil.executeBashFile(bashFile);
+			}
+			catch (IOException | TimeoutException e) {
+				throw new RuntimeException(e);
+			}
+			finally {
+				bashFile.delete();
+			}
+		}
+	}
+
+	protected void cleanUpJavaProcesses() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("#!/bin/bash\n");
+		sb.append("for i in `ps -o pid,args -e | grep java | grep -v ant.home");
+		sb.append(" | grep -v grep | grep -v jenkins | cut -c1-5`\n");
+		sb.append("do\n");
+		sb.append("echo \"Killing $i.\"\n");
+		sb.append("kill -9 $i\n");
+		sb.append("done");
+
+		File bashFile = new File("clean_up_java.sh");
+
+		try {
+			JenkinsResultsParserUtil.write(bashFile, sb.toString());
+
+			JenkinsResultsParserUtil.executeBashFile(bashFile);
+		}
+		catch (IOException | TimeoutException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			bashFile.delete();
+		}
 	}
 
 	protected Job getJob() {
