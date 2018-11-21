@@ -382,6 +382,94 @@ public class JenkinsResultsParserUtil {
 			true, new File("."), _BASH_COMMAND_TIMEOUT_DEFAULT, commands);
 	}
 
+	public static Process executeBashFile(File bashFile)
+		throws IOException, TimeoutException {
+
+		return executeBashFile(
+			new File("."), _BASH_COMMAND_TIMEOUT_DEFAULT, bashFile);
+	}
+
+	public static Process executeBashFile(
+			File baseDir, long timeout, File bashFile)
+		throws IOException, TimeoutException {
+
+		executeBashCommands("chmod a+x " + bashFile.getCanonicalPath());
+
+		System.out.println("Executing bash: " + bashFile.getCanonicalPath());
+
+		String[] bashCommands = new String[3];
+
+		bashCommands[0] = "/bin/bash";
+		bashCommands[1] = "-c";
+		bashCommands[2] = combine(
+			bashFile.getCanonicalPath(),
+			" ; echo Finished executing Bash file.\n");
+
+		ProcessBuilder processBuilder = new ProcessBuilder(bashCommands);
+
+		processBuilder.directory(baseDir.getAbsoluteFile());
+
+		Process process = new BufferedProcess(2000000, processBuilder.start());
+
+		long duration = 0;
+		long start = System.currentTimeMillis();
+		int returnCode = -1;
+
+		while (true) {
+			try {
+				returnCode = process.exitValue();
+
+				if (returnCode == 0) {
+					String standardOut = readInputStream(
+						process.getInputStream(), true);
+
+					duration = System.currentTimeMillis() - start;
+
+					while (!standardOut.contains(
+								"Finished executing Bash file.") &&
+						   (duration < timeout)) {
+
+						sleep(10);
+
+						standardOut = readInputStream(
+							process.getInputStream(), true);
+
+						duration = System.currentTimeMillis() - start;
+					}
+				}
+
+				break;
+			}
+			catch (IllegalThreadStateException itse) {
+				duration = System.currentTimeMillis() - start;
+
+				if (duration >= timeout) {
+					throw new TimeoutException(
+						"Timeout occurred while executing Bash commands: " +
+							bashFile.getCanonicalPath());
+				}
+
+				returnCode = -1;
+
+				sleep(100);
+			}
+		}
+
+		if (debug) {
+			System.out.println(
+				"Output stream: " +
+					readInputStream(process.getInputStream(), true));
+		}
+
+		if (debug && (returnCode != 0)) {
+			System.out.println(
+				"Error stream: " +
+					readInputStream(process.getErrorStream(), true));
+		}
+
+		return process;
+	}
+
 	public static void executeJenkinsScript(
 		String jenkinsMasterName, String script) {
 
