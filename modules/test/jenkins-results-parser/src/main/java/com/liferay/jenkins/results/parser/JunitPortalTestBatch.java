@@ -31,7 +31,7 @@ public class JunitPortalTestBatch
 	}
 
 	@Override
-	protected void executeBatch() {
+	protected void executeBatch() throws AntException {
 		PortalBatchBuildData portalBatchBuildData = getBatchBuildData();
 
 		Map<String, String> buildParameters = new HashMap<>();

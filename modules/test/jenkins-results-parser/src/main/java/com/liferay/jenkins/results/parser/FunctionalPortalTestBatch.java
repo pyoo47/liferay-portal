@@ -25,11 +25,17 @@ public class FunctionalPortalTestBatch
 
 	@Override
 	public void run() {
-		executeBatch();
+		try {
+			executeBatch();
+		}
+		catch (AntException ae) {
+			throw new RuntimeException(ae);
+		}
+		finally {
+			publishResults();
 
-		publishResults();
-
-		publishPoshiReport();
+			publishPoshiReport();
+		}
 	}
 
 	protected FunctionalPortalTestBatch(

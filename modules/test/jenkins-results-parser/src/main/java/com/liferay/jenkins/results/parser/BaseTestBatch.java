@@ -26,9 +26,15 @@ public abstract class BaseTestBatch
 
 	@Override
 	public void run() {
-		executeBatch();
-
-		publishResults();
+		try {
+			executeBatch();
+		}
+		catch (AntException ae) {
+			throw new RuntimeException(ae);
+		}
+		finally {
+			publishResults();
+		}
 	}
 
 	protected BaseTestBatch(T batchBuildData, S workspace) {
@@ -37,7 +43,7 @@ public abstract class BaseTestBatch
 		_workspace = workspace;
 	}
 
-	protected abstract void executeBatch();
+	protected abstract void executeBatch() throws AntException;
 
 	protected String getAntOpts(String batchName) {
 		return _jdk.getAntOpts();

@@ -51,9 +51,14 @@ public class CompanionPortalWorkspaceGitRepository
 				throw new RuntimeException(ioe);
 			}
 
-			AntUtil.callTarget(
-				_parentWorkspaceGitRepository.getDirectory(),
-				"build-working-dir.xml", "prepare-working-dir");
+			try {
+				AntUtil.callTarget(
+					_parentWorkspaceGitRepository.getDirectory(),
+					"build-working-dir.xml", "prepare-working-dir");
+			}
+			catch (AntException ae) {
+				throw new RuntimeException(ae);
+			}
 
 			return;
 		}

@@ -32,7 +32,7 @@ public abstract class BasePortalTestBatch
 	}
 
 	@Override
-	protected void executeBatch() {
+	protected void executeBatch() throws AntException {
 		BatchBuildData batchBuildData = getBatchBuildData();
 
 		Map<String, String> buildParameters = new HashMap<>();
@@ -74,9 +74,14 @@ public abstract class BasePortalTestBatch
 
 	@Override
 	protected void publishResults() {
-		AntUtil.callTarget(
-			getPrimaryPortalWorkspaceDirectory(), "build-test.xml",
-			"merge-test-results");
+		try {
+			AntUtil.callTarget(
+				getPrimaryPortalWorkspaceDirectory(), "build-test.xml",
+				"merge-test-results");
+		}
+		catch (AntException ae) {
+			throw new RuntimeException(ae);
+		}
 
 		File sourceFile = new File(
 			getPrimaryPortalWorkspaceDirectory(),

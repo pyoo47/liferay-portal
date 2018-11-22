@@ -50,21 +50,24 @@ public class AntUtil {
 	}
 
 	public static void callTarget(
-		File baseDir, String buildFileName, String targetName) {
+			File baseDir, String buildFileName, String targetName)
+		throws AntException {
 
 		callTarget(baseDir, buildFileName, targetName, null);
 	}
 
 	public static void callTarget(
-		File baseDir, String buildFileName, String targetName,
-		Map<String, String> parameters) {
+			File baseDir, String buildFileName, String targetName,
+			Map<String, String> parameters)
+		throws AntException {
 
 		callTarget(baseDir, buildFileName, targetName, parameters, null);
 	}
 
 	public static void callTarget(
-		File baseDir, String buildFileName, String targetName,
-		Map<String, String> parameters, Map<String, String> envVariables) {
+			File baseDir, String buildFileName, String targetName,
+			Map<String, String> parameters, Map<String, String> envVariables)
+		throws AntException {
 
 		String[] bashCommands = new String[3];
 
@@ -179,13 +182,13 @@ public class AntUtil {
 					JenkinsResultsParserUtil.readInputStream(
 						process.getErrorStream(), true));
 
-				throw new RuntimeException();
+				throw new AntException();
 			}
 		}
 		catch (InterruptedException | IOException e) {
 			e.printStackTrace();
 
-			throw new RuntimeException(e);
+			throw new AntException(e);
 		}
 	}
 
