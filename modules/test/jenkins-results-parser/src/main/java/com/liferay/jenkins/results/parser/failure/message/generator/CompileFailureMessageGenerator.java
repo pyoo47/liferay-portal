@@ -24,19 +24,24 @@ public class CompileFailureMessageGenerator
 
 	@Override
 	public Element getMessageElement(String consoleText) {
-		int end = consoleText.indexOf("Compile failed;");
+		int start = consoleText.indexOf("Compile failed;");
 
-		if (end == -1) {
-			end = consoleText.indexOf("compileJava FAILED");
+		if (start == -1) {
+			start = consoleText.indexOf("compileJava FAILED");
 		}
 
-		if (end == -1) {
+		if (start == -1) {
 			return null;
 		}
 
+		start = consoleText.lastIndexOf("\n", start);
+
+		int end = Math.min(
+			start + MAX_CONSOLE_TEXT_SNIPPET_LENGTH, consoleText.length() - 1);
+
 		end = consoleText.lastIndexOf("\n", end);
 
-		return getConsoleTextSnippetElement(consoleText, true, end);
+		return getConsoleTextSnippetElement(consoleText, false, start, end);
 	}
 
 }
