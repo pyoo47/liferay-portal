@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.tools.ant.Project;
-
 /**
  * @author Kevin Yen
  */
@@ -52,16 +50,6 @@ public class TestrayServerNamesUtil {
 		}
 
 		return "";
-	}
-
-	public static void getTestrayServerNames(
-		Project project, String name, String key, String parameter) {
-
-		String unreplacedTestrayServerNames = getTestrayServerNames(
-			project.getProperties(), key, parameter);
-
-		project.setProperty(
-			name, project.replaceProperties(unreplacedTestrayServerNames));
 	}
 
 	private static String _findMatchingProperty(
