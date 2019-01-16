@@ -465,6 +465,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 
 	<macrodef name="get-java-jdk-home">
 		<attribute default="x64" name="architecture" />
+		<attribute default="jdk" name="type" />
 		<attribute default="${ant.java.version}" name="version" />
 
 		<sequential>
@@ -473,27 +474,27 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			<if>
 				<and>
 					<equals arg1="@{version}" arg2="1.7" />
-					<isset property="java.jdk.7.@{architecture}.home" />
+					<isset property="java.@{type}.7.@{architecture}.home" />
 				</and>
 				<then>
-					<property name="java.jdk.home" value="${java.jdk.7.@{architecture}.home}" />
+					<propertycopy from="java.@{type}.7.@{architecture}.home" name="java.jdk.home" />
 				</then>
 				<elseif>
 					<and>
 						<equals arg1="@{version}" arg2="1.8" />
-						<isset property="java.jdk.8.@{architecture}.home" />
+						<isset property="java.@{type}.8.@{architecture}.home" />
 					</and>
 					<then>
-						<property name="java.jdk.home" value="${java.jdk.8.@{architecture}.home}" />
+						<propertycopy from="java.@{type}.8.@{architecture}.home" name="java.jdk.home" />
 					</then>
 				</elseif>
 				<elseif>
 					<and>
 						<equals arg1="@{version}" arg2="1.11" />
-						<isset property="java.jdk.11.@{architecture}.home" />
+						<isset property="java.@{type}.11.@{architecture}.home" />
 					</and>
 					<then>
-						<property name="java.jdk.home" value="${java.jdk.11.@{architecture}.home}" />
+						<propertycopy from="java.@{type}.11.@{architecture}.home" name="java.jdk.home" />
 					</then>
 				</elseif>
 				<else>
