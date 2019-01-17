@@ -463,6 +463,59 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		</sequential>
 	</macrodef>
 
+	<macrodef name="get-java-jdk-bundle-type">
+		<attribute default="" name="test.batch.name" />
+
+		<sequential>
+			<local name="test.batch.name" />
+
+			<condition else="@{test.batch.name}" property="test.batch.name" value="${env.TEST_BATCH_NAME}">
+				<contains string="@{test.batch.name}" substring="{test.batch.name}" />
+			</condition>
+
+			<var name="java.jdk.bundle.type" unset="true" />
+
+			<if>
+				<matches string="${test.batch.name}" pattern="-adopt[0-9]+" />
+				<then>
+					<property name="java.jdk.bundle.type" value="adopt" />
+				</then>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-jdk[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="jdk" />
+					</then>
+				</elseif>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-open[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="open" />
+					</then>
+				</elseif>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-redhat[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="redhat" />
+					</then>
+				</elseif>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-oracle[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="oracle" />
+					</then>
+				</elseif>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-zulu[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="zulu" />
+					</then>
+				</elseif>
+			</if>
+
+			<property name="java.jdk.bundle.type" value="jdk" />
+		</sequential>
+	</macrodef>
+
 	<macrodef name="get-java-jdk-home">
 		<attribute default="x64" name="architecture" />
 		<attribute default="jdk" name="type" />
