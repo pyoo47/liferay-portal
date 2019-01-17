@@ -463,6 +463,33 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		</sequential>
 	</macrodef>
 
+	<macrodef name="get-java-jdk-bundle-type">
+		<attribute default="" name="test.batch.name" />
+
+		<sequential>
+			<local name="test.batch.name" />
+
+			<condition else="@{test.batch.name}" property="test.batch.name" value="${env.TEST_BATCH_NAME}">
+				<contains string="@{test.batch.name}" substring="{test.batch.name}" />
+			</condition>
+
+			<var name="java.jdk.bundle.type" unset="true" />
+
+			<propertyregex
+				input="${test.batch.name}"
+				property="java.jdk.bundle.type"
+				regexp="-jdk[0-9]+_(\w+)"
+				select="\1"
+			/>
+
+			<condition property="java.jdk.bundle.type" value="oracle">
+				<matches string="${test.batch.name}" pattern="-jdk[0-9]+$" />
+			</condition>
+
+			<property name="java.jdk.bundle.type" value="oracle" />
+		</sequential>
+	</macrodef>
+
 	<macrodef name="get-java-jdk-home">
 		<attribute default="x64" name="architecture" />
 		<attribute default="jdk" name="type" />
