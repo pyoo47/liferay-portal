@@ -3977,7 +3977,9 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 					<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-					<get-java-jdk-home version="${java.jdk.bundle.version}" />
+					<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+					<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 					<if>
 						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
@@ -4165,7 +4167,9 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 			<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-			<get-java-jdk-home version="${java.jdk.bundle.version}" />
+			<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+			<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 			<parallel>
 				<daemons>
@@ -11158,7 +11162,9 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 
 		<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-		<get-java-jdk-home version="${java.jdk.bundle.version}" />
+		<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+		<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 		<trycatch property="upgrade.error">
 			<try>
