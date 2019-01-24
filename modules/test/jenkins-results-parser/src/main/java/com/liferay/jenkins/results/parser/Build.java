@@ -116,6 +116,8 @@ public interface Build {
 
 	public String getResult();
 
+	public int getSlaveUsageValue();
+
 	public Map<String, String> getStartPropertiesTempMap();
 
 	public Long getStartTime();

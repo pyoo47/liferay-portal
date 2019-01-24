@@ -354,7 +354,7 @@ public class TopLevelBuild extends BaseBuild {
 	}
 
 	protected TopLevelBuild(String url, TopLevelBuild topLevelBuild) {
-		super(url, topLevelBuild);
+		super(url, topLevelBuild, 1);
 	}
 
 	@Override

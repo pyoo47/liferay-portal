@@ -143,7 +143,7 @@ public class ValidationBuild extends BaseBuild {
 	}
 
 	protected ValidationBuild(String url, TopLevelBuild topLevelBuild) {
-		super(url, topLevelBuild);
+		super(url, topLevelBuild, 1);
 	}
 
 	protected Element getBaseBranchDetailsElement() {

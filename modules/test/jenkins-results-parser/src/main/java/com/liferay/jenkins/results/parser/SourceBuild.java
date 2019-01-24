@@ -32,11 +32,11 @@ import org.json.JSONObject;
 public class SourceBuild extends BaseBuild {
 
 	public SourceBuild(String url) {
-		super(url);
+		super(url, 1);
 	}
 
 	public SourceBuild(String url, Build parentBuild) {
-		super(url, parentBuild);
+		super(url, parentBuild, 1);
 	}
 
 	@Override

@@ -843,6 +843,11 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public int getSlaveUsageValue() {
+		return _slaveUsageValue;
+	}
+
+	@Override
 	public Map<String, String> getStartPropertiesTempMap() {
 		return getTempMap("start.properties");
 	}
@@ -1405,12 +1410,9 @@ public abstract class BaseBuild implements Build {
 		return false;
 	}
 
-	protected BaseBuild(String url) {
-		this(url, null);
-	}
-
-	protected BaseBuild(String url, Build parentBuild) {
+	protected BaseBuild(String url, Build parentBuild, int slaveUsageValue) {
 		_parentBuild = parentBuild;
+		_slaveUsageValue = slaveUsageValue;
 
 		if (url.contains("buildWithParameters")) {
 			setInvocationURL(url);
@@ -1420,6 +1422,10 @@ public abstract class BaseBuild implements Build {
 		}
 
 		update();
+	}
+
+	protected BaseBuild(String url, int slaveUsageValue) {
+		this(url, null, slaveUsageValue);
 	}
 
 	protected void addDownstreamBuildsTimelineData(
@@ -2588,6 +2594,7 @@ public abstract class BaseBuild implements Build {
 	private Map<String, String> _parameters = new HashMap<>();
 	private final Build _parentBuild;
 	private String _result;
+	private final int _slaveUsageValue;
 	private String _status;
 
 }
