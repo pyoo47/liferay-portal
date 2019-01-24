@@ -14,6 +14,9 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.liferay.jenkins.results.parser.event.BuildCompletedEventListener;
+import com.liferay.jenkins.results.parser.event.BuildRunningEventListener;
+import com.liferay.jenkins.results.parser.event.EventSender;
 import com.liferay.jenkins.results.parser.failure.message.generator.FailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.GenericFailureMessageGenerator;
 
@@ -1411,6 +1414,25 @@ public abstract class BaseBuild implements Build {
 	}
 
 	protected BaseBuild(String url, Build parentBuild, int slaveUsageValue) {
+		Properties buildProperties = null;
+
+		try {
+			buildProperties = JenkinsResultsParserUtil.getBuildProperties();
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException("Unable to get build.properties", ioe);
+		}
+
+		String sendBuildEvents = buildProperties.getProperty(
+			"build.metrics.send.events");
+
+		if ((sendBuildEvents != null) && sendBuildEvents.equals("true")) {
+			_eventSender.subscribe(
+				"buildCompleted", new BuildCompletedEventListener());
+			_eventSender.subscribe(
+				"buildRunning", new BuildRunningEventListener());
+		}
+
 		_parentBuild = parentBuild;
 		_slaveUsageValue = slaveUsageValue;
 
@@ -2360,6 +2382,13 @@ public abstract class BaseBuild implements Build {
 
 			statusModifiedTime = System.currentTimeMillis();
 
+			if (status.equals("completed")) {
+				_eventSender.notify("buildCompleted", this);
+			}
+			else if (status.equals("running")) {
+				_eventSender.notify("buildRunning", this);
+			}
+
 			if (isParentBuildRoot()) {
 				System.out.println(getBuildMessage());
 			}
@@ -2589,6 +2618,7 @@ public abstract class BaseBuild implements Build {
 	}
 
 	private int _buildNumber = -1;
+	private EventSender _eventSender;
 	private JenkinsMaster _jenkinsMaster;
 	private JenkinsSlave _jenkinsSlave;
 	private Map<String, String> _parameters = new HashMap<>();
