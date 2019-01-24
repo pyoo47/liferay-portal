@@ -280,7 +280,13 @@ public class JenkinsResultsParserUtil {
 
 		String[] bashCommands = new String[3];
 
-		bashCommands[0] = "/bin/sh";
+		if (isWindows()) {
+			bashCommands[0] = "C:\\Program Files\\Git\\bin\\sh.exe";
+		}
+		else {
+			bashCommands[0] = "/bin/sh";
+		}
+
 		bashCommands[1] = "-c";
 
 		String commandTerminator = ";";
@@ -292,6 +298,11 @@ public class JenkinsResultsParserUtil {
 		StringBuffer sb = new StringBuffer();
 
 		for (String command : commands) {
+			if (isWindows()) {
+				command = command.replaceAll("\\(", "\\\\\\\\(");
+				command = command.replaceAll("\\)", "\\\\\\\\)");
+			}
+
 			sb.append(command);
 			sb.append(commandTerminator);
 			sb.append(" ");
