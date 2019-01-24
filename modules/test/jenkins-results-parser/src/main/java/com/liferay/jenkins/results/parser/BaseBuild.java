@@ -1062,7 +1062,7 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public int getTotalSlavesUsedCount() {
-		int totalSlavesUsedCount = 1;
+		int totalSlavesUsedCount = _slaveUsageValue;
 
 		for (Build downstreamBuild : getDownstreamBuilds(null)) {
 			totalSlavesUsedCount += downstreamBuild.getTotalSlavesUsedCount();
