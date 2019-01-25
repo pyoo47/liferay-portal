@@ -441,18 +441,18 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			<var name="java.jdk.bundle.version" unset="true" />
 
 			<if>
-				<contains string="${test.batch.name}" substring="-jdk7" />
+				<matches string="${test.batch.name}" pattern="-(adopt|jdk|open|oracle|redhat|zulu)7" />
 				<then>
 					<property name="java.jdk.bundle.version" value="1.7" />
 				</then>
 				<elseif>
-					<contains string="${test.batch.name}" substring="-jdk8" />
+					<matches string="${test.batch.name}" pattern="-(adopt|jdk|open|oracle|redhat|zulu)8" />
 					<then>
 						<property name="java.jdk.bundle.version" value="1.8" />
 					</then>
 				</elseif>
 				<elseif>
-					<contains string="${test.batch.name}" substring="-open11" />
+					<matches string="${test.batch.name}" pattern="-(adopt|jdk|open|oracle|redhat|zulu)11" />
 					<then>
 						<property name="java.jdk.bundle.version" value="1.11" />
 					</then>
@@ -463,8 +463,62 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		</sequential>
 	</macrodef>
 
+	<macrodef name="get-java-jdk-bundle-type">
+		<attribute default="" name="test.batch.name" />
+
+		<sequential>
+			<local name="test.batch.name" />
+
+			<condition else="@{test.batch.name}" property="test.batch.name" value="${env.TEST_BATCH_NAME}">
+				<contains string="@{test.batch.name}" substring="{test.batch.name}" />
+			</condition>
+
+			<var name="java.jdk.bundle.type" unset="true" />
+
+			<if>
+				<matches string="${test.batch.name}" pattern="-adopt[0-9]+" />
+				<then>
+					<property name="java.jdk.bundle.type" value="adopt" />
+				</then>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-jdk[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="jdk" />
+					</then>
+				</elseif>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-open[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="open" />
+					</then>
+				</elseif>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-redhat[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="redhat" />
+					</then>
+				</elseif>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-oracle[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="oracle" />
+					</then>
+				</elseif>
+				<elseif>
+					<matches string="${test.batch.name}" pattern="-zulu[0-9]+" />
+					<then>
+						<property name="java.jdk.bundle.type" value="zulu" />
+					</then>
+				</elseif>
+			</if>
+
+			<property name="java.jdk.bundle.type" value="jdk" />
+		</sequential>
+	</macrodef>
+
 	<macrodef name="get-java-jdk-home">
-		<attribute default="x64" name="architecture" />
+		<attribute default="${java.jdk.architecture}" name="architecture" />
+		<attribute default="jdk" name="type" />
 		<attribute default="${ant.java.version}" name="version" />
 
 		<sequential>
@@ -473,27 +527,27 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			<if>
 				<and>
 					<equals arg1="@{version}" arg2="1.7" />
-					<isset property="java.jdk.7.@{architecture}.home" />
+					<isset property="java.jdk.@{type}.7.@{architecture}.home" />
 				</and>
 				<then>
-					<property name="java.jdk.home" value="${java.jdk.7.@{architecture}.home}" />
+					<propertycopy from="java.jdk.@{type}.7.@{architecture}.home" name="java.jdk.home" />
 				</then>
 				<elseif>
 					<and>
 						<equals arg1="@{version}" arg2="1.8" />
-						<isset property="java.jdk.8.@{architecture}.home" />
+						<isset property="java.jdk.@{type}.8.@{architecture}.home" />
 					</and>
 					<then>
-						<property name="java.jdk.home" value="${java.jdk.8.@{architecture}.home}" />
+						<propertycopy from="java.jdk.@{type}.8.@{architecture}.home" name="java.jdk.home" />
 					</then>
 				</elseif>
 				<elseif>
 					<and>
 						<equals arg1="@{version}" arg2="1.11" />
-						<isset property="java.jdk.11.@{architecture}.home" />
+						<isset property="java.jdk.@{type}.11.@{architecture}.home" />
 					</and>
 					<then>
-						<property name="java.jdk.home" value="${java.jdk.11.@{architecture}.home}" />
+						<propertycopy from="java.jdk.@{type}.11.@{architecture}.home" name="java.jdk.home" />
 					</then>
 				</elseif>
 				<else>
@@ -3923,7 +3977,9 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 					<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-					<get-java-jdk-home version="${java.jdk.bundle.version}" />
+					<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+					<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 					<if>
 						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
@@ -4111,7 +4167,9 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 			<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-			<get-java-jdk-home version="${java.jdk.bundle.version}" />
+			<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+			<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 			<parallel>
 				<daemons>
@@ -11104,7 +11162,9 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 
 		<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-		<get-java-jdk-home version="${java.jdk.bundle.version}" />
+		<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+		<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 		<trycatch property="upgrade.error">
 			<try>
