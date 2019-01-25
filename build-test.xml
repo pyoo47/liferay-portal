@@ -471,36 +471,23 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		<sequential>
 			<var name="java.jdk.home" unset="true" />
 
-			<if>
-				<and>
-					<equals arg1="@{version}" arg2="1.7" />
-					<isset property="java.@{type}.7.@{architecture}.home" />
-				</and>
-				<then>
-					<propertycopy from="java.@{type}.7.@{architecture}.home" name="java.jdk.home" />
-				</then>
-				<elseif>
-					<and>
-						<equals arg1="@{version}" arg2="1.8" />
-						<isset property="java.@{type}.8.@{architecture}.home" />
-					</and>
-					<then>
-						<propertycopy from="java.@{type}.8.@{architecture}.home" name="java.jdk.home" />
-					</then>
-				</elseif>
-				<elseif>
-					<and>
-						<equals arg1="@{version}" arg2="1.11" />
-						<isset property="java.@{type}.11.@{architecture}.home" />
-					</and>
-					<then>
-						<propertycopy from="java.@{type}.11.@{architecture}.home" name="java.jdk.home" />
-					</then>
-				</elseif>
-				<else>
-					<property name="java.jdk.home" value="${java.home}" />
-				</else>
-			</if>
+			<local name="version" />
+
+			<propertyregex
+				defaultValue="@{version}"
+				input="@{version}"
+				property="version"
+				regexp="1\.([0-9]+)"
+				select="\1"
+			/>
+
+			<propertycopy
+				from="java.jdk.home[${version}][@{architecture}][@{type}]"
+				property="java.jdk.home"
+				silent="true"
+			/>
+
+			<property name="java.jdk.home" value="${java.home}" />
 
 			<if>
 				<not>
@@ -509,7 +496,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 				<then>
 					<var name="java.jdk.home" unset="true" />
 
-					<var name="java.jdk.home" value="${java.home}" />
+					<property name="java.jdk.home" value="${java.home}" />
 				</then>
 			</if>
 		</sequential>
