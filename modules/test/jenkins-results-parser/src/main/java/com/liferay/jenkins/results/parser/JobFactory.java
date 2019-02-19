@@ -158,8 +158,6 @@ public class JobFactory {
 
 		job = _jobs.get(jobName);
 
-		job.readJobProperties();
-
 		return job;
 	}
 
