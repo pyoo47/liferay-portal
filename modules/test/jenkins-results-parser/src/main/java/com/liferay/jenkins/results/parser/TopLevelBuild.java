@@ -28,9 +28,6 @@ import com.liferay.jenkins.results.parser.failure.message.generator.RebaseFailur
 import java.io.IOException;
 import java.io.StringWriter;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -319,70 +316,6 @@ public class TopLevelBuild extends BaseBuild {
 		}
 
 		return super.getStatusSummary();
-	}
-
-	public Map<String, StopwatchRecord> getStopwatchRecordMap() {
-		String consoleText = getConsoleText();
-
-		int consoleTextLength = consoleText.length();
-
-		consoleText = consoleText.substring(stopwatchRecordConsoleReadCursor);
-
-		for (String line : consoleText.split("\n")) {
-			Matcher matcher = stopwatchStartTimestampPattern.matcher(line);
-
-			if (matcher.matches()) {
-				Date timestamp = null;
-
-				try {
-					timestamp = stopwatchTimestampSimpleDateFormat.parse(
-						matcher.group("timestamp"));
-				}
-				catch (ParseException pe) {
-					throw new RuntimeException(
-						"Unable to parse timestamp in " + line, pe);
-				}
-
-				String stopwatchName = matcher.group("name");
-
-				stopwatchRecordMap.put(
-					stopwatchName,
-					new StopwatchRecord(stopwatchName, timestamp.getTime()));
-
-				continue;
-			}
-
-			matcher = stopwatchPattern.matcher(line);
-
-			if (matcher.matches()) {
-				long duration = Long.parseLong(matcher.group("milliseconds"));
-
-				String seconds = matcher.group("seconds");
-
-				if (seconds != null) {
-					duration += Long.parseLong(seconds) * 1000L;
-				}
-
-				String minutes = matcher.group("minutes");
-
-				if (minutes != null) {
-					duration += Long.parseLong(minutes) * 60L * 1000L;
-				}
-
-				String stopwatchName = matcher.group("name");
-
-				StopwatchRecord stopwatchRecord = stopwatchRecordMap.get(
-					stopwatchName);
-
-				if (stopwatchRecord != null) {
-					stopwatchRecord.setDuration(duration);
-				}
-			}
-		}
-
-		stopwatchRecordConsoleReadCursor = consoleTextLength;
-
-		return stopwatchRecordMap;
 	}
 
 	@Override
@@ -1220,25 +1153,12 @@ public class TopLevelBuild extends BaseBuild {
 			topLevelTableElement, getJenkinsReportTableColumnHeadersElement(),
 			getJenkinsReportTableRowElement());
 
-		Map<String, StopwatchRecord> stopwatchRecordMap =
-			getStopwatchRecordMap();
+		List<Element> jenkinsReportStopwatchRecordElements =
+			getJenkinsReportStopwatchRecordElements();
 
-		List<StopwatchRecord> stopwatchRecords = new ArrayList<>(
-			stopwatchRecordMap.size());
-
-		stopwatchRecords.addAll(stopwatchRecordMap.values());
-
-		Collections.sort(stopwatchRecords);
-
-		for (StopwatchRecord stopwatchRecord : stopwatchRecords) {
-			if (stopwatchRecord.getDuration() == null) {
-				continue;
-			}
-
-			Dom4JUtil.addToElement(
-				topLevelTableElement,
-				stopwatchRecord.getJenkinsReportTableRowElement());
-		}
+		Dom4JUtil.addToElement(
+			topLevelTableElement,
+			jenkinsReportStopwatchRecordElements.toArray());
 
 		return topLevelTableElement;
 	}
@@ -1560,109 +1480,6 @@ public class TopLevelBuild extends BaseBuild {
 
 	protected static final Pattern gitRepositoryTempMapNamePattern =
 		Pattern.compile("git\\.(?<gitRepositoryType>.*)\\.properties");
-	protected static final Pattern stopwatchPattern = Pattern.compile(
-		JenkinsResultsParserUtil.combine(
-			"\\s*\\[stopwatch\\]\\s*\\[(?<name>[^:]+): ",
-			"((?<minutes>\\d+):)?((?<seconds>\\d+))?\\.",
-			"(?<milliseconds>\\d+) sec\\]"));
-	protected static final Pattern stopwatchStartTimestampPattern =
-		Pattern.compile(
-			JenkinsResultsParserUtil.combine(
-				"\\s*\\[echo\\] (?<name>.*)\\.start\\.timestamp: ",
-				"(?<timestamp>.*)$"));
-	protected static final SimpleDateFormat stopwatchTimestampSimpleDateFormat =
-		new SimpleDateFormat("MM-dd-yyyy HH:mm:ss z");
-
-	protected int stopwatchRecordConsoleReadCursor;
-	protected Map<String, StopwatchRecord> stopwatchRecordMap = new HashMap<>();
-
-	protected class StopwatchRecord implements Comparable<StopwatchRecord> {
-
-		public StopwatchRecord(String name, long startTimestamp) {
-			_name = name;
-			_startTimestamp = startTimestamp;
-		}
-
-		@Override
-		public int compareTo(StopwatchRecord stopwatchRecord) {
-			int compareToValue = _startTimestamp.compareTo(
-				stopwatchRecord.getStartTimestamp());
-
-			if (compareToValue != 0) {
-				return compareToValue;
-			}
-
-			compareToValue = _duration.compareTo(stopwatchRecord.getDuration());
-
-			if (compareToValue != 0) {
-				return compareToValue;
-			}
-
-			return _name.compareTo(stopwatchRecord.getName());
-		}
-
-		public Long getDuration() {
-			return _duration;
-		}
-
-		public String getName() {
-			return _name;
-		}
-
-		public Long getStartTimestamp() {
-			return _startTimestamp;
-		}
-
-		public void setDuration(long duration) {
-			_duration = duration;
-		}
-
-		@Override
-		public String toString() {
-			return JenkinsResultsParserUtil.combine(
-				getName(), " started at ",
-				JenkinsResultsParserUtil.toDateString(
-					new Date(getStartTimestamp()), "America/Los_Angeles"),
-				" and ran for ",
-				JenkinsResultsParserUtil.toDurationString(getDuration()), ".");
-		}
-
-		protected Element getJenkinsReportTableRowElement() {
-			Element buildInfoElement = Dom4JUtil.getNewElement("tr", null);
-
-			Dom4JUtil.getNewElement("td", buildInfoElement, getName());
-
-			Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp;");
-
-			Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp;");
-
-			Dom4JUtil.getNewElement(
-				"td", buildInfoElement,
-				toJenkinsReportDateString(
-					new Date(getStartTimestamp()),
-					getJenkinsReportTimeZoneName()));
-
-			if (getDuration() == null) {
-				Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp");
-			}
-			else {
-				Dom4JUtil.getNewElement(
-					"td", buildInfoElement,
-					JenkinsResultsParserUtil.toDurationString(getDuration()));
-			}
-
-			Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp;");
-
-			Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp;");
-
-			return buildInfoElement;
-		}
-
-		private Long _duration;
-		private final String _name;
-		private final Long _startTimestamp;
-
-	}
 
 	private Map<Map<String, String>, Integer> _getSlaveUsageByLabels() {
 		Map<Map<String, String>, Integer> slaveUsages = new HashMap<>();
