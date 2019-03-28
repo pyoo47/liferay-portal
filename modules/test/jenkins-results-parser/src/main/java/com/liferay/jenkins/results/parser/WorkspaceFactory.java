@@ -70,6 +70,32 @@ public abstract class WorkspaceFactory {
 			new MethodLogger(workspace));
 	}
 
+	public static Workspace newControllerWorkspace(
+		String gitHubURL, String upstreamBranchName) {
+
+		if (gitHubURL == null) {
+			throw new RuntimeException("GitHub URL is null");
+		}
+
+		if (!BasePortalWorkspace.isPortalGitHubURL(gitHubURL)) {
+			throw new RuntimeException("Unsupported GitHub URL " + gitHubURL);
+		}
+
+		Workspace workspace = new PortalTestSuiteUpstreamControllerWorkspace(
+			gitHubURL, upstreamBranchName);
+
+		if (workspace instanceof PortalWorkspace) {
+			return (PortalWorkspace)Proxy.newProxyInstance(
+				PortalWorkspace.class.getClassLoader(),
+				new Class<?>[] {PortalWorkspace.class},
+				new MethodLogger(workspace));
+		}
+
+		return (Workspace)Proxy.newProxyInstance(
+			Workspace.class.getClassLoader(), new Class<?>[] {Workspace.class},
+			new MethodLogger(workspace));
+	}
+
 	public static Workspace newTopLevelWorkspace(
 		String gitHubURL, String upstreamBranchName) {
 

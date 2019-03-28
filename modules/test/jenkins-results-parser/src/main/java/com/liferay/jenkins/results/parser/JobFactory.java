@@ -189,6 +189,12 @@ public class JobFactory {
 			return _jobs.get(jobName);
 		}
 
+		if (jobName.startsWith("test-portal-testsuite-upstream-controller(")) {
+			_jobs.put(jobName, new DefaultJob(jobName));
+
+			return _jobs.get(jobName);
+		}
+
 		if (jobName.startsWith("test-subrepository-acceptance-pullrequest(")) {
 			_jobs.put(
 				jobName,
