@@ -91,41 +91,6 @@ public abstract class BaseWorkspaceGitRepository
 	}
 
 	@Override
-	public List<LocalGitCommit> getRangeLocalGitCommits(
-		String earliestSHA, String latestSHA) {
-
-		List<LocalGitCommit> rangeLocalGitCommits = new ArrayList<>();
-
-		GitWorkingDirectory gitWorkingDirectory = getGitWorkingDirectory();
-
-		int index = 0;
-
-		while (index < MAX_COMMIT_HISTORY) {
-			int currentGroupSize = _COMMIT_HISTORY_GROUP_SIZE;
-
-			if (index > (MAX_COMMIT_HISTORY - _COMMIT_HISTORY_GROUP_SIZE)) {
-				currentGroupSize =
-					MAX_COMMIT_HISTORY % _COMMIT_HISTORY_GROUP_SIZE;
-			}
-
-			List<LocalGitCommit> localGitCommits = gitWorkingDirectory.log(
-				index, currentGroupSize, latestSHA);
-
-			for (LocalGitCommit localGitCommit : localGitCommits) {
-				rangeLocalGitCommits.add(localGitCommit);
-
-				if (earliestSHA.equals(localGitCommit.getSHA())) {
-					return rangeLocalGitCommits;
-				}
-			}
-
-			index += _COMMIT_HISTORY_GROUP_SIZE;
-		}
-
-		return rangeLocalGitCommits;
-	}
-
-	@Override
 	public Properties getWorkspaceJobProperties(String propertyType, Job job) {
 		Properties jobProperties = job.getJobProperties();
 
@@ -283,11 +248,11 @@ public abstract class BaseWorkspaceGitRepository
 		int index = 0;
 
 		while (index < MAX_COMMIT_HISTORY) {
-			int currentGroupSize = _COMMIT_HISTORY_GROUP_SIZE;
+			int currentGroupSize = COMMIT_HISTORY_GROUP_SIZE;
 
-			if (index > (MAX_COMMIT_HISTORY - _COMMIT_HISTORY_GROUP_SIZE)) {
+			if (index > (MAX_COMMIT_HISTORY - COMMIT_HISTORY_GROUP_SIZE)) {
 				currentGroupSize =
-					MAX_COMMIT_HISTORY % _COMMIT_HISTORY_GROUP_SIZE;
+					MAX_COMMIT_HISTORY % COMMIT_HISTORY_GROUP_SIZE;
 			}
 
 			List<LocalGitCommit> localGitCommits = gitWorkingDirectory.log(
@@ -313,7 +278,7 @@ public abstract class BaseWorkspaceGitRepository
 				break;
 			}
 
-			index += _COMMIT_HISTORY_GROUP_SIZE;
+			index += COMMIT_HISTORY_GROUP_SIZE;
 		}
 
 		if (!requiredCommitSHAs.isEmpty()) {
@@ -547,8 +512,6 @@ public abstract class BaseWorkspaceGitRepository
 	private void _setType() {
 		put("type", getType());
 	}
-
-	private static final Integer _COMMIT_HISTORY_GROUP_SIZE = 100;
 
 	private static final String[] _REQUIRED_CI_KEYS = {
 		"git_hub_dev_branch_name"
