@@ -2109,31 +2109,15 @@ public class GitWorkingDirectory {
 	}
 
 	protected void setUpstreamGitRemoteToPrivateGitRepository() {
-		GitRemote gitRemote = getUpstreamGitRemote();
+		GitRemote upstreamGitRemote = getUpstreamGitRemote();
 
-		String privateGitRepositoryName = GitUtil.getPrivateRepositoryName(
-			getGitRepositoryName());
-
-		RemoteGitRepository remoteGitRepository =
-			GitRepositoryFactory.getRemoteGitRepository(
-				"github.com", privateGitRepositoryName,
-				gitRemote.getUsername());
-
-		addGitRemote(true, "upstream-temp", remoteGitRepository.getRemoteURL());
+		addGitRemote(true, "upstream-temp", upstreamGitRemote.getRemoteURL());
 	}
 
 	protected void setUpstreamGitRemoteToPublicGitRepository() {
-		GitRemote gitRemote = getUpstreamGitRemote();
+		GitRemote upstreamGitRemote = getUpstreamGitRemote();
 
-		String privateGitRepositoryName = GitUtil.getPublicRepositoryName(
-			getGitRepositoryName());
-
-		RemoteGitRepository remoteGitRepository =
-			GitRepositoryFactory.getRemoteGitRepository(
-				"github.com", privateGitRepositoryName,
-				gitRemote.getUsername());
-
-		addGitRemote(true, "upstream-temp", remoteGitRepository.getRemoteURL());
+		addGitRemote(true, "upstream-temp", upstreamGitRemote.getRemoteURL());
 	}
 
 	protected void setWorkingDirectory(String workingDirectoryPath)
