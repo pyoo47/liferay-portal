@@ -45,10 +45,6 @@ public class GitWorkingDirectoryFactory {
 				return _gitWorkingDirectories.get(key);
 			}
 
-			if (gitRepositoryName == null) {
-				gitRepositoryName = gitRepositoryDir.getName();
-			}
-
 			GitWorkingDirectory gitWorkingDirectory = null;
 
 			if (gitRepositoryName.startsWith("com-liferay-")) {
