@@ -161,6 +161,14 @@ public class SyncDirTask extends Task {
 
 				if (_symbolic) {
 					if (Files.exists(toFilePath, LinkOption.NOFOLLOW_LINKS)) {
+						System.out.println(
+							"Deleting broken symlink " + _toFile.getPath() +
+								" to " + _file.getPath());
+
+						System.out.println(
+							"symlink contents:" +
+								new String(Files.readAllBytes(toFilePath)));
+
 						Files.delete(toFilePath);
 					}
 
