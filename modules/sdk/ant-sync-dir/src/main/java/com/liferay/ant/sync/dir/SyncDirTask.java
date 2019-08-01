@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.ArrayList;
@@ -155,13 +157,18 @@ public class SyncDirTask extends Task {
 		@Override
 		public Integer call() {
 			try {
+				Path toFilePath = Paths.get(_toFile.toURI());
+
 				if (_symbolic) {
+					if (Files.exists(toFilePath, LinkOption.NOFOLLOW_LINKS)) {
+						Files.delete(toFilePath);
+					}
+
 					Files.createSymbolicLink(
-						Paths.get(_toFile.toURI()), Paths.get(_file.toURI()));
+						toFilePath, Paths.get(_file.toURI()));
 				}
 				else {
-					Files.copy(
-						Paths.get(_file.toURI()), Paths.get(_toFile.toURI()));
+					Files.copy(Paths.get(_file.toURI()), toFilePath);
 				}
 			}
 			catch (IOException ioe) {
