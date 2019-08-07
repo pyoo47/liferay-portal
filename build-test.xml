@@ -8836,10 +8836,27 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		<if>
 			<isset property="theme.file.name" />
 			<then>
+				<propertyregex
+					input="${theme.file.name}"
+					override="true"
+					property="theme.file.name.prefix"
+					regexp="(.*?)(\.[^\s]*)"
+					replace="\1"
+				/>
+
+				<propertyregex
+					input="${theme.file.name}"
+					override="true"
+					property="theme.file.name.suffix"
+					regexp="(.*?)(\.[^\s]*)"
+					replace="\2"
+				/>
+
 				<if>
 					<resourcecount count="0" when="greater">
 						<zipfileset
-							src="${liferay.home}/osgi/war/${theme.file.name}"
+							dir="${liferay.home1}/osgi/war"
+							includes="${theme.file.name.prefix}*${theme.file.name.suffix}"
 						>
 							<patternset>
 								<include name="**/private.lar" />
