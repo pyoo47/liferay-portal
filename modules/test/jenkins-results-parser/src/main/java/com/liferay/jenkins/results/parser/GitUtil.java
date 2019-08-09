@@ -212,15 +212,12 @@ public class GitUtil {
 				"Invalid remote url " + remoteURL);
 		}
 
-		String command = null;
+		String command = JenkinsResultsParserUtil.combine(
+			"git ls-remote ", remoteURL);
 
 		if (remoteGitBranchName != null) {
 			command = JenkinsResultsParserUtil.combine(
-				"git ls-remote -h ", remoteURL, " ", remoteGitBranchName);
-		}
-		else {
-			command = JenkinsResultsParserUtil.combine(
-				"git ls-remote -h ", remoteURL);
+				command, " ", remoteGitBranchName);
 		}
 
 		ExecutionResult executionResult = executeBashCommands(
