@@ -1545,6 +1545,35 @@ public class GitWorkingDirectory {
 		return null;
 	}
 
+	public RemoteGitRef getRemoteGitRef(
+		String remoteGitRefName, String remoteURL, boolean required) {
+
+		List<RemoteGitRef> remoteGitRefs = getRemoteGitRefs(
+			remoteGitRefName, remoteURL);
+
+		for (RemoteGitRef remoteGitRef : remoteGitRefs) {
+			if (remoteGitRefName.equals(remoteGitRef.getName())) {
+				return remoteGitRef;
+			}
+		}
+
+		if (required) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to find required git ref ", remoteGitRefName,
+					" from remote URL ", remoteURL));
+		}
+
+		return null;
+	}
+
+	public List<RemoteGitRef> getRemoteGitRefs(
+		String remoteGitRefName, String remoteURL) {
+
+		return GitUtil.getRemoteGitRefs(
+			remoteGitRefName, _workingDirectory, remoteURL);
+	}
+
 	public String getUpstreamBranchName() {
 		return _upstreamBranchName;
 	}
