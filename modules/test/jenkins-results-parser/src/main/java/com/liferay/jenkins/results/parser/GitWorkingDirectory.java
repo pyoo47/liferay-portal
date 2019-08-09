@@ -1316,7 +1316,7 @@ public class GitWorkingDirectory {
 	}
 
 	public LocalGitBranch getRebasedLocalGitBranch(
-		String rebasedLocalGitBranchName, String senderBranchName,
+		String rebasedLocalGitBranchName, String senderRefName,
 		String senderRemoteURL, String senderSHA, String upstreamBranchName,
 		String upstreamBranchSHA) {
 
@@ -1335,7 +1335,7 @@ public class GitWorkingDirectory {
 			}
 
 			RemoteGitBranch senderRemoteGitBranch = getRemoteGitBranch(
-				senderBranchName, senderRemoteURL, true);
+				senderRefName, senderRemoteURL, true);
 
 			fetch(senderRemoteGitBranch);
 

@@ -203,12 +203,12 @@ public class GitHubDevSyncUtil {
 
 	public static String synchronizeToGitHubDev(
 			GitWorkingDirectory gitWorkingDirectory, String receiverUsername,
-			String senderBranchName, String senderUsername,
-			String senderBranchSHA, String upstreamBranchSHA)
+			String senderRefName, String senderUsername, String senderBranchSHA,
+			String upstreamBranchSHA)
 		throws IOException {
 
 		return synchronizeToGitHubDev(
-			gitWorkingDirectory, receiverUsername, 0, senderBranchName,
+			gitWorkingDirectory, receiverUsername, 0, senderRefName,
 			senderUsername, senderBranchSHA, upstreamBranchSHA);
 	}
 
@@ -979,7 +979,7 @@ public class GitHubDevSyncUtil {
 
 	protected static String synchronizeToGitHubDev(
 		GitWorkingDirectory gitWorkingDirectory, String receiverUsername,
-		int retryCount, String senderBranchName, String senderUsername,
+		int retryCount, String senderRefName, String senderUsername,
 		String senderBranchSHA, String upstreamBranchSHA) {
 
 		long start = System.currentTimeMillis();
@@ -1078,11 +1078,11 @@ public class GitHubDevSyncUtil {
 					return cacheBranchName;
 				}
 
-				senderBranchName = senderBranchName.trim();
+				senderRefName = senderRefName.trim();
 
 				LocalGitBranch cacheLocalGitBranch =
 					gitWorkingDirectory.getRebasedLocalGitBranch(
-						cacheBranchName, senderBranchName,
+						cacheBranchName, senderRefName,
 						senderGitRemote.getRemoteURL(), senderBranchSHA,
 						upstreamBranchName, upstreamBranchSHA);
 
@@ -1110,7 +1110,7 @@ public class GitHubDevSyncUtil {
 
 				return synchronizeToGitHubDev(
 					gitWorkingDirectory, receiverUsername, retryCount + 1,
-					senderBranchName, senderUsername, senderBranchSHA,
+					senderRefName, senderUsername, senderBranchSHA,
 					upstreamBranchSHA);
 			}
 			finally {
