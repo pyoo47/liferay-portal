@@ -42,28 +42,6 @@ import org.json.JSONObject;
  */
 public class GitWorkingDirectory {
 
-	public static String getGitHubUserName(GitRemote gitRemote) {
-		String remoteURL = gitRemote.getRemoteURL();
-
-		if (!remoteURL.contains("github.com")) {
-			throw new IllegalArgumentException(
-				JenkinsResultsParserUtil.combine(
-					gitRemote.getName(),
-					" does not point to a GitHub repository"));
-		}
-
-		String userName = null;
-
-		if (remoteURL.startsWith("https://github.com/")) {
-			userName = remoteURL.substring("https://github.com/".length());
-		}
-		else {
-			userName = remoteURL.substring("git@github.com:".length());
-		}
-
-		return userName.substring(0, userName.indexOf("/"));
-	}
-
 	public GitRemote addGitRemote(
 		boolean force, String gitRemoteName, String remoteURL) {
 
