@@ -150,7 +150,12 @@ public abstract class BaseLocalGitRepository
 
 		return rangeLocalGitCommits;
 	}
-	
+
+	@Override
+	public String getUpstreamBranchName() {
+		return getString("upstream_branch_name");
+	}
+
 	public GitRemote getUpstreamGitRemote() {
 		GitRemote gitRemote = getGitRemote("upstream");
 
@@ -163,11 +168,6 @@ public abstract class BaseLocalGitRepository
 		}
 
 		return gitRemote;
-	}
-
-	@Override
-	public String getUpstreamBranchName() {
-		return getString("upstream_branch_name");
 	}
 
 	@Override

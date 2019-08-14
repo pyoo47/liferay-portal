@@ -15,15 +15,30 @@
 package com.liferay.jenkins.results.parser;
 
 /**
- * @author Michael Hashimoto
+ * @author Peter Yoo
  */
-public class RemoteGitBranch extends RemoteGitRef {
+public class LocalGitRef extends BaseGitRef {
 
-	protected RemoteGitBranch(
-		LocalGitRepository localGitRepository, String name,
-		RemoteGitRepository remoteGitRepository, String sha) {
+	@Override
+	public String toString() {
+		LocalGitRepository localGitRepository = getLocalGitRepository();
 
-		super(localGitRepository, name, remoteGitRepository, sha);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(localGitRepository.getDirectory());
+		sb.append(" (");
+		sb.append(getName());
+		sb.append(" - ");
+		sb.append(getSHA());
+		sb.append(")");
+
+		return sb.toString();
+	}
+
+	protected LocalGitRef(
+		LocalGitRepository localGitRepository, String name, String sha) {
+
+		super(localGitRepository, name, sha);
 	}
 
 }

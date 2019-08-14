@@ -30,6 +30,8 @@ public interface LocalGitRepository extends GitRepository {
 	public GitRemote addGitRemote(
 		boolean force, String gitRemoteName, String remoteURL, boolean write);
 
+	public LocalGitRef checkout(String localGitRefName);
+
 	public File getDirectory();
 
 	public GitRemote getGitRemote(String gitRemoteName);
@@ -40,7 +42,7 @@ public interface LocalGitRepository extends GitRepository {
 		String earliestSHA, String latestSHA);
 
 	public String getUpstreamBranchName();
-	
+
 	public GitRemote getUpstreamGitRemote();
 
 	public boolean gitRemoteExists(String gitRemoteName);
