@@ -92,6 +92,11 @@ public abstract class BaseLocalGitRepository
 	}
 
 	@Override
+	public LocalGitBranch getCurrentLocalGitBranch() {
+		return getLocalGitBranch(GitUtil.getCurrentBranchName(this, false));
+	}
+
+	@Override
 	public File getDirectory() {
 		return getFile("directory");
 	}
@@ -112,6 +117,16 @@ public abstract class BaseLocalGitRepository
 				getUpstreamBranchName(), getDirectory(), getName());
 
 		return _gitWorkingDirectory;
+	}
+
+	@Override
+	public LocalGitBranch getLocalGitBranch(String localGitBranchName) {
+		return GitUtil.getLocalGitBranch(localGitBranchName, this);
+	}
+
+	@Override
+	public Map<String, LocalGitBranch> getLocalGitBranches() {
+		return GitUtil.getLocalGitBranches(this);
 	}
 
 	@Override
@@ -156,6 +171,7 @@ public abstract class BaseLocalGitRepository
 		return getString("upstream_branch_name");
 	}
 
+	@Override
 	public GitRemote getUpstreamGitRemote() {
 		GitRemote gitRemote = getGitRemote("upstream");
 
@@ -214,6 +230,25 @@ public abstract class BaseLocalGitRepository
 	public void removeGitRemotes(List<GitRemote> gitRemotes, boolean write) {
 		for (GitRemote gitRemote : gitRemotes) {
 			removeGitRemote(gitRemote, write);
+		}
+	}
+
+	@Override
+	public void waitForIndexLock() {
+		int retries = 0;
+
+		File file = new File(getDirectory(), "index.lock");
+
+		while (file.exists()) {
+			System.out.println("Waiting for index.lock to be cleared.");
+
+			JenkinsResultsParserUtil.sleep(5000);
+
+			retries++;
+
+			if (retries >= 24) {
+				file.delete();
+			}
 		}
 	}
 

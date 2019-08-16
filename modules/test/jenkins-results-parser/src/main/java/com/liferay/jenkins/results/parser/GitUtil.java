@@ -97,6 +97,34 @@ public class GitUtil {
 		}
 	}
 
+	public static String getCurrentBranchName(
+		LocalGitRepository localGitRepository, boolean required) {
+
+		localGitRepository.waitForIndexLock();
+
+		ExecutionResult executionResult = executeBashCommands(
+			localGitRepository, RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY,
+			MILLIS_TIMEOUT, "git branch | grep \\*");
+
+		if (executionResult.getExitValue() != 0) {
+			System.out.println(executionResult.getStandardError());
+
+			if (required) {
+				throw new RuntimeException(
+					"Unable to find required local branch HEAD");
+			}
+
+			return null;
+		}
+
+		String currentBranchName = executionResult.getStandardOut();
+
+		currentBranchName = currentBranchName.replaceAll(
+			"\\s*\\*\\s*([^\\s]+)\\s*", "$1");
+
+		return currentBranchName;
+	}
+
 	public static String getDefaultBranchName(File workingDirectory) {
 		String defaultBranchName = _getDefaultBranchName(
 			workingDirectory, "origin");
@@ -107,6 +135,82 @@ public class GitUtil {
 		}
 
 		return defaultBranchName;
+	}
+
+	public static LocalGitBranch getLocalGitBranch(
+		String localGitBranchName, LocalGitRepository localGitRepository) {
+
+		String sha = getLocalGitBranchSHA(
+			localGitBranchName, localGitRepository);
+
+		if (sha == null) {
+			return null;
+		}
+
+		return GitBranchFactory.newLocalGitBranch(
+			localGitRepository, localGitBranchName, sha);
+	}
+
+	public static Map<String, LocalGitBranch> getLocalGitBranches(
+		LocalGitRepository localGitRepository) {
+
+		ExecutionResult executionResult = executeBashCommands(
+			RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY, MILLIS_TIMEOUT,
+			localGitRepository.getDirectory(), "git branch");
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				"Unable to get branch names." +
+					executionResult.getStandardError());
+		}
+
+		String executionResultOutput = executionResult.getStandardOut();
+
+		String[] localGitBranchNames = executionResultOutput.split("\\s*\\*?");
+
+		Map<String, LocalGitBranch> localGitBranchMap = new HashMap<>(
+			localGitBranchNames.length);
+
+		for (String localGitBranchName : localGitBranchNames) {
+			localGitBranchMap.put(
+				localGitBranchName,
+				GitBranchFactory.newLocalGitBranch(
+					localGitRepository, localGitBranchName,
+					getLocalGitBranchSHA(
+						localGitBranchName, localGitRepository)));
+		}
+
+		return localGitBranchMap;
+	}
+
+	public static String getLocalGitBranchSHA(
+		String localGitBranchName, LocalGitRepository localGitRepository) {
+
+		if (localGitBranchName == null) {
+			throw new IllegalArgumentException("Local branch name is null");
+		}
+
+		ExecutionResult executionResult = executeBashCommands(
+			RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY, 1000 * 60 * 2,
+			localGitRepository.getDirectory(),
+			"git rev-parse " + localGitBranchName);
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to determine SHA of branch ", localGitBranchName,
+					"\n", executionResult.getStandardError()));
+		}
+
+		String sha = executionResult.getStandardOut();
+
+		sha = sha.trim();
+
+		if (sha.isEmpty()) {
+			return null;
+		}
+
+		return sha.trim();
 	}
 
 	public static String getPrivateRepositoryName(String repositoryName) {
@@ -515,6 +619,15 @@ public class GitUtil {
 
 		return new ExecutionResult(
 			process.exitValue(), standardErr.trim(), standardOut.trim());
+	}
+
+	protected static ExecutionResult executeBashCommands(
+		LocalGitRepository localGitRepository, int maxRetries, long retryDelay,
+		long timeout, String... commands) {
+
+		return executeBashCommands(
+			maxRetries, retryDelay, timeout, localGitRepository.getDirectory(),
+			commands);
 	}
 
 	protected static Map<String, GitRemote> getGitRemotes(

@@ -848,16 +848,6 @@ public class GitWorkingDirectory {
 		return currentBranchName;
 	}
 
-	public LocalGitBranch getCurrentLocalGitBranch() {
-		String currentBranchName = getCurrentBranchName();
-
-		if (currentBranchName == null) {
-			return null;
-		}
-
-		return getLocalGitBranch(currentBranchName);
-	}
-
 	public String getGitConfigProperty(String gitConfigPropertyName) {
 		GitUtil.ExecutionResult executionResult = executeBashCommands(
 			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
@@ -945,82 +935,6 @@ public class GitWorkingDirectory {
 		}
 
 		return null;
-	}
-
-	public LocalGitBranch getLocalGitBranch(String branchName) {
-		return getLocalGitBranch(branchName, false);
-	}
-
-	public LocalGitBranch getLocalGitBranch(
-		String branchName, boolean required) {
-
-		if (branchName.equals(getUpstreamBranchName())) {
-			return getUpstreamLocalGitBranch();
-		}
-
-		if (!localGitBranchExists(branchName)) {
-			return null;
-		}
-
-		return _getLocalGitBranch(branchName, required);
-	}
-
-	public List<LocalGitBranch> getLocalGitBranches(String branchName) {
-		String upstreamBranchName = getUpstreamBranchName();
-
-		LocalGitRepository localGitRepository =
-			GitRepositoryFactory.getLocalGitRepository(
-				getGitRepositoryName(), upstreamBranchName);
-
-		if (branchName != null) {
-			try {
-				return Arrays.asList(
-					GitBranchFactory.newLocalGitBranch(
-						localGitRepository, branchName,
-						getLocalGitBranchSHA(branchName)));
-			}
-			catch (Exception e) {
-				if (!branchName.equals(upstreamBranchName)) {
-					return null;
-				}
-			}
-		}
-
-		List<String> localGitBranchNames = getLocalGitBranchNames();
-
-		List<LocalGitBranch> localGitBranches = new ArrayList<>(
-			localGitBranchNames.size());
-
-		Map<String, String> localGitBranchesShaMap =
-			getLocalGitBranchesShaMap();
-
-		for (String localGitBranchName : localGitBranchNames) {
-			localGitBranches.add(
-				GitBranchFactory.newLocalGitBranch(
-					localGitRepository, localGitBranchName,
-					localGitBranchesShaMap.get(localGitBranchName)));
-		}
-
-		return localGitBranches;
-	}
-
-	public String getLocalGitBranchSHA(String localGitBranchName) {
-		if (localGitBranchName == null) {
-			throw new IllegalArgumentException("Local branch name is null");
-		}
-
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY, 1000 * 60 * 2,
-			"git rev-parse " + localGitBranchName);
-
-		if (executionResult.getExitValue() != 0) {
-			throw new RuntimeException(
-				JenkinsResultsParserUtil.combine(
-					"Unable to determine SHA of branch ", localGitBranchName,
-					"\n", executionResult.getStandardError()));
-		}
-
-		return executionResult.getStandardOut();
 	}
 
 	public List<File> getModifiedDirsList(

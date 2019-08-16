@@ -17,6 +17,7 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Peter Yoo
@@ -32,11 +33,17 @@ public interface LocalGitRepository extends GitRepository {
 
 	public LocalGitRef checkout(String localGitRefName);
 
+	public LocalGitBranch getCurrentLocalGitBranch();
+
 	public File getDirectory();
 
 	public GitRemote getGitRemote(String gitRemoteName);
 
 	public GitWorkingDirectory getGitWorkingDirectory();
+
+	public LocalGitBranch getLocalGitBranch(String localGitBranchName);
+
+	public Map<String, LocalGitBranch> getLocalGitBranches();
 
 	public List<LocalGitCommit> getRangeLocalGitCommits(
 		String earliestSHA, String latestSHA);
@@ -52,5 +59,7 @@ public interface LocalGitRepository extends GitRepository {
 	public void removeGitRemote(String gitRemoteName, boolean write);
 
 	public void removeGitRemotes(List<GitRemote> gitRemotes, boolean write);
+
+	public void waitForIndexLock();
 
 }
