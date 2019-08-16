@@ -44,12 +44,12 @@ public class GitRemote {
 		return _gitRepositoryName;
 	}
 
-	public GitWorkingDirectory getGitWorkingDirectory() {
-		return _gitWorkingDirectory;
-	}
-
 	public String getHostname() {
 		return _hostname;
+	}
+
+	public LocalGitRepository getLocalGitRepository() {
+		return _localGitRepository;
 	}
 
 	public String getName() {
@@ -79,10 +79,9 @@ public class GitRemote {
 	}
 
 	protected GitRemote(
-		GitWorkingDirectory gitWorkingDirectory, String name,
-		String remoteURL) {
+		LocalGitRepository localGitRepository, String name, String remoteURL) {
 
-		_gitWorkingDirectory = gitWorkingDirectory;
+		_localGitRepository = localGitRepository;
 		_fetchRemoteURL = remoteURL;
 		_name = name;
 		_pushRemoteURL = remoteURL;
@@ -91,9 +90,9 @@ public class GitRemote {
 	}
 
 	protected GitRemote(
-		GitWorkingDirectory gitWorkingDirectory, String[] remoteInputLines) {
+		LocalGitRepository localGitRepository, String[] remoteInputLines) {
 
-		_gitWorkingDirectory = gitWorkingDirectory;
+		_localGitRepository = localGitRepository;
 
 		if (remoteInputLines.length != 2) {
 			throw new IllegalArgumentException(
@@ -187,8 +186,8 @@ public class GitRemote {
 
 	private final String _fetchRemoteURL;
 	private String _gitRepositoryName;
-	private final GitWorkingDirectory _gitWorkingDirectory;
 	private String _hostname;
+	private final LocalGitRepository _localGitRepository;
 	private final String _name;
 	private final String _pushRemoteURL;
 	private String _username;

@@ -19,7 +19,9 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +36,35 @@ public class GitUtil {
 	public static final long MILLIS_TIMEOUT = 30 * 1000;
 
 	public static final int RETRIES_SIZE_MAX = 1;
+
+	public static void addGitRemote(GitRemote gitRemote) {
+		String gitRemoteName = gitRemote.getName();
+		String gitRemoteURL = gitRemote.getRemoteURL();
+
+		String[] commands = {
+			JenkinsResultsParserUtil.combine(
+				"if [ \"$(git remote | grep ", gitRemoteName,
+				")\" != \"\" ] ; then git remote remove ", gitRemoteName,
+				" ; fi"),
+			JenkinsResultsParserUtil.combine(
+				"git remote add ", gitRemoteName, " ", gitRemoteURL)
+		};
+
+		LocalGitRepository localGitRepository =
+			gitRemote.getLocalGitRepository();
+
+		GitUtil.ExecutionResult executionResult = executeBashCommands(
+			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
+			GitUtil.MILLIS_TIMEOUT, localGitRepository.getDirectory(),
+			commands);
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to write Git remote ", gitRemoteName, "\n",
+					executionResult.getStandardError()));
+		}
+	}
 
 	public static void clone(String remoteURL, File workingDirectory) {
 		String command = JenkinsResultsParserUtil.combine(
@@ -295,6 +326,36 @@ public class GitUtil {
 		return false;
 	}
 
+	public static void removeGitRemote(GitRemote gitRemote) {
+		if (gitRemote == null) {
+			return;
+		}
+
+		String gitRemoteName = gitRemote.getName();
+
+		String[] commands = {
+			JenkinsResultsParserUtil.combine(
+				"if [ \"$(git remote | grep ", gitRemoteName,
+				")\" != \"\" ] ; then git remote remove ", gitRemoteName,
+				" ; fi")
+		};
+
+		LocalGitRepository localGitRepository =
+			gitRemote.getLocalGitRepository();
+
+		GitUtil.ExecutionResult executionResult = executeBashCommands(
+			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
+			GitUtil.MILLIS_TIMEOUT, localGitRepository.getDirectory(),
+			commands);
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to remove Git remote ", gitRemoteName, "\n",
+					executionResult.getStandardError()));
+		}
+	}
+
 	public static String toSlaveGitHubDevNodeRemoteURL(
 		String gitHubDevRemoteURL, String slaveGitHubDevNodeHostname) {
 
@@ -454,6 +515,82 @@ public class GitUtil {
 
 		return new ExecutionResult(
 			process.exitValue(), standardErr.trim(), standardOut.trim());
+	}
+
+	protected static Map<String, GitRemote> getGitRemotes(
+		LocalGitRepository localGitRepository) {
+
+		String standardOut = null;
+
+		Map<String, GitRemote> gitRemotes = new HashMap<>();
+
+		ExecutionResult executionResult = executeBashCommands(
+			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
+			GitUtil.MILLIS_TIMEOUT, localGitRepository.getDirectory(),
+			"git remote -v");
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to get list of git remotes\n",
+					executionResult.getStandardError()));
+		}
+
+		standardOut = executionResult.getStandardOut();
+
+		String[] lines = standardOut.split("\\s*\n\\s*");
+
+		Arrays.sort(lines);
+
+		int x = 0;
+
+		for (int i = 0; i < lines.length; i++) {
+			String line = lines[i];
+
+			if (line == null) {
+				continue;
+			}
+
+			line = line.trim();
+
+			if (line.isEmpty()) {
+				continue;
+			}
+
+			x = i;
+
+			break;
+		}
+
+		lines = Arrays.copyOfRange(lines, x, lines.length);
+
+		try {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Found git remotes: ");
+
+			for (int i = 0; i < lines.length; i = i + 2) {
+				GitRemote gitRemote = new GitRemote(
+					localGitRepository, Arrays.copyOfRange(lines, i, i + 2));
+
+				if (i > 0) {
+					sb.append(", ");
+				}
+
+				sb.append(gitRemote.getName());
+
+				gitRemotes.put(gitRemote.getName(), gitRemote);
+			}
+
+			System.out.println(sb);
+		}
+		catch (Throwable t) {
+			System.out.println("Unable to parse git remotes\n" + standardOut);
+
+			throw t;
+		}
+
+		return gitRemotes;
 	}
 
 	private static String _getDefaultBranchName(

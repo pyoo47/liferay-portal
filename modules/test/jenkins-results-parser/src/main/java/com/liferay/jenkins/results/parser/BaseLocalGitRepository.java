@@ -18,7 +18,9 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.json.JSONObject;
@@ -29,6 +31,34 @@ import org.json.JSONObject;
  */
 public abstract class BaseLocalGitRepository
 	extends BaseGitRepository implements LocalGitRepository {
+
+	@Override
+	public GitRemote addGitRemote(
+		boolean force, String gitRemoteName, String remoteURL, boolean write) {
+
+		GitRemote gitRemote = getGitRemote(gitRemoteName);
+
+		if (gitRemote != null) {
+			if (force) {
+				removeGitRemote(gitRemote, write);
+			}
+			else {
+				throw new IllegalArgumentException(
+					JenkinsResultsParserUtil.combine(
+						"Git remote ", gitRemoteName, " already exists"));
+			}
+		}
+
+		gitRemote = new GitRemote(this, gitRemoteName, remoteURL);
+
+		if (write) {
+			GitUtil.addGitRemote(gitRemote);
+		}
+
+		_gitRemotes.put(gitRemoteName, gitRemote);
+
+		return gitRemote;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -64,6 +94,11 @@ public abstract class BaseLocalGitRepository
 	@Override
 	public File getDirectory() {
 		return getFile("directory");
+	}
+
+	@Override
+	public GitRemote getGitRemote(String gitRemoteName) {
+		return _gitRemotes.get(gitRemoteName);
 	}
 
 	@Override
@@ -115,10 +150,33 @@ public abstract class BaseLocalGitRepository
 
 		return rangeLocalGitCommits;
 	}
+	
+	public GitRemote getUpstreamGitRemote() {
+		GitRemote gitRemote = getGitRemote("upstream");
+
+		if (gitRemote == null) {
+			gitRemote = addGitRemote(
+				true, "upstream",
+				JenkinsResultsParserUtil.combine(
+					"git@github.com:liferay/", getName(), ".git"),
+				false);
+		}
+
+		return gitRemote;
+	}
 
 	@Override
 	public String getUpstreamBranchName() {
 		return getString("upstream_branch_name");
+	}
+
+	@Override
+	public boolean gitRemoteExists(String gitRemoteName) {
+		if (getGitRemote(gitRemoteName) != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -132,10 +190,39 @@ public abstract class BaseLocalGitRepository
 		return hash.hashCode();
 	}
 
+	@Override
+	public void removeGitRemote(GitRemote gitRemote, boolean write) {
+		if (gitRemote == null) {
+			return;
+		}
+
+		if (gitRemote != null) {
+			_gitRemotes.remove(gitRemote.getName());
+		}
+
+		if (write) {
+			GitUtil.removeGitRemote(gitRemote);
+		}
+	}
+
+	@Override
+	public void removeGitRemote(String gitRemoteName, boolean write) {
+		removeGitRemote(getGitRemote(gitRemoteName), write);
+	}
+
+	@Override
+	public void removeGitRemotes(List<GitRemote> gitRemotes, boolean write) {
+		for (GitRemote gitRemote : gitRemotes) {
+			removeGitRemote(gitRemote, write);
+		}
+	}
+
 	protected BaseLocalGitRepository(JSONObject jsonObject) {
 		super(jsonObject);
 
 		validateKeys(_KEYS_REQUIRED);
+
+		_gitRemotes.putAll(GitUtil.getGitRemotes(this));
 	}
 
 	protected BaseLocalGitRepository(String name, String upstreamBranchName) {
@@ -145,6 +232,8 @@ public abstract class BaseLocalGitRepository
 		_setUpstreamBranchName(upstreamBranchName);
 
 		validateKeys(_KEYS_REQUIRED);
+
+		_gitRemotes.putAll(GitUtil.getGitRemotes(this));
 	}
 
 	protected String getDefaultRelativeGitRepositoryDirPath(
@@ -211,6 +300,7 @@ public abstract class BaseLocalGitRepository
 		"directory", "upstream_branch_name"
 	};
 
+	private final Map<String, GitRemote> _gitRemotes = new HashMap<>();
 	private GitWorkingDirectory _gitWorkingDirectory;
 
 }

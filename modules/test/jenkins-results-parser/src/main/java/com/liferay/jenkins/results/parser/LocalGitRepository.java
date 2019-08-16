@@ -27,7 +27,12 @@ public interface LocalGitRepository extends GitRepository {
 
 	public static final Integer COMMITS_HISTORY_SIZE_MAX = 25000;
 
+	public GitRemote addGitRemote(
+		boolean force, String gitRemoteName, String remoteURL, boolean write);
+
 	public File getDirectory();
+
+	public GitRemote getGitRemote(String gitRemoteName);
 
 	public GitWorkingDirectory getGitWorkingDirectory();
 
@@ -35,5 +40,15 @@ public interface LocalGitRepository extends GitRepository {
 		String earliestSHA, String latestSHA);
 
 	public String getUpstreamBranchName();
+	
+	public GitRemote getUpstreamGitRemote();
+
+	public boolean gitRemoteExists(String gitRemoteName);
+
+	public void removeGitRemote(GitRemote gitRemote, boolean write);
+
+	public void removeGitRemote(String gitRemoteName, boolean write);
+
+	public void removeGitRemotes(List<GitRemote> gitRemotes, boolean write);
 
 }
