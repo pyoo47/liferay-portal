@@ -179,6 +179,40 @@ public class GitUtil {
 		}
 	}
 
+	public static void configure(
+		Map<String, String> configMap, LocalGitRepository localGitRepository,
+		String options) {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("git config ");
+
+		if ((options != null) && !options.isEmpty()) {
+			sb.append(options);
+			sb.append(" ");
+		}
+
+		String commandPrefix = sb.toString();
+
+		List<String> commands = new ArrayList<>(configMap.size());
+
+		for (Map.Entry<String, String> entry : configMap.entrySet()) {
+			commands.add(
+				JenkinsResultsParserUtil.combine(
+					commandPrefix, entry.getKey(), " ", entry.getValue()));
+		}
+
+		ExecutionResult executionResult = executeBashCommands(
+			localGitRepository, RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY,
+			MILLIS_TIMEOUT, commands.toArray(new String[0]));
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				"Unable to configure git repository.\n" +
+					executionResult.getStandardError());
+		}
+	}
+
 	public static LocalGitBranch createLocalGitBranch(
 		String localGitBranchName, LocalGitRepository localGitRepository,
 		boolean force, String startPoint) {
@@ -194,7 +228,7 @@ public class GitUtil {
 
 				tempLocalGitBranch = createLocalGitBranch(
 					"temp-" + System.currentTimeMillis(), localGitRepository,
-					false);
+					false, null);
 
 				checkout(tempLocalGitBranch, null);
 			}

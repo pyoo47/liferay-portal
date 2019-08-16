@@ -125,51 +125,6 @@ public class GitWorkingDirectory {
 		}
 	}
 
-	public void configure(Map<String, String> configMap, String options) {
-		String[] commands = new String[configMap.size()];
-
-		int i = 0;
-
-		for (Map.Entry<String, String> entry : configMap.entrySet()) {
-			StringBuilder sb = new StringBuilder();
-
-			sb.append("git config ");
-
-			if ((options != null) && !options.isEmpty()) {
-				sb.append(options);
-				sb.append(" ");
-			}
-
-			sb.append(entry.getKey());
-			sb.append(" ");
-			sb.append(entry.getValue());
-
-			commands[i] = sb.toString();
-
-			i++;
-		}
-
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			GitUtil.MILLIS_TIMEOUT, commands);
-
-		if (executionResult.getExitValue() != 0) {
-			throw new RuntimeException(
-				"Unable to configure git repository.\n" +
-					executionResult.getStandardError());
-		}
-	}
-
-	public void configure(
-		String configName, String configValue, String options) {
-
-		Map<String, String> configMap = new HashMap<>(1);
-
-		configMap.put(configName, configValue);
-
-		configure(configMap, options);
-	}
-
 	public String createPullRequest(
 			String body, String pullRequestBranchName, String receiverUserName,
 			String senderUserName, String title)

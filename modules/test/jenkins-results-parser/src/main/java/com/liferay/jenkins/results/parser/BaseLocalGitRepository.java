@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,18 @@ public abstract class BaseLocalGitRepository
 
 		throw new RuntimeException(
 			"Unable to checkout upstream local Git branch");
+	}
+
+	@Override
+	public void configure(Map<String, String> configMap, String options) {
+		GitUtil.configure(configMap, this, options);
+	}
+
+	@Override
+	public void configure(
+		String configName, String configValue, String options) {
+
+		configure(Collections.singletonMap(configName, configValue), options);
 	}
 
 	@Override
