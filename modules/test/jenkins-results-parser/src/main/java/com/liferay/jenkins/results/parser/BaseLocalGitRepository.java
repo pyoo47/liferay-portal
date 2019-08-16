@@ -61,6 +61,18 @@ public abstract class BaseLocalGitRepository
 	}
 
 	@Override
+	public boolean deleteLocalGitBranch(LocalGitBranch localGitBranch) {
+		return deleteLocalGitBranches(Arrays.asList(localGitBranch));
+	}
+
+	@Override
+	public boolean deleteLocalGitBranches(
+		List<LocalGitBranch> localGitBranches) {
+
+		return GitUtil.deleteLocalGitBranches(localGitBranches, this);
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;

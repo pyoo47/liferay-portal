@@ -356,38 +356,6 @@ public class GitWorkingDirectory {
 		return pullRequestURL;
 	}
 
-	public void deleteLocalGitBranch(LocalGitBranch localGitBranch) {
-		if (localGitBranch == null) {
-			return;
-		}
-
-		deleteLocalGitBranches(Arrays.asList(localGitBranch));
-	}
-
-	public void deleteLocalGitBranch(String branchName) {
-		deleteLocalGitBranch(getLocalGitBranch(branchName));
-	}
-
-	public void deleteLocalGitBranches(List<LocalGitBranch> localGitBranches) {
-		if (localGitBranches.isEmpty()) {
-			return;
-		}
-
-		Set<String> localGitBranchNames = new HashSet<>();
-
-		for (LocalGitBranch localGitBranch : localGitBranches) {
-			localGitBranchNames.add(localGitBranch.getName());
-		}
-
-		for (List<String> branchNames :
-				Lists.partition(
-					new ArrayList<>(localGitBranchNames),
-					_BRANCHES_DELETE_BATCH_SIZE)) {
-
-			_deleteLocalGitBranches(branchNames.toArray(new String[0]));
-		}
-	}
-
 	public void deleteRemoteGitBranch(RemoteGitBranch remoteGitBranch) {
 		deleteRemoteGitBranches(Arrays.asList(remoteGitBranch));
 	}

@@ -14,14 +14,18 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.google.common.collect.Lists;
+
 import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -95,6 +99,33 @@ public class GitUtil {
 				JenkinsResultsParserUtil.combine(
 					"Unable to clone ", remoteURL, "\n", errorString));
 		}
+	}
+
+	public static boolean deleteLocalGitBranches(
+		List<LocalGitBranch> localGitBranches,
+		LocalGitRepository localGitRepository) {
+
+		if (localGitBranches.isEmpty()) {
+			return true;
+		}
+
+		Set<String> localGitBranchNames = new HashSet<>();
+
+		for (LocalGitBranch localGitBranch : localGitBranches) {
+			localGitBranchNames.add(localGitBranch.getName());
+		}
+
+		for (List<LocalGitBranch> localGitBranchBatch :
+				Lists.partition(localGitBranches, 5)) {
+
+			if (!_deleteLocalGitBranches(
+					localGitBranchBatch, localGitRepository)) {
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public static String getCurrentBranchName(
@@ -704,6 +735,59 @@ public class GitUtil {
 		}
 
 		return gitRemotes;
+	}
+
+	private static boolean _deleteLocalGitBranches(
+		List<LocalGitBranch> localGitBranches,
+		LocalGitRepository localGitRepository) {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("git branch -D -f");
+
+		for (LocalGitBranch localGitBranch : localGitBranches) {
+			sb.append(" ");
+
+			sb.append(localGitBranch.getName());
+		}
+
+		GitUtil.ExecutionResult executionResult = null;
+
+		boolean exceptionThrown = false;
+
+		try {
+			executionResult = executeBashCommands(
+				localGitRepository, RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY,
+				1000 * 60 * 10, sb.toString());
+		}
+		catch (RuntimeException re) {
+			exceptionThrown = true;
+		}
+
+		String localGitBranchNamesReport = sb.toString();
+
+		localGitBranchNamesReport = localGitBranchNamesReport.replaceAll(
+			Pattern.quote("git branch -D -f "), "");
+
+		localGitBranchNamesReport = localGitBranchNamesReport.replaceAll(
+			"\\s+", "\n    ");
+
+		if (exceptionThrown || (executionResult.getExitValue() != 0)) {
+			System.out.println(
+				JenkinsResultsParserUtil.combine(
+					"Unable to delete local branches", "\n    ",
+					localGitBranchNamesReport, "\n",
+					executionResult.getStandardError()));
+
+			return false;
+		}
+
+		System.out.println(
+			JenkinsResultsParserUtil.combine(
+				"Deleted local branches:", "\n    ",
+				localGitBranchNamesReport));
+
+		return true;
 	}
 
 	private static String _getDefaultBranchName(

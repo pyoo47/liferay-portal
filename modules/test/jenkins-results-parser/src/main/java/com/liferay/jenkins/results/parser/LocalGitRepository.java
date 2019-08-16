@@ -33,6 +33,11 @@ public interface LocalGitRepository extends GitRepository {
 
 	public LocalGitRef checkout(String localGitRefName);
 
+	public boolean deleteLocalGitBranch(LocalGitBranch localGitBranch);
+
+	public boolean deleteLocalGitBranches(
+		List<LocalGitBranch> localGitBranches);
+
 	public LocalGitBranch getCurrentLocalGitBranch();
 
 	public File getDirectory();
