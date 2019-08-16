@@ -18,7 +18,4 @@ package com.liferay.jenkins.results.parser;
  * @author Michael Hashimoto
  */
 public interface LocalGitCommit extends GitCommit {
-
-	public GitWorkingDirectory getGitWorkingDirectory();
-
 }

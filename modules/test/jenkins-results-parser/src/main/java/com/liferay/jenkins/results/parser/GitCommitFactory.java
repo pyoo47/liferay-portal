@@ -31,10 +31,11 @@ import org.json.JSONObject;
 public class GitCommitFactory {
 
 	public static GitHubRemoteGitCommit newGitHubRemoteGitCommit(
-		String gitHubUsername, String gitRepositoryName, String sha) {
+		String gitHubUsername, LocalGitRepository localGitRepository,
+		String sha) {
 
 		String gitHubCommitURL = _getGitHubCommitURL(
-			gitHubUsername, gitRepositoryName, sha);
+			gitHubUsername, localGitRepository.getName(), sha);
 
 		if (_gitHubRemoteGitCommits.containsKey(gitHubCommitURL)) {
 			return _gitHubRemoteGitCommits.get(gitHubCommitURL);
@@ -60,7 +61,7 @@ public class GitCommitFactory {
 
 				GitHubRemoteGitCommit remoteGitCommit =
 					new GitHubRemoteGitCommit(
-						gitHubUsername, gitRepositoryName, message, sha,
+						gitHubUsername, localGitRepository, message, sha,
 						_getGitCommitType(message), date.getTime());
 
 				_gitHubRemoteGitCommits.put(gitHubCommitURL, remoteGitCommit);
@@ -77,11 +78,11 @@ public class GitCommitFactory {
 	}
 
 	public static LocalGitCommit newLocalGitCommit(
-		GitWorkingDirectory gitWorkingDirectory, String message, String sha,
+		LocalGitRepository localGitRepository, String message, String sha,
 		long commitTime) {
 
 		return new DefaultLocalGitCommit(
-			gitWorkingDirectory, message, sha, _getGitCommitType(message),
+			localGitRepository, message, sha, _getGitCommitType(message),
 			commitTime);
 	}
 

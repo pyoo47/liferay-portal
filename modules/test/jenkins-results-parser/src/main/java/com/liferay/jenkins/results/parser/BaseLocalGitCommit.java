@@ -20,22 +20,11 @@ package com.liferay.jenkins.results.parser;
 public abstract class BaseLocalGitCommit
 	extends BaseGitCommit implements LocalGitCommit {
 
-	@Override
-	public GitWorkingDirectory getGitWorkingDirectory() {
-		return _gitWorkingDirectory;
-	}
-
 	protected BaseLocalGitCommit(
-		GitWorkingDirectory gitWorkingDirectory, String message, String sha,
+		LocalGitRepository localGitRepository, String message, String sha,
 		GitCommit.Type type, long commitTime) {
 
-		super(
-			gitWorkingDirectory.getGitRepositoryName(), message, sha, type,
-			commitTime);
-
-		_gitWorkingDirectory = gitWorkingDirectory;
+		super(localGitRepository, message, sha, type, commitTime);
 	}
-
-	private final GitWorkingDirectory _gitWorkingDirectory;
 
 }
