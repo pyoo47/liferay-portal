@@ -42,89 +42,6 @@ import org.json.JSONObject;
  */
 public class GitWorkingDirectory {
 
-	public void checkoutLocalGitBranch(LocalGitBranch localGitBranch) {
-		checkoutLocalGitBranch(localGitBranch, "-f");
-	}
-
-	public void checkoutLocalGitBranch(
-		LocalGitBranch localGitBranch, String options) {
-
-		waitForIndexLock();
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("git checkout ");
-
-		if (options != null) {
-			sb.append(options);
-			sb.append(" ");
-		}
-
-		String branchName = localGitBranch.getName();
-
-		sb.append(branchName);
-
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			1000 * 60 * 10, sb.toString());
-
-		if (executionResult.getExitValue() != 0) {
-			throw new RuntimeException(
-				JenkinsResultsParserUtil.combine(
-					"Unable to checkout ", branchName, "\n",
-					executionResult.getStandardError()));
-		}
-
-		int timeout = 0;
-
-		File headFile = new File(_gitDirectory, "HEAD");
-
-		String expectedContent = JenkinsResultsParserUtil.combine(
-			"ref: refs/heads/", branchName);
-
-		while (true) {
-			String headContent = null;
-
-			try {
-				headContent = JenkinsResultsParserUtil.read(headFile);
-			}
-			catch (IOException ioe) {
-				throw new RuntimeException(
-					"Unable to read file " + headFile.getPath(), ioe);
-			}
-
-			headContent = headContent.trim();
-
-			if (headContent.equals(expectedContent)) {
-				return;
-			}
-
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"HEAD file content is: ", headContent,
-					". Waiting for branch to be updated."));
-
-			JenkinsResultsParserUtil.sleep(5000);
-
-			timeout++;
-
-			if (timeout >= 59) {
-				if (Objects.equals(branchName, getCurrentBranchName())) {
-					return;
-				}
-
-				throw new RuntimeException(
-					"Unable to checkout branch " + branchName);
-			}
-		}
-	}
-
-	public void checkoutUpstreamLocalGitBranch() {
-		if (!Objects.equals(getCurrentBranchName(), getUpstreamBranchName())) {
-			checkoutLocalGitBranch(getUpstreamLocalGitBranch());
-		}
-	}
-
 	public void cherryPick(LocalGitCommit localGitCommit) {
 		String cherryPickCommand = JenkinsResultsParserUtil.combine(
 			"git cherry-pick " + localGitCommit.getSHA());
@@ -1697,31 +1614,6 @@ public class GitWorkingDirectory {
 		return GitCommitFactory.newLocalGitCommit(
 			this, matcher.group("message"), matcher.group("sha"),
 			epochTimestamp);
-	}
-
-	protected File getRealGitDirectory(File gitFile) {
-		String gitFileContent = null;
-
-		try {
-			gitFileContent = JenkinsResultsParserUtil.read(gitFile);
-		}
-		catch (IOException ioe) {
-			throw new RuntimeException(
-				"Real .git directory could not be found", ioe);
-		}
-
-		for (String line : gitFileContent.split("\n")) {
-			Matcher matcher = _gitDirectoryPathPattern.matcher(line);
-
-			if (!matcher.find()) {
-				continue;
-			}
-
-			return new File(matcher.group(1));
-		}
-
-		throw new IllegalArgumentException(
-			"Real Git directory could not be found in " + gitFile.getPath());
 	}
 
 	protected List<File> getSubdirectoriesContainingFiles(

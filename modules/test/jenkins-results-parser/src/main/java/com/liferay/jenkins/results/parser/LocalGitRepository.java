@@ -31,7 +31,9 @@ public interface LocalGitRepository extends GitRepository {
 	public GitRemote addGitRemote(
 		boolean force, String gitRemoteName, String remoteURL, boolean write);
 
-	public LocalGitRef checkout(String localGitRefName);
+	public void checkout(LocalGitBranch localGitBranch, String options);
+
+	public LocalGitBranch checkoutUpstreamLocalGitBranch();
 
 	public boolean deleteLocalGitBranch(LocalGitBranch localGitBranch);
 
@@ -41,6 +43,8 @@ public interface LocalGitRepository extends GitRepository {
 	public LocalGitBranch getCurrentLocalGitBranch();
 
 	public File getDirectory();
+
+	public File getDotGitDirectory();
 
 	public GitRemote getGitRemote(String gitRemoteName);
 

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
@@ -54,19 +55,96 @@ public class GitUtil {
 				"git remote add ", gitRemoteName, " ", gitRemoteURL)
 		};
 
-		LocalGitRepository localGitRepository =
-			gitRemote.getLocalGitRepository();
-
 		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			GitUtil.MILLIS_TIMEOUT, localGitRepository.getDirectory(),
-			commands);
+			gitRemote.getLocalGitRepository(), RETRIES_SIZE_MAX,
+			MILLIS_RETRY_DELAY, MILLIS_TIMEOUT, commands);
 
 		if (executionResult.getExitValue() != 0) {
 			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to write Git remote ", gitRemoteName, "\n",
 					executionResult.getStandardError()));
+		}
+	}
+
+	public static void checkout(LocalGitBranch localGitBranch, String options) {
+		LocalGitRepository localGitRepository =
+			localGitBranch.getLocalGitRepository();
+
+		localGitRepository.waitForIndexLock();
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("git checkout ");
+
+		if (options != null) {
+			sb.append(options);
+			sb.append(" ");
+		}
+
+		String branchName = localGitBranch.getName();
+
+		sb.append(branchName);
+
+		ExecutionResult executionResult = executeBashCommands(
+			localGitRepository, RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY,
+			1000 * 60 * 10, sb.toString());
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to checkout ", branchName, "\n",
+					executionResult.getStandardError()));
+		}
+
+		int timeout = 0;
+
+		File headFile = new File(
+			localGitRepository.getDotGitDirectory(), "HEAD");
+
+		String expectedContent = JenkinsResultsParserUtil.combine(
+			"ref: refs/heads/", branchName);
+
+		while (true) {
+			String headContent = null;
+
+			try {
+				headContent = JenkinsResultsParserUtil.read(headFile);
+			}
+			catch (IOException ioe) {
+				throw new RuntimeException(
+					"Unable to read file " + headFile.getPath(), ioe);
+			}
+
+			headContent = headContent.trim();
+
+			if (headContent.equals(expectedContent)) {
+				return;
+			}
+
+			System.out.println(
+				JenkinsResultsParserUtil.combine(
+					"HEAD file content is: ", headContent,
+					". Waiting for branch to be updated."));
+
+			JenkinsResultsParserUtil.sleep(5000);
+
+			timeout++;
+
+			if (timeout >= 59) {
+				LocalGitBranch currentLocalGitBranch =
+					localGitRepository.getCurrentLocalGitBranch();
+
+				if ((currentLocalGitBranch != null) &&
+					Objects.equals(
+						branchName, currentLocalGitBranch.getName())) {
+
+					return;
+				}
+
+				throw new RuntimeException(
+					"Unable to checkout branch " + branchName);
+			}
 		}
 	}
 
@@ -102,8 +180,7 @@ public class GitUtil {
 	}
 
 	public static boolean deleteLocalGitBranches(
-		List<LocalGitBranch> localGitBranches,
-		LocalGitRepository localGitRepository) {
+		List<LocalGitBranch> localGitBranches) {
 
 		if (localGitBranches.isEmpty()) {
 			return true;
@@ -118,9 +195,7 @@ public class GitUtil {
 		for (List<LocalGitBranch> localGitBranchBatch :
 				Lists.partition(localGitBranches, 5)) {
 
-			if (!_deleteLocalGitBranches(
-					localGitBranchBatch, localGitRepository)) {
-
+			if (!_deleteLocalGitBranches(localGitBranchBatch)) {
 				return false;
 			}
 		}
@@ -738,17 +813,31 @@ public class GitUtil {
 	}
 
 	private static boolean _deleteLocalGitBranches(
-		List<LocalGitBranch> localGitBranches,
-		LocalGitRepository localGitRepository) {
+		List<LocalGitBranch> localGitBranches) {
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("git branch -D -f");
 
+		LocalGitRepository localGitRepository = null;
+
 		for (LocalGitBranch localGitBranch : localGitBranches) {
 			sb.append(" ");
 
 			sb.append(localGitBranch.getName());
+
+			if (localGitRepository == null) {
+				localGitRepository = localGitBranch.getLocalGitRepository();
+			}
+			else {
+				if (localGitRepository !=
+						localGitBranch.getLocalGitRepository()) {
+
+					throw new IllegalArgumentException(
+						"All branches must be in the same local Git " +
+							"repository");
+				}
+			}
 		}
 
 		GitUtil.ExecutionResult executionResult = null;

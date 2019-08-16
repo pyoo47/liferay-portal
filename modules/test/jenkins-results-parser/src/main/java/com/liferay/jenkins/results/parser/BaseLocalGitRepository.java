@@ -15,6 +15,7 @@
 package com.liferay.jenkins.results.parser;
 
 import java.io.File;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +62,30 @@ public abstract class BaseLocalGitRepository
 	}
 
 	@Override
+	public void checkout(LocalGitBranch localGitBranch, String options) {
+		GitUtil.checkout(localGitBranch, options);
+	}
+
+	@Override
+	public LocalGitBranch checkoutUpstreamLocalGitBranch() {
+		LocalGitBranch currentLocalGitBranch = getCurrentLocalGitBranch();
+
+		if (!Objects.equals(
+				currentLocalGitBranch.getName(), getUpstreamBranchName())) {
+
+			LocalGitBranch upstreamLocalGitBranch = getLocalGitBranch(
+				getUpstreamBranchName());
+
+			checkout(upstreamLocalGitBranch, null);
+
+			return upstreamLocalGitBranch;
+		}
+
+		throw new RuntimeException(
+			"Unable to checkout upstream local Git branch");
+	}
+
+	@Override
 	public boolean deleteLocalGitBranch(LocalGitBranch localGitBranch) {
 		return deleteLocalGitBranches(Arrays.asList(localGitBranch));
 	}
@@ -69,7 +94,7 @@ public abstract class BaseLocalGitRepository
 	public boolean deleteLocalGitBranches(
 		List<LocalGitBranch> localGitBranches) {
 
-		return GitUtil.deleteLocalGitBranches(localGitBranches, this);
+		return GitUtil.deleteLocalGitBranches(localGitBranches);
 	}
 
 	@Override
@@ -111,6 +136,27 @@ public abstract class BaseLocalGitRepository
 	@Override
 	public File getDirectory() {
 		return getFile("directory");
+	}
+
+	@Override
+	public File getDotGitDirectory() {
+		File dotGitFile = new File(getDirectory(), ".git");
+
+		if (dotGitFile.isDirectory()) {
+			return dotGitFile;
+		}
+
+		try {
+			String dotGitFileContents = JenkinsResultsParserUtil.read(
+				dotGitFile);
+
+			return new File(
+				dotGitFileContents.replaceAll("gitdir:\\s*([\\s]+)", "$1"));
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				"Unable to get repository .git directory", ioe);
+		}
 	}
 
 	@Override
