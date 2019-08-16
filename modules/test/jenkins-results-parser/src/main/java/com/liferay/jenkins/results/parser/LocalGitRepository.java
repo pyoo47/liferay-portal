@@ -35,6 +35,12 @@ public interface LocalGitRepository extends GitRepository {
 
 	public LocalGitBranch checkoutUpstreamLocalGitBranch();
 
+	public LocalGitBranch createLocalGitBranch(
+		String localGitBranchName, boolean force);
+
+	public LocalGitBranch createLocalGitBranch(
+		String localGitBranchName, boolean force, String startPoint);
+
 	public boolean deleteLocalGitBranch(LocalGitBranch localGitBranch);
 
 	public boolean deleteLocalGitBranches(

@@ -86,6 +86,21 @@ public abstract class BaseLocalGitRepository
 	}
 
 	@Override
+	public LocalGitBranch createLocalGitBranch(
+		String localGitBranchName, boolean force) {
+
+		return createLocalGitBranch(localGitBranchName, force, null);
+	}
+
+	@Override
+	public LocalGitBranch createLocalGitBranch(
+		String localGitBranchName, boolean force, String startPoint) {
+
+		return GitUtil.createLocalGitBranch(
+			localGitBranchName, this, force, startPoint);
+	}
+
+	@Override
 	public boolean deleteLocalGitBranch(LocalGitBranch localGitBranch) {
 		return deleteLocalGitBranches(Arrays.asList(localGitBranch));
 	}
