@@ -87,6 +87,16 @@ public abstract class BaseLocalGitRepository
 	}
 
 	@Override
+	public void cherryPick(LocalGitCommit localGitCommit) {
+		GitUtil.cherryPick(localGitCommit);
+	}
+
+	@Override
+	public void clean() {
+		GitUtil.clean(this);
+	}
+
+	@Override
 	public void configure(Map<String, String> configMap, String options) {
 		GitUtil.configure(configMap, this, options);
 	}

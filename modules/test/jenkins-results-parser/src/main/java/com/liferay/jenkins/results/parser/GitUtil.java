@@ -148,6 +148,34 @@ public class GitUtil {
 		}
 	}
 
+	public static void cherryPick(LocalGitCommit localGitCommit) {
+		ExecutionResult executionResult = executeBashCommands(
+			localGitCommit.getLocalGitRepository(), RETRIES_SIZE_MAX,
+			MILLIS_RETRY_DELAY, MILLIS_TIMEOUT,
+			JenkinsResultsParserUtil.combine(
+				"git cherry-pick ", localGitCommit.getSHA()));
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to cherry pick commit ", localGitCommit.getSHA(),
+					"\n", executionResult.getStandardError()));
+		}
+	}
+
+	public static void clean(LocalGitRepository localGitRepository) {
+		ExecutionResult executionResult = executeBashCommands(
+			localGitRepository, RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY,
+			1000 * 60 * 10, "git clean -dfx");
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to clean Git repository\n",
+					executionResult.getStandardError()));
+		}
+	}
+
 	public static void clone(String remoteURL, File workingDirectory) {
 		String command = JenkinsResultsParserUtil.combine(
 			"git clone ", remoteURL, " ",

@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,35 +40,6 @@ import org.json.JSONObject;
  * @author Peter Yoo
  */
 public class GitWorkingDirectory {
-
-	public void cherryPick(LocalGitCommit localGitCommit) {
-		String cherryPickCommand = JenkinsResultsParserUtil.combine(
-			"git cherry-pick " + localGitCommit.getSHA());
-
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			GitUtil.MILLIS_TIMEOUT, cherryPickCommand);
-
-		if (executionResult.getExitValue() != 0) {
-			throw new RuntimeException(
-				JenkinsResultsParserUtil.combine(
-					"Unable to cherry pick commit ", localGitCommit.getSHA(),
-					"\n", executionResult.getStandardError()));
-		}
-	}
-
-	public void clean() {
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			1000 * 60 * 10, "git clean -dfx");
-
-		if (executionResult.getExitValue() != 0) {
-			throw new RuntimeException(
-				JenkinsResultsParserUtil.combine(
-					"Unable to clean Git repository\n",
-					executionResult.getStandardError()));
-		}
-	}
 
 	public void cleanTempBranches() {
 		checkoutUpstreamLocalGitBranch();
@@ -1607,24 +1577,6 @@ public class GitWorkingDirectory {
 		}
 
 		return shortNames;
-	}
-
-	protected void waitForIndexLock() {
-		int retries = 0;
-
-		File file = new File(_gitDirectory, "index.lock");
-
-		while (file.exists()) {
-			System.out.println("Waiting for index.lock to be cleared.");
-
-			JenkinsResultsParserUtil.sleep(5000);
-
-			retries++;
-
-			if (retries >= 24) {
-				file.delete();
-			}
-		}
 	}
 
 	private static List<String> _getBuildPropertyAsList(String key) {

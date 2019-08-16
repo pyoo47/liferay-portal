@@ -35,6 +35,10 @@ public interface LocalGitRepository extends GitRepository {
 
 	public LocalGitBranch checkoutUpstreamLocalGitBranch();
 
+	public void cherryPick(LocalGitCommit localGitCommit);
+
+	public void clean();
+
 	public void configure(Map<String, String> configMap, String options);
 
 	public void configure(
