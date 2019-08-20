@@ -63,38 +63,6 @@ public class GitWorkingDirectory {
 		}
 	}
 
-	public void commitFileToCurrentBranch(String fileName, String message) {
-		String commitCommand = JenkinsResultsParserUtil.combine(
-			"git commit -m \"", message, "\" ", fileName);
-
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			GitUtil.MILLIS_TIMEOUT, commitCommand);
-
-		if (executionResult.getExitValue() != 0) {
-			throw new RuntimeException(
-				JenkinsResultsParserUtil.combine(
-					"Unable to commit file ", fileName, "\n",
-					executionResult.getStandardError()));
-		}
-	}
-
-	public void commitStagedFilesToCurrentBranch(String message) {
-		String commitCommand = JenkinsResultsParserUtil.combine(
-			"git commit -m \"", message, "\" ");
-
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			GitUtil.MILLIS_TIMEOUT, commitCommand);
-
-		if (executionResult.getExitValue() != 0) {
-			throw new RuntimeException(
-				JenkinsResultsParserUtil.combine(
-					"Unable to commit staged files", "\n",
-					executionResult.getStandardError()));
-		}
-	}
-
 	public String createPullRequest(
 			String body, String pullRequestBranchName, String receiverUserName,
 			String senderUserName, String title)
@@ -1121,22 +1089,6 @@ public class GitWorkingDirectory {
 		return false;
 	}
 
-	public List<LocalGitCommit> log(int num) {
-		return _log(0, num, null, null);
-	}
-
-	public List<LocalGitCommit> log(int num, File file) {
-		return _log(0, num, file, null);
-	}
-
-	public List<LocalGitCommit> log(int start, int num) {
-		return _log(start, num, null, null);
-	}
-
-	public List<LocalGitCommit> log(int start, int num, String sha) {
-		return _log(start, num, null, sha);
-	}
-
 	public RemoteGitBranch pushToRemoteGitRepository(
 		boolean force, LocalGitBranch localGitBranch,
 		String remoteGitBranchName, GitRemote gitRemote) {
@@ -1448,22 +1400,6 @@ public class GitWorkingDirectory {
 		return toShortNameList(Arrays.asList(standardOut.split("\n")));
 	}
 
-	protected LocalGitCommit getLocalGitCommit(String gitLogEntity) {
-		Matcher matcher = _gitLogEntityPattern.matcher(gitLogEntity);
-
-		if (!matcher.matches()) {
-			throw new IllegalArgumentException("Unable to find Git SHA");
-		}
-
-		int unixTimestamp = Integer.valueOf(matcher.group("commitTime"));
-
-		long epochTimestamp = (long)unixTimestamp * 1000;
-
-		return GitCommitFactory.newLocalGitCommit(
-			this, matcher.group("message"), matcher.group("sha"),
-			epochTimestamp);
-	}
-
 	protected List<File> getSubdirectoriesContainingFiles(
 		int depth, List<File> files, File rootDirectory) {
 
@@ -1753,69 +1689,6 @@ public class GitWorkingDirectory {
 		return sb.toString();
 	}
 
-	private List<LocalGitCommit> _log(
-		int start, int num, File file, String sha) {
-
-		List<LocalGitCommit> localGitCommits = new ArrayList<>(num);
-
-		String gitLog = _log(start, num, file, "%H %ct %s", sha);
-
-		gitLog = gitLog.replaceAll("Finished executing Bash commands.", "");
-
-		String[] gitLogEntities = gitLog.split("\n");
-
-		for (String gitLogEntity : gitLogEntities) {
-			localGitCommits.add(getLocalGitCommit(gitLogEntity));
-		}
-
-		return localGitCommits;
-	}
-
-	private String _log(
-		int start, int num, File file, String format, String sha) {
-
-		if ((sha == null) || sha.isEmpty()) {
-			sha = "HEAD";
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("git log ");
-
-		if (file != null) {
-			sb.append("-n ");
-			sb.append(num);
-			sb.append(" ");
-		}
-		else {
-			sb.append(sha);
-			sb.append("~");
-			sb.append(start + num);
-			sb.append("..");
-			sb.append(sha);
-			sb.append("~");
-			sb.append(start);
-		}
-
-		sb.append(" --pretty=format:'");
-		sb.append(format);
-		sb.append("'");
-
-		if (file != null) {
-			sb.append(" ");
-			sb.append(JenkinsResultsParserUtil.getCanonicalPath(file));
-		}
-
-		GitUtil.ExecutionResult result = executeBashCommands(
-			5, 1000, 30 * 1000, sb.toString());
-
-		if (result.getExitValue() != 0) {
-			throw new RuntimeException("Unable to run: git log");
-		}
-
-		return result.getStandardOut();
-	}
-
 	private String _status() {
 		String command = "git status";
 
@@ -1834,10 +1707,6 @@ public class GitWorkingDirectory {
 
 	private static final Pattern _badRefPattern = Pattern.compile(
 		"fatal: bad object (?<badRef>.+/HEAD)");
-	private static final Pattern _gitDirectoryPathPattern = Pattern.compile(
-		"gitdir\\: (.*)\\s*");
-	private static final Pattern _gitLogEntityPattern = Pattern.compile(
-		"(?<sha>[0-9a-f]{40}) (?<commitTime>\\d+) (?<message>.*)");
 	private static final List<String> _privateOnlyGitRepositoryNames =
 		_getBuildPropertyAsList(
 			"git.working.directory.private.only.repository.names");
@@ -1846,9 +1715,7 @@ public class GitWorkingDirectory {
 			"git.working.directory.public.only.repository.names");
 
 	private File _gitDirectory;
-	private final Map<String, GitRemote> _gitRemotes = new HashMap<>();
 	private final String _gitRepositoryName;
-	private final String _gitRepositoryUsername;
 	private Set<String> _javaDirPaths;
 	private final String _upstreamBranchName;
 	private File _workingDirectory;

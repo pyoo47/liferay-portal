@@ -97,6 +97,14 @@ public abstract class BaseLocalGitRepository
 	}
 
 	@Override
+	public LocalGitCommit commitFileToCurrentBranch(
+		String fileName, String message) {
+
+		return GitUtil.commitToBranch(
+			fileName, getCurrentLocalGitBranch(), message);
+	}
+
+	@Override
 	public void configure(Map<String, String> configMap, String options) {
 		GitUtil.configure(configMap, this, options);
 	}
@@ -300,6 +308,16 @@ public abstract class BaseLocalGitRepository
 			getUpstreamBranchName());
 
 		return hash.hashCode();
+	}
+
+	@Override
+	public List<LocalGitCommit> log(File file, Integer size) {
+		return GitUtil.log(file, this, size);
+	}
+
+	@Override
+	public List<LocalGitCommit> log(Integer size) {
+		return log(null, size);
 	}
 
 	@Override

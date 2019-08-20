@@ -207,6 +207,42 @@ public class GitUtil {
 		}
 	}
 
+	public static LocalGitCommit commitToBranch(
+		String fileName, LocalGitBranch localGitBranch, String message) {
+
+		LocalGitRepository localGitRepository =
+			localGitBranch.getLocalGitRepository();
+
+		LocalGitBranch currentGitBranch =
+			localGitRepository.getCurrentLocalGitBranch();
+
+		if (!currentGitBranch.equals(localGitBranch)) {
+			checkout(localGitBranch, null);
+		}
+
+		String commitCommand = JenkinsResultsParserUtil.combine(
+			"git commit -m \"", message, "\"");
+
+		if ((fileName != null) && !fileName.isEmpty()) {
+			commitCommand += " " + fileName;
+		}
+
+		GitUtil.ExecutionResult executionResult = executeBashCommands(
+			localGitBranch.getLocalGitRepository(), RETRIES_SIZE_MAX,
+			MILLIS_RETRY_DELAY, MILLIS_TIMEOUT, commitCommand);
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to commit file ", fileName, "\n",
+					executionResult.getStandardError()));
+		}
+
+		List<LocalGitCommit> localGitCommits = log(null, localGitRepository, 1);
+
+		return localGitCommits.get(0);
+	}
+
 	public static void configure(
 		Map<String, String> configMap, LocalGitRepository localGitRepository,
 		String options) {
@@ -656,6 +692,42 @@ public class GitUtil {
 		return false;
 	}
 
+	public static List<LocalGitCommit> log(
+		File file, LocalGitRepository localGitRepository, Integer size) {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("git log --date=raw --pretty=format:\"%H%n%ct%n%B%n---\" -");
+		sb.append(size);
+		sb.append(" ");
+
+		if (file == null) {
+			sb.append("HEAD");
+		}
+		else {
+			sb.append(file.getPath());
+		}
+
+		ExecutionResult executionResult = executeBashCommands(
+			localGitRepository, RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY,
+			MILLIS_TIMEOUT, sb.toString());
+
+		Matcher matcher = _commitLinePattern.matcher(
+			executionResult.getStandardOut());
+
+		List<LocalGitCommit> localGitCommits = new ArrayList<>(size);
+
+		while (matcher.find()) {
+			localGitCommits.add(
+				GitCommitFactory.newLocalGitCommit(
+					localGitRepository, matcher.group("message"),
+					matcher.group("sha"),
+					Long.parseLong(matcher.group("timestamp")) * 1000));
+		}
+
+		return localGitCommits;
+	}
+
 	public static void removeGitRemote(GitRemote gitRemote) {
 		if (gitRemote == null) {
 			return;
@@ -1030,6 +1102,10 @@ public class GitUtil {
 	private static final String _HOSTNAME_GITHUB_CACHE_PROXY =
 		"github-dev.liferay.com";
 
+	private static final Pattern _commitLinePattern = Pattern.compile(
+		"(?<sha>[^\\s]+)\\s+(?<timestamp>\\d+)\\s+(?<message>.*?)" +
+			"\\s*---\\s*",
+		Pattern.DOTALL);
 	private static final Pattern _gitHubRefURLPattern = Pattern.compile(
 		JenkinsResultsParserUtil.combine(
 			"https://github.com/(?<username>[^/]+)/",

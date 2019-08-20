@@ -39,6 +39,9 @@ public interface LocalGitRepository extends GitRepository {
 
 	public void clean();
 
+	public LocalGitCommit commitFileToCurrentBranch(
+		String fileName, String message);
+
 	public void configure(Map<String, String> configMap, String options);
 
 	public void configure(
@@ -77,6 +80,10 @@ public interface LocalGitRepository extends GitRepository {
 	public GitRemote getUpstreamGitRemote();
 
 	public boolean gitRemoteExists(String gitRemoteName);
+
+	public List<LocalGitCommit> log(File file, Integer size);
+
+	public List<LocalGitCommit> log(Integer size);
 
 	public void removeGitRemote(GitRemote gitRemote, boolean write);
 
