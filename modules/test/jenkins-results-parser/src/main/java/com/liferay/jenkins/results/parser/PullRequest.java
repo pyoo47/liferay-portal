@@ -67,10 +67,13 @@ public class PullRequest {
 			throw new RuntimeException("Invalid GitHub URL " + gitHubURL);
 		}
 
-		_gitHubRemoteGitRepositoryName = matcher.group(
-			"gitHubRemoteGitRepositoryName");
 		_number = Integer.parseInt(matcher.group("number"));
-		_ownerUsername = matcher.group("owner");
+		_gitHubRemoteGitRepository =
+			(GitHubRemoteGitRepository)
+				GitRepositoryFactory.getRemoteGitRepository(
+					"github.com",
+					matcher.group("gitHubRemoteGitRepositoryName"),
+					matcher.group("owner"));
 
 		refresh();
 	}
@@ -114,7 +117,8 @@ public class PullRequest {
 			System.out.println(
 				JenkinsResultsParserUtil.combine(
 					"GitHubRemoteGitRepository.Label ", label.getName(),
-					" does not exist in ", getGitHubRemoteGitRepositoryName()));
+					" does not exist in ",
+					_gitHubRemoteGitRepository.getName()));
 
 			return false;
 		}
@@ -124,7 +128,8 @@ public class PullRequest {
 		jsonArray.put(label.getName());
 
 		String gitHubApiUrl = JenkinsResultsParserUtil.getGitHubApiUrl(
-			getGitHubRemoteGitRepositoryName(), getOwnerUsername(),
+			gitHubRemoteGitRepository.getName(),
+			_gitHubRemoteGitRepository.getUsername(),
 			"issues/" + getNumber() + "/labels");
 
 		try {
@@ -159,7 +164,8 @@ public class PullRequest {
 		List<Comment> comments = new ArrayList<>();
 
 		String gitHubApiUrl = JenkinsResultsParserUtil.getGitHubApiUrl(
-			getGitHubRemoteGitRepositoryName(), getOwnerUsername(),
+			_gitHubRemoteGitRepository.getName(),
+			_gitHubRemoteGitRepository.getUsername(),
 			"issues/" + getNumber() + "/comments?page=");
 
 		int page = 1;
@@ -190,28 +196,12 @@ public class PullRequest {
 
 	public GitHubRemoteGitCommit getGitHubRemoteGitCommit() {
 		return GitCommitFactory.newGitHubRemoteGitCommit(
-			getOwnerUsername(), getGitHubRemoteGitRepositoryName(),
-			getSenderSHA());
+			_gitHubRemoteGitRepository.getUsername(),
+			_gitHubRemoteGitRepository, getSenderSHA());
 	}
 
 	public GitHubRemoteGitRepository getGitHubRemoteGitRepository() {
-		if (_gitHubRemoteGitRepository == null) {
-			_gitHubRemoteGitRepository =
-				(GitHubRemoteGitRepository)
-					GitRepositoryFactory.getRemoteGitRepository(
-						"github.com", _gitHubRemoteGitRepositoryName,
-						getOwnerUsername());
-		}
-
 		return _gitHubRemoteGitRepository;
-	}
-
-	public String getGitHubRemoteGitRepositoryName() {
-		return _gitHubRemoteGitRepositoryName;
-	}
-
-	public String getGitRepositoryName() {
-		return getGitHubRemoteGitRepositoryName();
 	}
 
 	public String getHtmlURL() {
@@ -240,7 +230,7 @@ public class PullRequest {
 		if (_liferayRemoteGitBranch == null) {
 			_liferayRemoteGitBranch = GitUtil.getRemoteGitBranch(
 				getUpstreamBranchName(), new File("."),
-				"git@github.com:liferay/" + getGitRepositoryName());
+				_gitHubRemoteGitRepository.getRemoteURL());
 		}
 
 		return _liferayRemoteGitBranch;
@@ -253,10 +243,6 @@ public class PullRequest {
 
 	public String getNumber() {
 		return String.valueOf(_number);
-	}
-
-	public String getOwnerUsername() {
-		return _ownerUsername;
 	}
 
 	public String getReceiverUsername() {
@@ -276,7 +262,7 @@ public class PullRequest {
 	public String getSenderRemoteURL() {
 		return JenkinsResultsParserUtil.combine(
 			"git@github.com:", getSenderUsername(), "/",
-			getGitHubRemoteGitRepositoryName());
+			_gitHubRemoteGitRepository.getName());
 	}
 
 	public String getSenderSHA() {
@@ -315,7 +301,8 @@ public class PullRequest {
 
 	public String getURL() {
 		return JenkinsResultsParserUtil.getGitHubApiUrl(
-			_gitHubRemoteGitRepositoryName, _ownerUsername, "pulls/" + _number);
+			_gitHubRemoteGitRepository.getName(),
+			_gitHubRemoteGitRepository.getUsername(), "pulls/" + _number);
 	}
 
 	public boolean hasLabel(String labelName) {
@@ -403,7 +390,8 @@ public class PullRequest {
 			"issues/", getNumber(), "/labels/", labelName);
 
 		String gitHubApiUrl = JenkinsResultsParserUtil.getGitHubApiUrl(
-			getGitHubRemoteGitRepositoryName(), getOwnerUsername(), path);
+			_gitHubRemoteGitRepository.getName(),
+			_gitHubRemoteGitRepository.getUsername(), path);
 
 		try {
 			JenkinsResultsParserUtil.toString(
@@ -655,13 +643,11 @@ public class PullRequest {
 
 	private Boolean _autoCloseCommentAvailable;
 	private GitHubRemoteGitRepository _gitHubRemoteGitRepository;
-	private String _gitHubRemoteGitRepositoryName;
 	private JSONObject _jsonObject;
 	private final List<GitHubRemoteGitRepository.Label> _labels =
 		new ArrayList<>();
 	private RemoteGitBranch _liferayRemoteGitBranch;
 	private Integer _number;
-	private String _ownerUsername;
 	private final String _testSuiteName;
 	private TestSuiteStatus _testSuiteStatus = TestSuiteStatus.MISSING;
 
