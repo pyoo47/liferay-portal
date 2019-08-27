@@ -30,7 +30,7 @@ public interface GitCommit {
 
 	public Date getCommitDate();
 
-	public LocalGitRepository getLocalGitRepository();
+	public GitRepository getGitRepository();
 
 	public String getMessage();
 

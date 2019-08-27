@@ -150,8 +150,8 @@ public class GitUtil {
 
 	public static void cherryPick(LocalGitCommit localGitCommit) {
 		ExecutionResult executionResult = executeBashCommands(
-			localGitCommit.getLocalGitRepository(), RETRIES_SIZE_MAX,
-			MILLIS_RETRY_DELAY, MILLIS_TIMEOUT,
+			(LocalGitRepository)localGitCommit.getGitRepository(),
+			RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY, MILLIS_TIMEOUT,
 			JenkinsResultsParserUtil.combine(
 				"git cherry-pick ", localGitCommit.getSHA()));
 

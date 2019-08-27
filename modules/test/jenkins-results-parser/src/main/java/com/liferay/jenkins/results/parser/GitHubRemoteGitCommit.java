@@ -26,11 +26,12 @@ import org.json.JSONObject;
 public class GitHubRemoteGitCommit extends BaseGitCommit {
 
 	public String getGitHubCommitURL() {
-		LocalGitRepository localGitRepository = getLocalGitRepository();
+		RemoteGitRepository remoteGitRepository =
+			(RemoteGitRepository)getGitRepository();
 
 		return JenkinsResultsParserUtil.combine(
-			"https://github.com/", _gitHubUsername, "/",
-			localGitRepository.getName(), "/commit/", getSHA());
+			"https://github.com/", remoteGitRepository.getUsername(), "/",
+			remoteGitRepository.getName(), "/commit/", getSHA());
 	}
 
 	public void setStatus(
@@ -68,20 +69,19 @@ public class GitHubRemoteGitCommit extends BaseGitCommit {
 	}
 
 	protected GitHubRemoteGitCommit(
-		String gitHubUsername, LocalGitRepository localGitRepository,
+		String gitHubUsername, RemoteGitRepository remoteGitRepository,
 		String message, String sha, Type type, long commitTime) {
 
-		super(localGitRepository, message, sha, type, commitTime);
+		super(remoteGitRepository, message, sha, type, commitTime);
 
 		_gitHubUsername = gitHubUsername;
 	}
 
 	protected String getGitHubStatusURL() {
-		LocalGitRepository localGitRepository = getLocalGitRepository();
+		GitRepository gitRepository = getGitRepository();
 
 		return JenkinsResultsParserUtil.getGitHubApiUrl(
-			localGitRepository.getName(), _gitHubUsername,
-			"statuses/" + getSHA());
+			gitRepository.getName(), _gitHubUsername, "statuses/" + getSHA());
 	}
 
 	private final String _gitHubUsername;

@@ -52,8 +52,8 @@ public abstract class BaseGitCommit implements GitCommit {
 	}
 
 	@Override
-	public LocalGitRepository getLocalGitRepository() {
-		return _localGitRepository;
+	public GitRepository getGitRepository() {
+		return _gitRepository;
 	}
 
 	@Override
@@ -92,10 +92,10 @@ public abstract class BaseGitCommit implements GitCommit {
 	}
 
 	protected BaseGitCommit(
-		LocalGitRepository localGitRepository, String message, String sha,
+		GitRepository gitRepository, String message, String sha,
 		GitCommit.Type type, long commitTime) {
 
-		_localGitRepository = localGitRepository;
+		_gitRepository = gitRepository;
 		_message = message;
 		_sha = sha;
 		_type = type;
@@ -103,7 +103,7 @@ public abstract class BaseGitCommit implements GitCommit {
 	}
 
 	private final long _commitTime;
-	private final LocalGitRepository _localGitRepository;
+	private final GitRepository _gitRepository;
 	private final String _message;
 	private final String _sha;
 	private final GitCommit.Type _type;
