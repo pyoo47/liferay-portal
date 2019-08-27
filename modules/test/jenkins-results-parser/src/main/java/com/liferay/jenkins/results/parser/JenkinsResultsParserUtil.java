@@ -788,6 +788,10 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getCohortName() {
+		if (!isCINode()) {
+			return null;
+		}
+
 		String jenkinsURL = System.getenv("JENKINS_URL");
 
 		return getCohortName(jenkinsURL);
