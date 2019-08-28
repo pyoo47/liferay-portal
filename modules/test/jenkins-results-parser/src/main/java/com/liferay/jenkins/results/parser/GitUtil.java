@@ -31,6 +31,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
+
 /**
  * @author Peter Yoo
  */
@@ -756,6 +758,46 @@ public class GitUtil {
 					"Unable to remove Git remote ", gitRemoteName, "\n",
 					executionResult.getStandardError()));
 		}
+	}
+
+	public static PullRequest sendPullRequest(
+			String body, RemoteGitBranch recipientRemoteGitBranch,
+			RemoteGitBranch senderRemoteGitBranch, String title)
+		throws IOException {
+
+		JSONObject requestJSONObject = new JSONObject();
+
+		requestJSONObject.put("base", recipientRemoteGitBranch.getName());
+		requestJSONObject.put("body", body);
+
+		RemoteGitRepository senderRemoteGitRepository =
+			senderRemoteGitBranch.getRemoteGitRepository();
+
+		requestJSONObject.put(
+			"head",
+			JenkinsResultsParserUtil.combine(
+				senderRemoteGitRepository.getUsername(), ":",
+				senderRemoteGitBranch.getName()));
+
+		requestJSONObject.put("title", title);
+
+		RemoteGitRepository recipientRemoteGitRepository =
+			recipientRemoteGitBranch.getRemoteGitRepository();
+
+		String url = JenkinsResultsParserUtil.getGitHubApiUrl(
+			recipientRemoteGitRepository.getName(),
+			recipientRemoteGitRepository.getUsername(), "pulls");
+
+		JSONObject responseJSONObject = JenkinsResultsParserUtil.toJSONObject(
+			url, requestJSONObject.toString());
+
+		PullRequest pullRequest = new PullRequest(
+			responseJSONObject.getString("html_url"));
+
+		System.out.println(
+			"Created a pull request at " + pullRequest.getHtmlURL());
+
+		return pullRequest;
 	}
 
 	public static String toSlaveGitHubDevNodeRemoteURL(

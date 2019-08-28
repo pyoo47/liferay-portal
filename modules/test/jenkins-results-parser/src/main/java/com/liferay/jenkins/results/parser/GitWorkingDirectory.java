@@ -63,32 +63,6 @@ public class GitWorkingDirectory {
 		}
 	}
 
-	public String createPullRequest(
-			String body, String pullRequestBranchName, String receiverUserName,
-			String senderUserName, String title)
-		throws IOException {
-
-		JSONObject requestJSONObject = new JSONObject();
-
-		requestJSONObject.put("base", _upstreamBranchName);
-		requestJSONObject.put("body", body);
-		requestJSONObject.put(
-			"head", senderUserName + ":" + pullRequestBranchName);
-		requestJSONObject.put("title", title);
-
-		String url = JenkinsResultsParserUtil.getGitHubApiUrl(
-			_gitRepositoryName, receiverUserName, "pulls");
-
-		JSONObject responseJSONObject = JenkinsResultsParserUtil.toJSONObject(
-			url, requestJSONObject.toString());
-
-		String pullRequestURL = responseJSONObject.getString("html_url");
-
-		System.out.println("Created a pull request at " + pullRequestURL);
-
-		return pullRequestURL;
-	}
-
 	public void deleteRemoteGitBranch(RemoteGitBranch remoteGitBranch) {
 		deleteRemoteGitBranches(Arrays.asList(remoteGitBranch));
 	}
