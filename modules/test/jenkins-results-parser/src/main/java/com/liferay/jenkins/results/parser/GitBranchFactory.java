@@ -30,10 +30,10 @@ public class GitBranchFactory {
 		String type) {
 
 		if (type.equals("heads")) {
-			return new RemoteGitBranch(remoteGitRepository, name, sha);
+			return new RemoteGitBranch(name, remoteGitRepository, sha);
 		}
 
-		return new RemoteGitRef(remoteGitRepository, name, sha);
+		return new RemoteGitRef(name, remoteGitRepository, sha);
 	}
 
 }

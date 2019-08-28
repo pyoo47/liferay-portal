@@ -20,8 +20,8 @@ package com.liferay.jenkins.results.parser;
 public abstract class BaseGitRef implements GitRef {
 
 	@Override
-	public LocalGitRepository getLocalGitRepository() {
-		return _localGitRepository;
+	public GitRepository getGitRepository() {
+		return _gitRepository;
 	}
 
 	@Override
@@ -35,9 +35,9 @@ public abstract class BaseGitRef implements GitRef {
 	}
 
 	protected BaseGitRef(
-		LocalGitRepository localGitRepository, String name, String sha) {
+		GitRepository gitRepository, String name, String sha) {
 
-		if (localGitRepository == null) {
+		if (gitRepository == null) {
 			throw new IllegalArgumentException("Local git repository is null");
 		}
 
@@ -53,12 +53,12 @@ public abstract class BaseGitRef implements GitRef {
 			throw new IllegalArgumentException("SHA is invalid");
 		}
 
-		_localGitRepository = localGitRepository;
+		_gitRepository = gitRepository;
 		_name = name;
 		_sha = sha;
 	}
 
-	private final LocalGitRepository _localGitRepository;
+	private final GitRepository _gitRepository;
 	private final String _name;
 	private final String _sha;
 

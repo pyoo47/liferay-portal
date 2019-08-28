@@ -28,14 +28,14 @@ public class RemoteGitRef
 	}
 
 	public RemoteGitRepository getRemoteGitRepository() {
-		return _remoteGitRepository;
+		return (RemoteGitRepository)getGitRepository();
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
-		RemoteGitRepository remoteGitRepository = getRemoteGitRepository();
+		RemoteGitRepository remoteGitRepository = (RemoteGitRepository)getGitRepository();
 
 		sb.append(remoteGitRepository.getRemoteURL());
 
@@ -49,18 +49,8 @@ public class RemoteGitRef
 	}
 
 	protected RemoteGitRef(
-		LocalGitRepository localGitRepository, String name,
-		RemoteGitRepository remoteGitRepository, String sha) {
+		String name, RemoteGitRepository remoteGitRepository, String sha) {
 
-		super(localGitRepository, name, sha);
-
-		if (remoteGitRepository == null) {
-			throw new IllegalArgumentException("Remote git repository is null");
-		}
-
-		_remoteGitRepository = remoteGitRepository;
+		super(remoteGitRepository, name, sha);
 	}
-
-	private final RemoteGitRepository _remoteGitRepository;
-
 }

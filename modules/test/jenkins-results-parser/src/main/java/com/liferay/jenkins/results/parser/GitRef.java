@@ -19,7 +19,7 @@ package com.liferay.jenkins.results.parser;
  */
 public interface GitRef {
 
-	public GitRepository getLocalGitRepository();
+	public GitRepository getGitRepository();
 
 	public String getName();
 

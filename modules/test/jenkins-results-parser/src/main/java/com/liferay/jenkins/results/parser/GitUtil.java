@@ -70,7 +70,7 @@ public class GitUtil {
 	}
 
 	public static void checkout(LocalGitBranch localGitBranch, String options) {
-		LocalGitRepository localGitRepository =
+		LocalGitRepository localGitRepository = 
 			localGitBranch.getLocalGitRepository();
 
 		localGitRepository.waitForIndexLock();
