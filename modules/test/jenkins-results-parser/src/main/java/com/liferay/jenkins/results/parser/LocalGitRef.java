@@ -17,7 +17,7 @@ package com.liferay.jenkins.results.parser;
 /**
  * @author Peter Yoo
  */
-public class LocalGitRef extends BaseGitRef {
+public abstract class LocalGitRef extends BaseGitRef {
 
 	public LocalGitRepository getLocalGitRepository() {
 		return (LocalGitRepository)getGitRepository();
@@ -25,7 +25,8 @@ public class LocalGitRef extends BaseGitRef {
 
 	@Override
 	public String toString() {
-		LocalGitRepository localGitRepository = (LocalGitRepository)getGitRepository();
+		LocalGitRepository localGitRepository =
+			(LocalGitRepository)getGitRepository();
 
 		StringBuilder sb = new StringBuilder();
 

@@ -70,7 +70,7 @@ public class GitUtil {
 	}
 
 	public static void checkout(LocalGitBranch localGitBranch, String options) {
-		LocalGitRepository localGitRepository = 
+		LocalGitRepository localGitRepository =
 			localGitBranch.getLocalGitRepository();
 
 		localGitRepository.waitForIndexLock();
@@ -337,6 +337,10 @@ public class GitUtil {
 		return getLocalGitBranch(localGitBranchName, localGitRepository);
 	}
 
+	public static boolean deleteLocalGitBranch(LocalGitBranch localGitBranch) {
+		return deleteLocalGitBranches(Lists.newArrayList(localGitBranch));
+	}
+
 	public static boolean deleteLocalGitBranches(
 		List<LocalGitBranch> localGitBranches) {
 
@@ -359,6 +363,85 @@ public class GitUtil {
 		}
 
 		return true;
+	}
+
+	public static boolean deleteRemoteGitRef(RemoteGitRef remoteGitRef) {
+		return deleteRemoteGitRefs(Lists.newArrayList(remoteGitRef));
+	}
+
+	public static boolean deleteRemoteGitRefs(
+		List<RemoteGitRef> remoteGitRefs) {
+
+		boolean result = true;
+
+		Map<RemoteGitRepository, List<RemoteGitRef>> remoteGitRefMap =
+			_groupByRemoteGitRepository(remoteGitRefs);
+
+		for (Map.Entry<RemoteGitRepository, List<RemoteGitRef>> entry :
+				remoteGitRefMap.entrySet()) {
+
+			RemoteGitRepository remoteGitRepository = entry.getKey();
+
+			for (List<RemoteGitRef> remoteGitRepositoryGitRefs :
+					Lists.partition(
+						entry.getValue(), _SIZE_REFS_DELETE_BATCH)) {
+
+				StringBuilder sb = new StringBuilder();
+
+				sb.append("git push --delete ");
+				sb.append(remoteGitRepository.getRemoteURL());
+
+				StringBuilder joinedBranchNamesStringBuilder =
+					new StringBuilder();
+
+				for (RemoteGitRef remoteGitRef : remoteGitRepositoryGitRefs) {
+					joinedBranchNamesStringBuilder.append(" ");
+					joinedBranchNamesStringBuilder.append(
+						remoteGitRef.getName());
+				}
+
+				sb.append(joinedBranchNamesStringBuilder);
+
+				GitUtil.ExecutionResult executionResult = null;
+
+				boolean exceptionThrown = false;
+
+				try {
+					executionResult = executeBashCommands(
+						null, RETRIES_SIZE_MAX, MILLIS_RETRY_DELAY,
+						1000 * 60 * 10, sb.toString());
+				}
+				catch (RuntimeException re) {
+					exceptionThrown = true;
+				}
+
+				String joinedBranchNames =
+					joinedBranchNamesStringBuilder.toString();
+
+				joinedBranchNames = joinedBranchNames.trim();
+
+				if (exceptionThrown || (executionResult.getExitValue() != 0)) {
+					System.out.println(
+						JenkinsResultsParserUtil.combine(
+							"Unable to delete ",
+							remoteGitRepository.getRemoteURL(),
+							" branches:\n    ",
+							joinedBranchNames.replaceAll("\\s", "\n    "), "\n",
+							executionResult.getStandardError()));
+
+					result = false;
+				}
+				else {
+					System.out.println(
+						JenkinsResultsParserUtil.combine(
+							"Deleted ", remoteGitRepository.getRemoteURL(),
+							" branches:", "\n    ",
+							joinedBranchNames.replaceAll("\\s", "\n    ")));
+				}
+			}
+		}
+
+		return result;
 	}
 
 	public static String getCurrentBranchName(
@@ -965,9 +1048,17 @@ public class GitUtil {
 		LocalGitRepository localGitRepository, int maxRetries, long retryDelay,
 		long timeout, String... commands) {
 
+		File workingDirectory = null;
+
+		if (localGitRepository == null) {
+			workingDirectory = new File(".");
+		}
+		else {
+			workingDirectory = localGitRepository.getDirectory();
+		}
+
 		return executeBashCommands(
-			maxRetries, retryDelay, timeout, localGitRepository.getDirectory(),
-			commands);
+			maxRetries, retryDelay, timeout, workingDirectory, commands);
 	}
 
 	protected static Map<String, GitRemote> getGitRemotes(
@@ -1141,8 +1232,35 @@ public class GitUtil {
 		return defaultBranchName;
 	}
 
+	private static Map<RemoteGitRepository, List<RemoteGitRef>>
+		_groupByRemoteGitRepository(List<RemoteGitRef> remoteGitRefs) {
+
+		Map<RemoteGitRepository, List<RemoteGitRef>> remoteGitRefMap =
+			new HashMap<>(remoteGitRefs.size());
+
+		for (RemoteGitRef remoteGitRef : remoteGitRefs) {
+			RemoteGitRepository remoteGitRepository =
+				remoteGitRef.getRemoteGitRepository();
+
+			if (!remoteGitRefMap.containsKey(remoteGitRepository)) {
+				remoteGitRefMap.put(remoteGitRepository, new ArrayList<>());
+			}
+
+			List<RemoteGitRef> remoteGitRepositoryRefs = remoteGitRefMap.get(
+				remoteGitRepository);
+
+			remoteGitRepositoryRefs.add(remoteGitRef);
+
+			remoteGitRefMap.put(remoteGitRepository, remoteGitRepositoryRefs);
+		}
+
+		return remoteGitRefMap;
+	}
+
 	private static final String _HOSTNAME_GITHUB_CACHE_PROXY =
 		"github-dev.liferay.com";
+
+	private static final int _SIZE_REFS_DELETE_BATCH = 5;
 
 	private static final Pattern _commitLinePattern = Pattern.compile(
 		"(?<sha>[^\\s]+)\\s+(?<timestamp>\\d+)\\s+(?<message>.*?)" +

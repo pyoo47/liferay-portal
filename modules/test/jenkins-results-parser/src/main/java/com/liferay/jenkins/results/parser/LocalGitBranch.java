@@ -19,6 +19,11 @@ package com.liferay.jenkins.results.parser;
  */
 public class LocalGitBranch extends LocalGitRef {
 
+	@Override
+	public void delete() {
+		GitUtil.deleteLocalGitBranch(this);
+	}
+
 	protected LocalGitBranch(
 		LocalGitRepository localGitRepository, String name, String sha) {
 

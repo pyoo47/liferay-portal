@@ -17,7 +17,7 @@ package com.liferay.jenkins.results.parser;
 /**
  * @author Michael Hashimoto
  */
-public class RemoteGitRef
+public abstract class RemoteGitRef
 	extends BaseGitRef implements Comparable<RemoteGitRef> {
 
 	@Override
@@ -25,6 +25,11 @@ public class RemoteGitRef
 		String name = getName();
 
 		return name.compareTo(o.getName());
+	}
+
+	@Override
+	public void delete() {
+		GitUtil.deleteRemoteGitRef(this);
 	}
 
 	public RemoteGitRepository getRemoteGitRepository() {
@@ -35,7 +40,8 @@ public class RemoteGitRef
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
-		RemoteGitRepository remoteGitRepository = (RemoteGitRepository)getGitRepository();
+		RemoteGitRepository remoteGitRepository =
+			(RemoteGitRepository)getGitRepository();
 
 		sb.append(remoteGitRepository.getRemoteURL());
 
@@ -53,4 +59,5 @@ public class RemoteGitRef
 
 		super(remoteGitRepository, name, sha);
 	}
+
 }

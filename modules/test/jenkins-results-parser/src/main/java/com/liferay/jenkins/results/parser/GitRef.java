@@ -19,6 +19,8 @@ package com.liferay.jenkins.results.parser;
  */
 public interface GitRef {
 
+	public void delete();
+
 	public GitRepository getGitRepository();
 
 	public String getName();

@@ -34,9 +34,7 @@ public abstract class BaseGitRef implements GitRef {
 		return _sha;
 	}
 
-	protected BaseGitRef(
-		GitRepository gitRepository, String name, String sha) {
-
+	protected BaseGitRef(GitRepository gitRepository, String name, String sha) {
 		if (gitRepository == null) {
 			throw new IllegalArgumentException("Local git repository is null");
 		}
