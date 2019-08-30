@@ -119,8 +119,7 @@ public class LiferayCIGitRepositoriesInitializerUtil {
 				k8sNodeReadWriteResourceMonitor.getNewConnectionName();
 
 			try {
-				k8sNodeReadWriteResourceMonitor.waitWrite(
-					k8sNodeConnectionName);
+				k8sNodeReadWriteResourceMonitor.wait(k8sNodeConnectionName);
 
 				gitRepositoryArchivesDirResourceMonitor.wait(
 					gitRepositoryConnectionKey);
@@ -138,13 +137,11 @@ public class LiferayCIGitRepositoriesInitializerUtil {
 				gitRepositoryArchivesDirResourceMonitor.signal(
 					gitRepositoryConnectionKey);
 
-				k8sNodeReadWriteResourceMonitor.signalWrite(
-					k8sNodeConnectionName);
+				k8sNodeReadWriteResourceMonitor.signal(k8sNodeConnectionName);
 			}
 
 			try {
-				k8sNodeReadWriteResourceMonitor.waitWrite(
-					k8sNodeConnectionName);
+				k8sNodeReadWriteResourceMonitor.wait(k8sNodeConnectionName);
 
 				TGZUtil.unarchive(
 					localGitRepositoryArchiveFile, gitRepositoriesBaseDir);
@@ -154,8 +151,7 @@ public class LiferayCIGitRepositoriesInitializerUtil {
 					"Unable to unarchive the repository archive file", ioe);
 			}
 			finally {
-				k8sNodeReadWriteResourceMonitor.signalWrite(
-					k8sNodeConnectionName);
+				k8sNodeReadWriteResourceMonitor.signal(k8sNodeConnectionName);
 
 				JenkinsResultsParserUtil.delete(localGitRepositoryArchiveFile);
 			}
