@@ -151,7 +151,9 @@ public class JobFactory {
 			return portalAcceptancePullRequestJob;
 		}
 
-		if (jobName.startsWith("test-portal-acceptance-upstream(")) {
+		if (jobName.startsWith("test-ce-acceptance-upstream(") ||
+			jobName.startsWith("test-portal-acceptance-upstream(")) {
+
 			_jobs.put(
 				jobName,
 				new PortalAcceptanceUpstreamJob(jobName, testSuiteName));
