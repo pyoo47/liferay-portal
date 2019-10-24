@@ -5761,6 +5761,12 @@ information. Make sure to commit in all build services results.
 
 		<echo>Executing baseline on ${module.base.dir}.</echo>
 
+		<move
+			file="${module.base.dir}/settings.gradle"
+			tofile="${module.base.dir}/settings.gradle.temp"
+			verbose="true"
+		/>
+
 		<trycatch property="failure.property">
 			<try>
 				<gradle-execute checktask="true" dir="${module.base.dir}" forcedcacheenabled="false" outputproperty="gradle.output" refreshdependencies="true" task="baseline" />
@@ -5771,6 +5777,12 @@ information. Make sure to commit in all build services results.
 				<fail message="${failure.property}" />
 			</catch>
 		</trycatch>
+
+		<move
+			file="${module.base.dir}/settings.gradle.temp"
+			tofile="${module.base.dir}/settings.gradle"
+			verbose="true"
+		/>
 
 		<echo>Checking for baseline log files.</echo>
 
