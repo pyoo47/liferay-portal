@@ -1445,7 +1445,7 @@ public class JenkinsResultsParserUtil {
 			throw new IllegalArgumentException("Collection is null or empty");
 		}
 
-		int randomIndex = getRandomValue(0, collection.size() - 1);
+		int randomIndex = getRandomValue(0, collection.size());
 
 		Iterator<String> iterator = collection.iterator();
 
