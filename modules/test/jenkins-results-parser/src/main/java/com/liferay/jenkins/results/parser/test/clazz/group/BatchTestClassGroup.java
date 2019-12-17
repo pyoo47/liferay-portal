@@ -359,6 +359,14 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 		return _getRequiredModuleDirs(moduleDirs, new ArrayList<>(moduleDirs));
 	}
 
+	protected boolean isDXPBuildProfile() {
+		if (buildProfile == null) {
+			return false;
+		}
+
+		return buildProfile.equals("dxp");
+	}
+
 	protected boolean isIntegrationUnitTestFileModifiedOnly() {
 		List<PathMatcher> relevantIntegrationUnitIncludePathMatchers =
 			getRelevantIntegrationUnitIncludePathMatchers();
