@@ -130,6 +130,14 @@ public abstract class ModulesBatchTestClassGroup extends BatchTestClassGroup {
 				}
 			}
 
+			if (!isDXPBuildProfile()) {
+				excludesPathMatchers.addAll(
+					getPathMatchers(
+						getFirstPropertyValue(
+							"modules.excludes.portal", batchName),
+						modulesDir));
+			}
+
 			if (testRelevantChanges) {
 				moduleDirsList.addAll(
 					getRequiredModuleDirs(
