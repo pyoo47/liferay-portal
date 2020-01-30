@@ -243,6 +243,24 @@ public class SpiraRelease {
 		return true;
 	}
 
+	protected static final int STATUS_CANCELED = 5;
+
+	protected static final int STATUS_CLOSED = 3;
+
+	protected static final int STATUS_DEFERRED = 4;
+
+	protected static final int STATUS_IN_PROGRESS = 2;
+
+	protected static final int STATUS_PLANNED = 1;
+
+	protected static final int TYPE_MAJOR_RELEASE = 1;
+
+	protected static final int TYPE_MINOR_RELEASE = 2;
+
+	protected static final int TYPE_PHASE = 4;
+
+	protected static final int TYPE_SPRINT = 3;
+
 	private static String _createSpiraReleaseKey(
 		Integer projectID, Integer releaseID) {
 

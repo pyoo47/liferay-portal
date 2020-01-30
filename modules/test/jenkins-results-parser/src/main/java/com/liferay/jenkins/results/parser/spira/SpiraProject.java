@@ -15,10 +15,12 @@
 package com.liferay.jenkins.results.parser.spira;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil.HttpRequestMethod;
 
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +45,7 @@ public class SpiraProject {
 				SpiraProject spiraProject = new SpiraProject(
 					SpiraRestAPIUtil.requestJSONObject(
 						"projects/{project_id}", urlReplacements,
-						JenkinsResultsParserUtil.HttpRequestMethod.GET, null));
+						HttpRequestMethod.GET, null));
 
 				if (spiraProject != null) {
 					_spiraProjects.put(spiraProject.getID(), spiraProject);
@@ -55,6 +57,44 @@ public class SpiraProject {
 		}
 
 		return _spiraProjects.get(projectID);
+	}
+
+	public SpiraRelease addSpiraRelease(
+			String releaseName, Integer parentReleaseId)
+		throws IOException {
+
+		JSONObject requestJSONObject = new JSONObject();
+
+		requestJSONObject.put(
+			"Name", StringEscapeUtils.unescapeJava(releaseName));
+		requestJSONObject.put("ReleaseStatusId", SpiraRelease.STATUS_PLANNED);
+		requestJSONObject.put("ReleaseTypeId", SpiraRelease.TYPE_MAJOR_RELEASE);
+
+		Calendar calendar = Calendar.getInstance();
+
+		requestJSONObject.put("StartDate", _toDateString(calendar));
+
+		calendar.add(Calendar.MONTH, 1);
+
+		requestJSONObject.put("EndDate", _toDateString(calendar));
+
+		String urlPath = "projects/{project_id}/releases";
+
+		Map<String, String> urlReplacements = new HashMap<>();
+
+		urlReplacements.put("project_id", String.valueOf(getID()));
+
+		if ((parentReleaseId != null) && (parentReleaseId > 0)) {
+			urlPath += "/{parent_release_id}";
+			urlReplacements.put(
+				"parent_release_id", String.valueOf(parentReleaseId));
+		}
+
+		JSONObject responseJSONObject = SpiraRestAPIUtil.requestJSONObject(
+			urlPath, urlReplacements, HttpRequestMethod.POST,
+			requestJSONObject.toString());
+
+		return getSpiraReleaseById(responseJSONObject.getInt("ReleaseId"));
 	}
 
 	public int getID() {
@@ -156,6 +196,11 @@ public class SpiraProject {
 
 		return SpiraRelease.getSpiraReleases(
 			this, new SpiraRelease.SearchParameter("Name", releaseName));
+	}
+
+	private static String _toDateString(Calendar calendar) {
+		return JenkinsResultsParserUtil.combine(
+			"/Date(", String.valueOf(calendar.getTimeInMillis()), ")/");
 	}
 
 	private static final Map<Integer, SpiraProject> _spiraProjects =
