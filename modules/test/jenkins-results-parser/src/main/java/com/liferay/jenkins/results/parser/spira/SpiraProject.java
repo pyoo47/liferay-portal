@@ -37,14 +37,14 @@ public class SpiraProject {
 
 	public static SpiraProject getSpiraProjectById(int projectID) {
 		if (!_spiraProjects.containsKey(projectID)) {
-			Map<String, String> urlReplacements = new HashMap<>();
+			Map<String, String> urlPathReplacements = new HashMap<>();
 
-			urlReplacements.put("project_id", String.valueOf(projectID));
+			urlPathReplacements.put("project_id", String.valueOf(projectID));
 
 			try {
 				SpiraProject spiraProject = new SpiraProject(
 					SpiraRestAPIUtil.requestJSONObject(
-						"projects/{project_id}", urlReplacements,
+						"projects/{project_id}", null, urlPathReplacements,
 						HttpRequestMethod.GET, null));
 
 				if (spiraProject != null) {
@@ -59,9 +59,25 @@ public class SpiraProject {
 		return _spiraProjects.get(projectID);
 	}
 
+	public SpiraRelease addSpiraRelease(String releaseName) throws IOException {
+		return addSpiraRelease(releaseName, null);
+	}
+
 	public SpiraRelease addSpiraRelease(
 			String releaseName, Integer parentReleaseId)
 		throws IOException {
+
+		String urlPath = "projects/{project_id}/releases/{parent_release_id}";
+
+		Map<String, String> urlPathReplacements = new HashMap<>();
+
+		urlPathReplacements.put(
+			"parent_release_id", String.valueOf(parentReleaseId));
+		urlPathReplacements.put("project_id", String.valueOf(getID()));
+
+		if ((parentReleaseId == null) || (parentReleaseId == 0)) {
+			urlPath = urlPath.replace("/{parent_release_id}", "");
+		}
 
 		JSONObject requestJSONObject = new JSONObject();
 
@@ -78,34 +94,22 @@ public class SpiraProject {
 
 		requestJSONObject.put("EndDate", _toDateString(calendar));
 
-		String urlPath = "projects/{project_id}/releases";
-
-		Map<String, String> urlReplacements = new HashMap<>();
-
-		urlReplacements.put("project_id", String.valueOf(getID()));
-
-		if ((parentReleaseId != null) && (parentReleaseId > 0)) {
-			urlPath += "/{parent_release_id}";
-			urlReplacements.put(
-				"parent_release_id", String.valueOf(parentReleaseId));
-		}
-
 		JSONObject responseJSONObject = SpiraRestAPIUtil.requestJSONObject(
-			urlPath, urlReplacements, HttpRequestMethod.POST,
+			urlPath, null, urlPathReplacements, HttpRequestMethod.POST,
 			requestJSONObject.toString());
 
 		return getSpiraReleaseById(responseJSONObject.getInt("ReleaseId"));
 	}
 
 	public void deleteSpiraReleaseById(int releaseID) throws IOException {
-		Map<String, String> urlReplacements = new HashMap<>();
+		Map<String, String> urlPathReplacements = new HashMap<>();
 
-		urlReplacements.put("project_id", String.valueOf(getID()));
-		urlReplacements.put("release_id", String.valueOf(releaseID));
+		urlPathReplacements.put("project_id", String.valueOf(getID()));
+		urlPathReplacements.put("release_id", String.valueOf(releaseID));
 
 		SpiraRestAPIUtil.request(
-			"projects/{project_id}/releases/{release_id}", urlReplacements,
-			HttpRequestMethod.DELETE, null);
+			"projects/{project_id}/releases/{release_id}", null,
+			urlPathReplacements, HttpRequestMethod.DELETE, null);
 	}
 
 	public int getID() {
