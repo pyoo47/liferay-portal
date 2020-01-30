@@ -97,6 +97,17 @@ public class SpiraProject {
 		return getSpiraReleaseById(responseJSONObject.getInt("ReleaseId"));
 	}
 
+	public void deleteSpiraReleaseById(int releaseID) throws IOException {
+		Map<String, String> urlReplacements = new HashMap<>();
+
+		urlReplacements.put("project_id", String.valueOf(getID()));
+		urlReplacements.put("release_id", String.valueOf(releaseID));
+
+		SpiraRestAPIUtil.request(
+			"projects/{project_id}/releases/{release_id}", urlReplacements,
+			HttpRequestMethod.DELETE, null);
+	}
+
 	public int getID() {
 		return _jsonObject.getInt("ProjectId");
 	}
