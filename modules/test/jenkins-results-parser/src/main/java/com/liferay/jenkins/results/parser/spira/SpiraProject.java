@@ -205,6 +205,23 @@ public class SpiraProject extends BaseSpiraArtifact {
 		return spiraTestSets.get(0);
 	}
 
+	public SpiraTestSet getSpiraTestSetByPath(String testSetPath)
+		throws IOException {
+
+		List<SpiraTestSet> spiraTestSets = getSpiraTestSetsByPath(testSetPath);
+
+		if (spiraTestSets.size() > 1) {
+			throw new RuntimeException(
+				"Duplicate test set path " + testSetPath);
+		}
+
+		if (spiraTestSets.isEmpty()) {
+			throw new RuntimeException("Missing test set path " + testSetPath);
+		}
+
+		return spiraTestSets.get(0);
+	}
+
 	public SpiraTestSetFolder getSpiraTestSetFolderByID(int testSetFolderID)
 		throws IOException {
 
@@ -251,6 +268,13 @@ public class SpiraProject extends BaseSpiraArtifact {
 
 		return SpiraTestSetFolder.getSpiraTestSetFolders(
 			this, new SearchParameter("Path", testCaseSetPath));
+	}
+
+	public List<SpiraTestSet> getSpiraTestSetsByPath(String testSetPath)
+		throws IOException {
+
+		return SpiraTestSet.getSpiraTestSets(
+			this, new SearchParameter("Path", testSetPath));
 	}
 
 	protected SpiraRelease getSpiraReleaseByIndentLevel(String indentLevel)
