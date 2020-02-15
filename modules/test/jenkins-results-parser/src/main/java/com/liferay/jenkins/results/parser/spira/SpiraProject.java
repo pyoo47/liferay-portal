@@ -190,6 +190,21 @@ public class SpiraProject extends BaseSpiraArtifact {
 			this, new SearchParameter("Path", testCasePath));
 	}
 
+	public SpiraTestSet getSpiraTestSetByID(int testSetID) throws IOException {
+		List<SpiraTestSet> spiraTestSets = SpiraTestSet.getSpiraTestSets(
+			this, new SearchParameter("TestSetId", testSetID));
+
+		if (spiraTestSets.size() > 1) {
+			throw new RuntimeException("Duplicate test set ID " + testSetID);
+		}
+
+		if (spiraTestSets.isEmpty()) {
+			throw new RuntimeException("Missing test set ID " + testSetID);
+		}
+
+		return spiraTestSets.get(0);
+	}
+
 	public SpiraTestSetFolder getSpiraTestSetFolderByID(int testSetFolderID)
 		throws IOException {
 
