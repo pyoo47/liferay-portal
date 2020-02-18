@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -30,6 +32,90 @@ import org.json.JSONObject;
  * @author Michael Hashimoto
  */
 public class SpiraTestSet extends PathSpiraArtifact {
+
+	public static SpiraTestSet createSpiraTestSet(
+			SpiraProject spiraProject, String testSetName)
+		throws IOException {
+
+		return createSpiraTestSet(spiraProject, testSetName, null);
+	}
+
+	public static SpiraTestSet createSpiraTestSet(
+			SpiraProject spiraProject, String testSetName,
+			Integer parentTestSetFolderID)
+		throws IOException {
+
+		String testSetPath = "/" + testSetName;
+
+		if (parentTestSetFolderID != null) {
+			SpiraTestSetFolder parentSpiraTestSetFolder =
+				spiraProject.getSpiraTestSetFolderByID(parentTestSetFolderID);
+
+			testSetPath =
+				parentSpiraTestSetFolder.getPath() + "/" + testSetName;
+		}
+
+		List<SpiraTestSet> spiraTestSets = spiraProject.getSpiraTestSetsByPath(
+			testSetPath);
+
+		if (!spiraTestSets.isEmpty()) {
+			return spiraTestSets.get(0);
+		}
+
+		String urlPath = "projects/{project_id}/test-sets";
+
+		Map<String, String> urlPathReplacements = new HashMap<>();
+
+		urlPathReplacements.put(
+			"project_id", String.valueOf(spiraProject.getID()));
+
+		JSONObject requestJSONObject = new JSONObject();
+
+		requestJSONObject.put(
+			"Name", StringEscapeUtils.unescapeJava(testSetName));
+		requestJSONObject.put("TestRunTypeId", TEST_RUN_TYPE_AUTOMATED);
+		requestJSONObject.put("TestSetFolderId", parentTestSetFolderID);
+		requestJSONObject.put("TestSetStatusId", STATUS_NOT_STARTED);
+
+		JSONObject responseJSONObject = SpiraRestAPIUtil.requestJSONObject(
+			urlPath, null, urlPathReplacements, HttpRequestMethod.POST,
+			requestJSONObject.toString());
+
+		SpiraTestSet spiraTestSet = spiraProject.getSpiraTestSetByID(
+			responseJSONObject.getInt("TestSetId"));
+
+		_spiraTestSets.put(
+			_createSpiraTestSetKey(spiraProject.getID(), spiraTestSet.getID()),
+			spiraTestSet);
+
+		return spiraTestSet;
+	}
+
+	public static SpiraTestSet createSpiraTestSetByPath(
+			SpiraProject spiraProject, String testSetPath)
+		throws IOException {
+
+		List<SpiraTestSet> spiraTestSets = spiraProject.getSpiraTestSetsByPath(
+			testSetPath);
+
+		if (!spiraTestSets.isEmpty()) {
+			return spiraTestSets.get(0);
+		}
+
+		String testSetName = getPathName(testSetPath);
+		String parentTestSetFolderPath = getParentPath(testSetPath);
+
+		if (parentTestSetFolderPath.isEmpty()) {
+			return createSpiraTestSet(spiraProject, testSetName);
+		}
+
+		SpiraTestSetFolder parentSpiraTestSetFolder =
+			SpiraTestSetFolder.createSpiraTestSetFolderByPath(
+				spiraProject, parentTestSetFolderPath);
+
+		return createSpiraTestSet(
+			spiraProject, testSetName, parentSpiraTestSetFolder.getID());
+	}
 
 	@Override
 	public int getID() {
@@ -121,6 +207,20 @@ public class SpiraTestSet extends PathSpiraArtifact {
 
 		return _parentSpiraArtifact;
 	}
+
+	protected static final int STATUS_BLOCKED = 4;
+
+	protected static final int STATUS_COMPLETED = 3;
+
+	protected static final int STATUS_DEFERRED = 5;
+
+	protected static final int STATUS_IN_PROGRESS = 2;
+
+	protected static final int STATUS_NOT_STARTED = 1;
+
+	protected static final int TEST_RUN_TYPE_AUTOMATED = 2;
+
+	protected static final int TEST_RUN_TYPE_MANUAL = 1;
 
 	private static String _createSpiraTestSetKey(
 		Integer projectID, Integer testSetID) {
