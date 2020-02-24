@@ -2924,6 +2924,35 @@ plugins.includes=</echo>
 		</zip>
 	</target>
 
+	<target name="zip-portal-elasticsearch-sidecar">
+		<delete failonerror="false" file="dist/liferay-portal-elasticsearch-sidecar-${lp.version}.zip" />
+
+		<tstamp>
+			<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
+		</tstamp>
+
+		<mkdir dir="${tstamp.value}" />
+
+		<copy
+			todir="${tstamp.value}"
+		>
+			<fileset
+				dir="${liferay.home}/elasticsearch7"
+			/>
+		</copy>
+
+		<zip
+			destfile="dist/liferay-portal-elasticsearch-sidecar-${lp.version}.zip"
+		>
+			<zipfileset
+				dir="${tstamp.value}"
+				prefix="liferay-portal-elasticsearch-sidecar-${lp.version}"
+			/>
+		</zip>
+
+		<delete dir="${tstamp.value}" />
+	</target>
+
 	<target name="zip-portal-tools">
 		<tstamp>
 			<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />

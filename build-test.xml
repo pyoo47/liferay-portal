@@ -7581,7 +7581,7 @@ osb.lcs.portlet.oauth.consumer.secret=${osb.lcs.portlet.oauth.consumer.secret}</
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
-	<category name="com.liferay.portal.search.elasticsearch7.internal.connection.EmbeddedElasticsearchConnection">
+	<category name="com.liferay.portal.search.elasticsearch7.internal.connection.SidecarElasticsearchConnectionManager">
 		<priority value="ERROR" />
 	</category>
 </log4j:configuration>]]></echo>
@@ -9818,6 +9818,24 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 				</if>
 
 				<delete file="liferay-portal-dependencies.zip" />
+
+				<mirrors-get
+					dest="liferay-portal-elasticsearch-sidecar.zip"
+					src="${test.build.portal.elasticsearch.sidecar.zip.url}"
+				/>
+
+				<unzip
+					dest="${liferay.home}/elasticsearch7"
+					src="liferay-portal-elasticsearch-sidecar.zip"
+				>
+					<mapper
+						from="[^/]+/(elasticsearch7/)?(.*)"
+						to="\2"
+						type="regexp"
+					/>
+				</unzip>
+
+				<delete file="liferay-portal-elasticsearch-sidecar.zip" />
 
 				<mirrors-get
 					dest="liferay-portal-osgi.zip"
