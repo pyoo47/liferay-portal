@@ -805,13 +805,18 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 				replace="MetaspaceSize"
 			/>
 
-			<propertyregex
-				input="${poshi.java.jdk.opts}"
-				override="true"
-				property="poshi.java.jdk.opts"
-				regexp="&quot;"
-				replace=""
-			/>
+			<if>
+				<os family="windows" />
+				<then>
+					<propertyregex
+						input="${poshi.java.jdk.opts}"
+						override="true"
+						property="poshi.java.jdk.opts"
+						regexp="&quot;"
+						replace=""
+					/>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 
