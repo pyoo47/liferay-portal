@@ -109,6 +109,9 @@ public class PortalTestSuiteUpstreamControllerSingleSuiteBuildRunner
 
 		S buildData = getBuildData();
 
+		sb.append("&BUILD_PRIORITY=");
+		sb.append(buildData.getBuildParameter("BUILD_PRIORITY"));
+
 		sb.append("&CI_TEST_SUITE=");
 
 		String testSuiteName = buildData.getTestSuiteName();

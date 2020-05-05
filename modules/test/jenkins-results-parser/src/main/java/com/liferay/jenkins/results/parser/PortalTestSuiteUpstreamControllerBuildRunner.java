@@ -141,6 +141,8 @@ public class PortalTestSuiteUpstreamControllerBuildRunner
 			sb.append("/buildWithParameters?");
 			sb.append("token=");
 			sb.append(jenkinsAuthenticationToken);
+			sb.append("&BUILD_PRIORITY=");
+			sb.append(buildData.getBuildParameter("BUILD_PRIORITY"));
 			sb.append("&CI_TEST_SUITE=");
 			sb.append(testSuiteName);
 			sb.append("&JENKINS_GITHUB_BRANCH_NAME=");
