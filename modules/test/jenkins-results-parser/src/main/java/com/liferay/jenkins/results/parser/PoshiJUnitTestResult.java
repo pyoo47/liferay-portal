@@ -21,7 +21,7 @@ import org.json.JSONObject;
 /**
  * @author Kenji Heigel
  */
-public class PoshiJunitTestResult extends JunitTestResult {
+public class PoshiJUnitTestResult extends JUnitTestResult {
 
 	@Override
 	public String getDisplayName() {
@@ -71,7 +71,7 @@ public class PoshiJunitTestResult extends JunitTestResult {
 		return downstreamBuildListItemElement;
 	}
 
-	protected PoshiJunitTestResult(Build build, JSONObject caseJSONObject) {
+	protected PoshiJUnitTestResult(Build build, JSONObject caseJSONObject) {
 		super(build, caseJSONObject);
 	}
 

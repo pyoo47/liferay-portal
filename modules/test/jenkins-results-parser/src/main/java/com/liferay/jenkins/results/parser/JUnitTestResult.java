@@ -32,7 +32,7 @@ import org.json.JSONObject;
  * @author Leslie Wong
  * @author Yi-Chen Tsai
  */
-public class JunitTestResult extends BaseTestResult {
+public class JUnitTestResult extends BaseTestResult {
 
 	@Override
 	public String getClassName() {
@@ -179,7 +179,7 @@ public class JunitTestResult extends BaseTestResult {
 		return testReportURL;
 	}
 
-	protected JunitTestResult(Build build, JSONObject caseJSONObject) {
+	protected JUnitTestResult(Build build, JSONObject caseJSONObject) {
 		super(build);
 
 		_className = caseJSONObject.getString("className");
