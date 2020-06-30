@@ -206,6 +206,8 @@ public interface Build {
 		public LocalGitBranch getLocalGitBranch(
 			GitWorkingDirectory gitWorkingDirectory);
 
+		public Integer getPullRequestNumber();
+
 		public String getReceiverUsername();
 
 		public String getRepositoryName();

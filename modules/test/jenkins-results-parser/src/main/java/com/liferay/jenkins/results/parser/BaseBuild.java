@@ -1681,6 +1681,22 @@ public abstract class BaseBuild implements Build {
 		}
 
 		@Override
+		public Integer getPullRequestNumber() {
+			String branchInformationString = _getBranchInformationString();
+
+			String pullRequestNumberRegex =
+				"[\\S\\s]*github.pull.request.number=(\\d+)\\n[\\S\\s]*";
+
+			if (branchInformationString.matches(pullRequestNumberRegex)) {
+				return Integer.valueOf(
+					branchInformationString.replaceAll(
+						pullRequestNumberRegex, "$1"));
+			}
+
+			return 0;
+		}
+
+		@Override
 		public String getReceiverUsername() {
 			String branchInformationString = _getBranchInformationString();
 
