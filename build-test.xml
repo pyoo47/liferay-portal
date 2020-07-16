@@ -4320,15 +4320,20 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 							Runtime runtime = Runtime.getRuntime();
 
-							Process process = runtime.exec(sb.toString(), new String[] {"JAVA_HOME=" + project.getProperty("java.jdk.home")}, new File(project.getProperty("test.app.server.bin.dir")));
+							String javaHome = project.getProperty("java.jdk.home");
+
+							String path = project.getProperty("env.PATH");
+
+							path = path.replaceAll("/opt/java/jdk[^/]*/bin", javaHome + "/bin");
+
+							Process process = runtime.exec(sb.toString(), new String[] {"JAVA_HOME=" + javaHome, "JAVA_OPTS=" + project.getProperty("env.JAVA_OPTS"), "PATH=" + path}, new File(project.getProperty("test.app.server.bin.dir")));
 
 							InputStream inputStream = process.getInputStream();
 
 							int appServerLogByte;
+							int appServerLogSize = 0;
 
-							long appServerLogSize = 0;
-
-							Integer appServerLogMaxSize = Integer.valueOf(project.getProperty("app.server.log.max.size.in.mb")) * 1024 * 1024;
+							int appServerLogMaxSize = Integer.valueOf(project.getProperty("app.server.log.max.size.in.mb")) * 1024 * 1024;
 
 							try {
 								while ((appServerLogByte = inputStream.read()) != -1) {
