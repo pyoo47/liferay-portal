@@ -4324,15 +4324,35 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 							String path = project.getProperty("env.PATH");
 
-							path = path.replaceAll("[^:]+/jdk[^/]*/bin", javaHome + "/bin");
-
-							String[] args = new String[] {"JAVA_HOME=" + javaHome, "JAVA_OPTS=" + project.getProperty("env.JAVA_OPTS"), "PATH=" + path};
-
-							for (String arg : args) {
-								System.out.println(arg);
+							if (JenkinsResultsParserUtil.isWindows()) {
+								path = path.replaceAll("[^:]+\\/jdk[^\\/]*\\/[^:]*bin", javaHome + "/bin");
+							}
+							else {
+								path = path.replaceAll("[^;]+\\\\jdk[^\\\\]*\\\\[^;]*bin", javaHome + "\\bin");
 							}
 
-							Process process = runtime.exec(sb.toString(), new String[] {"JAVA_HOME=" + javaHome, "JAVA_OPTS=" + project.getProperty("env.JAVA_OPTS"), "PATH=" + path}, new File(project.getProperty("test.app.server.bin.dir")));
+							String javaOpts = project.getProperty("env.JAVA_OPTS");
+
+							List arguments = new ArrayList();
+
+							arguments.add("JAVA_HOME=" + javaHome);
+							arguments.add("PATH=" + path);
+
+							if ((javaOpts != null) || javaOpts.isEmpty()) {
+								arguments.add("JAVA_OPTS=" + javaOpts);
+							}
+
+							for (String argument : arguments) {
+								System.out.println("+ " + argument);
+							}
+
+							String[] argumentsArray = new String[arguments.size()];
+
+							for (String argument : arguments.toArray(argumentsArray)) {
+								System.out.println("* " + argument);
+							}
+
+							Process process = runtime.exec(sb.toString(), arguments.toArray(argumentsArray), new File(project.getProperty("test.app.server.bin.dir")));
 
 							InputStream inputStream = process.getInputStream();
 
