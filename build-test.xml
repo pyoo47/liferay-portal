@@ -4324,7 +4324,13 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 							String path = project.getProperty("env.PATH");
 
-							path = path.replaceAll("/opt/java/jdk[^/]*/bin", javaHome + "/bin");
+							path = path.replaceAll("[^:]+/jdk[^/]*/bin", javaHome + "/bin");
+
+							String[] args = new String[] {"JAVA_HOME=" + javaHome, "JAVA_OPTS=" + project.getProperty("env.JAVA_OPTS"), "PATH=" + path};
+
+							for (String arg : args) {
+								System.out.println(arg);
+							}
 
 							Process process = runtime.exec(sb.toString(), new String[] {"JAVA_HOME=" + javaHome, "JAVA_OPTS=" + project.getProperty("env.JAVA_OPTS"), "PATH=" + path}, new File(project.getProperty("test.app.server.bin.dir")));
 
