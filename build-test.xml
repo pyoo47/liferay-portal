@@ -4325,10 +4325,10 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 							String path = project.getProperty("env.PATH");
 
 							if (JenkinsResultsParserUtil.isWindows()) {
-								path = path.replaceAll("[^:]+\\/jdk[^\\/]*\\/[^:]*bin", javaHome + "/bin");
+								path = path.replaceAll("[^;]+\\\\jdk[^\\\\]*\\\\[^;]*bin", javaHome + "\\bin");
 							}
 							else {
-								path = path.replaceAll("[^;]+\\\\jdk[^\\\\]*\\\\[^;]*bin", javaHome + "\\bin");
+								path = path.replaceAll("[^:]+/jdk[^/]+/[^:]*bin", javaHome + "/bin");
 							}
 
 							String javaOpts = project.getProperty("env.JAVA_OPTS");
