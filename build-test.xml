@@ -4318,6 +4318,8 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 							sb.append(" ");
 							sb.append(project.getProperty("app.server.start.executable.arg.line"));
 
+							System.out.println(sb.toString());
+
 							Runtime runtime = Runtime.getRuntime();
 
 							String javaHome = project.getProperty("java.jdk.home");
