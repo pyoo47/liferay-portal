@@ -4333,7 +4333,12 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 								path = path.replaceAll("[^:]+/jdk[^/]+/[^:]*bin", javaHome + "/bin");
 							}
 
+							System.out.println("path=" + path);
+							System.out.println("javaHome=" + javaHome);
+
 							String javaOpts = project.getProperty("env.JAVA_OPTS");
+
+							System.out.println("javaOpts=" + javaOpts);
 
 							List arguments = new ArrayList();
 
