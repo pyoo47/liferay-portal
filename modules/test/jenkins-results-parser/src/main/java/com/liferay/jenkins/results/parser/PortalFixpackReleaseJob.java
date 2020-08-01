@@ -21,8 +21,10 @@ import java.io.File;
  */
 public class PortalFixpackReleaseJob extends BasePortalReleaseJob {
 
-	public PortalFixpackReleaseJob(String jobName, String portalBranchName) {
-		super(jobName, portalBranchName);
+	public PortalFixpackReleaseJob(
+		String jobName, String portalBranchName, BuildProfile buildProfile) {
+
+		super(jobName, portalBranchName, buildProfile);
 
 		GitWorkingDirectory jenkinsGitWorkingDirectory =
 			getJenkinsGitWorkingDirectory();

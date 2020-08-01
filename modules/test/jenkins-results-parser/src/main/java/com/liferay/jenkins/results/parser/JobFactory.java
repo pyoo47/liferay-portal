@@ -57,7 +57,16 @@ public class JobFactory {
 		String repositoryName) {
 
 		return _newJob(
-			jobName, testSuiteName, portalBranchName, repositoryName);
+			jobName, testSuiteName, portalBranchName, repositoryName, null);
+	}
+
+	public static Job newJob(
+		String jobName, String testSuiteName, String portalBranchName,
+		String repositoryName, BasePortalReleaseJob.BuildProfile buildProfile) {
+
+		return _newJob(
+			jobName, testSuiteName, portalBranchName, repositoryName,
+			buildProfile);
 	}
 
 	private static boolean _isCentralMergePullRequest(
@@ -81,7 +90,7 @@ public class JobFactory {
 
 	private static Job _newJob(
 		String jobName, String testSuiteName, String portalBranchName,
-		String repositoryName) {
+		String repositoryName, BasePortalReleaseJob.BuildProfile buildProfile) {
 
 		String jobKey = jobName;
 
@@ -168,20 +177,26 @@ public class JobFactory {
 
 		if (jobName.equals("test-portal-fixpack-release")) {
 			_jobs.put(
-				jobKey, new PortalFixpackReleaseJob(jobName, portalBranchName));
+				jobKey,
+				new PortalFixpackReleaseJob(
+					jobName, portalBranchName, buildProfile));
 
 			return _jobs.get(jobKey);
 		}
 
 		if (jobName.equals("test-portal-hotfix-release")) {
 			_jobs.put(
-				jobKey, new PortalHotfixReleaseJob(jobName, portalBranchName));
+				jobKey,
+				new PortalHotfixReleaseJob(
+					jobName, portalBranchName, buildProfile));
 
 			return _jobs.get(jobKey);
 		}
 
 		if (jobName.equals("test-portal-release")) {
-			_jobs.put(jobKey, new PortalReleaseJob(jobName, portalBranchName));
+			_jobs.put(
+				jobKey,
+				new PortalReleaseJob(jobName, portalBranchName, buildProfile));
 
 			return _jobs.get(jobKey);
 		}

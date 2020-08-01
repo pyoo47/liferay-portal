@@ -25,8 +25,16 @@ import java.util.Set;
 public abstract class BasePortalReleaseJob
 	extends BaseJob implements BatchDependentJob, PortalTestClassJob {
 
-	public BasePortalReleaseJob(String jobName, String portalBranchName) {
+	public BasePortalReleaseJob(
+		String jobName, String portalBranchName, BuildProfile buildProfile) {
+
 		super(jobName);
+
+		if (buildProfile == null) {
+			buildProfile = BuildProfile.PORTAL;
+		}
+
+		_buildProfile = buildProfile;
 
 		_portalBranchName = portalBranchName;
 
@@ -70,10 +78,36 @@ public abstract class BasePortalReleaseJob
 		return _portalGitWorkingDirectory;
 	}
 
+	public static enum BuildProfile {
+
+		DXP {
+
+			private static final String _TEXT = "dxp";
+
+			@Override
+			public String toString() {
+				return _TEXT;
+			}
+
+		},
+		PORTAL {
+
+			private static final String _TEXT = "portal";
+
+			@Override
+			public String toString() {
+				return _TEXT;
+			}
+
+		}
+
+	}
+
 	protected GitWorkingDirectory getJenkinsGitWorkingDirectory() {
 		return _jenkinsGitWorkingDirectory;
 	}
 
+	private final BuildProfile _buildProfile;
 	private final GitWorkingDirectory _jenkinsGitWorkingDirectory;
 	private final String _portalBranchName;
 	private final PortalGitWorkingDirectory _portalGitWorkingDirectory;

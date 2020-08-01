@@ -24,8 +24,10 @@ import java.util.Set;
  */
 public class PortalReleaseJob extends BasePortalReleaseJob {
 
-	public PortalReleaseJob(String jobName, String portalBranchName) {
-		super(jobName, portalBranchName);
+	public PortalReleaseJob(
+		String jobName, String portalBranchName, BuildProfile buildProfile) {
+
+		super(jobName, portalBranchName, buildProfile);
 
 		GitWorkingDirectory jenkinsGitWorkingDirectory =
 			getJenkinsGitWorkingDirectory();
