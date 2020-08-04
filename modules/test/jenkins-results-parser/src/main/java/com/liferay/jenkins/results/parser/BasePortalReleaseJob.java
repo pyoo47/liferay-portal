@@ -17,7 +17,9 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 
 import java.util.Collections;
+import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Michael Hashimoto
@@ -53,19 +55,43 @@ public abstract class BasePortalReleaseJob
 
 	@Override
 	public Set<String> getBatchNames() {
-		String testBatchNamesString = JenkinsResultsParserUtil.getProperty(
-			getJobProperties(), "test.batch.names[" + _portalBranchName + "]");
+		Set<String> batchNames = new TreeSet<>();
 
-		return getSetFromString(testBatchNamesString);
+		Properties jobProperties = getJobProperties();
+
+		batchNames.addAll(
+			getSetFromString(
+				JenkinsResultsParserUtil.getProperty(
+					jobProperties, "test.batch.names", _portalBranchName)));
+
+		batchNames.addAll(
+			getSetFromString(
+				JenkinsResultsParserUtil.getProperty(
+					jobProperties, "test.batch.names", _portalBranchName,
+					_buildProfile.toString())));
+
+		return batchNames;
 	}
 
 	@Override
 	public Set<String> getDependentBatchNames() {
-		String testBatchNames = JenkinsResultsParserUtil.getProperty(
-			getJobProperties(),
-			"test.batch.names.smoke[" + _portalBranchName + "]");
+		Set<String> batchNames = new TreeSet<>();
 
-		return getSetFromString(testBatchNames);
+		Properties jobProperties = getJobProperties();
+
+		batchNames.addAll(
+			getSetFromString(
+				JenkinsResultsParserUtil.getProperty(
+					jobProperties, "test.batch.names.smoke",
+					_portalBranchName)));
+
+		batchNames.addAll(
+			getSetFromString(
+				JenkinsResultsParserUtil.getProperty(
+					jobProperties, "test.batch.names.smoke", _portalBranchName,
+					_buildProfile.toString())));
+
+		return batchNames;
 	}
 
 	@Override
