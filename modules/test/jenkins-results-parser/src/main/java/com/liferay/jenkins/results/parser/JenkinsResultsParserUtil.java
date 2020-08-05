@@ -1629,7 +1629,8 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getProperty(
-		Properties properties, String basePropertyName, String... opts) {
+		Properties properties, String basePropertyName,
+		boolean useBasePropertyAsDefault, String... opts) {
 
 		if ((opts == null) || (opts.length == 0)) {
 			return _getProperty(
@@ -1712,11 +1713,23 @@ public class JenkinsResultsParserUtil {
 			}
 		}
 
-		if (propertyName == null) {
-			propertyName = basePropertyName;
+		if (propertyName != null) {
+			return _getProperty(
+				properties, new ArrayList<String>(), propertyName);
 		}
 
-		return _getProperty(properties, new ArrayList<String>(), propertyName);
+		if (useBasePropertyAsDefault) {
+			return _getProperty(
+				properties, new ArrayList<String>(), basePropertyName);
+		}
+
+		return null;
+	}
+
+	public static String getProperty(
+		Properties properties, String basePropertyName, String... opts) {
+
+		return getProperty(properties, basePropertyName, true, opts);
 	}
 
 	public static String getRandomGitHubDevNodeHostname() {
