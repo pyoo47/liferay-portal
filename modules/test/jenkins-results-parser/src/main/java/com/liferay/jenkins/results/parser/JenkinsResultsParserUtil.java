@@ -1647,7 +1647,15 @@ public class JenkinsResultsParserUtil {
 		for (Object key : properties.keySet()) {
 			String keyString = key.toString();
 
-			if (!keyString.startsWith(basePropertyName)) {
+			Matcher matcher = _propertyNamePattern.matcher(keyString);
+
+			if (!matcher.find()) {
+				continue;
+			}
+
+			String name = matcher.group("name");
+
+			if (!name.equals(basePropertyName)) {
 				continue;
 			}
 
@@ -3693,6 +3701,8 @@ public class JenkinsResultsParserUtil {
 		"http://(test-[0-9]+-[0-9]+)/");
 	private static final Pattern _nestedPropertyPattern = Pattern.compile(
 		"\\$\\{([^\\}]+)\\}");
+	private static final Pattern _propertyNamePattern = Pattern.compile(
+		"(?<name>[^\\[]+)");
 	private static final Pattern _propertyOptionPattern = Pattern.compile(
 		"\\[(?<opt>[^\\]]+)\\]");
 	private static final Set<String> _redactTokens = new HashSet<>();
