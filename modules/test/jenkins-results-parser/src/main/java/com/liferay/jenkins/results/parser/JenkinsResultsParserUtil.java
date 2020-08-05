@@ -3523,7 +3523,7 @@ public class JenkinsResultsParserUtil {
 		int maxOptCount = 0;
 
 		for (String propertyName : propertyNames) {
-			Matcher matcher = _propertyNamePattern.matcher(propertyName);
+			Matcher matcher = _propertyOptionPattern.matcher(propertyName);
 
 			Set<String> optSet = new LinkedHashSet<>();
 
@@ -3693,7 +3693,7 @@ public class JenkinsResultsParserUtil {
 		"http://(test-[0-9]+-[0-9]+)/");
 	private static final Pattern _nestedPropertyPattern = Pattern.compile(
 		"\\$\\{([^\\}]+)\\}");
-	private static final Pattern _propertyNamePattern = Pattern.compile(
+	private static final Pattern _propertyOptionPattern = Pattern.compile(
 		"\\[(?<opt>[^\\]]+)\\]");
 	private static final Set<String> _redactTokens = new HashSet<>();
 	private static final Pattern _remoteURLAuthorityPattern1 = Pattern.compile(
