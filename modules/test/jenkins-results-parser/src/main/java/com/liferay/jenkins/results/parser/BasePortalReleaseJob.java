@@ -32,11 +32,11 @@ public abstract class BasePortalReleaseJob
 
 		super(jobName);
 
-		if (buildProfile == null) {
-			buildProfile = BuildProfile.PORTAL;
-		}
+		this.buildProfile = buildProfile;
 
-		_buildProfile = buildProfile;
+		if (buildProfile == null) {
+			this.buildProfile = BuildProfile.PORTAL;
+		}
 
 		_portalBranchName = portalBranchName;
 
@@ -68,7 +68,7 @@ public abstract class BasePortalReleaseJob
 			getSetFromString(
 				JenkinsResultsParserUtil.getProperty(
 					jobProperties, "test.batch.names", _portalBranchName,
-					_buildProfile.toString())));
+					buildProfile.toString())));
 
 		return batchNames;
 	}
@@ -89,7 +89,7 @@ public abstract class BasePortalReleaseJob
 			getSetFromString(
 				JenkinsResultsParserUtil.getProperty(
 					jobProperties, "test.batch.names.smoke", _portalBranchName,
-					_buildProfile.toString())));
+					buildProfile.toString())));
 
 		return batchNames;
 	}
@@ -133,7 +133,8 @@ public abstract class BasePortalReleaseJob
 		return _jenkinsGitWorkingDirectory;
 	}
 
-	private final BuildProfile _buildProfile;
+	protected BuildProfile buildProfile;
+
 	private final GitWorkingDirectory _jenkinsGitWorkingDirectory;
 	private final String _portalBranchName;
 	private final PortalGitWorkingDirectory _portalGitWorkingDirectory;
