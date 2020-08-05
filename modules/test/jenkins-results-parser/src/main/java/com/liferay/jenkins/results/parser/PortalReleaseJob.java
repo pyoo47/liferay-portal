@@ -67,13 +67,13 @@ public class PortalReleaseJob extends BasePortalReleaseJob {
 		batchNames.addAll(
 			getSetFromString(
 				JenkinsResultsParserUtil.getProperty(
-					jobProperties, "test.batch.names.optional",
+					jobProperties, "test.batch.names.optional", false,
 					_portalReleaseRef)));
 
 		batchNames.addAll(
 			getSetFromString(
 				JenkinsResultsParserUtil.getProperty(
-					jobProperties, "test.batch.names.optional",
+					jobProperties, "test.batch.names.optional", false,
 					_portalReleaseRef, buildProfile.toString())));
 
 		return batchNames;
