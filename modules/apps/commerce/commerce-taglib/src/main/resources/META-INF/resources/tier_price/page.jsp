@@ -54,9 +54,9 @@ String tierPriceId = randomNamespace + "tierPrice";
 
 						BigDecimal discount = price.subtract(commerceTierPriceEntryPrice);
 
-						BigDecimal dividedPrice = discount.divide(price, RoundingMode.HALF_EVEN);
+						BigDecimal discountPercent = discount.divide(price, RoundingMode.HALF_EVEN);
 
-						BigDecimal discountPercent = dividedPrice.multiply(BigDecimal.valueOf(100));
+						discountPercent = discountPercent.multiply(BigDecimal.valueOf(100));
 
 						BigDecimal total = commerceTierPriceEntryPrice.multiply(BigDecimal.valueOf(commerceTierPriceEntry.getMinQuantity()));
 
