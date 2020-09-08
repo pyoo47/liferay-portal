@@ -14,6 +14,8 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +38,10 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 	public static final String PROPERTY_SLAVES_PER_HOST_DEFAULT =
 		"slaves.per.host.default";
 
+	public static final Integer SLAVE_RAM_DEFAULT = 16;
+
+	public static final Integer SLAVES_PER_HOST_DEFAULT = 2;
+
 	public static Integer getSlaveRAMMinimumDefault() {
 		try {
 			String propertyValue = JenkinsResultsParserUtil.getBuildProperty(
@@ -43,11 +49,20 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 
 			return Integer.valueOf(propertyValue);
 		}
-		catch (Exception exception) {
-			throw new RuntimeException(
-				"Unable to get property '" +
-					PROPERTY_SLAVE_RAM_MINIMUM_DEFAULT + "'",
-				exception);
+		catch (IOException ioException) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Unable to get property '");
+			sb.append(PROPERTY_SLAVE_RAM_MINIMUM_DEFAULT);
+			sb.append("', defaulting to '");
+			sb.append(SLAVE_RAM_DEFAULT);
+			sb.append("'");
+
+			System.out.println(sb.toString());
+
+			ioException.printStackTrace();
+
+			return SLAVE_RAM_DEFAULT;
 		}
 	}
 
@@ -58,11 +73,20 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 
 			return Integer.valueOf(propertyValue);
 		}
-		catch (Exception exception) {
-			throw new RuntimeException(
-				"Unable to get property '" + PROPERTY_SLAVES_PER_HOST_DEFAULT +
-					"'",
-				exception);
+		catch (IOException ioException) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Unable to get property '");
+			sb.append(PROPERTY_SLAVES_PER_HOST_DEFAULT);
+			sb.append("', defaulting to '");
+			sb.append(SLAVES_PER_HOST_DEFAULT);
+			sb.append("'");
+
+			System.out.println(sb.toString());
+
+			ioException.printStackTrace();
+
+			return SLAVES_PER_HOST_DEFAULT;
 		}
 	}
 
