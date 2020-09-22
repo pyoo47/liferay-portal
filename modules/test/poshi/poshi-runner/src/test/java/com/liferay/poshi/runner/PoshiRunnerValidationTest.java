@@ -14,10 +14,10 @@
 
 package com.liferay.poshi.runner;
 
+import com.liferay.poshi.core.util.PropsValues;
+import com.liferay.poshi.core.util.StringUtil;
 import com.liferay.poshi.runner.util.FileUtil;
 import com.liferay.poshi.runner.util.OSDetector;
-import com.liferay.poshi.runner.util.PropsValues;
-import com.liferay.poshi.runner.util.StringUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -929,7 +929,7 @@ public class PoshiRunnerValidationTest extends TestCase {
 		String invalidUtilityClassName =
 			"com.liferay.poshi.runner.PoshiRunnerGetterUtil";
 		String invalidUtilityClassMethodName = "getCurrentNamespace";
-		String validClassName = "com.liferay.poshi.runner.util.StringUtil";
+		String validClassName = "com.liferay.poshi.core.util.StringUtil";
 		String validMethodName = "add";
 
 		List<String> testClassNames = new ArrayList<>();

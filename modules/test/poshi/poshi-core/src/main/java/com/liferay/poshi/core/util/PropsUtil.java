@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.poshi.runner.util;
+package com.liferay.poshi.core.util;
 
 import java.io.InputStream;
 
@@ -41,7 +41,7 @@ public class PropsUtil {
 	private PropsUtil() {
 		try {
 			String[] propertiesFileNames = {
-				"poshi-runner.properties", "poshi-runner-ext.properties"
+				"poshi.properties", "poshi-ext.properties"
 			};
 
 			for (String propertiesFileName : propertiesFileNames) {

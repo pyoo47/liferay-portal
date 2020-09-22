@@ -17,6 +17,7 @@ package com.liferay.poshi.core.selenium;
 /**
  * @author Brian Wing Shun Chan
  */
+@SuppressWarnings("deprecation")
 public interface LiferaySelenium {
 
 	public void addSelection(String locator, String optionLocator);
