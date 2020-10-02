@@ -16,6 +16,7 @@ package com.liferay.poshi.core.elements;
 
 import com.liferay.poshi.core.PoshiContext;
 import com.liferay.poshi.core.script.PoshiScriptParserException;
+import com.liferay.poshi.core.util.PropsValues;
 import com.liferay.poshi.core.util.RegexUtil;
 import com.liferay.poshi.core.util.StringUtil;
 import com.liferay.poshi.core.util.Validator;
@@ -91,8 +92,10 @@ public class ExecutePoshiElement extends PoshiElement {
 			List<String> methodParameters = getMethodParameters(
 				poshiScriptParentheticalContent);
 
-			for (String methodParameter : methodParameters) {
-				add(PoshiNodeFactory.newPoshiNode(this, methodParameter));
+			if (!PropsValues.IGNORE_ERRORS_UTIL_CLASSES) {
+				for (String methodParameter : methodParameters) {
+					add(PoshiNodeFactory.newPoshiNode(this, methodParameter));
+				}
 			}
 
 			return;
