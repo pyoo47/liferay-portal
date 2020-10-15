@@ -26,6 +26,7 @@ import com.liferay.poshi.core.selenium.LiferaySelenium;
 import com.liferay.poshi.core.util.FileUtil;
 import com.liferay.poshi.core.util.MathUtil;
 import com.liferay.poshi.core.util.OSDetector;
+import com.liferay.poshi.core.util.PropsUtil;
 import com.liferay.poshi.core.util.PropsValues;
 import com.liferay.poshi.core.util.StringUtil;
 import com.liferay.poshi.core.util.Validator;
@@ -415,7 +416,22 @@ public class PoshiContext {
 	}
 
 	public static void readFiles() throws Exception {
+		readFiles(new Properties());
+	}
+
+	public static void readFiles(Properties poshiProperties) throws Exception {
 		System.out.print("Reading Poshi files...");
+
+		for (String poshiPropertyName : poshiProperties.stringPropertyNames()) {
+			String poshiPropertyValue = poshiProperties.getProperty(
+				poshiPropertyName);
+
+			if (poshiPropertyValue == null) {
+				continue;
+			}
+
+			PropsUtil.set(poshiPropertyName, poshiPropertyValue);
+		}
 
 		long start = System.currentTimeMillis();
 
