@@ -95,6 +95,7 @@ public class PoshiContext {
 		_overrideClassNames.clear();
 		_pathExtensions.clear();
 		_pathLocators.clear();
+		_poshiPropertyNames.clear();
 		_rootElements.clear();
 		_rootVarElements.clear();
 		_seleniumParameterCounts.clear();
@@ -482,9 +483,6 @@ public class PoshiContext {
 
 		Properties properties = new Properties();
 
-		List<String> poshiPropertyNames =
-			PoshiProperties.getPoshiPropertiesNames();
-
 		List<Element> rootPropertyElements = rootElement.elements("property");
 
 		for (Element propertyElement : rootPropertyElements) {
@@ -492,10 +490,6 @@ public class PoshiContext {
 			String propertyValue = propertyElement.attributeValue("value");
 
 			properties.setProperty(propertyName, propertyValue);
-
-			if (!poshiPropertyNames.contains(propertyName)) {
-				poshiPropertyNames.add(propertyName);
-			}
 		}
 
 		List<Element> commandPropertyElements = commandElement.elements(
@@ -506,10 +500,6 @@ public class PoshiContext {
 			String propertyValue = propertyElement.attributeValue("value");
 
 			properties.setProperty(propertyName, propertyValue);
-
-			if (!poshiPropertyNames.contains(propertyName)) {
-				poshiPropertyNames.add(propertyName);
-			}
 		}
 
 		if (Validator.isNotNull(
@@ -676,6 +666,18 @@ public class PoshiContext {
 					namespacedClassCommandName);
 			}
 		}
+	}
+
+	protected static List<String> getPoshiPropertyNames() {
+		List<String> poshiPropertyNames = new ArrayList<>(
+			_poshiPropertyNames);
+
+		poshiPropertyNames.add("ignored");
+		poshiPropertyNames.add("known-issues");
+		poshiPropertyNames.add("priority");
+		poshiPropertyNames.add("test.run.environment");
+
+		return poshiPropertyNames;
 	}
 
 	private static boolean _isClassOverridden(String namespacedClassName) {
@@ -859,6 +861,9 @@ public class PoshiContext {
 
 					_namespacedClassCommandNamePropertiesMap.put(
 						baseNamespacedClassCommandName, overriddenProperties);
+
+					_poshiPropertyNames.addAll(
+						overrideProperties.stringPropertyNames());
 
 					if (Validator.isNotNull(
 							overrideCommandElement.attributeValue(
@@ -1216,6 +1221,9 @@ public class PoshiContext {
 					_namespacedClassCommandNamePropertiesMap.put(
 						namespace + "." + classCommandName, properties);
 
+					_poshiPropertyNames.addAll(
+						properties.stringPropertyNames());
+
 					if (Validator.isNotNull(
 							commandElement.attributeValue("description"))) {
 
@@ -1518,6 +1526,8 @@ public class PoshiContext {
 		Collections.synchronizedMap(new HashMap<>());
 	private static final Map<String, String> _pathLocators =
 		Collections.synchronizedMap(new HashMap<>());
+	private static final Set<String> _poshiPropertyNames =
+		Collections.synchronizedSet(new HashSet<>());
 	private static final Pattern _poshiResourceJarNamePattern = Pattern.compile(
 		"jar:.*\\/(?<namespace>\\w+)\\-(?<branchName>\\w+" +
 			"([\\-\\.]\\w+)*)\\-.*?\\.jar.*");
