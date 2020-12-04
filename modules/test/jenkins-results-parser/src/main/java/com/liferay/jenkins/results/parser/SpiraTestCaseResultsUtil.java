@@ -14,7 +14,13 @@
 
 package com.liferay.jenkins.results.parser;
 
-import com.liferay.jenkins.results.parser.spira.SpiraTestCaseObject;
+import com.liferay.jenkins.results.parser.spira.SearchQuery;
+import com.liferay.jenkins.results.parser.spira.SpiraProject;
+import com.liferay.jenkins.results.parser.spira.SpiraRelease;
+import com.liferay.jenkins.results.parser.spira.SpiraReleaseBuild;
+import com.liferay.jenkins.results.parser.spira.SpiraTestCaseRun;
+
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +28,38 @@ import java.util.List;
 /**
  * @author Yi-Chen Tsai
  */
-
 public class SpiraTestCaseResultsUtil {
-    public static List<SpiraTestCaseObject> getSpiraTestCaseResults() {
-        return new ArrayList();
-    }
+
+	public static List<SpiraTestCaseRun> getLatestUpstreamSpiraTestCaseRuns(
+			String branchName, String testSuite)
+		throws IOException {
+
+		SpiraProject spiraProject =
+			SpiraProject.getSpiraProjectByID(SpiraProject.getID("dxp"));
+
+		int testSuiteReleaseID = Integer.parseInt(
+			JenkinsResultsParserUtil.getBuildProperty(
+				"spira.release.id[test-portal-testsuite-upstream(" +
+					branchName + ")][" + testSuite + "]"));
+
+		SpiraRelease spiraRelease = spiraProject.getSpiraReleaseByID(
+			testSuiteReleaseID);
+
+		SearchQuery.SearchParameter searchParameter =
+			new SearchQuery.SearchParameter(
+				SpiraRelease.getKeyID(SpiraRelease.class), testSuiteReleaseID);
+
+		List<SpiraReleaseBuild> spiraReleaseBuilds =
+			SpiraReleaseBuild.getSpiraReleaseBuilds(
+				spiraProject, spiraRelease, searchParameter);
+
+		if (spiraReleaseBuilds.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		SpiraReleaseBuild spiraReleaseBuild = spiraReleaseBuilds.get(0);
+
+		return spiraReleaseBuild.getSpiraTestCaseRuns();
+	}
+
 }
