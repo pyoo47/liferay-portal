@@ -118,6 +118,14 @@ public class SpiraReleaseBuild extends BaseSpiraArtifact {
 		return jsonObject.getString("CreationDate");
 	}
 
+	public List<SpiraTestCaseRun> getSpiraTestCaseRuns() {
+		SearchQuery.SearchParameter searchParameter =
+			new SearchQuery.SearchParameter(KEY_ID, getID());
+
+		return SpiraTestCaseRun.getSpiraTestCaseRuns(
+			getSpiraProject(), searchParameter);
+	}
+
 	@Override
 	public String getURL() {
 		SpiraProject spiraProject = getSpiraProject();
