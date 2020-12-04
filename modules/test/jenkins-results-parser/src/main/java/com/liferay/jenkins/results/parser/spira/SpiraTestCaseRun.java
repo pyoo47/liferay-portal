@@ -604,8 +604,11 @@ public class SpiraTestCaseRun extends BaseSpiraArtifact {
 
 		urlPathReplacements.put(
 			"project_id", String.valueOf(spiraProject.getID()));
-		urlPathReplacements.put(
-			"test_case_id", String.valueOf(spiraTestCase.getID()));
+
+		if (spiraTestCase != null) {
+			urlPathReplacements.put(
+				"test_case_id", String.valueOf(spiraTestCase.getID()));
+		}
 
 		JSONArray requestJSONArray = new JSONArray();
 
@@ -614,11 +617,17 @@ public class SpiraTestCaseRun extends BaseSpiraArtifact {
 		}
 
 		try {
+			String baseRequestURL = "projects/{project_id}/test-runs/search";
+
+			if (spiraTestCase != null) {
+				baseRequestURL =
+					"projects/{project_id}/test-cases/{test_case_id}" +
+						"/test-runs/search";
+			}
+
 			JSONArray responseJSONArray = SpiraRestAPIUtil.requestJSONArray(
-				"projects/{project_id}/test-cases/{test_case_id}/test-runs" +
-					"/search",
-				urlParameters, urlPathReplacements, HttpRequestMethod.POST,
-				requestJSONArray.toString());
+				baseRequestURL, urlParameters, urlPathReplacements,
+				HttpRequestMethod.POST, requestJSONArray.toString());
 
 			List<JSONObject> spiraTestCaseRuns = new ArrayList<>();
 
