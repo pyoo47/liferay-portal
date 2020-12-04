@@ -549,6 +549,13 @@ public class SpiraTestCaseRun extends BaseSpiraArtifact {
 
 	protected static List<SpiraTestCaseRun> getSpiraTestCaseRuns(
 		final SpiraProject spiraProject,
+		final SearchQuery.SearchParameter... searchParameters) {
+
+		return getSpiraTestCaseRuns(spiraProject, null, searchParameters);
+	}
+
+	protected static List<SpiraTestCaseRun> getSpiraTestCaseRuns(
+		final SpiraProject spiraProject,
 		final SpiraTestCaseObject spiraTestCase,
 		final SearchQuery.SearchParameter... searchParameters) {
 
@@ -557,9 +564,11 @@ public class SpiraTestCaseRun extends BaseSpiraArtifact {
 
 		Collections.addAll(searchParameterList, searchParameters);
 
-		searchParameterList.add(
-			new SearchQuery.SearchParameter(
-				SpiraTestCaseObject.KEY_ID, spiraTestCase.getID()));
+		if (spiraTestCase != null) {
+			searchParameterList.add(
+				new SearchQuery.SearchParameter(
+					SpiraTestCaseObject.KEY_ID, spiraTestCase.getID()));
+		}
 
 		return getSpiraArtifacts(
 			SpiraTestCaseRun.class,
