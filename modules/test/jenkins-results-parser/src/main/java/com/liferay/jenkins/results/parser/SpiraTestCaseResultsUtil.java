@@ -59,7 +59,7 @@ public class SpiraTestCaseResultsUtil {
 
 		SpiraReleaseBuild spiraReleaseBuild = spiraReleaseBuilds.get(0);
 
-		return spiraReleaseBuild.getSpiraTestCaseRuns();
+		return spiraReleaseBuild.getSpiraTestCaseRuns(50000);
 	}
 
 }
