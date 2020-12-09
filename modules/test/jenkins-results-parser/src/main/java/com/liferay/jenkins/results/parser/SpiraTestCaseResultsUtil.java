@@ -34,8 +34,8 @@ public class SpiraTestCaseResultsUtil {
 			String branchName, String testSuite)
 		throws IOException {
 
-		SpiraProject spiraProject =
-			SpiraProject.getSpiraProjectByID(SpiraProject.getID("dxp"));
+		SpiraProject spiraProject = SpiraProject.getSpiraProjectByID(
+			SpiraProject.getID("dxp"));
 
 		int testSuiteReleaseID = Integer.parseInt(
 			JenkinsResultsParserUtil.getBuildProperty(

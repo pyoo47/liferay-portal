@@ -294,7 +294,7 @@ public class SpiraTestCaseObject extends PathSpiraArtifact {
 	public SpiraTestCaseRun getSpiraTestCaseRunByID(int testCaseRunID) {
 		List<SpiraTestCaseRun> spiraTestCaseRuns =
 			SpiraTestCaseRun.getSpiraTestCaseRuns(
-				getSpiraProject(), this,
+				SpiraTestCaseRun.numberOfRowsDefault, getSpiraProject(), this,
 				new SearchQuery.SearchParameter(
 					SpiraTestCaseRun.KEY_ID, testCaseRunID));
 
@@ -312,7 +312,8 @@ public class SpiraTestCaseObject extends PathSpiraArtifact {
 	}
 
 	public List<SpiraTestCaseRun> getSpiraTestCaseRuns() {
-		return SpiraTestCaseRun.getSpiraTestCaseRuns(getSpiraProject(), this);
+		return SpiraTestCaseRun.getSpiraTestCaseRuns(
+			SpiraTestCaseRun.numberOfRowsDefault, getSpiraProject(), this);
 	}
 
 	public SpiraTestCaseType getSpiraTestCaseType() {

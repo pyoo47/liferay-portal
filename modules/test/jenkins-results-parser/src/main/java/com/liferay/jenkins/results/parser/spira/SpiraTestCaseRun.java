@@ -40,6 +40,8 @@ import org.json.JSONObject;
  */
 public class SpiraTestCaseRun extends BaseSpiraArtifact {
 
+	public static int numberOfRowsDefault = 1000;
+
 	public static void clearCachedSpiraTestCaseRuns() {
 		clearCachedSpiraArtifacts(SpiraTestCaseRun.class);
 	}
@@ -548,14 +550,15 @@ public class SpiraTestCaseRun extends BaseSpiraArtifact {
 	}
 
 	protected static List<SpiraTestCaseRun> getSpiraTestCaseRuns(
-		final SpiraProject spiraProject,
+		int numberOfRows, final SpiraProject spiraProject,
 		final SearchQuery.SearchParameter... searchParameters) {
 
-		return getSpiraTestCaseRuns(spiraProject, null, searchParameters);
+		return getSpiraTestCaseRuns(
+			numberOfRows, spiraProject, null, searchParameters);
 	}
 
 	protected static List<SpiraTestCaseRun> getSpiraTestCaseRuns(
-		final SpiraProject spiraProject,
+		int numberOfRows, final SpiraProject spiraProject,
 		final SpiraTestCaseObject spiraTestCase,
 		final SearchQuery.SearchParameter... searchParameters) {
 
@@ -577,7 +580,8 @@ public class SpiraTestCaseRun extends BaseSpiraArtifact {
 				@Override
 				public List<JSONObject> get() {
 					return _requestSpiraTestCaseRuns(
-						spiraProject, spiraTestCase, searchParameters);
+						numberOfRows, spiraProject, spiraTestCase,
+						searchParameters);
 				}
 
 			},
@@ -599,12 +603,13 @@ public class SpiraTestCaseRun extends BaseSpiraArtifact {
 	protected static final String KEY_ID = "TestRunId";
 
 	private static List<JSONObject> _requestSpiraTestCaseRuns(
-		SpiraProject spiraProject, SpiraTestCaseObject spiraTestCase,
+		int numberOfRows, SpiraProject spiraProject,
+		SpiraTestCaseObject spiraTestCase,
 		SearchQuery.SearchParameter... searchParameters) {
 
 		Map<String, String> urlParameters = new HashMap<>();
 
-		urlParameters.put("number_of_rows", String.valueOf(1000));
+		urlParameters.put("number_of_rows", String.valueOf(numberOfRows));
 		urlParameters.put("sort_direction", "DESC");
 		urlParameters.put("sort_field", KEY_ID);
 		urlParameters.put("starting_row", String.valueOf(1));

@@ -119,11 +119,15 @@ public class SpiraReleaseBuild extends BaseSpiraArtifact {
 	}
 
 	public List<SpiraTestCaseRun> getSpiraTestCaseRuns() {
+		return getSpiraTestCaseRuns(SpiraTestCaseRun.numberOfRowsDefault);
+	}
+
+	public List<SpiraTestCaseRun> getSpiraTestCaseRuns(int numTestCaseRuns) {
 		SearchQuery.SearchParameter searchParameter =
 			new SearchQuery.SearchParameter(KEY_ID, getID());
 
 		return SpiraTestCaseRun.getSpiraTestCaseRuns(
-			getSpiraProject(), searchParameter);
+			numTestCaseRuns, getSpiraProject(), searchParameter);
 	}
 
 	@Override
