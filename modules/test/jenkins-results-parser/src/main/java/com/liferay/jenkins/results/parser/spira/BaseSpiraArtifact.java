@@ -92,6 +92,11 @@ public abstract class BaseSpiraArtifact implements SpiraArtifact {
 	}
 
 	@Override
+	public Object getProperty(String propertyName) {
+		return jsonObject.get(propertyName);
+	}
+
+	@Override
 	public List<SpiraCustomProperty> getSpiraCustomProperties() {
 		return SpiraCustomProperty.getSpiraCustomProperties(
 			getSpiraProject(), getClass());
