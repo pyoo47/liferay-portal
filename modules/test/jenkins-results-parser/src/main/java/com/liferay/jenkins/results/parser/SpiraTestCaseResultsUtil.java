@@ -23,7 +23,10 @@ import com.liferay.jenkins.results.parser.spira.SpiraTestCaseRun;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Yi-Chen Tsai
@@ -60,6 +63,52 @@ public class SpiraTestCaseResultsUtil {
 		SpiraReleaseBuild spiraReleaseBuild = spiraReleaseBuilds.get(0);
 
 		return spiraReleaseBuild.getSpiraTestCaseRuns(50000);
+	}
+
+	private String _getLatestUpstreamComparisonMessage(
+		String branchName, String testSuite) {
+
+		String message = "";
+
+		StringBuilder sb = new StringBuilder();
+
+		String comparisonUpstreamSuites = JenkinsResultsParserUtil.getProperty(
+			_buildProperties,
+			"spira.test.case.results.comparison.upstream.suites");
+
+		int testSuiteReleaseID = Integer.parseInt(
+			JenkinsResultsParserUtil.getProperty(
+				_buildProperties,
+				"spira.release.id[test-portal-testsuite-upstream(" +
+					branchName + ")][" + testSuite + "]"));
+
+		return message;
+	}
+
+	private Map<Integer, SpiraTestCaseRun> _getSpiraTestCaseRunMapFromList(
+		List<SpiraTestCaseRun> spiraTestCaseRuns) {
+
+		Map<Integer, SpiraTestCaseRun> spiraTestCaseRunMap = new HashMap<>();
+
+		for (SpiraTestCaseRun spiraTestCaseRun : spiraTestCaseRuns) {
+			spiraTestCaseRunMap.put(
+				(int)spiraTestCaseRun.getProperty("TestCaseId"),
+				spiraTestCaseRun);
+		}
+
+		return spiraTestCaseRunMap;
+	}
+
+	private static final Properties _buildProperties;
+
+	static {
+		try {
+			_buildProperties = JenkinsResultsParserUtil.getBuildProperties();
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(
+				"Unable to get build.properties", ioException);
+		}
 	}
 
 }
