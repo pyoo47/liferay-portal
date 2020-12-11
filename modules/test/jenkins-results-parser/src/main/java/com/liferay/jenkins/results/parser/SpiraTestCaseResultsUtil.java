@@ -34,14 +34,14 @@ import java.util.Properties;
 public class SpiraTestCaseResultsUtil {
 
 	public static List<SpiraTestCaseRun> getLatestUpstreamSpiraTestCaseRuns(
-			String branchName, String testSuite)
-		throws IOException {
+		String branchName, String testSuite) {
 
 		SpiraProject spiraProject = SpiraProject.getSpiraProjectByID(
 			SpiraProject.getID("dxp"));
 
 		int testSuiteReleaseID = Integer.parseInt(
-			JenkinsResultsParserUtil.getBuildProperty(
+			JenkinsResultsParserUtil.getProperty(
+				_buildProperties,
 				"spira.release.id[test-portal-testsuite-upstream(" +
 					branchName + ")][" + testSuite + "]"));
 
@@ -68,21 +68,109 @@ public class SpiraTestCaseResultsUtil {
 	private String _getLatestUpstreamComparisonMessage(
 		String branchName, String testSuite) {
 
-		String message = "";
-
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb1 = new StringBuilder();
 
 		String comparisonUpstreamSuites = JenkinsResultsParserUtil.getProperty(
 			_buildProperties,
 			"spira.test.case.results.comparison.upstream.suites");
 
-		int testSuiteReleaseID = Integer.parseInt(
-			JenkinsResultsParserUtil.getProperty(
-				_buildProperties,
-				"spira.release.id[test-portal-testsuite-upstream(" +
-					branchName + ")][" + testSuite + "]"));
+		if (comparisonUpstreamSuites == null) {
+			throw new RuntimeException(
+				"The Property " +
+					"'spira.test.case.results.comparison.upstream.suites' is " +
+						"undefined.");
+		}
 
-		return message;
+		Map<String, Map<Integer, SpiraTestCaseRun>> comparisonTestSuiteMaps =
+			new HashMap<>();
+
+		for (String comparisonUpstreamSuite :
+				comparisonUpstreamSuites.split(",")) {
+
+			comparisonTestSuiteMaps.put(
+				comparisonUpstreamSuite,
+				_getSpiraTestCaseRunMapFromList(
+					getLatestUpstreamSpiraTestCaseRuns(
+						branchName, comparisonUpstreamSuite)));
+		}
+
+		Map<Integer, SpiraTestCaseRun> spiraTestCaseRuns =
+			_getSpiraTestCaseRunMapFromList(
+				getLatestUpstreamSpiraTestCaseRuns(branchName, testSuite));
+
+		for (Map.Entry<Integer, SpiraTestCaseRun> entry :
+				spiraTestCaseRuns.entrySet()) {
+
+			boolean inconsistent = false;
+
+			StringBuilder sb2 = new StringBuilder();
+
+			SpiraTestCaseRun spiraTestCaseRun = entry.getValue();
+
+			sb2.append(spiraTestCaseRun.getName());
+
+			sb2.append("\n");
+			sb2.append(testSuite);
+			sb2.append("\n<");
+			sb2.append(spiraTestCaseRun.getURL());
+			sb2.append("|");
+
+			int executionStatusId = (int)spiraTestCaseRun.getProperty(
+				"ExecutionStatusId");
+
+			sb2.append(
+				SpiraTestCaseRun.Status.getStatusName(executionStatusId));
+
+			sb2.append(">\n");
+
+			int testCaseID = entry.getKey();
+
+			for (Map.Entry<String, Map<Integer, SpiraTestCaseRun>>
+					comparisonEntry : comparisonTestSuiteMaps.entrySet()) {
+
+				Map<Integer, SpiraTestCaseRun> comparisonSpiraTestCaseRuns =
+					comparisonEntry.getValue();
+
+				if (!comparisonSpiraTestCaseRuns.containsKey(testCaseID)) {
+					sb2.append(comparisonEntry.getKey());
+					sb2.append("\nN/A\n");
+
+					inconsistent = true;
+
+					continue;
+				}
+
+				sb2.append(comparisonEntry.getKey());
+				sb2.append("\n<");
+
+				SpiraTestCaseRun comparisonSpiraTestCaseRun =
+					comparisonSpiraTestCaseRuns.get(testCaseID);
+
+				sb2.append(comparisonSpiraTestCaseRun.getURL());
+
+				sb2.append("|");
+
+				int comparisonExecutionStatusId =
+					(int)comparisonSpiraTestCaseRun.getProperty(
+						"ExecutionStatusId");
+
+				if (comparisonExecutionStatusId != executionStatusId) {
+					inconsistent = true;
+				}
+
+				sb2.append(
+					SpiraTestCaseRun.Status.getStatusName(
+						comparisonExecutionStatusId));
+				sb2.append(">\n");
+			}
+
+			if (inconsistent) {
+				sb1.append(sb2.toString());
+				sb1.append("\n");
+			}
+		}
+
+		return sb1.toString();
 	}
 
 	private Map<Integer, SpiraTestCaseRun> _getSpiraTestCaseRunMapFromList(
