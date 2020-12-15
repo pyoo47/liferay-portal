@@ -537,6 +537,17 @@ public class SpiraTestCaseRun extends BaseSpiraArtifact {
 		BLOCKED(5), CAUTION(6), FAILED(1), NOT_APPLICABLE(4), NOT_RUN(3),
 		PASSED(2);
 
+		public static String getStatusName(int statusID) {
+			for (Status status : values()) {
+				if (statusID == status.getID()) {
+					return status.name();
+				}
+			}
+
+			throw new IllegalArgumentException(
+				"No enum is defined for status ID: " + statusID);
+		}
+
 		public Integer getID() {
 			return _id;
 		}
