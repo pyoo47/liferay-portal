@@ -156,7 +156,7 @@ public class SpiraTestCaseResultsUtil {
 		return sb1.toString();
 	}
 
-	private List<SpiraTestCaseRun> _getLatestUpstreamSpiraTestCaseRuns(
+	private static List<SpiraTestCaseRun> _getLatestUpstreamSpiraTestCaseRuns(
 		String branchName, String testSuite) {
 
 		SpiraProject spiraProject = SpiraProject.getSpiraProjectByID(
@@ -188,8 +188,9 @@ public class SpiraTestCaseResultsUtil {
 		return spiraReleaseBuild.getSpiraTestCaseRuns(50000);
 	}
 
-	private Map<Integer, SpiraTestCaseRun> _getSpiraTestCaseRunMapFromList(
-		List<SpiraTestCaseRun> spiraTestCaseRuns) {
+	private static Map<Integer, SpiraTestCaseRun>
+		_getSpiraTestCaseRunMapFromList(
+			List<SpiraTestCaseRun> spiraTestCaseRuns) {
 
 		Map<Integer, SpiraTestCaseRun> spiraTestCaseRunMap = new HashMap<>();
 
