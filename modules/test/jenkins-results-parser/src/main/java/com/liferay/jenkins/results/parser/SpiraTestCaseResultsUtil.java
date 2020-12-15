@@ -33,39 +33,7 @@ import java.util.Properties;
  */
 public class SpiraTestCaseResultsUtil {
 
-	public static List<SpiraTestCaseRun> getLatestUpstreamSpiraTestCaseRuns(
-		String branchName, String testSuite) {
-
-		SpiraProject spiraProject = SpiraProject.getSpiraProjectByID(
-			SpiraProject.getID("dxp"));
-
-		int testSuiteReleaseID = Integer.parseInt(
-			JenkinsResultsParserUtil.getProperty(
-				_buildProperties,
-				"spira.release.id[test-portal-testsuite-upstream(" +
-					branchName + ")][" + testSuite + "]"));
-
-		SpiraRelease spiraRelease = spiraProject.getSpiraReleaseByID(
-			testSuiteReleaseID);
-
-		SearchQuery.SearchParameter searchParameter =
-			new SearchQuery.SearchParameter(
-				SpiraRelease.getKeyID(SpiraRelease.class), testSuiteReleaseID);
-
-		List<SpiraReleaseBuild> spiraReleaseBuilds =
-			SpiraReleaseBuild.getSpiraReleaseBuilds(
-				spiraProject, spiraRelease, searchParameter);
-
-		if (spiraReleaseBuilds.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		SpiraReleaseBuild spiraReleaseBuild = spiraReleaseBuilds.get(0);
-
-		return spiraReleaseBuild.getSpiraTestCaseRuns(50000);
-	}
-
-	private String _getLatestUpstreamComparisonMessage(
+	private static String _getLatestUpstreamComparisonMessage(
 		String branchName, String testSuite) {
 
 		StringBuilder sb1 = new StringBuilder();
@@ -90,13 +58,13 @@ public class SpiraTestCaseResultsUtil {
 			comparisonTestSuiteMaps.put(
 				comparisonUpstreamSuite,
 				_getSpiraTestCaseRunMapFromList(
-					getLatestUpstreamSpiraTestCaseRuns(
+					_getLatestUpstreamSpiraTestCaseRuns(
 						branchName, comparisonUpstreamSuite)));
 		}
 
 		Map<Integer, SpiraTestCaseRun> spiraTestCaseRuns =
 			_getSpiraTestCaseRunMapFromList(
-				getLatestUpstreamSpiraTestCaseRuns(branchName, testSuite));
+				_getLatestUpstreamSpiraTestCaseRuns(branchName, testSuite));
 
 		for (Map.Entry<Integer, SpiraTestCaseRun> entry :
 				spiraTestCaseRuns.entrySet()) {
@@ -186,6 +154,38 @@ public class SpiraTestCaseResultsUtil {
 		}
 
 		return sb1.toString();
+	}
+
+	private List<SpiraTestCaseRun> _getLatestUpstreamSpiraTestCaseRuns(
+		String branchName, String testSuite) {
+
+		SpiraProject spiraProject = SpiraProject.getSpiraProjectByID(
+			SpiraProject.getID("dxp"));
+
+		int testSuiteReleaseID = Integer.parseInt(
+			JenkinsResultsParserUtil.getProperty(
+				_buildProperties,
+				"spira.release.id[test-portal-testsuite-upstream(" +
+					branchName + ")][" + testSuite + "]"));
+
+		SpiraRelease spiraRelease = spiraProject.getSpiraReleaseByID(
+			testSuiteReleaseID);
+
+		SearchQuery.SearchParameter searchParameter =
+			new SearchQuery.SearchParameter(
+				SpiraRelease.getKeyID(SpiraRelease.class), testSuiteReleaseID);
+
+		List<SpiraReleaseBuild> spiraReleaseBuilds =
+			SpiraReleaseBuild.getSpiraReleaseBuilds(
+				spiraProject, spiraRelease, searchParameter);
+
+		if (spiraReleaseBuilds.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		SpiraReleaseBuild spiraReleaseBuild = spiraReleaseBuilds.get(0);
+
+		return spiraReleaseBuild.getSpiraTestCaseRuns(50000);
 	}
 
 	private Map<Integer, SpiraTestCaseRun> _getSpiraTestCaseRunMapFromList(
