@@ -33,6 +33,19 @@ import java.util.Properties;
  */
 public class SpiraTestCaseResultsUtil {
 
+	public static void sendUpstreamTestSuiteSlackNotification(
+		String branchName, String channel, String testSuite) {
+
+		String message = _getLatestUpstreamComparisonMessage(
+			branchName, testSuite);
+
+		String subject = JenkinsResultsParserUtil.combine(
+			"Inconsistent Upstream Test Suite Test Report (", branchName,
+			") - ", testSuite);
+
+		NotificationUtil.sendSlackNotification(message, channel, subject);
+	}
+
 	private static String _getLatestUpstreamComparisonMessage(
 		String branchName, String testSuite) {
 
