@@ -170,6 +170,21 @@ public class SpiraTestCaseResultsUtil {
 			}
 		}
 
+		if (sb1.length() == 0) {
+			sb1.append("There are no inconsistent test results in the latest ");
+			sb1.append(branchName);
+			sb1.append(" upstream test run for the test suite '");
+			sb1.append(testSuite);
+			sb1.append("' compared to the following upstream test suite(s):\n");
+
+			for (String comparisonUpstreamSuite :
+					comparisonUpstreamSuites.split(",")) {
+
+				sb1.append(comparisonUpstreamSuite);
+				sb1.append("\n");
+			}
+		}
+
 		return sb1.toString();
 	}
 
