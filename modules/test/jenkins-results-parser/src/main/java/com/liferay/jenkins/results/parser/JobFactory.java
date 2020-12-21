@@ -150,6 +150,15 @@ public class JobFactory {
 			return _jobs.get(jobKey);
 		}
 
+		if (jobName.equals(
+				"send-inconsistent-test-report-slack-notification-" +
+					"controller")) {
+
+			_jobs.put(jobKey, new SimpleJob(jobName, buildProfile));
+
+			return _jobs.get(jobKey);
+		}
+
 		if (jobName.startsWith("test-plugins-acceptance-pullrequest(")) {
 			PluginsGitRepositoryJob pluginsGitRepositoryJob =
 				new PluginsGitRepositoryJob(jobName, buildProfile);
