@@ -53,6 +53,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -1178,15 +1179,18 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public JSONObject getTestReportJSONObject(boolean checkCache) {
+		String testReportURL = getBuildURL() + "testReport/api/json";
+
 		try {
 			return JenkinsResultsParserUtil.toJSONObject(
-				JenkinsResultsParserUtil.getLocalURL(
-					getBuildURL() + "testReport/api/json"),
+				JenkinsResultsParserUtil.getLocalURL(testReportURL),
 				checkCache);
 		}
-		catch (IOException ioException) {
-			throw new RuntimeException(
-				"Unable to get test report JSON object", ioException);
+		catch (IOException | JSONException exception) {
+			System.out.println(
+				"Unable to get test report JSON object " + testReportURL);
+
+			return null;
 		}
 	}
 

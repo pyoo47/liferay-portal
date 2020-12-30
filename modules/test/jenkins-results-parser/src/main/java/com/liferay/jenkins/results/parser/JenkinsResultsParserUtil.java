@@ -3033,7 +3033,7 @@ public class JenkinsResultsParserUtil {
 		throws IOException {
 
 		String response = toString(
-			url, checkCache, maxRetries, null, postContent, retryPeriod,
+			url, checkCache, maxRetries, method, postContent, retryPeriod,
 			timeout, httpAuthorization);
 
 		if ((response == null) ||
@@ -3174,9 +3174,18 @@ public class JenkinsResultsParserUtil {
 
 			int bytes = sb.length();
 
+			if (checkCache && (bytes == 0)) {
+				sb.append(
+					toString(
+						url, false, maxRetries, method, postContent,
+						retryPeriod, timeout, httpAuthorizationHeader));
+
+				bytes = sb.length();
+			}
+
 			String content = sb.toString();
 
-			if (checkCache && !url.startsWith("file:") &&
+			if (checkCache && !url.startsWith("file:") && (bytes > 0) &&
 				(bytes < (3 * 1024 * 1024))) {
 
 				url = fixURL(url);
