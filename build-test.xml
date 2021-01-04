@@ -10607,7 +10607,7 @@ log.sanitizer.enabled=false</echo>
 	</target>
 
 	<target name="prepare-release-bundle">
-		<ant dir="${release.tool.dir}" inheritAll="false" target="dist" useNativeBasedir="true">
+		<ant antfile="build-release-slim.xml" dir="${release.tool.dir}" inheritAll="false" target="dist" useNativeBasedir="true">
 			<property name="override.decrement.module.bnd.versions" value="true" />
 			<property name="project.release.dir.native" value="${release.tool.dir}" />
 		</ant>
