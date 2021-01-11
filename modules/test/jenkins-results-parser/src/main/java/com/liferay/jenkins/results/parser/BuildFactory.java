@@ -17,10 +17,12 @@ package com.liferay.jenkins.results.parser;
 import java.io.IOException;
 import java.io.StringReader;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author Peter Yoo
@@ -39,11 +41,9 @@ public class BuildFactory {
 
 		String axisVariable = matcher.group("axisVariable");
 
-		Map<String, String> buildParameters =
-			JenkinsResultsParserUtil.getBuildParameters(url);
-
 		if (axisVariable != null) {
-			String jobVariant = buildParameters.get("JOB_VARIANT");
+			String jobVariant = JenkinsResultsParserUtil.getBuildParameter(
+				url, "JOB_VARIANT");
 
 			if ((jobVariant != null) && jobVariant.contains("cucumber")) {
 				return new CucumberAxisBuild(url, (BatchBuild)parentBuild);
@@ -82,9 +82,7 @@ public class BuildFactory {
 			return new FreestyleBatchBuild(url, (TopLevelBuild)parentBuild);
 		}
 
-		String axisVariables = buildParameters.get("AXIS_VARIABLES");
-
-		if ((axisVariables != null) && !axisVariables.isEmpty()) {
+		if (_isBatchBuild(matcher.group("master"), jobName)) {
 			if (jobName.contains("qa-websites")) {
 				return new QAWebsitesBatchBuild(
 					url, (TopLevelBuild)parentBuild);
@@ -184,6 +182,79 @@ public class BuildFactory {
 			archiveProperties.getProperty("top.level.build.url"), null);
 	}
 
+	private static boolean _isBatchBuild(String master, String jobName) {
+		JSONObject jobJSONObject;
+
+		try {
+			jobJSONObject = JenkinsResultsParserUtil.toJSONObject(
+				JenkinsResultsParserUtil.combine(
+					"http://", master, "/job/", jobName,
+					"/api/json?tree=actions[*[*]]"));
+		}
+		catch (IOException ioException) {
+			return false;
+		}
+
+		JSONArray actionsJSONArray = jobJSONObject.optJSONArray("actions");
+
+		if (actionsJSONArray == JSONObject.NULL) {
+			return false;
+		}
+
+		JSONObject parameterDefinitionsJSONObject = null;
+
+		for (int i = 0; i < actionsJSONArray.length(); i++) {
+			JSONObject actionJSONObject = actionsJSONArray.getJSONObject(i);
+
+			if (actionJSONObject == JSONObject.NULL) {
+				continue;
+			}
+
+			if (!actionJSONObject.has("parameterDefinitions")) {
+				continue;
+			}
+
+			parameterDefinitionsJSONObject = actionJSONObject;
+
+			break;
+		}
+
+		if (parameterDefinitionsJSONObject == null) {
+			return false;
+		}
+
+		JSONArray parameterDefinitionsJSONArray =
+			parameterDefinitionsJSONObject.optJSONArray("parameterDefinitions");
+
+		if (parameterDefinitionsJSONArray == JSONObject.NULL) {
+			return false;
+		}
+
+		for (int i = 0; i < parameterDefinitionsJSONArray.length(); i++) {
+			JSONObject parameterDefinitionJSONObject =
+				parameterDefinitionsJSONArray.getJSONObject(i);
+
+			if (parameterDefinitionJSONObject == JSONObject.NULL) {
+				continue;
+			}
+
+			String parameterName = parameterDefinitionJSONObject.optString(
+				"name");
+
+			if (JenkinsResultsParserUtil.isNullOrEmpty(parameterName)) {
+				continue;
+			}
+
+			if (!parameterName.equals("AXIS_VARIABLES")) {
+				continue;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private static final String _BUILD_URL_SUFFIX_REGEX =
 		JenkinsResultsParserUtil.combine(
 			"((?<axisVariable>AXIS_VARIABLE=[^,]+,[^/]+)|)/?",
@@ -195,7 +266,7 @@ public class BuildFactory {
 			"\\w+://(?<master>[^/]+)/+job/+(?<jobName>[^/]+)/?",
 			_BUILD_URL_SUFFIX_REGEX),
 		JenkinsResultsParserUtil.combine(
-			".*?Test/+[^/]+/+test-[0-9]-[0-9]{1,2}/", "(?<jobName>[^/]+)/?",
-			_BUILD_URL_SUFFIX_REGEX));
+			".*?Test/+[^/]+/+(?<master>test-[0-9]-[0-9]{1,2})/",
+			"(?<jobName>[^/]+)/?", _BUILD_URL_SUFFIX_REGEX));
 
 }
