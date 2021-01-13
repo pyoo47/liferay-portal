@@ -31,9 +31,7 @@ public class AppReleaseFunctionalBatchTestClassGroup
 			return propertyQuery;
 		}
 
-		return JenkinsResultsParserUtil.getProperty(
-			portalTestClassJob.getJobProperties(),
-			"test.batch.run.property.query", getJobName());
+		return super.getRelevantTestBatchRunPropertyQuery();
 	}
 
 	protected AppReleaseFunctionalBatchTestClassGroup(
