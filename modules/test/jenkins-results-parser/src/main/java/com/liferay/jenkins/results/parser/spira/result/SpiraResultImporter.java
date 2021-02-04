@@ -1031,6 +1031,10 @@ public class SpiraResultImporter {
 
 		if (!JenkinsResultsParserUtil.isNullOrEmpty(spiraSlackChannels)) {
 			for (String spiraSlackChannel : spiraSlackChannels.split(",")) {
+				if (!spiraSlackChannel.startsWith("#")) {
+					spiraSlackChannel = "#" + spiraSlackChannel;
+				}
+
 				NotificationUtil.sendSlackNotification(
 					sb.toString(), spiraSlackChannel, ":liferay-ci:", buildName,
 					"Liferay CI");
