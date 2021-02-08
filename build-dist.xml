@@ -1103,6 +1103,9 @@ wrapper.java.additional.11="-Dfile.encoding=UTF-8"]]></replacevalue>
 			<then>
 				<mkdir dir="${app.server.parent.dir}" />
 
+				<echo>PDY app.server.tomcat.zip.url:${app.server.tomcat.zip.url}</echo>
+				<echo>PDY app.server.parent.dir/app.server.tomcat.zip.name:${app.server.parent.dir}/${app.server.tomcat.zip.name}</echo>
+
 				<mirrors-get
 					dest="${app.server.parent.dir}/${app.server.tomcat.zip.name}"
 					src="${app.server.tomcat.zip.url}"
