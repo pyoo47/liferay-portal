@@ -143,7 +143,7 @@ public abstract class BaseBuild implements Build {
 
 		try {
 			writeArchiveFile(
-				String.valueOf(System.currentTimeMillis()),
+				String.valueOf(JenkinsResultsParserUtil.getCurrentTimeMillis()),
 				getArchivePath() + "/archive-marker");
 		}
 		catch (IOException ioException) {
@@ -518,7 +518,7 @@ public abstract class BaseBuild implements Build {
 	public Long getDelayTime() {
 		Long startTime = getStartTime();
 
-		long currentTime = System.currentTimeMillis();
+		long currentTime = JenkinsResultsParserUtil.getCurrentTimeMillis();
 
 		if (startTime == null) {
 			startTime = currentTime;
@@ -612,7 +612,7 @@ public abstract class BaseBuild implements Build {
 		if (duration == 0) {
 			long timestamp = buildJSONObject.getLong("timestamp");
 
-			duration = System.currentTimeMillis() - timestamp;
+			duration = JenkinsResultsParserUtil.getCurrentTimeMillis() - timestamp;
 		}
 
 		return duration;
@@ -1138,7 +1138,7 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public long getStatusAge() {
-		return System.currentTimeMillis() - statusModifiedTime;
+		return JenkinsResultsParserUtil.getCurrentTimeMillis() - statusModifiedTime;
 	}
 
 	@Override
@@ -3601,7 +3601,7 @@ public abstract class BaseBuild implements Build {
 
 			long previousStatusModifiedTime = statusModifiedTime;
 
-			statusModifiedTime = System.currentTimeMillis();
+			statusModifiedTime = JenkinsResultsParserUtil.getCurrentTimeMillis();
 
 			statusDurations.put(
 				_previousStatus,
