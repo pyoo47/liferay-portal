@@ -612,7 +612,8 @@ public abstract class BaseBuild implements Build {
 		if (duration == 0) {
 			long timestamp = buildJSONObject.getLong("timestamp");
 
-			duration = JenkinsResultsParserUtil.getCurrentTimeMillis() - timestamp;
+			duration =
+				JenkinsResultsParserUtil.getCurrentTimeMillis() - timestamp;
 		}
 
 		return duration;
@@ -1138,7 +1139,8 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public long getStatusAge() {
-		return JenkinsResultsParserUtil.getCurrentTimeMillis() - statusModifiedTime;
+		return JenkinsResultsParserUtil.getCurrentTimeMillis() -
+			statusModifiedTime;
 	}
 
 	@Override
@@ -3601,7 +3603,8 @@ public abstract class BaseBuild implements Build {
 
 			long previousStatusModifiedTime = statusModifiedTime;
 
-			statusModifiedTime = JenkinsResultsParserUtil.getCurrentTimeMillis();
+			statusModifiedTime =
+				JenkinsResultsParserUtil.getCurrentTimeMillis();
 
 			statusDurations.put(
 				_previousStatus,
