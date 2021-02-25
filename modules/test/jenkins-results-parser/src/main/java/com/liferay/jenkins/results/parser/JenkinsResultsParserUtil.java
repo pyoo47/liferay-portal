@@ -1514,7 +1514,8 @@ public class JenkinsResultsParserUtil {
 
 		Map<String, List<String>> jenkinsNodeMap = getJenkinsNodeMap();
 
-		System.out.println("PDY 3 jenkinsNodeMap size: " + jenkinsNodeMap.size());
+		System.out.println(
+			"PDY 3 jenkinsNodeMap size: " + jenkinsNodeMap.size());
 
 		if (jenkinsNodeMap != null) {
 			for (Map.Entry<String, List<String>> entry :
@@ -1613,7 +1614,10 @@ public class JenkinsResultsParserUtil {
 								buildProperties, jenkinsMasterName, null,
 								false);
 
-							System.out.println("PDY - Jenkins master " + jenkinsMasterName + " slave names list size: " + jenkinsSlaveNames.size());
+							System.out.println(
+								"PDY - Jenkins master " + jenkinsMasterName +
+									" slave names list size: " +
+										jenkinsSlaveNames.size());
 
 							if (jenkinsSlaveNames.isEmpty()) {
 								continue;
@@ -2260,7 +2264,13 @@ public class JenkinsResultsParserUtil {
 					buildProperties.getProperty(propertyName.toString()));
 
 				for (String slave : slavesString.split(",")) {
-					slaves.add(slave.trim());
+					slave = slave.trim();
+
+					if (isNullOrEmpty(slave)) {
+						continue;
+					}
+
+					slaves.add(slave);
 				}
 			}
 		}
