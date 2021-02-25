@@ -1629,6 +1629,8 @@ public class JenkinsResultsParserUtil {
 					}
 
 					if (jenkinsNodeMap.isEmpty()) {
+						setBuildProperties(URLS_BUILD_PROPERTIES_DEFAULT);
+
 						_checkCache = false;
 
 						throw new RuntimeException(
