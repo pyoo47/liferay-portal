@@ -1502,15 +1502,19 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getJenkinsMasterName(String jenkinsSlaveName) {
-		System.out.println("PDY jenkinsSlaveName: " + jenkinsSlaveName);
+		System.out.println("PDY 1 jenkinsSlaveName: " + jenkinsSlaveName);
 
 		jenkinsSlaveName = jenkinsSlaveName.replaceAll("([^\\.]+).*", "$1");
+
+		System.out.println("PDY 2 jenkinsSlaveName: " + jenkinsSlaveName);
 
 		if (jenkinsSlaveName.matches("test-\\d{1,2}-\\d{1,2}")) {
 			return jenkinsSlaveName;
 		}
 
 		Map<String, List<String>> jenkinsNodeMap = getJenkinsNodeMap();
+
+		System.out.println("PDY 3 jenkinsNodeMap size: " + jenkinsNodeMap.size());
 
 		if (jenkinsNodeMap != null) {
 			for (Map.Entry<String, List<String>> entry :
@@ -1546,6 +1550,8 @@ public class JenkinsResultsParserUtil {
 				sb.append("\n");
 			}
 		}
+
+		System.out.println("PDY Message:\n" + sb.toString());
 
 		NotificationUtil.sendEmail(
 			sb.toString(), "jenkins", "Unable to get Jenkins master name",
