@@ -1364,6 +1364,8 @@ public class JenkinsResultsParserUtil {
 			return inetAddress.getHostName();
 		}
 		catch (UnknownHostException unknownHostException) {
+			unknownHostException.printStackTrace();
+
 			return defaultHostName;
 		}
 	}
@@ -1500,6 +1502,8 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getJenkinsMasterName(String jenkinsSlaveName) {
+		System.out.println("PDY jenkinsSlaveName: " + jenkinsSlaveName);
+
 		jenkinsSlaveName = jenkinsSlaveName.replaceAll("([^\\.]+).*", "$1");
 
 		if (jenkinsSlaveName.matches("test-\\d{1,2}-\\d{1,2}")) {
