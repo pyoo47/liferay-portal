@@ -53,6 +53,8 @@ public abstract class Retryable<T> {
 					System.out.println("An error has occurred: " + exception);
 				}
 
+				exception.printStackTrace();
+
 				if ((_maxRetries >= 0) && (retryCount > _maxRetries)) {
 					if (_exceptionOnFail) {
 						throw exception;

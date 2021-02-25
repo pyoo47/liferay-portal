@@ -902,6 +902,8 @@ public class JenkinsResultsParserUtil {
 			}
 
 			for (String url : _buildPropertiesURLs) {
+				System.out.println("PDY loading buildPropertiesURL: " + url);
+
 				properties.load(
 					new StringReader(
 						toString(
@@ -1594,6 +1596,7 @@ public class JenkinsResultsParserUtil {
 					Map<String, List<String>> jenkinsNodeMap = new HashMap<>();
 
 					try {
+						System.out.println("Calling getBuildProperties(" + _checkCache + ")");
 						buildProperties = getBuildProperties(_checkCache);
 					}
 					catch (IOException ioException) {
