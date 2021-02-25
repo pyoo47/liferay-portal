@@ -1613,6 +1613,8 @@ public class JenkinsResultsParserUtil {
 								buildProperties, jenkinsMasterName, null,
 								false);
 
+							System.out.println("PDY - Jenkins master " + jenkinsMasterName + " slave names list size: " + jenkinsSlaveNames.size());
+
 							if (jenkinsSlaveNames.isEmpty()) {
 								continue;
 							}
