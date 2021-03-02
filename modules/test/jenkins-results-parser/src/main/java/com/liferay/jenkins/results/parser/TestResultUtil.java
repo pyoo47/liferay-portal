@@ -14,6 +14,12 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.liferay.jenkins.results.parser.testray.TestrayBuild;
+import com.liferay.jenkins.results.parser.testray.TestrayCaseResult;
+import com.liferay.jenkins.results.parser.testray.TestrayProject;
+import com.liferay.jenkins.results.parser.testray.TestrayRoutine;
+import com.liferay.jenkins.results.parser.testray.TestrayServer;
+
 import java.io.IOException;
 
 import java.net.URL;
@@ -23,6 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,6 +39,25 @@ import org.json.JSONObject;
  * @author Kenji Heigel
  */
 public class TestResultUtil {
+
+	public static void addToTestDataMap(
+		String name, String batchName, String status, String buildURL,
+		String errorSnippet) {
+
+		String key = name + "/" + batchName;
+
+		if (!_testDataMap.containsKey(key)) {
+			_testDataMap.put(
+				key,
+				new TestData(name, batchName, status, buildURL, errorSnippet));
+
+			return;
+		}
+
+		TestData testData = _testDataMap.get(key);
+
+		testData.update(buildURL, errorSnippet, status);
+	}
 
 	public static void loadBuildResultJSON(JSONObject jsonObject) {
 		JSONArray batchResultsJSONArray = jsonObject.getJSONArray(
@@ -70,20 +97,8 @@ public class TestResultUtil {
 				String errorDetails = testResultJSONObject.optString(
 					"errorDetails");
 
-				String key = name + "/" + jobVariant;
-
-				if (!_testDataMap.containsKey(key)) {
-					_testDataMap.put(
-						key,
-						new TestData(
-							name, jobVariant, status, buildURL, errorDetails));
-
-					continue;
-				}
-
-				TestData testData = _testDataMap.get(key);
-
-				testData.update(buildURL, errorDetails, status);
+				addToTestDataMap(
+					name, jobVariant, status, buildURL, errorDetails);
 			}
 		}
 	}
@@ -97,6 +112,58 @@ public class TestResultUtil {
 		}
 		catch (IOException ioException) {
 			System.out.println("Unable to load " + url);
+		}
+	}
+
+	public static void loadTestrayBuilds(
+		String testrayServerName, String projectName, String routineName,
+		int maxBuilds) {
+
+		TestrayServer testrayServer = new TestrayServer(testrayServerName);
+
+		TestrayProject testrayProject = testrayServer.getTestrayProjectByName(
+			projectName);
+
+		TestrayRoutine testrayRoutine = testrayProject.getTestrayRoutineByName(
+			routineName);
+
+		for (TestrayBuild testrayBuild :
+				testrayRoutine.getTestrayBuilds(maxBuilds)) {
+
+			for (TestrayCaseResult testrayCaseResult :
+					testrayBuild.getTestrayCaseResults()) {
+
+				String name = testrayCaseResult.getName();
+
+				String jobVariant = null;
+
+				List<TestrayCaseResult.Attachment> attachments =
+					testrayCaseResult.getAttachments();
+
+				if (!attachments.isEmpty()) {
+					for (TestrayCaseResult.Attachment attachment :
+							attachments) {
+
+						String attachmentValue = attachment.getValue();
+
+						Matcher matcher = _testrayLogPattern.matcher(
+							attachmentValue);
+
+						matcher.find();
+
+						jobVariant = matcher.group("jobVariant");
+					}
+				}
+
+				TestrayCaseResult.Status status = testrayCaseResult.getStatus();
+
+				URL url = testrayCaseResult.getURL();
+
+				String errors = testrayCaseResult.getErrors();
+
+				addToTestDataMap(
+					name, jobVariant, status.getName(), url.toString(), errors);
+			}
 		}
 	}
 
@@ -215,5 +282,7 @@ public class TestResultUtil {
 	}
 
 	private static final Map<String, TestData> _testDataMap = new HashMap<>();
+	private static final Pattern _testrayLogPattern = Pattern.compile(
+		"test[0-9-]+\\/[0-9]+\\/.+?\\/[0-9]+\\/(?<jobVariant>.+?)\\/.*");
 
 }
