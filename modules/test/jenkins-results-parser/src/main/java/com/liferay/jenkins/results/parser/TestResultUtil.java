@@ -14,6 +14,10 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.IOException;
+
+import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,11 +25,80 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author Kenji Heigel
  */
 public class TestResultUtil {
+
+	public static void loadBuildResultJSON(JSONObject jsonObject) {
+		JSONArray batchResultsJSONArray = jsonObject.getJSONArray(
+			"batchResults");
+
+		for (int i = 0; i < batchResultsJSONArray.length(); i++) {
+			JSONObject batchResultJSONObject =
+				batchResultsJSONArray.getJSONObject(i);
+
+			String jobVariant = batchResultJSONObject.getString("jobVariant");
+
+			jobVariant = jobVariant.replaceAll("(.*)/.*", "$1");
+
+			JSONArray testResultsJSONArray = batchResultJSONObject.getJSONArray(
+				"testResults");
+
+			for (int j = 0; j < testResultsJSONArray.length(); j++) {
+				JSONObject testResultJSONObject =
+					testResultsJSONArray.getJSONObject(j);
+
+				String name = testResultJSONObject.optString("name");
+
+				String status = testResultJSONObject.optString("status");
+
+				status = status.replace("REGRESSION", "FAILED");
+				status = status.replace("FIXED", "PASSED");
+
+				if (name.startsWith("PortalLogAssertorTest") ||
+					name.startsWith("JenkinsLogAsserterTest") ||
+					status.equals("SKIPPED")) {
+
+					continue;
+				}
+
+				String buildURL = testResultJSONObject.optString("buildURL");
+
+				String errorDetails = testResultJSONObject.optString(
+					"errorDetails");
+
+				String key = name + "/" + jobVariant;
+
+				if (!_testDataMap.containsKey(key)) {
+					_testDataMap.put(
+						key,
+						new TestData(
+							name, jobVariant, status, buildURL, errorDetails));
+
+					continue;
+				}
+
+				TestData testData = _testDataMap.get(key);
+
+				testData.update(buildURL, errorDetails, status);
+			}
+		}
+	}
+
+	public static void loadBuildResultJSON(URL url) {
+		try {
+			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
+				url.toString());
+
+			loadBuildResultJSON(jsonObject);
+		}
+		catch (IOException ioException) {
+			System.out.println("Unable to load " + url);
+		}
+	}
 
 	public static class TestData {
 
