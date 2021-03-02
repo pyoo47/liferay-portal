@@ -97,6 +97,32 @@ public class TestResultUtil {
 			_statuses.add(status);
 		}
 
+		protected boolean isFlakyAlgorithm1() {
+			int statusChanges = 0;
+
+			String lastStatus = null;
+
+			for (String status : _statuses) {
+				if (lastStatus == null) {
+					lastStatus = status;
+
+					continue;
+				}
+
+				if (!lastStatus.equals(status)) {
+					lastStatus = status;
+
+					statusChanges++;
+				}
+			}
+
+			if (statusChanges > 1) {
+				return true;
+			}
+
+			return false;
+		}
+
 		protected boolean isFlakyBasicAlgorithm() {
 			if (Collections.frequency(_statuses, _statuses.get(0)) <
 					_statuses.size()) {
