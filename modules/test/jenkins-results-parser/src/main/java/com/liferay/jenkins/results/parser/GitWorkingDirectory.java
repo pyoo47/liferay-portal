@@ -1755,6 +1755,28 @@ public class GitWorkingDirectory {
 		return false;
 	}
 
+	public boolean isOnlyPoshiFilesModified() {
+		for (File modifiedFile : getModifiedFilesList()) {
+			String modifiedFileName = modifiedFile.getName();
+
+			boolean poshiFileModified = false;
+
+			for (String poshiFileEnding : _POSHI_FILE_ENDINGS) {
+				if (modifiedFileName.endsWith(poshiFileEnding)) {
+					poshiFileModified = true;
+
+					break;
+				}
+			}
+
+			if (!poshiFileModified) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	public boolean isRemoteGitRepositoryAlive(String remoteURL) {
 		String command = JenkinsResultsParserUtil.combine(
 			"git ls-remote -h ", remoteURL, " HEAD");
@@ -2625,6 +2647,10 @@ public class GitWorkingDirectory {
 	}
 
 	private static final int _BRANCHES_DELETE_BATCH_SIZE = 5;
+
+	private static final String[] _POSHI_FILE_ENDINGS = {
+		".function", ".macro", ".path", ".prose", ".testcase"
+	};
 
 	private static final Pattern _badRefPattern = Pattern.compile(
 		"fatal: bad object (?<badRef>.+/HEAD)");
