@@ -212,6 +212,10 @@ public class TestResultUtil {
 		JenkinsResultsParserUtil.write(filePath, sb.toString());
 	}
 
+	public void setFlakyDetectionAlgorithm(String type) {
+		_flakyDetectionAlgorithm = FlakyDetectionAlgorithm.get(type);
+	}
+
 	public static class TestData {
 
 		public TestData(
@@ -249,7 +253,13 @@ public class TestResultUtil {
 		}
 
 		public boolean isFlaky() {
-			return isFlakyBasicAlgorithm();
+			if (_flakyDetectionAlgorithm ==
+					FlakyDetectionAlgorithm.STATUS_CHANGE) {
+
+				return isFlakyByStatusChangeAlgorithm();
+			}
+
+			return isFlakyByBasicAlgorithm();
 		}
 
 		public JSONArray toJSONArray() {
@@ -283,7 +293,17 @@ public class TestResultUtil {
 			_statuses.add(status);
 		}
 
-		protected boolean isFlakyAlgorithm1() {
+		protected boolean isFlakyByBasicAlgorithm() {
+			if (Collections.frequency(_statuses, _statuses.get(0)) <
+					_statuses.size()) {
+
+				return true;
+			}
+
+			return false;
+		}
+
+		protected boolean isFlakyByStatusChangeAlgorithm() {
 			String lastStatus = null;
 
 			for (String status : _statuses) {
@@ -307,22 +327,42 @@ public class TestResultUtil {
 			return false;
 		}
 
-		protected boolean isFlakyBasicAlgorithm() {
-			if (Collections.frequency(_statuses, _statuses.get(0)) <
-					_statuses.size()) {
-
-				return true;
-			}
-
-			return false;
-		}
-
 		private final String _batchName;
 		private final List<String> _buildURLs = new ArrayList<>();
 		private final List<String> _errorSnippets = new ArrayList<>();
 		private final String _name;
 		private int _statusChanges;
 		private final List<String> _statuses = new ArrayList<>();
+
+	}
+
+	public enum FlakyDetectionAlgorithm {
+
+		BASIC("basic"), STATUS_CHANGE("status_change");
+
+		public static FlakyDetectionAlgorithm get(String type) {
+			return _flakyDetectionAlgorithms.get(type);
+		}
+
+		public String getType() {
+			return _type;
+		}
+
+		private FlakyDetectionAlgorithm(String type) {
+			_type = type;
+		}
+
+		private static Map<String, FlakyDetectionAlgorithm>
+			_flakyDetectionAlgorithms = new HashMap<>();
+
+		static {
+			for (FlakyDetectionAlgorithm flakyDetectionAlgorithm : values()) {
+				_flakyDetectionAlgorithms.put(
+					flakyDetectionAlgorithm.getType(), flakyDetectionAlgorithm);
+			}
+		}
+
+		private final String _type;
 
 	}
 
@@ -386,6 +426,8 @@ public class TestResultUtil {
 		return buildResultJsonURLs;
 	}
 
+	private static FlakyDetectionAlgorithm _flakyDetectionAlgorithm =
+		FlakyDetectionAlgorithm.BASIC;
 	private static final Map<String, TestData> _testDataMap = new HashMap<>();
 	private static final Pattern _testrayLogPattern = Pattern.compile(
 		"test[0-9-]+\\/[0-9]+\\/.+?\\/[0-9]+\\/(?<jobVariant>.+?)\\/.*");
