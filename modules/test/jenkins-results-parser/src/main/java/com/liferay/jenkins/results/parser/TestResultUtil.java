@@ -66,7 +66,7 @@ public class TestResultUtil {
 		return _testHistoryMap;
 	}
 
-	public static void loadBuildResultJSON(JSONObject jsonObject) {
+	public static void loadBuildResult(JSONObject jsonObject) {
 		JSONArray batchResultsJSONArray = jsonObject.getJSONArray(
 			"batchResults");
 
@@ -110,12 +110,12 @@ public class TestResultUtil {
 		}
 	}
 
-	public static void loadBuildResultJSON(URL url) {
+	public static void loadBuildResult(URL url) {
 		try {
 			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
 				url.toString());
 
-			loadBuildResultJSON(jsonObject);
+			loadBuildResult(jsonObject);
 		}
 		catch (IOException ioException) {
 			System.out.println("Unable to load " + url);
@@ -191,7 +191,7 @@ public class TestResultUtil {
 			_getBuildResultJSONObjects(buildResultJsonURLs);
 
 		for (String buildResultJsonURL : buildResultJsonURLs) {
-			loadBuildResultJSON(buildResultJSONObjects.get(buildResultJsonURL));
+			loadBuildResult(buildResultJSONObjects.get(buildResultJsonURL));
 		}
 
 		JSONArray flakyTestDataJSONArray = new JSONArray();
