@@ -186,7 +186,14 @@ public class TestReportUtil {
 	}
 
 	public static void setFlakinessAlgorithm(String type) {
-		_flakinessAlgorithm = FlakinessAlgorithm.get(type);
+		FlakinessAlgorithm flakinessAlgorithm = FlakinessAlgorithm.get(type);
+
+		if (flakinessAlgorithm == null) {
+			throw new IllegalArgumentException(
+				"Invalid flakiness algorithm type: '" + type + "'");
+		}
+
+		_flakinessAlgorithm = flakinessAlgorithm;
 	}
 
 	public static void writeFlakyTestDataJavaScriptFile(String filePath)
