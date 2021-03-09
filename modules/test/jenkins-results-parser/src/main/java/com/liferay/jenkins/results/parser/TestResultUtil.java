@@ -270,6 +270,7 @@ public class TestResultUtil {
 			}
 
 			jsonArray.put(statusesJSONArray);
+			jsonArray.put(_statusChanges);
 
 			return jsonArray;
 		}
@@ -283,8 +284,6 @@ public class TestResultUtil {
 		}
 
 		protected boolean isFlakyAlgorithm1() {
-			int statusChanges = 0;
-
 			String lastStatus = null;
 
 			for (String status : _statuses) {
@@ -297,11 +296,11 @@ public class TestResultUtil {
 				if (!lastStatus.equals(status)) {
 					lastStatus = status;
 
-					statusChanges++;
+					_statusChanges++;
 				}
 			}
 
-			if (statusChanges > 1) {
+			if (_statusChanges > 1) {
 				return true;
 			}
 
