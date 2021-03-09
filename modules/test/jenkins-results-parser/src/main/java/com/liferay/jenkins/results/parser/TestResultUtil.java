@@ -166,10 +166,9 @@ public class TestResultUtil {
 
 				URL url = testrayCaseResult.getURL();
 
-				String errors = testrayCaseResult.getErrors();
-
 				addToTestHistoryMap(
-					name, jobVariant, status.getName(), url.toString(), errors);
+					name, jobVariant, status.getName(), url.toString(),
+					testrayCaseResult.getErrors());
 			}
 		}
 	}
