@@ -40,7 +40,7 @@ import org.json.JSONObject;
 /**
  * @author Kenji Heigel
  */
-public class TestResultUtil {
+public class TestReportUtil {
 
 	public static void addToTestHistoryMap(
 		String name, String batchName, String status, String buildURL,
@@ -122,6 +122,18 @@ public class TestResultUtil {
 		}
 	}
 
+	public static void loadBuildResultsByJenkinsJob(String jobURL, int builds) {
+		List<String> buildResultJsonURLs = _getBuildResultJsonURLs(
+			jobURL, builds);
+
+		Map<String, JSONObject> buildResultJSONObjects =
+			_getBuildResultJSONObjects(buildResultJsonURLs);
+
+		for (String buildResultJsonURL : buildResultJsonURLs) {
+			loadBuildResult(buildResultJSONObjects.get(buildResultJsonURL));
+		}
+	}
+
 	public static void loadTestrayBuilds(
 		String testrayServerName, String projectName, String routineName,
 		int maxBuilds) {
@@ -179,20 +191,6 @@ public class TestResultUtil {
 
 	public static void writeFlakyTestDataJavaScriptFile(String filePath)
 		throws IOException {
-
-		String acceptanceUpstreamJobURL =
-			"https://test-1-1.liferay.com/job" +
-				"/test-portal-acceptance-upstream-dxp(master)/";
-
-		List<String> buildResultJsonURLs = _getBuildResultJsonURLs(
-			acceptanceUpstreamJobURL, 25);
-
-		Map<String, JSONObject> buildResultJSONObjects =
-			_getBuildResultJSONObjects(buildResultJsonURLs);
-
-		for (String buildResultJsonURL : buildResultJsonURLs) {
-			loadBuildResult(buildResultJSONObjects.get(buildResultJsonURL));
-		}
 
 		JSONArray flakyTestDataJSONArray = new JSONArray();
 
