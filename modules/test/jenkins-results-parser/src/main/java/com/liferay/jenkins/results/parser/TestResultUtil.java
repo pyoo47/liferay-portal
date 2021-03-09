@@ -173,6 +173,10 @@ public class TestResultUtil {
 		}
 	}
 
+	public static void setFlakinessAlgorithm(String type) {
+		_flakinessAlgorithm = FlakinessAlgorithm.get(type);
+	}
+
 	public static void writeFlakyTestDataJavaScriptFile(String filePath)
 		throws IOException {
 
@@ -210,10 +214,6 @@ public class TestResultUtil {
 		sb.append(";");
 
 		JenkinsResultsParserUtil.write(filePath, sb.toString());
-	}
-
-	public void setFlakinessAlgorithm(String type) {
-		_flakinessAlgorithm = FlakinessAlgorithm.get(type);
 	}
 
 	public static class TestHistory {
