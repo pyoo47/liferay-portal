@@ -42,27 +42,28 @@ import org.json.JSONObject;
  */
 public class TestResultUtil {
 
-	public static void addToTestDataMap(
+	public static void addToTestHistoryMap(
 		String name, String batchName, String status, String buildURL,
 		String errorSnippet) {
 
 		String key = name + "/" + batchName;
 
-		if (!_testDataMap.containsKey(key)) {
-			_testDataMap.put(
+		if (!_testHistoryMap.containsKey(key)) {
+			_testHistoryMap.put(
 				key,
-				new TestData(name, batchName, status, buildURL, errorSnippet));
+				new TestHistory(
+					name, batchName, status, buildURL, errorSnippet));
 
 			return;
 		}
 
-		TestData testData = _testDataMap.get(key);
+		TestHistory testHistory = _testHistoryMap.get(key);
 
-		testData.update(buildURL, errorSnippet, status);
+		testHistory.update(buildURL, errorSnippet, status);
 	}
 
-	public static Map<String, TestData> getTestDataMap() {
-		return _testDataMap;
+	public static Map<String, TestHistory> getTestHistoryMap() {
+		return _testHistoryMap;
 	}
 
 	public static void loadBuildResultJSON(JSONObject jsonObject) {
@@ -103,7 +104,7 @@ public class TestResultUtil {
 				String errorDetails = testResultJSONObject.optString(
 					"errorDetails");
 
-				addToTestDataMap(
+				addToTestHistoryMap(
 					name, jobVariant, status, buildURL, errorDetails);
 			}
 		}
@@ -167,7 +168,7 @@ public class TestResultUtil {
 
 				String errors = testrayCaseResult.getErrors();
 
-				addToTestDataMap(
+				addToTestHistoryMap(
 					name, jobVariant, status.getName(), url.toString(), errors);
 			}
 		}
@@ -195,11 +196,11 @@ public class TestResultUtil {
 		flakyTestDataJSONArray.put(
 			new String[] {"Name", "Batch Type", "Results", "Status Changes"});
 
-		Map<String, TestData> testDataMap = getTestDataMap();
+		Map<String, TestHistory> testHistoryMap = getTestHistoryMap();
 
-		for (TestData testData : testDataMap.values()) {
-			if (testData.isFlaky()) {
-				flakyTestDataJSONArray.put(testData.toJSONArray());
+		for (TestHistory testHistory : testHistoryMap.values()) {
+			if (testHistory.isFlaky()) {
+				flakyTestDataJSONArray.put(testHistory.toJSONArray());
 			}
 		}
 
@@ -216,9 +217,9 @@ public class TestResultUtil {
 		_flakyDetectionAlgorithm = FlakyDetectionAlgorithm.get(type);
 	}
 
-	public static class TestData {
+	public static class TestHistory {
 
-		public TestData(
+		public TestHistory(
 			String name, String batchName, String status, String buildURL,
 			String errorSnippet) {
 
@@ -428,7 +429,8 @@ public class TestResultUtil {
 
 	private static FlakyDetectionAlgorithm _flakyDetectionAlgorithm =
 		FlakyDetectionAlgorithm.BASIC;
-	private static final Map<String, TestData> _testDataMap = new HashMap<>();
+	private static final Map<String, TestHistory> _testHistoryMap =
+		new HashMap<>();
 	private static final Pattern _testrayLogPattern = Pattern.compile(
 		"test[0-9-]+\\/[0-9]+\\/.+?\\/[0-9]+\\/(?<jobVariant>.+?)\\/.*");
 
