@@ -199,7 +199,7 @@ public class TestResultUtil {
 		Map<String, TestHistory> testHistoryMap = getTestHistoryMap();
 
 		for (TestHistory testHistory : testHistoryMap.values()) {
-			if (testHistory.isFlaky()) {
+			if (testHistory.hasFlakiness()) {
 				flakyTestDataJSONArray.put(testHistory.toJSONArray());
 			}
 		}
@@ -213,8 +213,8 @@ public class TestResultUtil {
 		JenkinsResultsParserUtil.write(filePath, sb.toString());
 	}
 
-	public void setFlakyDetectionAlgorithm(String type) {
-		_flakyDetectionAlgorithm = FlakyDetectionAlgorithm.get(type);
+	public void setFlakinessAlgorithm(String type) {
+		_flakinessAlgorithm = FlakinessAlgorithm.get(type);
 	}
 
 	public static class TestHistory {
@@ -253,14 +253,12 @@ public class TestResultUtil {
 			return _name;
 		}
 
-		public boolean isFlaky() {
-			if (_flakyDetectionAlgorithm ==
-					FlakyDetectionAlgorithm.STATUS_CHANGE) {
-
-				return isFlakyByStatusChangeAlgorithm();
+		public boolean hasFlakiness() {
+			if (_flakinessAlgorithm == FlakinessAlgorithm.STATUS_CHANGE) {
+				return hasFlakinessByStatusChangeAlgorithm();
 			}
 
-			return isFlakyByBasicAlgorithm();
+			return hasFlakinessByBasicAlgorithm();
 		}
 
 		public JSONArray toJSONArray() {
@@ -294,7 +292,7 @@ public class TestResultUtil {
 			_statuses.add(status);
 		}
 
-		protected boolean isFlakyByBasicAlgorithm() {
+		protected boolean hasFlakinessByBasicAlgorithm() {
 			if (Collections.frequency(_statuses, _statuses.get(0)) <
 					_statuses.size()) {
 
@@ -304,7 +302,7 @@ public class TestResultUtil {
 			return false;
 		}
 
-		protected boolean isFlakyByStatusChangeAlgorithm() {
+		protected boolean hasFlakinessByStatusChangeAlgorithm() {
 			String lastStatus = null;
 
 			for (String status : _statuses) {
@@ -337,29 +335,29 @@ public class TestResultUtil {
 
 	}
 
-	public enum FlakyDetectionAlgorithm {
+	public enum FlakinessAlgorithm {
 
 		BASIC("basic"), STATUS_CHANGE("status_change");
 
-		public static FlakyDetectionAlgorithm get(String type) {
-			return _flakyDetectionAlgorithms.get(type);
+		public static FlakinessAlgorithm get(String type) {
+			return _flakinessAlgorithms.get(type);
 		}
 
 		public String getType() {
 			return _type;
 		}
 
-		private FlakyDetectionAlgorithm(String type) {
+		private FlakinessAlgorithm(String type) {
 			_type = type;
 		}
 
-		private static Map<String, FlakyDetectionAlgorithm>
-			_flakyDetectionAlgorithms = new HashMap<>();
+		private static Map<String, FlakinessAlgorithm> _flakinessAlgorithms =
+			new HashMap<>();
 
 		static {
-			for (FlakyDetectionAlgorithm flakyDetectionAlgorithm : values()) {
-				_flakyDetectionAlgorithms.put(
-					flakyDetectionAlgorithm.getType(), flakyDetectionAlgorithm);
+			for (FlakinessAlgorithm flakinessAlgorithm : values()) {
+				_flakinessAlgorithms.put(
+					flakinessAlgorithm.getType(), flakinessAlgorithm);
 			}
 		}
 
@@ -427,8 +425,8 @@ public class TestResultUtil {
 		return buildResultJsonURLs;
 	}
 
-	private static FlakyDetectionAlgorithm _flakyDetectionAlgorithm =
-		FlakyDetectionAlgorithm.BASIC;
+	private static FlakinessAlgorithm _flakinessAlgorithm =
+		FlakinessAlgorithm.BASIC;
 	private static final Map<String, TestHistory> _testHistoryMap =
 		new HashMap<>();
 	private static final Pattern _testrayLogPattern = Pattern.compile(
