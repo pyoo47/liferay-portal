@@ -61,6 +61,10 @@ public class TestResultUtil {
 		testData.update(buildURL, errorSnippet, status);
 	}
 
+	public static Map<String, TestData> getTestDataMap() {
+		return _testDataMap;
+	}
+
 	public static void loadBuildResultJSON(JSONObject jsonObject) {
 		JSONArray batchResultsJSONArray = jsonObject.getJSONArray(
 			"batchResults");
@@ -167,6 +171,45 @@ public class TestResultUtil {
 					name, jobVariant, status.getName(), url.toString(), errors);
 			}
 		}
+	}
+
+	public static void writeFlakyTestDataJavaScriptFile(String filePath)
+		throws IOException {
+
+		String acceptanceUpstreamJobURL =
+			"https://test-1-1.liferay.com/job" +
+				"/test-portal-acceptance-upstream-dxp(master)/";
+
+		List<String> buildResultJsonURLs = _getBuildResultJsonURLs(
+			acceptanceUpstreamJobURL, 25);
+
+		Map<String, JSONObject> buildResultJSONObjects =
+			_getBuildResultJSONObjects(buildResultJsonURLs);
+
+		for (String buildResultJsonURL : buildResultJsonURLs) {
+			loadBuildResultJSON(buildResultJSONObjects.get(buildResultJsonURL));
+		}
+
+		JSONArray flakyTestDataJSONArray = new JSONArray();
+
+		flakyTestDataJSONArray.put(
+			new String[] {"Name", "Batch Type", "Results", "Status Changes"});
+
+		Map<String, TestData> testDataMap = getTestDataMap();
+
+		for (TestData testData : testDataMap.values()) {
+			if (testData.isFlaky()) {
+				flakyTestDataJSONArray.put(testData.toJSONArray());
+			}
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("var flakyTestData = ");
+		sb.append(flakyTestDataJSONArray.toString());
+		sb.append(";");
+
+		JenkinsResultsParserUtil.write(filePath, sb.toString());
 	}
 
 	public static class TestData {
