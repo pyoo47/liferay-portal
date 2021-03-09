@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -277,8 +279,69 @@ public class TestResultUtil {
 		private final List<String> _buildURLs = new ArrayList<>();
 		private final List<String> _errorSnippets = new ArrayList<>();
 		private final String _name;
+		private int _statusChanges;
 		private final List<String> _statuses = new ArrayList<>();
 
+	}
+
+	private static Map<String, JSONObject> _getBuildResultJSONObjects(
+		List<String> buildResultJsonURLs) {
+
+		final Map<String, JSONObject> buildResultJSONObjects =
+			Collections.synchronizedMap(new HashMap<String, JSONObject>());
+
+		List<Callable<Void>> callables = new ArrayList<>();
+
+		for (final String buildResultJsonURL : buildResultJsonURLs) {
+			Callable<Void> callable = new Callable<Void>() {
+
+				@Override
+				public Void call() throws IOException {
+					buildResultJSONObjects.put(
+						buildResultJsonURL,
+						JenkinsResultsParserUtil.toJSONObject(
+							buildResultJsonURL));
+
+					return null;
+				}
+
+			};
+
+			callables.add(callable);
+		}
+
+		ThreadPoolExecutor threadPoolExecutor =
+			JenkinsResultsParserUtil.getNewThreadPoolExecutor(25, true);
+
+		ParallelExecutor<Void> parallelExecutor = new ParallelExecutor<>(
+			callables, threadPoolExecutor);
+
+		parallelExecutor.execute();
+
+		return buildResultJSONObjects;
+	}
+
+	private static List<String> _getBuildResultJsonURLs(
+		String jobURL, int maxBuilds) {
+
+		List<String> buildResultJsonURLs = new ArrayList<>();
+
+		int lastCompletedBuildNumber =
+			JenkinsAPIUtil.getLastCompletedBuildNumber(jobURL);
+
+		int buildNumber = lastCompletedBuildNumber;
+
+		while (buildNumber > (lastCompletedBuildNumber - maxBuilds)) {
+			String buildURL = jobURL + buildNumber;
+
+			buildResultJsonURLs.add(
+				JenkinsResultsParserUtil.getBuildArtifactURL(
+					buildURL, "build-result.json"));
+
+			buildNumber--;
+		}
+
+		return buildResultJsonURLs;
 	}
 
 	private static final Map<String, TestData> _testDataMap = new HashMap<>();
