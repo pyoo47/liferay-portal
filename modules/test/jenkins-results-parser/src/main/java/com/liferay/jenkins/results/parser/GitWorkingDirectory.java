@@ -372,6 +372,17 @@ public class GitWorkingDirectory {
 		configure(configMap, options);
 	}
 
+	public boolean containsSHA(String sha) {
+		GitUtil.ExecutionResult result = executeBashCommands(
+			1, 0, 1, "git log -n 1 " + sha);
+
+		if (result.getExitValue() != 0) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public LocalGitBranch createLocalGitBranch(LocalGitBranch localGitBranch) {
 		return createLocalGitBranch(
 			localGitBranch.getName(), false, localGitBranch.getSHA());
