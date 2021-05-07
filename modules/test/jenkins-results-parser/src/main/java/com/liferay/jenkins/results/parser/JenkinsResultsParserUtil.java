@@ -2534,6 +2534,10 @@ public class JenkinsResultsParserUtil {
 	public static boolean isCINode() {
 		String hostName = getHostName("");
 
+		if (hostName.equals(_HOSTNAME_LOAD_BALANCER)) {
+			return false;
+		}
+
 		if (hostName.startsWith("cloud-10-0-") ||
 			hostName.startsWith("test-")) {
 
@@ -4504,6 +4508,9 @@ public class JenkinsResultsParserUtil {
 	private static final String _DIST_PORTAL_JOB_URL_DEFAULT =
 		"http://test-1-1/job/test-portal-acceptance-upstream";
 
+	private static final String _HOSTNAME_LOAD_BALANCER =
+		"cloud-10-0-0-31.lax.liferay.com";
+
 	private static final long _MILLIS_BASH_COMMAND_TIMEOUT_DEFAULT =
 		1000 * 60 * 60;
 
@@ -4524,7 +4531,7 @@ public class JenkinsResultsParserUtil {
 	private static final int _SECONDS_RETRY_PERIOD_DEFAULT = 5;
 
 	private static final String _URL_LOAD_BALANCER =
-		"http://cloud-10-0-0-31.lax.liferay.com/osb-jenkins-web/load_balancer";
+		"http://" + _HOSTNAME_LOAD_BALANCER + "/osb-jenkins-web/load_balancer";
 
 	private static final Log _log = LogFactory.getLog(
 		JenkinsResultsParserUtil.class);
