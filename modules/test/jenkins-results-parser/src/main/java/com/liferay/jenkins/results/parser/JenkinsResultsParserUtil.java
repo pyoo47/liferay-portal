@@ -96,6 +96,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
@@ -3223,8 +3224,13 @@ public class JenkinsResultsParserUtil {
 					}
 				}
 
-				return new BufferedReader(
-					new InputStreamReader(urlConnection.getInputStream()));
+				InputStream inputStream = urlConnection.getInputStream();
+
+				if (url.endsWith(".gz")) {
+					inputStream = new GzipCompressorInputStream(inputStream);
+				}
+
+				return new BufferedReader(new InputStreamReader(inputStream));
 			}
 			catch (IOException ioException) {
 				if ((ioException instanceof UnknownHostException) &&
