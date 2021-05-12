@@ -435,6 +435,46 @@ public abstract class BaseBuild implements Build {
 			testResultsJSONArray.put(testResultJSONObject);
 		}
 
+		JSONArray buildResultsJSONArray = new JSONArray();
+
+		if (this instanceof BatchBuild) {
+			for (Build downstreamBuild : getDownstreamBuilds(null)) {
+				JSONObject buildResultJSONObject = new JSONObject();
+
+				if (downstreamBuild instanceof AxisBuild) {
+					AxisBuild downstreamAxisBuild = (AxisBuild)downstreamBuild;
+
+					buildResultJSONObject.put(
+						"axisName", downstreamAxisBuild.getAxisName());
+				}
+
+				if (dataTypesList.contains("buildURL")) {
+					buildResultJSONObject.put(
+						"buildURL", downstreamBuild.getBuildURL());
+				}
+
+				if (dataTypesList.contains("duration")) {
+					buildResultJSONObject.put(
+						"duration", downstreamBuild.getDuration());
+				}
+
+				buildResultJSONObject.put(
+					"result", downstreamBuild.getResult());
+
+				if (dataTypesList.contains("duration")) {
+					StopWatchRecordsGroup stopWatchRecordsGroup =
+						getStopWatchRecordsGroup();
+
+					buildResultJSONObject.put(
+						"stopWatchRecords",
+						stopWatchRecordsGroup.getJSONArray());
+				}
+
+				buildResultsJSONArray.put(buildResultJSONObject);
+			}
+		}
+
+		buildResultsJSONObject.put("buildResults", buildResultsJSONArray);
 		buildResultsJSONObject.put("jobVariant", getJobVariant());
 		buildResultsJSONObject.put("result", getResult());
 		buildResultsJSONObject.put("testResults", testResultsJSONArray);
@@ -2173,6 +2213,30 @@ public abstract class BaseBuild implements Build {
 			return _duration;
 		}
 
+		public JSONObject getJSONObject() {
+			if (_childStopWatchRecords == null) {
+				return new JSONObject();
+			}
+
+			JSONArray childStopWatchRecordJSONArray = new JSONArray();
+
+			for (StopWatchRecord childStopWatchRecord :
+					_childStopWatchRecords) {
+
+				childStopWatchRecordJSONArray.put(
+					childStopWatchRecord.getJSONObject());
+			}
+
+			JSONObject jsonObject = new JSONObject();
+
+			jsonObject.put(
+				"childStopWatchRecords", childStopWatchRecordJSONArray);
+			jsonObject.put("duration", getDuration());
+			jsonObject.put("name", getName());
+
+			return jsonObject;
+		}
+
 		public String getName() {
 			return _name;
 		}
@@ -2383,6 +2447,16 @@ public abstract class BaseBuild implements Build {
 
 		public StopWatchRecord get(String name) {
 			return _stopWatchRecordsMap.get(name);
+		}
+
+		public JSONArray getJSONArray() {
+			JSONArray jsonArray = new JSONArray();
+
+			for (StopWatchRecord stopWatchRecord : getStopWatchRecords()) {
+				jsonArray.put(stopWatchRecord.getJSONObject());
+			}
+
+			return jsonArray;
 		}
 
 		public List<StopWatchRecord> getStopWatchRecords() {
