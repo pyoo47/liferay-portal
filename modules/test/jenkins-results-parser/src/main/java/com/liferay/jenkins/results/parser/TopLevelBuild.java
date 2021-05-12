@@ -227,10 +227,16 @@ public abstract class TopLevelBuild extends BaseBuild {
 			}
 		}
 
+		StopWatchRecordsGroup stopWatchRecordsGroup =
+			getStopWatchRecordsGroup();
+
 		buildResultsJSONObject.put("batchResults", downstreamBuildJSONArray);
 		buildResultsJSONObject.put("buildNumber", getBuildNumber());
+		buildResultsJSONObject.put("duration", getDuration());
 		buildResultsJSONObject.put("jobURL", getJobURL());
 		buildResultsJSONObject.put("startTime", getStartTime());
+		buildResultsJSONObject.put(
+			"stopWatchRecords", stopWatchRecordsGroup.getJSONArray());
 		buildResultsJSONObject.put("upstreamBranchSHA", getUpstreamBranchSHA());
 
 		return buildResultsJSONObject;
