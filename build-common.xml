@@ -2352,6 +2352,9 @@ rerun your task.
 			/>
 		</path>
 
+		<echo>ls ${sdk.dir}/dependencies/net.sourceforge.pmd/lib</echo>
+		<exec executable="ls" dir="${sdk.dir}/dependencies/net.sourceforge.pmd/lib" />
+
 		<taskdef
 			classname="net.sourceforge.pmd.ant.PMDTask"
 			classpathref="pmd.classpath"
