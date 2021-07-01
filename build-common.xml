@@ -750,7 +750,7 @@ information.
 		<attribute default="${basedir}" name="dir" />
 		<attribute default="true" name="failonerror" />
 		<attribute default="true" name="forcedcacheenabled" />
-		<attribute default="" name="gradlejvmargs" />
+		<attribute default="${env.ANT_OPTS}" name="gradlejvmargs" />
 		<attribute default="" name="outputproperty" />
 		<attribute default="" name="refreshdependencies" />
 		<attribute default="true" name="setupbinariescache" />
@@ -804,7 +804,7 @@ information.
 					</not>
 				</and>
 				<then>
-					<property name="ci.jvmargs" value="${env.ANT_OPTS}" />
+					<property name="ci.jvmargs" value="@{gradlejvmargs}" />
 				</then>
 			</if>
 
@@ -814,6 +814,8 @@ information.
 				<equals arg1="@{checktask}" arg2="true" />
 				<then>
 					<local name="tasks.output" />
+
+					<echo>PDY1 @{project.dir}/gradlew${gradlew.suffix} -Dorg.gradle.jvmargs=${ci.jvmargs}</echo>
 
 					<exec dir="@{dir}" executable="${project.dir}/gradlew${gradlew.suffix}" failonerror="@{failonerror}">
 						<arg if:set="env.JENKINS_HOME" value="--max-workers=4" />
@@ -933,6 +935,8 @@ information.
 								</then>
 							</if>
 
+							<echo>PDY2 @{project.dir}/gradlew${gradlew.suffix} -Dorg.gradle.jvmargs=${ci.jvmargs} @{task}</echo>
+
 							<exec dir="@{dir}" executable="${project.dir}/gradlew${gradlew.suffix}" failonerror="@{failonerror}">
 								<args />
 								<arg if:set="env.JENKINS_HOME" value="--max-workers=4" />
@@ -967,6 +971,8 @@ information.
 							</if>
 
 							<echo />
+							<echo>PDY3 @{project.dir}/gradlew${gradlew.suffix} -Dorg.gradle.jvmargs=${ci.jvmargs}</echo>
+
 
 							<echoxml>
 								<exec dir="@{dir}" executable="${project.dir}/gradlew${gradlew.suffix}" failonerror="@{failonerror}">
