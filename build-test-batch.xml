@@ -5944,7 +5944,7 @@ log.sanitizer.enabled=false</echo>
 				<if>
 					<equals arg1="${project.templates.test}" arg2="true" />
 					<then>
-						<gradle-execute dir="modules/sdk/project-templates" task="install">
+						<gradle-execute dir="modules/sdk/project-templates" gradlejvmargs="-Xmx8192m -XX:MetaspaceSize=512m" task="install">
 							<arg value="--continue" />
 							<arg value="-Dbuild.exclude.ant.plugin=true" />
 							<arg if:set="project.templates.test.builds" value="-Dproject.templates.test.builds=${project.templates.test.builds}" />
@@ -5952,7 +5952,7 @@ log.sanitizer.enabled=false</echo>
 					</then>
 				</if>
 
-				<gradle-execute dir="modules" task="test">
+				<gradle-execute dir="modules" gradlejvmargs="-Xmx8192m -XX:MetaspaceSize=512m" task="test">
 					<arg value="--continue" />
 					<arg value="-Dbuild.exclude.ant.plugin=true" />
 					<arg value="-Djunit.code.coverage=${test.batch.code.coverage}" />
