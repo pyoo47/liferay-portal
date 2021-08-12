@@ -15,12 +15,24 @@
 package com.liferay.jenkins.results.parser;
 
 import com.liferay.jenkins.results.parser.java.task.Item;
+import com.liferay.jenkins.results.parser.java.task.ItemParser;
 import com.liferay.jenkins.results.parser.java.task.Receipt;
 import com.liferay.jenkins.results.parser.java.task.ShoppingCart;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+
+import java.net.URI;
+import java.net.URL;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.util.ArrayList;
 
-import org.junit.Assert;
+import org.apache.commons.io.FileUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,89 +47,83 @@ public class SaleTaxTest {
 	}
 
 	@Test
-	public void testCart1() {
-		cart.addItem(1, "book", (float)12.49);
-		cart.addItem(1, "music CD", (float)14.99);
-		cart.addItem(1, "chocolate bar", (float)0.85);
+	public void testCompareOutputs() throws Exception {
+		String[] outputs = {"output1.txt", "output2.txt", "output3.txt"};
 
-		float expectedSalesTax = (float)1.50;
-		float expectedTotal = (float)29.83;
+		String[] expectedOutputs = {
+			"dependencies/expected_output1.txt",
+			"dependencies/expected_output2.txt",
+			"dependencies/expected_output3.txt"
+		};
+		int count = 0;
+		Class<?> clazz = Receipt.class;
 
-		ArrayList<Item> pendingCart = cart.getShoppingList();
+		for (String file : expectedOutputs) {
+			URL resourceURL = clazz.getResource(file);
 
-		Receipt receipt = new Receipt();
+			URI resourceURI = resourceURL.toURI();
 
-		float salesTax = 0;
-		float total = 0;
+			Path resourcePath = Paths.get(resourceURI);
 
-		for (Item item : pendingCart) {
-			cart.calculateSalesTax(item);
-			salesTax += item.getTax();
-			total += item.getPriceWithTax();
+			File expectedFile = resourcePath.toFile();
+
+			File output = new File(outputs[count]);
+
+			boolean areFilesEqual = FileUtils.contentEquals(
+				expectedFile, output);
+
+			System.out.println(areFilesEqual);
+
+			count += 1;
 		}
-
-		Assert.assertEquals(expectedSalesTax, salesTax, 0.0F);
-		Assert.assertEquals(expectedTotal, total, 0.0F);
-
-		receipt.printReceipt(pendingCart);
 	}
 
 	@Test
-	public void testCart2() {
-		cart.addItem(1, "imported box of chocolates", (float)10.00);
-		cart.addItem(1, "imported bottle of perfume", (float)47.50);
+	public void testGenerateOutputs() throws Exception {
+		String[] inputs = {
+			"dependencies/input1.txt", "dependencies/input2.txt",
+			"dependencies/input3.txt"
+		};
 
-		float expectedSalesTax = (float)7.65;
-		float expectedTotal = (float)65.15;
+		int count = 1;
+		Class<?> clazz = Receipt.class;
 
-		ArrayList<Item> pendingCart = cart.getShoppingList();
+		for (String file : inputs) {
+			URL resourceURL = clazz.getResource(file);
 
-		Receipt receipt = new Receipt();
+			URI resourceURI = resourceURL.toURI();
 
-		float salesTax = 0;
-		float total = 0;
+			Path resourcePath = Paths.get(resourceURI);
 
-		for (Item item : pendingCart) {
-			cart.calculateSalesTax(item);
-			salesTax += item.getTax();
-			total += item.getPriceWithTax();
+			File resourceFile = resourcePath.toFile();
+
+			String path = resourceFile.getPath();
+
+			ItemParser parser = new ItemParser(path);
+
+			cart = parser.getCart();
+
+			ArrayList<Item> items = cart.getItems();
+
+			for (Item item : items) {
+				item.setTax();
+			}
+
+			Receipt receipt = new Receipt();
+
+			String printedReceipt = receipt.printReceipt(cart);
+
+			BufferedWriter writer = new BufferedWriter(
+				new FileWriter("output" + count + ".txt"));
+
+			writer.write(printedReceipt);
+
+			writer.close();
+
+			count += 1;
 		}
-
-		Assert.assertEquals(expectedSalesTax, salesTax, 0.0F);
-		Assert.assertEquals(expectedTotal, total, 0.0F);
-
-		receipt.printReceipt(pendingCart);
 	}
 
-	@Test
-	public void testCart3() {
-		cart.addItem(1, "imported box of perfume", (float)27.99);
-		cart.addItem(1, "bottle of perfume", (float)18.99);
-		cart.addItem(1, "packet of headache pills", (float)9.75);
-		cart.addItem(1, "imported box of chocolates", (float)11.25);
-
-		float expectedSalesTax = (float)6.70;
-		float expectedTotal = (float)74.68;
-
-		ArrayList<Item> pendingCart = cart.getShoppingList();
-
-		Receipt receipt = new Receipt();
-
-		float salesTax = 0;
-		float total = 0;
-
-		for (Item item : pendingCart) {
-			cart.calculateSalesTax(item);
-			salesTax += item.getTax();
-			total += item.getPriceWithTax();
-		}
-
-		Assert.assertEquals(expectedSalesTax, salesTax, 0.0F);
-		Assert.assertEquals(expectedTotal, total, 0.0F);
-
-		receipt.printReceipt(pendingCart);
-	}
-
-	public ShoppingCart cart;
+	protected ShoppingCart cart;
 
 }

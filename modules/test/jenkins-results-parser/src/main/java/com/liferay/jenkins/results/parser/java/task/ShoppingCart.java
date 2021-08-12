@@ -24,36 +24,35 @@ public class ShoppingCart {
 	public Item addItem(int quantity, String name, float price) {
 		Item item = new Item(quantity, name, price);
 
-		shoppingList.add(item);
+		items.add(item);
 
 		return item;
 	}
 
-	public void calculateSalesTax(Item item) {
-		float tax = 0.0F;
-
-		if (item.isImported()) {
-			tax = 0.05F;
-		}
-
-		if (!item.isExempt()) {
-			tax = 0.10F;
-		}
-
-		if (item.isImported() && !item.isExempt()) {
-			tax = 0.15F;
-		}
-
-		float updateTax =
-			(float)(Math.ceil((tax * item.getPrice()) * 20.0) / 20.0);
-
-		item.setPriceWithTax(updateTax);
+	public ArrayList<Item> getItems() {
+		return items;
 	}
 
-	public ArrayList<Item> getShoppingList() {
-		return shoppingList;
+	public float getSalesTax() {
+		float salesTax = 0.0F;
+
+		for (Item item : items) {
+			salesTax += item.getTax();
+		}
+
+		return salesTax;
 	}
 
-	public ArrayList<Item> shoppingList = new ArrayList<>();
+	public float getTotal() {
+		float total = 0.0F;
+
+		for (Item item : items) {
+			total += item.getPriceWithTax();
+		}
+
+		return total;
+	}
+
+	protected ArrayList<Item> items = new ArrayList<>();
 
 }

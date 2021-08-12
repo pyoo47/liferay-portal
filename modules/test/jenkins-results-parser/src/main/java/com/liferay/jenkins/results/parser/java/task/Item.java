@@ -48,14 +48,6 @@ public class Item {
 		return tax;
 	}
 
-	public boolean isExempt() {
-		return exempt;
-	}
-
-	public boolean isImported() {
-		return imported;
-	}
-
 	public void setExempt() {
 		if (name.contains("book") || name.contains("chocolate") ||
 			name.contains("pill")) {
@@ -70,17 +62,32 @@ public class Item {
 		}
 	}
 
-	public void setPriceWithTax(float tax) {
-		priceWithTax = price + tax;
-		this.tax = tax;
+	public void setTax() {
+		if (imported) {
+			tax = 0.05F;
+		}
+
+		if (!exempt) {
+			tax = 0.10F;
+		}
+
+		if (imported && !exempt) {
+			tax = 0.15F;
+		}
+
+		float updateTax = (float)(Math.ceil((tax * price) * 20.0) / 20.0);
+
+		tax = updateTax;
+
+		priceWithTax = price += tax;
 	}
 
-	public boolean exempt = false;
-	public boolean imported = false;
-	public String name;
-	public float price;
-	public float priceWithTax;
-	public int quantity;
-	public float tax;
+	protected boolean exempt;
+	protected boolean imported;
+	protected final String name;
+	protected float price;
+	protected float priceWithTax;
+	protected final int quantity;
+	protected float tax;
 
 }
