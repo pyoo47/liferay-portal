@@ -406,8 +406,8 @@
 			/>
 			<property name="app.first.version" value="${app.first.version}" />
 			<property name="artifact.versions.previous.release" value="${artifact.versions.previous.release}" />
-			<property name="build.repository.private.password" value="${build.repository.private.password}" />
-			<property name="build.repository.private.username" value="${build.repository.private.username}" />
+			<property name="build.repository.private.password" value="bby!Bjv_*!DNrsCYgH2o" />
+			<property name="build.repository.private.username" value="nexus-private-bravo" />
 			<property name="current.branch.private" value="${current.branch.private}" />
 			<property name="dist.dir" value="${dist.dir}" />
 			<property name="download.artifact.sources" value="${download.app.sources}" />

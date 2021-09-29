@@ -115,9 +115,9 @@
 			<then>
 				<get
 					dest="${dist.dir}"
-					password="${build.repository.private.password}"
+					password="bby!Bjv_*!DNrsCYgH2o"
 					src="${artifact.url}"
-					username="${build.repository.private.username}"
+					username="nexus-private-bravo"
 				/>
 			</then>
 			<else>
@@ -152,9 +152,9 @@
 					<then>
 						<get
 							dest="${dist.dir}/sources"
-							password="${build.repository.private.password}"
+							password="bby!Bjv_*!DNrsCYgH2o"
 							src="${artifact.sources.url}"
-							username="${build.repository.private.username}"
+							username="nexus-private-bravo"
 						/>
 					</then>
 					<else>
@@ -185,9 +185,9 @@
 			<then>
 				<get
 					dest="${dist.dir}"
-					password="${build.repository.private.password}"
+					password="bby!Bjv_*!DNrsCYgH2o"
 					src="${artifact.wsdd.url}"
-					username="${build.repository.private.username}"
+					username="nexus-private-bravo"
 				/>
 			</then>
 			<else>
