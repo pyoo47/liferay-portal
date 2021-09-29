@@ -14,6 +14,8 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.File;
+
 import org.json.JSONObject;
 
 /**
@@ -21,11 +23,9 @@ import org.json.JSONObject;
  */
 public class PluginsWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 
-	public static final String TYPE = "plugins";
-
 	@Override
-	public String getType() {
-		return TYPE;
+	public void writePropertiesFiles() {
+		_writeBuildPropertiesFile();
 	}
 
 	protected PluginsWorkspaceGitRepository(JSONObject jsonObject) {
@@ -44,18 +44,13 @@ public class PluginsWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 		super(remoteGitRef, upstreamBranchName);
 	}
 
-	@Override
-	protected String getDefaultRelativeGitRepositoryDirPath(
-		String upstreamBranchName) {
-
-		String name = getName();
-
-		if (upstreamBranchName.equals("master")) {
-			return name.replace("-ee", "");
-		}
-
-		return JenkinsResultsParserUtil.combine(
-			name.replace("-ee", ""), "-", upstreamBranchName);
+	private void _writeBuildPropertiesFile() {
+		JenkinsResultsParserUtil.writePropertiesFile(
+			new File(
+				getDirectory(),
+				JenkinsResultsParserUtil.combine(
+					"build.", System.getenv("HOSTNAME"), ".properties")),
+			getProperties("plugins.build.property"), true);
 	}
 
 }

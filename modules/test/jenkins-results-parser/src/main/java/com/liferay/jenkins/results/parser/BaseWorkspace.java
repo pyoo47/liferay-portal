@@ -14,92 +14,257 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import org.json.JSONObject;
+
 /**
  * @author Michael Hashimoto
  */
 public abstract class BaseWorkspace implements Workspace {
 
 	@Override
-	public void addJenkinsWorkspaceGitRepository(String jenkinsGitHubURL) {
-		if (!JenkinsResultsParserUtil.isCINode() ||
-			(jenkinsGitHubURL == null)) {
+	public JSONObject getJSONObject() {
+		return _jsonObject;
+	}
 
-			return;
+	@Override
+	public WorkspaceGitRepository getPrimaryWorkspaceGitRepository() {
+		return _primaryWorkspaceGitRepository;
+	}
+
+	@Override
+	public List<WorkspaceGitRepository> getWorkspaceGitRepositories() {
+		if (_workspaceGitRepositories != null) {
+			return new ArrayList<>(_workspaceGitRepositories.values());
 		}
 
-		_jenkinsWorkspaceGitRepository =
-			WorkspaceUtil.getWorkspaceGitRepository(
-				JenkinsWorkspaceGitRepository.TYPE, jenkinsGitHubURL, "master");
-	}
+		_workspaceGitRepositories = new HashMap<>();
 
-	@Override
-	public WorkspaceGitRepository getJenkinsWorkspaceGitRepository() {
-		return _jenkinsWorkspaceGitRepository;
-	}
+		String workspaceRepositoryDirNames = _jsonObject.getString(
+			"workspace_repository_dir_names");
 
-	@Override
-	public void setBuildData(BuildData buildData) {
-		_buildData = buildData;
-	}
+		if (JenkinsResultsParserUtil.isNullOrEmpty(
+				workspaceRepositoryDirNames)) {
 
-	@Override
-	public void setJob(Job job) {
-		_job = job;
+			return new ArrayList<>(_workspaceGitRepositories.values());
+		}
+
+		List<Callable<WorkspaceGitRepository>> callables = new ArrayList<>();
+
+		for (final String workspaceRepositoryDirName :
+				workspaceRepositoryDirNames.split(",")) {
+
+			Callable<WorkspaceGitRepository> callable =
+				new Callable<WorkspaceGitRepository>() {
+
+					@Override
+					public WorkspaceGitRepository call() {
+						return GitRepositoryFactory.getWorkspaceGitRepository(
+							workspaceRepositoryDirName);
+					}
+
+				};
+
+			callables.add(callable);
+		}
+
+		ParallelExecutor<WorkspaceGitRepository> parallelExecutor =
+			new ParallelExecutor<>(callables, threadPoolExecutor);
+
+		List<WorkspaceGitRepository> workspaceGitRepositories =
+			parallelExecutor.execute();
+
+		for (WorkspaceGitRepository workspaceGitRepository :
+				workspaceGitRepositories) {
+
+			_workspaceGitRepositories.put(
+				workspaceGitRepository.getDirectoryName(),
+				workspaceGitRepository);
+		}
+
+		return new ArrayList<>(_workspaceGitRepositories.values());
 	}
 
 	@Override
 	public void setUp() {
-		setUpWorkspaceGitRepositories();
+		List<Callable<Object>> callables = new ArrayList<>();
 
-		setWorkspaceDefaultProperties();
+		for (final WorkspaceGitRepository workspaceGitRepository :
+				getWorkspaceGitRepositories()) {
 
-		if (_buildData != null) {
-			setWorkspaceBuildDataProperties(_buildData);
+			Callable<Object> callable = new Callable<Object>() {
+
+				@Override
+				public Object call() {
+					workspaceGitRepository.setUp();
+
+					workspaceGitRepository.writePropertiesFiles();
+
+					return null;
+				}
+
+			};
+
+			callables.add(callable);
 		}
 
-		if (_job != null) {
-			setWorkspaceJobProperties(_job);
+		ParallelExecutor<Object> parallelExecutor = new ParallelExecutor<>(
+			callables, threadPoolExecutor);
+
+		parallelExecutor.execute();
+	}
+
+	@Override
+	public void synchronizeToGitHubDev() {
+		List<Callable<Object>> callables = new ArrayList<>();
+
+		for (final WorkspaceGitRepository workspaceGitRepository :
+				getWorkspaceGitRepositories()) {
+
+			Callable<Object> callable = new Callable<Object>() {
+
+				@Override
+				public Object call() {
+					workspaceGitRepository.synchronizeToGitHubDev();
+
+					return null;
+				}
+
+			};
+
+			callables.add(callable);
 		}
 
-		writeWorkspaceGitRepositoryPropertiesFiles();
+		ParallelExecutor<Object> parallelExecutor = new ParallelExecutor<>(
+			callables, threadPoolExecutor);
+
+		parallelExecutor.execute();
 	}
 
 	@Override
 	public void tearDown() {
-		tearDownWorkspaceGitRepositories();
+		List<Callable<Object>> callables = new ArrayList<>();
+
+		for (final WorkspaceGitRepository workspaceGitRepository :
+				getWorkspaceGitRepositories()) {
+
+			Callable<Object> callable = new Callable<Object>() {
+
+				@Override
+				public Object call() {
+					try {
+						workspaceGitRepository.tearDown();
+					}
+					catch (Exception exception) {
+						exception.printStackTrace();
+					}
+
+					return null;
+				}
+
+			};
+
+			callables.add(callable);
+		}
+
+		ParallelExecutor<Object> parallelExecutor = new ParallelExecutor<>(
+			callables, threadPoolExecutor);
+
+		parallelExecutor.execute();
 	}
 
-	protected void setUpJenkinsWorkspaceGitRepository() {
-		if (_jenkinsWorkspaceGitRepository != null) {
-			_jenkinsWorkspaceGitRepository.setUp();
+	protected BaseWorkspace(JSONObject jsonObject) {
+		_jsonObject = jsonObject;
+
+		_validateKeys();
+
+		_primaryWorkspaceGitRepository =
+			GitRepositoryFactory.getWorkspaceGitRepository(
+				_jsonObject.getString("primary_repository_name"),
+				_jsonObject.getString("primary_upstream_branch_name"));
+
+		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
+
+		buildDatabase.putWorkspace(this);
+	}
+
+	protected BaseWorkspace(
+		String primaryRepositoryName, String upstreamBranchName) {
+
+		_primaryWorkspaceGitRepository =
+			GitRepositoryFactory.getWorkspaceGitRepository(
+				primaryRepositoryName, upstreamBranchName);
+
+		_jsonObject = new JSONObject();
+
+		_jsonObject.put(
+			"primary_repository_name",
+			_primaryWorkspaceGitRepository.getName());
+
+		_jsonObject.put(
+			"primary_repository_dir_name",
+			_primaryWorkspaceGitRepository.getDirectoryName());
+
+		_jsonObject.put(
+			"primary_upstream_branch_name",
+			_primaryWorkspaceGitRepository.getUpstreamBranchName());
+
+		try {
+			_jsonObject.put(
+				"workspace_repository_dir_names",
+				JenkinsResultsParserUtil.getProperty(
+					JenkinsResultsParserUtil.getBuildProperties(),
+					"workspace.repository.dir.names",
+					_primaryWorkspaceGitRepository.getName(),
+					_primaryWorkspaceGitRepository.getUpstreamBranchName()));
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+
+		_validateKeys();
+
+		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
+
+		buildDatabase.putWorkspace(this);
+	}
+
+	protected WorkspaceGitRepository getWorkspaceGitRepository(
+		String repositoryDirName) {
+
+		if (_workspaceGitRepositories == null) {
+			getWorkspaceGitRepositories();
+		}
+
+		return _workspaceGitRepositories.get(repositoryDirName);
+	}
+
+	protected static final ThreadPoolExecutor threadPoolExecutor =
+		JenkinsResultsParserUtil.getNewThreadPoolExecutor(16, true);
+
+	private void _validateKeys() {
+		for (String requiredKey : _REQUIRED_KEYS) {
+			if (!_jsonObject.has(requiredKey)) {
+				throw new RuntimeException("Missing " + requiredKey);
+			}
 		}
 	}
 
-	protected void setUpWorkspaceGitRepositories() {
-		setUpJenkinsWorkspaceGitRepository();
-	}
+	private static final String[] _REQUIRED_KEYS = {
+		"primary_repository_name", "primary_repository_dir_name",
+		"primary_upstream_branch_name", "workspace_repository_dir_names"
+	};
 
-	protected abstract void setWorkspaceBuildDataProperties(
-		BuildData buildData);
-
-	protected abstract void setWorkspaceDefaultProperties();
-
-	protected abstract void setWorkspaceJobProperties(Job job);
-
-	protected void tearDownJenkinsWorkspaceGitRepository() {
-		if (_jenkinsWorkspaceGitRepository != null) {
-			_jenkinsWorkspaceGitRepository.tearDown();
-		}
-	}
-
-	protected void tearDownWorkspaceGitRepositories() {
-		tearDownJenkinsWorkspaceGitRepository();
-	}
-
-	protected abstract void writeWorkspaceGitRepositoryPropertiesFiles();
-
-	private BuildData _buildData;
-	private WorkspaceGitRepository _jenkinsWorkspaceGitRepository;
-	private Job _job;
+	private final JSONObject _jsonObject;
+	private final WorkspaceGitRepository _primaryWorkspaceGitRepository;
+	private Map<String, WorkspaceGitRepository> _workspaceGitRepositories;
 
 }
