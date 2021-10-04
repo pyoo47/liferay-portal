@@ -52,6 +52,8 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 
 		invokeDownstreamBuilds();
 
+		propagateBuildDatabaseToUserContent();
+
 		waitForDownstreamBuildsToComplete();
 
 		publishJenkinsReport();
@@ -155,6 +157,19 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 		distNodes.removeAll(filePropagator.getErrorSlaves());
 
 		topLevelBuildData.setDistNodes(distNodes);
+	}
+
+	protected void propagateBuildDatabaseToUserContent() {
+		if (!JenkinsResultsParserUtil.isCINode()) {
+			return;
+		}
+
+		TopLevelBuildData topLevelBuildData = getBuildData();
+
+		publishToUserContentDir(
+			new File(
+				topLevelBuildData.getWorkspaceDir(),
+				BuildDatabase.FILE_NAME_BUILD_DATABASE));
 	}
 
 	protected void publishJenkinsReport() {
