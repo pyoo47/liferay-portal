@@ -1,7 +1,7 @@
 @component-name = "portal-frontend-infrastructure"
 definition {
 
-	property osgi.modules.includes = "frontend-editor-ckeditor-sample-web";
+	property osgi.modules.includes = "frontend-editor-alloyeditor-web,frontend-editor-api,frontend-editor-ckeditor-web,frontend-editor-ckeditor-sample-web,frontend-editor-lang,frontend-editor-taglib";
 	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
