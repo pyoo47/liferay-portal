@@ -544,6 +544,15 @@ public abstract class BaseWorkspaceGitRepository
 				continue;
 			}
 
+			String baseBranchSHA = getBaseBranchSHA();
+
+			if (!gitWorkingDirectory.localSHAExists(baseBranchSHA)) {
+				continue;
+			}
+
+			gitWorkingDirectory.createLocalGitBranch(
+				getUpstreamBranchName(), true, baseBranchSHA);
+
 			return gitWorkingDirectory.createLocalGitBranch(
 				getBranchName(), true, remoteGitBranchSHA);
 		}
