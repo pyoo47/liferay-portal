@@ -91,7 +91,7 @@ public class Test {
 			return;
 		}
 
-		String expectedMessage = read(expectedMessageFile);
+		String expectedMessage = fixMessage(read(expectedMessageFile));
 
 		boolean value = expectedMessage.equals(actualMessage);
 
@@ -233,7 +233,11 @@ public class Test {
 				"${dependencies.url}");
 		}
 
-		return message.replaceAll("[^\\S\\r\\n]+\n", "\n");
+		message = message.replaceAll("[^\\S\\r\\n]+\n", "\n");
+
+		message = message.replaceAll("\\t", "  ");
+
+		return message;
 	}
 
 	protected String formatXML(String xml)
