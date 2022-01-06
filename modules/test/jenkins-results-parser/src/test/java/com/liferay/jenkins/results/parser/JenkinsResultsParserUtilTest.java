@@ -85,6 +85,11 @@ public class JenkinsResultsParserUtilTest
 		testEquals("ABC%29123", JenkinsResultsParserUtil.fixURL("ABC)123"));
 		testEquals("ABC%5B123", JenkinsResultsParserUtil.fixURL("ABC[123"));
 		testEquals("ABC%5D123", JenkinsResultsParserUtil.fixURL("ABC]123"));
+		testEquals("0 1 2", JenkinsResultsParserUtil.fixURL("0 1 2"));
+		testEquals(
+			"https://test-1-1.liferay.com?AXIS_VARIABLE=0+1+2&PARAMS=0+1",
+			JenkinsResultsParserUtil.fixURL(
+				"https://test-1-1.liferay.com?AXIS_VARIABLE=0 1 2&PARAMS=0 1"));
 	}
 
 	@Test
