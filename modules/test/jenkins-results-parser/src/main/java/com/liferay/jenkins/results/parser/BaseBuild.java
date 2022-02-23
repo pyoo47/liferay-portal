@@ -3937,12 +3937,22 @@ public abstract class BaseBuild implements Build {
 		_NAME_JENKINS_REPORT_TIME_ZONE = properties.getProperty(
 			"jenkins.report.time.zone");
 
-		TestrayS3Bucket testrayS3Bucket = TestrayS3Bucket.getInstance();
+		String testrayS3BaseURL =
+			"https://storage.cloud.google.com/testray-results";
+
+		try {
+			TestrayS3Bucket testrayS3Bucket = TestrayS3Bucket.getInstance();
+
+			testrayS3BaseURL = testrayS3Bucket.getTestrayS3BaseURL();
+		}
+		catch (Exception exception) {
+			exception.printStackTrace();
+		}
 
 		_testrayS3ObjectURLPattern = Pattern.compile(
 			JenkinsResultsParserUtil.combine(
-				"\\[beanshell\\] Created S3 Object (?<url>",
-				testrayS3Bucket.getTestrayS3BaseURL(), "/[^\\s?]+).*"));
+				"\\[beanshell\\] Created S3 Object (?<url>", testrayS3BaseURL,
+				"/[^\\s?]+).*"));
 	}
 
 	private String _archiveName;
