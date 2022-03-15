@@ -51,11 +51,6 @@ public abstract class PortalAcceptanceTestSuiteJob
 	}
 
 	@Override
-	public List<BatchTestClassGroup> getDependentBatchTestClassGroups() {
-		return getBatchTestClassGroups(getRawDependentBatchNames());
-	}
-
-	@Override
 	public Set<String> getDependentSegmentNames() {
 		return getFilteredSegmentNames(getRawDependentBatchNames());
 	}
@@ -155,14 +150,6 @@ public abstract class PortalAcceptanceTestSuiteJob
 		rawBatchNames.addAll(getSetFromString(jobProperty.getValue()));
 
 		return rawBatchNames;
-	}
-
-	protected Set<String> getRawDependentBatchNames() {
-		JobProperty jobProperty = getJobProperty("test.batch.names.smoke");
-
-		recordJobProperty(jobProperty);
-
-		return getSetFromString(jobProperty.getValue());
 	}
 
 	private final String _testSuiteName;

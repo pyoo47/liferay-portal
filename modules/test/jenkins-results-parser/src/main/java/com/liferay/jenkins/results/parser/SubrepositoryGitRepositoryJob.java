@@ -14,7 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import com.liferay.jenkins.results.parser.job.property.JobProperty;
 import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.BatchTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.SegmentTestClassGroup;
@@ -52,11 +51,6 @@ public class SubrepositoryGitRepositoryJob
 	@Override
 	public Set<String> getDependentBatchNames() {
 		return getFilteredBatchNames(getRawDependentBatchNames());
-	}
-
-	@Override
-	public List<BatchTestClassGroup> getDependentBatchTestClassGroups() {
-		return getBatchTestClassGroups(getRawDependentBatchNames());
 	}
 
 	@Override
@@ -167,14 +161,6 @@ public class SubrepositoryGitRepositoryJob
 		_upstreamBranchName = jsonObject.getString("upstream_branch_name");
 
 		_initialize();
-	}
-
-	protected Set<String> getRawDependentBatchNames() {
-		JobProperty jobProperty = getJobProperty("test.batch.names.smoke");
-
-		recordJobProperty(jobProperty);
-
-		return getSetFromString(jobProperty.getValue());
 	}
 
 	protected PortalGitWorkingDirectory portalGitWorkingDirectory;

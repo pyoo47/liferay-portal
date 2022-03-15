@@ -81,7 +81,13 @@ public abstract class BaseJob implements Job {
 
 	@Override
 	public List<BatchTestClassGroup> getBatchTestClassGroups() {
-		return getBatchTestClassGroups(getRawBatchNames());
+		if (_batchTestClassGroups != null) {
+			return _batchTestClassGroups;
+		}
+
+		_batchTestClassGroups = getBatchTestClassGroups(getRawBatchNames());
+
+		return _batchTestClassGroups;
 	}
 
 	@Override
@@ -110,6 +116,18 @@ public abstract class BaseJob implements Job {
 	@Override
 	public BuildProfile getBuildProfile() {
 		return _buildProfile;
+	}
+
+	@Override
+	public List<BatchTestClassGroup> getDependentBatchTestClassGroups() {
+		if (_dependentBatchTestClassGroups != null) {
+			return _dependentBatchTestClassGroups;
+		}
+
+		_dependentBatchTestClassGroups = getBatchTestClassGroups(
+			getRawDependentBatchNames());
+
+		return _dependentBatchTestClassGroups;
 	}
 
 	@Override
@@ -217,10 +235,12 @@ public abstract class BaseJob implements Job {
 
 		JSONArray batchesJSONArray = new JSONArray();
 
-		for (BatchTestClassGroup batchTestClassGroup :
-				getBatchTestClassGroups()) {
+		if (_batchTestClassGroups != null) {
+			for (BatchTestClassGroup batchTestClassGroup :
+					_batchTestClassGroups) {
 
-			batchesJSONArray.put(batchTestClassGroup.getJSONObject());
+				batchesJSONArray.put(batchTestClassGroup.getJSONObject());
+			}
 		}
 
 		jsonObject.put("batches", batchesJSONArray);
@@ -232,11 +252,9 @@ public abstract class BaseJob implements Job {
 
 		JSONArray smokeBatchesJSONArray = new JSONArray();
 
-		if (this instanceof BatchDependentJob) {
-			BatchDependentJob batchDependentJob = (BatchDependentJob)this;
-
+		if (_dependentBatchTestClassGroups != null) {
 			for (BatchTestClassGroup batchTestClassGroup :
-					batchDependentJob.getDependentBatchTestClassGroups()) {
+					_dependentBatchTestClassGroups) {
 
 				smokeBatchesJSONArray.put(batchTestClassGroup.getJSONObject());
 			}
@@ -632,6 +650,14 @@ public abstract class BaseJob implements Job {
 		return getSetFromString(jobProperty.getValue());
 	}
 
+	protected Set<String> getRawDependentBatchNames() {
+		JobProperty jobProperty = getJobProperty("test.batch.names.smoke");
+
+		recordJobProperty(jobProperty);
+
+		return getSetFromString(jobProperty.getValue());
+	}
+
 	protected List<SegmentTestClassGroup> getSegmentTestClassGroups(
 		Set<String> rawBatchNames) {
 
@@ -798,7 +824,9 @@ public abstract class BaseJob implements Job {
 	private static final ExecutorService _executorService =
 		JenkinsResultsParserUtil.getNewThreadPoolExecutor(_THREAD_COUNT, true);
 
+	private List<BatchTestClassGroup> _batchTestClassGroups;
 	private final BuildProfile _buildProfile;
+	private List<BatchTestClassGroup> _dependentBatchTestClassGroups;
 	private boolean _initializeJobProperties;
 	private final String _jobName;
 	private final List<JobProperty> _jobProperties = new ArrayList<>();

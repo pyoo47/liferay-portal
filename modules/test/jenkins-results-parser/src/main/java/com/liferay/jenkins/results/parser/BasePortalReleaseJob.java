@@ -55,11 +55,6 @@ public abstract class BasePortalReleaseJob
 	}
 
 	@Override
-	public List<BatchTestClassGroup> getDependentBatchTestClassGroups() {
-		return getBatchTestClassGroups(getRawDependentBatchNames());
-	}
-
-	@Override
 	public Set<String> getDependentSegmentNames() {
 		return getFilteredSegmentNames(getRawDependentBatchNames());
 	}
@@ -140,6 +135,7 @@ public abstract class BasePortalReleaseJob
 		return getSetFromString(jobProperty.getValue());
 	}
 
+	@Override
 	protected Set<String> getRawDependentBatchNames() {
 		JobProperty jobProperty = getJobProperty(
 			"test.batch.names.smoke", false);
