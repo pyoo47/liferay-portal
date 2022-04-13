@@ -46,11 +46,11 @@ import org.osgi.service.component.ComponentServiceObjects;
 public class Mutation {
 
 	<#assign
-		generateBatch = configYAML.generateBatch
-
 		javaMethodSignatures = freeMarkerTool.getGraphQLJavaMethodSignatures(configYAML, "mutation", openAPIYAML)
 
 		schemaNames = freeMarkerTool.getGraphQLSchemaNames(javaMethodSignatures)
+
+		generateBatch = configYAML.generateBatch
 	/>
 
 	<#list schemaNames as schemaName>
