@@ -1072,14 +1072,14 @@ public class GraphQLServletExtender {
 					instanceArguments);
 			}
 			else {
-				Constructor<?>[] constructors =
-					declaringClass.getConstructors();
-
 				Class<?> typeClass = field.getType();
 
 				Object queryInstance = _fillQueryInstance(
 					dataFetchingEnvironment, typeClass.newInstance(),
 					instanceArguments);
+
+				Constructor<?>[] constructors =
+					declaringClass.getConstructors();
 
 				instance = ReflectionKit.constructNewInstance(
 					constructors[0], queryInstance,
