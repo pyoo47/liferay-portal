@@ -1045,9 +1045,11 @@ public class GraphQLServletExtender {
 
 		// Instance
 
-		Object instance = null;
-
 		Class<?> declaringClass = method.getDeclaringClass();
+
+		Field field = _getThisField(declaringClass);
+
+		Object instance = null;
 
 		Class<?> contributorClass = _getContributorClass(declaringClass);
 
@@ -1057,7 +1059,6 @@ public class GraphQLServletExtender {
 				instanceArguments);
 		}
 		else {
-			Field field = _getThisField(declaringClass);
 			GraphQLFieldDefinition graphQLFieldDefinition =
 				dataFetchingEnvironment.getFieldDefinition();
 
