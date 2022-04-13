@@ -46,6 +46,8 @@ import org.osgi.service.component.ComponentServiceObjects;
 public class Mutation {
 
 	<#assign
+		generateBatch = configYAML.generateBatch
+
 		javaMethodSignatures = freeMarkerTool.getGraphQLJavaMethodSignatures(configYAML, "mutation", openAPIYAML)
 
 		schemaNames = freeMarkerTool.getGraphQLSchemaNames(javaMethodSignatures)
@@ -125,8 +127,7 @@ public class Mutation {
 			${freeMarkerTool.getSchemaVarName(schemaName)}Resource.setContextUser(_user);
 			${freeMarkerTool.getSchemaVarName(schemaName)}Resource.setGroupLocalService(_groupLocalService);
 			${freeMarkerTool.getSchemaVarName(schemaName)}Resource.setRoleLocalService(_roleLocalService);
-
-			<#if configYAML.generateBatch>
+			<#if generateBatch>
 				${freeMarkerTool.getSchemaVarName(schemaName)}Resource.setVulcanBatchEngineImportTaskResource(_vulcanBatchEngineImportTaskResource);
 			</#if>
 		}
@@ -146,7 +147,7 @@ public class Mutation {
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
 
-	<#if configYAML.generateBatch>
+	<#if generateBatch>
 		private VulcanBatchEngineImportTaskResource _vulcanBatchEngineImportTaskResource;
 	</#if>
 
