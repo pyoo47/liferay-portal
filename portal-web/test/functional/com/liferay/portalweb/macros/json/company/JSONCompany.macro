@@ -28,6 +28,10 @@ definition {
 			var portalURL = JSONCompany.getPortalURL();
 		}
 
+		if (!(contains("${portalURL}", "/liferay"))) {
+			var portalURL = StringUtil.replace("${portalURL}", "080", "0/liferay");
+		}
+
 		if (!(isSet(creatorEmailAddress))) {
 			if ("${authenticationMethod}" == "By Screen Name") {
 				if (!(isSet(userScreenName))) {
