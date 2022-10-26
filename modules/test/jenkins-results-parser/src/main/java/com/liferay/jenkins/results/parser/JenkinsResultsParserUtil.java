@@ -4945,6 +4945,48 @@ public class JenkinsResultsParserUtil {
 		executeJenkinsScript(masterHostname, jenkinsScript);
 	}
 
+	public static void validateExpressionBalance(String pql, File file) {
+		Stack<Integer> stack = new Stack<>();
+
+		for (int i = 0; i < pql.length(); i++) {
+			char c = pql.charAt(i);
+
+			if (!stack.isEmpty()) {
+				int topIndex = stack.peek();
+
+				Character topCodeBoundary = pql.charAt(topIndex);
+
+				if (c == _codeBoundariesMap.get(topCodeBoundary)) {
+					stack.pop();
+
+					continue;
+				}
+
+				if (topCodeBoundary == '\"') {
+					continue;
+				}
+			}
+
+			if (_codeBoundariesMap.containsKey(c)) {
+				stack.push(i);
+
+				continue;
+			}
+
+			if (_codeBoundariesMap.containsValue(c)) {
+				throw new RuntimeException(
+					"Invalid PQL: Unexpected closing boundary '" +
+						pql.charAt(i) + "' at " + file + "\n" + pql);
+			}
+		}
+
+		if (!stack.isEmpty()) {
+			throw new RuntimeException(
+				"Invalid PQL: Unmatched opening boundary '" +
+					pql.charAt(stack.peek()) + "' at " + file + "\n" + pql);
+		}
+	}
+
 	public static void write(File file, String content) throws IOException {
 		if (debug) {
 			System.out.println(
@@ -6006,6 +6048,13 @@ public class JenkinsResultsParserUtil {
 			"(?<masterNumber>[\\d]{1,2})).*(?:|\\.liferay\\.com)\\/+job\\/+" +
 				"(?<jobName>[\\w\\W]*?)\\/+(?<buildNumber>[0-9]*)");
 	private static Boolean _ciNode;
+	private static final Map<Character, Character> _codeBoundariesMap =
+		new HashMap<Character, Character>() {
+			{
+				put('(', ')');
+				put('\"', '\"');
+			}
+		};
 	private static final Pattern _curlyBraceExpansionPattern = Pattern.compile(
 		"\\{.*?\\}");
 	private static Long _currentTimeMillisDelta;
