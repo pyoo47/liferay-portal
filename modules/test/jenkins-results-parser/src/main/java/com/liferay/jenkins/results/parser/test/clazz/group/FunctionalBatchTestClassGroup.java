@@ -195,6 +195,12 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 		JobProperty jobProperty = getJobProperty(
 			"test.batch.run.property.query", testSuiteName, batchName);
 
+		File testPropertiesFile = new File(
+			portalGitWorkingDirectory.getWorkingDirectory(), "test.properties");
+
+		JenkinsResultsParserUtil.validateExpressionBalance(
+			jobProperty.getValue(), testPropertiesFile);
+
 		recordJobProperty(jobProperty);
 
 		return jobProperty.getValue();
@@ -441,6 +447,9 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 			!testBatchPropertyQuery.equals("false") &&
 			!concatedPQL.contains(testBatchPropertyQuery)) {
 
+			JenkinsResultsParserUtil.validateExpressionBalance(
+				testBatchPropertyQuery, testPropertiesFile);
+
 			recordJobProperty(jobProperty);
 
 			if (!concatedPQL.isEmpty()) {
@@ -478,6 +487,9 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 			return getDefaultTestBatchRunPropertyQuery(
 				testBaseDir, testSuiteName);
 		}
+
+		File testPropertiesFile = new File(
+			portalGitWorkingDirectory.getWorkingDirectory(), "test.properties");
 
 		StringBuilder sb = new StringBuilder();
 
@@ -535,6 +547,9 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 				isStableTestSuiteBatch(batchName) &&
 				(sb.indexOf(jobPropertyValue) == -1)) {
 
+				JenkinsResultsParserUtil.validateExpressionBalance(
+					jobPropertyValue, testPropertiesFile);
+
 				recordJobProperty(jobProperty);
 
 				if (sb.length() > 0) {
@@ -555,6 +570,9 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 		String jobPropertyValue = jobProperty.getValue();
 
 		if (jobPropertyValue != null) {
+			JenkinsResultsParserUtil.validateExpressionBalance(
+				jobPropertyValue, testPropertiesFile);
+
 			recordJobProperty(jobProperty);
 
 			testBatchRunPropertyQuery = JenkinsResultsParserUtil.combine(
