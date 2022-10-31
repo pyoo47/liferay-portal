@@ -17,6 +17,8 @@ package com.liferay.jenkins.results.parser;
 import com.google.common.collect.Lists;
 import com.google.common.io.CountingInputStream;
 
+import com.liferay.poshi.core.PoshiContext;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -785,6 +787,16 @@ public class JenkinsResultsParserUtil {
 			System.out.println("Unable to execute Jenkins script");
 
 			ioException.printStackTrace();
+		}
+	}
+
+	public static void executePQL(String pql, File file) {
+		try {
+			PoshiContext.executePQLQuery(pql, false);
+		}
+		catch (Exception exception) {
+			throw new RuntimeException(
+				"Invalid PQL at " + file + ": " + pql, exception);
 		}
 	}
 
