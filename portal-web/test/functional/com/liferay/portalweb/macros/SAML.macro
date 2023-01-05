@@ -637,6 +637,10 @@ definition {
 		var creatorEmailAddress = "${creatorEmailAddress}";
 		var creatorPassword = "${creatorPassword}";
 
+		if (!(contains("${specificURL}", "/liferay"))) {
+			var specificURL = StringUtil.replace("${specificURL}", "080", "0/liferay");
+		}
+
 		// Get Company ID
 
 		var curl = '''
