@@ -28,7 +28,7 @@ definition {
 			var portalURL = JSONCompany.getPortalURL();
 		}
 
-		if (!(contains("${portalURL}", "/liferay"))) {
+		if (contains("${portalURL}", "080") && !(contains("${portalURL}", "/liferay"))) {
 			var portalURL = StringUtil.replace("${portalURL}", "080", "0/liferay");
 		}
 
@@ -148,13 +148,6 @@ definition {
 		Variables.assertDefined(parameterList = "${portalURL}");
 
 		var portalInstanceName = StringUtil.replace("${portalURL}", "http://", "");
-
-		if (contains("${portalInstanceName}", ":8080")) {
-			var portalInstanceName = StringUtil.replace("${portalInstanceName}", ":8080", "");
-		}
-		else {
-			var portalInstanceName = StringUtil.replace("${portalInstanceName}", ":80", "");
-		}
 
 		if (contains("${portalInstanceName}", "/liferay")) {
 			var portalInstanceName = StringUtil.replace("${portalInstanceName}", "/liferay", "");
