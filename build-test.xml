@@ -1830,8 +1830,8 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 							<propertyregex
 								input="${test.url}"
 								property="proxy.url"
-								regexp="(http:\/\/.*)(:[0-9][0-9])([0-9]+)"
-								select="\1\2"
+								regexp="(http:\/\/.*)(:[0-9]+)"
+								select="\1"
 							/>
 
 							<var name="test.url" value="${proxy.url}/liferay" />
