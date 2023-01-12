@@ -12564,7 +12564,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			</then>
 			<else>
 				<echo append="true" file="${test.ext.properties.file}">
-					default.portal.url=http://localhost:80/liferay
+					default.portal.url=http://localhost/liferay
 					portal.hostname=localhost
 				</echo>
 			</else>
@@ -15515,7 +15515,7 @@ mail.send.blacklist=</echo>
 
 						<echo file="${analytics.cloud.faro.dir}/osb-faro-functional-test/src/testIntegration/resources/ngrok.properties">
 ip=${ip.address}
-url=${short.hostname}:80/liferay</echo>
+url=${short.hostname}/liferay</echo>
 
 						<prepare-chrome-driver />
 
@@ -15530,7 +15530,7 @@ url=${short.hostname}:80/liferay</echo>
 								-Dchrome.driver.version=${selenium.chrome.driver.version} \
 								-Dcucumber.options='${analytics.cloud.cucumber.options}' \
 								-Dliferay.ci=true \
-								-Dportal.url=http://${short.hostname}:80/liferay \
+								-Dportal.url=http://${short.hostname}/liferay \
 								-Dselenium.chrome.driver.executable=${selenium.chrome.driver.executable} \
 								-Dselenium.executable.dir.name=${selenium.executable.dir.path}/ \
 								-Dwebdriver.chrome.driver=${selenium.executable.dir.path}/${selenium.chrome.driver.executable} \
