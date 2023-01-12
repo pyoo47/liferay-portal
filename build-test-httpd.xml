@@ -84,6 +84,17 @@ Listen ${test.app.server.leading.port.number}0]]></echo>
 		<print-file file.name="${apache.http.dir}/conf/httpd.conf" />
 	</target>
 
+	<target name="clean-up-httpd-server">
+		<replaceregexp
+			file="${apache.http.dir}/conf/httpd.conf"
+			flags="s"
+			match="(IncludeOptional.*conf)(.*)"
+			replace="\1"
+		/>
+
+		<print-file file.name="${apache.http.dir}/conf/httpd.conf" />
+	</target>
+
 	<target name="start-httpd-server">
 		<exec executable="systemctl" output="${liferay.home}/start-httpd.txt">
 			<arg line="start httpd.service" />
