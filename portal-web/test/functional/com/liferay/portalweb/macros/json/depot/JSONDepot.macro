@@ -7,7 +7,7 @@ definition {
 		}
 
 		if (contains("${portalURL}", "080") && !(contains("${portalURL}", "/liferay"))) {
-			var portalURL = StringUtil.replace("${portalURL}", "080", "0/liferay");
+			var portalURL = StringUtil.replace("${portalURL}", "080", "8/liferay");
 		}
 
 		var curl = '''

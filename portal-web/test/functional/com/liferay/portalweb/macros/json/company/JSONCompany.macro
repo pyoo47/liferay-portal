@@ -29,7 +29,7 @@ definition {
 		}
 
 		if (contains("${portalURL}", "080") && !(contains("${portalURL}", "/liferay"))) {
-			var portalURL = StringUtil.replace("${portalURL}", "080", "0/liferay");
+			var portalURL = StringUtil.replace("${portalURL}", "080", "8/liferay");
 		}
 
 		if (!(isSet(creatorEmailAddress))) {
@@ -148,6 +148,8 @@ definition {
 		Variables.assertDefined(parameterList = "${portalURL}");
 
 		var portalInstanceName = StringUtil.replace("${portalURL}", "http://", "");
+
+		var portalInstanceName = StringUtil.replace("${portalInstanceName}", ":88", "");
 
 		if (contains("${portalInstanceName}", "/liferay")) {
 			var portalInstanceName = StringUtil.replace("${portalInstanceName}", "/liferay", "");

@@ -114,6 +114,8 @@ definition {
 
 				var portalURL = StringUtil.replace("${portalURL}", "http://", "");
 
+				var portalURL = StringUtil.replace("${portalURL}", ":88", "");
+
 				if (contains("${portalURL}", "/liferay")) {
 					var portalURL = StringUtil.replace("${portalURL}", "/liferay", "");
 				}

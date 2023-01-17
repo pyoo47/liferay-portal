@@ -638,7 +638,7 @@ definition {
 		var creatorPassword = "${creatorPassword}";
 
 		if (!(contains("${specificURL}", "/liferay"))) {
-			var specificURL = StringUtil.replace("${specificURL}", "080", "0/liferay");
+			var specificURL = StringUtil.replace("${specificURL}", "080", "8/liferay");
 		}
 
 		// Get Company ID

@@ -26,7 +26,7 @@ definition {
 		var portalURL = JSONCompany.getPortalURL();
 		var attributes = JSONStagingSetter.setAttributes();
 
-		var remotePort = StringUtil.replace("${remotePort}", "080", "0");
+		var remotePort = StringUtil.replace("${remotePort}", "080", "8");
 
 		var serviceContext = JSONServiceContextUtil.setServiceContext(attributes = "${attributes}");
 
