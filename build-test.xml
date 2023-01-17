@@ -1834,7 +1834,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 								select="\1"
 							/>
 
-							<var name="test.url" value="${proxy.url}/liferay" />
+							<var name="test.url" value="${proxy.url}:88/liferay" />
 						</then>
 					</if>
 				</else>
@@ -2220,8 +2220,8 @@ war.path=${app.server.portal.dir}/</echo>
 
 						<replace
 							file="${test.app.server.classes.portal.dir}/portal-ext.properties"
-							token="web.server.http.port=8080"
-							value="web.server.http.port=${test.app.server.leading.port.number}080"
+							token="web.server.http.port=88"
+							value="web.server.http.port=${test.app.server.leading.port.number}8"
 						/>
 
 						<math
@@ -7540,7 +7540,7 @@ ${docker.start.error}</fail>
 											</then>
 										</elseif>
 										<else>
-											<property name="app.server.waiting.url" value="http://localhost:${test.app.server.leading.port.number}0/liferay/web/guest" />
+											<property name="app.server.waiting.url" value="http://localhost:${test.app.server.leading.port.number}8/liferay/web/guest" />
 										</else>
 									</if>
 
@@ -8162,7 +8162,7 @@ war.path=${app.server.portal.dir}/</echo>
 					</then>
 				</elseif>
 				<else>
-					<property name="app.server.waiting.url" value="http://localhost:${test.app.server.leading.port.number}0/liferay/web/guest" />
+					<property name="app.server.waiting.url" value="http://localhost:${test.app.server.leading.port.number}8/liferay/web/guest" />
 				</else>
 			</if>
 
@@ -11726,7 +11726,7 @@ portal.proxy.path=/liferay</echo>
 				<replace
 					file="portal-impl/src/portal-ext.properties"
 					token="web.server.http.port=8080"
-					value=""
+					value="web.server.http.port=88"
 				/>
 			</then>
 		</if>
@@ -12564,7 +12564,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			</then>
 			<else>
 				<echo append="true" file="${test.ext.properties.file}">
-					default.portal.url=http://localhost/liferay
+					default.portal.url=http://localhost:88/liferay
 					portal.hostname=localhost
 				</echo>
 			</else>
@@ -15519,7 +15519,7 @@ mail.send.blacklist=</echo>
 
 						<echo file="${analytics.cloud.faro.dir}/osb-faro-functional-test/src/testIntegration/resources/ngrok.properties">
 ip=${ip.address}
-url=${short.hostname}/liferay</echo>
+url=${short.hostname}:88/liferay</echo>
 
 						<prepare-chrome-driver />
 
@@ -15534,7 +15534,7 @@ url=${short.hostname}/liferay</echo>
 								-Dchrome.driver.version=${selenium.chrome.driver.version} \
 								-Dcucumber.options='${analytics.cloud.cucumber.options}' \
 								-Dliferay.ci=true \
-								-Dportal.url=http://${short.hostname}/liferay \
+								-Dportal.url=http://${short.hostname}:88/liferay \
 								-Dselenium.chrome.driver.executable=${selenium.chrome.driver.executable} \
 								-Dselenium.executable.dir.name=${selenium.executable.dir.path}/ \
 								-Dwebdriver.chrome.driver=${selenium.executable.dir.path}/${selenium.chrome.driver.executable} \
