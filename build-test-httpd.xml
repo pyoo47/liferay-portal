@@ -96,6 +96,7 @@ Listen ${test.app.server.leading.port.number}8]]></echo>
 		</if>
 
 		<print-file file.name="${apache.http.dir}/conf/httpd.conf" />
+		<print-file file.name="${apache.http.dir}/conf.modules.d/00-proxy.conf" />
 	</target>
 
 	<target name="clean-up-httpd-server">
@@ -115,6 +116,12 @@ Listen ${test.app.server.leading.port.number}8]]></echo>
 		</exec>
 
 		<print-file file.name="${liferay.home}/start-httpd.txt" />
+
+		<exec executable="systemctl" output="${liferay.home}/status-httpd.txt">
+			<arg line="status httpd.service" />
+		</exec>
+
+		<print-file file.name="${liferay.home}/status-httpd.txt" />
 	</target>
 
 	<target name="stop-httpd-server">
