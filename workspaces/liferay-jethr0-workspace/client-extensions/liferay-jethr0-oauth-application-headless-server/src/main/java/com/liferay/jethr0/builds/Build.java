@@ -44,6 +44,10 @@ public interface Build {
 
 	public JSONObject getJSONObject();
 
+	public int getMaxSlaveCount();
+
+	public int getMinSlaveRAM();
+
 	public Project getProject();
 
 	public State getState();
@@ -51,6 +55,8 @@ public interface Build {
 	public void removeBuildParameter(BuildParameter buildParameter);
 
 	public void removeBuildParameters(List<BuildParameter> buildParameters);
+
+	public boolean requiresGoodBattery();
 
 	public void setJobName(String jobName);
 
