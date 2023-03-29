@@ -443,6 +443,8 @@ public class GitWorkingDirectory {
 				String url = JenkinsResultsParserUtil.getGitHubApiUrl(
 					_gitRepositoryName, receiverUserName, "pulls");
 
+				System.out.println(requestJSONObject.toString(2));
+
 				JSONObject responseJSONObject;
 
 				try {
@@ -2044,36 +2046,12 @@ public class GitWorkingDirectory {
 				1000 * 60 * 10, sb.toString());
 
 			if (executionResult.getExitValue() != 0) {
+				System.out.println(
+					"execution result: " + executionResult.getExitValue());
+				System.out.println(executionResult.getStandardOut());
+				System.out.println(executionResult.getStandardError());
+
 				return null;
-			}
-
-			JenkinsSlave jenkinsSlave = new JenkinsSlave();
-
-			if (jenkinsSlave != null) {
-				String standardOut = executionResult.getStandardOut();
-
-				if ((standardOut != null) &&
-					standardOut.contains("(forced update)")) {
-
-					StringBuilder messageStringBuilder = new StringBuilder();
-
-					messageStringBuilder.append(
-						"Git branch force-push detected.\n");
-
-					Build currentBuild = jenkinsSlave.getCurrentBuild();
-
-					messageStringBuilder.append("BuildURL: ");
-					messageStringBuilder.append(currentBuild.getBuildURL());
-					messageStringBuilder.append("\n");
-
-					messageStringBuilder.append("git push command: ");
-					messageStringBuilder.append(sb.toString());
-
-					NotificationUtil.sendEmail(
-						messageStringBuilder.toString(), "jenkins",
-						"Git branch force-push detected",
-						"qa-slave-verify-fail@liferay.com");
-				}
 			}
 		}
 		catch (RuntimeException runtimeException) {
