@@ -17,6 +17,10 @@ package com.liferay.client.extension.util.spring.boot;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
@@ -25,6 +29,40 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Brian Wing Shun Chan
  */
 public class LiferayOAuth2Util {
+
+	public static String getBearerToken(
+		AuthorizedClientServiceOAuth2AuthorizedClientManager
+			authorizedClientServiceOAuth2AuthorizedClientManager,
+		String externalReferenceCode) {
+
+		OAuth2AuthorizeRequest.Builder oAuth2AuthorizeRequestBuilder =
+			OAuth2AuthorizeRequest.withClientRegistrationId(
+				externalReferenceCode
+			).principal(
+				externalReferenceCode
+			);
+
+		OAuth2AuthorizedClient oAuth2AuthorizedClient =
+			authorizedClientServiceOAuth2AuthorizedClientManager.authorize(
+				oAuth2AuthorizeRequestBuilder.build());
+
+		if (oAuth2AuthorizedClient == null) {
+			_log.error("Unable to get OAuth 2 authorized client");
+
+			return null;
+		}
+
+		OAuth2AccessToken oAuth2AccessToken =
+			oAuth2AuthorizedClient.getAccessToken();
+
+		if (oAuth2AccessToken == null) {
+			_log.error("Unable to get OAuth 2 access token");
+
+			return null;
+		}
+
+		return "Bearer " + oAuth2AccessToken.getTokenValue();
+	}
 
 	public static String getClientId(
 		String externalReferenceCode, String lxcMainDomain,
