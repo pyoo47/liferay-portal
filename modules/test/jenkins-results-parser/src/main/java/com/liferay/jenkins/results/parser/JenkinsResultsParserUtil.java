@@ -170,6 +170,7 @@ public class JenkinsResultsParserUtil {
 	};
 
 	public static boolean debug;
+	public static String dummy = "dummy";
 
 	public static void append(File file, String content) throws IOException {
 		if (debug) {
