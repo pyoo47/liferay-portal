@@ -72,6 +72,7 @@ public class TestrayAttachmentRecorder {
 			}
 			else {
 				_recordFailureMessages();
+				_recordGradlePluginsFiles();
 				_recordLiferayLogs();
 				_recordLiferayOSGiLogs();
 				_recordPoshiReportFiles();
@@ -487,6 +488,30 @@ public class TestrayAttachmentRecorder {
 			}
 		}
 		catch (DocumentException | IOException exception) {
+		}
+	}
+
+	private void _recordGradlePluginsFiles() {
+		PortalGitWorkingDirectory portalGitWorkingDirectory =
+			_getPortalGitWorkingDirectory();
+
+		String gradlePluginsFileDir =
+			portalGitWorkingDirectory.getWorkingDirectory() +
+				"/tmp/gradle_plugins.tar.gz";
+
+		File gradlePluginsFile = new File(gradlePluginsFileDir);
+
+		if (!gradlePluginsFile.exists()) {
+			return;
+		}
+
+		try {
+			JenkinsResultsParserUtil.copy(
+				gradlePluginsFile,
+				new File(_getRecordedFilesBuildDir(), "gradle_plugins.tar.gz"));
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
 		}
 	}
 
