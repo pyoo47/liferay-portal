@@ -14,9 +14,9 @@
 
 package com.liferay.jethr0.entity.dalo;
 
+import com.liferay.client.extension.util.spring.boot.LiferayOAuth2AccessToken;
 import com.liferay.jethr0.entity.Entity;
 import com.liferay.jethr0.entity.factory.EntityFactory;
-import com.liferay.jethr0.util.OAuth2AccessTokenSession;
 import com.liferay.jethr0.util.StringUtil;
 import com.liferay.jethr0.util.ThreadUtil;
 
@@ -146,7 +146,7 @@ public abstract class BaseEntityDALO<T extends Entity>
 					MediaType.APPLICATION_JSON
 				).header(
 					"Authorization",
-					_oAuth2AccessTokenSession.getAuthorization()
+					_liferayOAuth2AccessToken.getAuthorization()
 				).body(
 					BodyInserters.fromValue(requestJSONObject.toString())
 				).retrieve(
@@ -200,7 +200,7 @@ public abstract class BaseEntityDALO<T extends Entity>
 					MediaType.APPLICATION_JSON
 				).header(
 					"Authorization",
-					_oAuth2AccessTokenSession.getAuthorization()
+					_liferayOAuth2AccessToken.getAuthorization()
 				).retrieve(
 				).bodyToMono(
 					Void.class
@@ -262,7 +262,7 @@ public abstract class BaseEntityDALO<T extends Entity>
 						MediaType.APPLICATION_JSON
 					).header(
 						"Authorization",
-						_oAuth2AccessTokenSession.getAuthorization()
+						_liferayOAuth2AccessToken.getAuthorization()
 					).retrieve(
 					).bodyToMono(
 						String.class
@@ -360,7 +360,7 @@ public abstract class BaseEntityDALO<T extends Entity>
 					MediaType.APPLICATION_JSON
 				).header(
 					"Authorization",
-					_oAuth2AccessTokenSession.getAuthorization()
+					_liferayOAuth2AccessToken.getAuthorization()
 				).body(
 					BodyInserters.fromValue(requestJSONObject.toString())
 				).retrieve(
@@ -417,10 +417,10 @@ public abstract class BaseEntityDALO<T extends Entity>
 
 	private static final Log _log = LogFactory.getLog(BaseEntityDALO.class);
 
+	@Autowired
+	private LiferayOAuth2AccessToken _liferayOAuth2AccessToken;
+
 	@Value("${liferay.portal.url}")
 	private String _liferayPortalURL;
-
-	@Autowired
-	private OAuth2AccessTokenSession _oAuth2AccessTokenSession;
 
 }
