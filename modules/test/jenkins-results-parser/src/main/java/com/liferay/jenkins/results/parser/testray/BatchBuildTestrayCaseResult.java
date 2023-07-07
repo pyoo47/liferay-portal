@@ -212,6 +212,7 @@ public class BatchBuildTestrayCaseResult extends BuildTestrayCaseResult {
 	public List<TestrayAttachment> getTestrayAttachments() {
 		List<TestrayAttachment> testrayAttachments = new ArrayList<>();
 
+		testrayAttachments.add(_getGradlePluginsAttachment());
 		testrayAttachments.add(_getJenkinsConsoleTestrayAttachment());
 		testrayAttachments.add(getTopLevelBuildReportTestrayAttachment());
 		testrayAttachments.add(getTopLevelJenkinsConsoleTestrayAttachment());
@@ -469,6 +470,12 @@ public class BatchBuildTestrayCaseResult extends BuildTestrayCaseResult {
 			});
 	}
 
+	private TestrayAttachment _getGradlePluginsAttachment() {
+		return getTestrayAttachment(
+		getBuild(), "Gradle Plugins Test Report",
+		getAxisBuildURLPath() + "/gradle_plugins.tar.gz");
+	}
+	
 	private JobProperty _getJobProperty(String basePropertyName) {
 		TopLevelBuild topLevelBuild = getTopLevelBuild();
 
