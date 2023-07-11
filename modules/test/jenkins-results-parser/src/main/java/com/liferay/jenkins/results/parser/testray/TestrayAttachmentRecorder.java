@@ -490,14 +490,13 @@ public class TestrayAttachmentRecorder {
 		catch (DocumentException | IOException exception) {
 		}
 	}
-
 	private void _recordGradlePluginsFiles() {
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			_getPortalGitWorkingDirectory();
 
 		String gradlePluginsFileDir =
 			portalGitWorkingDirectory.getWorkingDirectory() +
-				"/tmp/gradle_plugins.tar.gz";
+				"/tmp/gradle_plugins.tar";
 
 		File gradlePluginsFile = new File(gradlePluginsFileDir);
 
@@ -508,7 +507,7 @@ public class TestrayAttachmentRecorder {
 		try {
 			JenkinsResultsParserUtil.copy(
 				gradlePluginsFile,
-				new File(_getRecordedFilesBuildDir(), "gradle_plugins.tar.gz"));
+				new File(_getRecordedFilesBuildDir(), "gradle_plugins.tar"));
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);
