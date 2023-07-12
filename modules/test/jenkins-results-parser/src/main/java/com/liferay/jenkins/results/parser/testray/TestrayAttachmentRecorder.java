@@ -495,11 +495,9 @@ public class TestrayAttachmentRecorder {
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			_getPortalGitWorkingDirectory();
 
-		String gradlePluginsFileDir =
-			portalGitWorkingDirectory.getWorkingDirectory() +
-				"/tmp/gradle_plugins.tar";
-
-		File gradlePluginsFile = new File(gradlePluginsFileDir);
+		File gradlePluginsFile = new File(
+			portalGitWorkingDirectory.getWorkingDirectory(),
+			"tmp/gradle_plugins.tar");
 
 		if (!gradlePluginsFile.exists()) {
 			return;
