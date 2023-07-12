@@ -490,6 +490,7 @@ public class TestrayAttachmentRecorder {
 		catch (DocumentException | IOException exception) {
 		}
 	}
+
 	private void _recordGradlePluginsFiles() {
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			_getPortalGitWorkingDirectory();
