@@ -23,6 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
+import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -375,6 +377,14 @@ public class MirrorsGetTask extends Task {
 		return _username;
 	}
 
+	protected boolean isSevenZFileName(String fileName) {
+		if (fileName.endsWith(".7z")) {
+			return true;
+		}
+
+		return false;
+	}
+
 	protected boolean isValidMD5(File file, URL url) throws IOException {
 		if (_skipChecksum) {
 			return true;
@@ -411,6 +421,47 @@ public class MirrorsGetTask extends Task {
 		String localMD5 = project.getProperty("md5");
 
 		return remoteMD5.contains(localMD5);
+	}
+
+	protected boolean isValidSevenZ(File file) throws IOException {
+		if (!file.exists()) {
+			return false;
+		}
+
+		SevenZFile sevenZFile = null;
+
+		try {
+			sevenZFile = new SevenZFile(file);
+
+			int count = 0;
+
+			SevenZArchiveEntry sevenZArchiveEntry = null;
+
+			while ((sevenZArchiveEntry = sevenZFile.getNextEntry()) != null) {
+				count++;
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(file.getPath());
+			sb.append(" is a valid 7z file with ");
+			sb.append(count);
+			sb.append(" entries.");
+
+			System.out.println(sb.toString());
+
+			return true;
+		}
+		catch (IOException ioException) {
+			System.out.println(file.getPath() + " is an invalid 7z file.");
+
+			return false;
+		}
+		finally {
+			if (sevenZFile != null) {
+				sevenZFile.close();
+			}
+		}
 	}
 
 	protected boolean isValidZip(File file) throws IOException {
@@ -650,6 +701,15 @@ public class MirrorsGetTask extends Task {
 
 			throw new IOException(
 				targetFile.getAbsolutePath() + " is an invalid zip file.");
+		}
+
+		if (isSevenZFileName(targetFile.getName()) &&
+			!isValidSevenZ(targetFile)) {
+
+			targetFile.delete();
+
+			throw new IOException(
+				targetFile.getAbsolutePath() + " is an invalid 7z file.");
 		}
 	}
 
