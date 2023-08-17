@@ -67,27 +67,12 @@ public class LoadBalancerUtil {
 			}
 		}
 
-		if (goodClockRequired) {
-			List<String> goodClockList = _getGoodClockList(properties, verbose);
-
-			for (JenkinsMaster jenkinsMaster : allJenkinsMasters) {
-				if (blacklist.contains(jenkinsMaster.getName()) ||
-					(goodClockRequired &&
-					 !goodClockList.contains(jenkinsMaster.getName())) ||
-					(jenkinsMaster.getSlaveRAM() < minimumRAM) ||
-					(jenkinsMaster.getSlavesPerHost() > maximumSlavesPerHost)) {
-
-					continue;
-				}
-
-				availableJenkinsMasters.add(jenkinsMaster);
-			}
-
-			return availableJenkinsMasters;
-		}
+		List<String> goodClockList = _getGoodClockList(properties, verbose);
 
 		for (JenkinsMaster jenkinsMaster : allJenkinsMasters) {
 			if (blacklist.contains(jenkinsMaster.getName()) ||
+				(goodClockRequired &&
+				 !goodClockList.contains(jenkinsMaster.getName())) ||
 				(jenkinsMaster.getSlaveRAM() < minimumRAM) ||
 				(jenkinsMaster.getSlavesPerHost() > maximumSlavesPerHost)) {
 
@@ -150,15 +135,8 @@ public class LoadBalancerUtil {
 
 				String blacklistString = properties.getProperty("blacklist");
 
-				Boolean goodClockRequired = false;
-
-				String goodClockRequiredString = properties.getProperty(
-					"good.clock.required");
-
-				if (goodClockRequiredString != null) {
-					goodClockRequired = Boolean.parseBoolean(
-						goodClockRequiredString);
-				}
+				boolean goodClockRequired = Boolean.valueOf(
+					properties.getProperty("good.clock.required"));
 
 				Integer minimumRAM = JenkinsMaster.getSlaveRAMMinimumDefault();
 
