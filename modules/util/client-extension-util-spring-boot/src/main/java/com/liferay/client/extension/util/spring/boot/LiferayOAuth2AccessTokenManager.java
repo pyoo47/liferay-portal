@@ -6,6 +6,8 @@
 package com.liferay.client.extension.util.spring.boot;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,42 +24,57 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
  * @author Michael Hashimoto
  */
 @Configuration
-public class LiferayOAuth2AccessTokenConfiguration {
+public class LiferayOAuth2AccessTokenManager {
 
-	public String getAuthorization() {
-		OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken();
+	public String getAuthorization(String externalReferenceCode) {
+		OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken(
+			externalReferenceCode);
 
 		if (oAuth2AccessToken == null) {
 			return null;
 		}
 
-		return getTokenType() + " " + getTokenValue();
+		return getTokenType(externalReferenceCode) + " " + getTokenValue(externalReferenceCode);
 	}
 
-	public OAuth2AccessToken getOAuth2AccessToken() {
-		synchronized (_log) {
-			if (_oAuth2AccessToken == null) {
-				_oAuth2AccessToken = _getOAuth2AccessToken();
+	public OAuth2AccessToken getOAuth2AccessToken(
+		String externalReferenceCode) {
 
-				return _oAuth2AccessToken;
+		synchronized (_oAuth2AccessTokens) {
+			OAuth2AccessToken oAuth2AccessToken = _oAuth2AccessTokens.get(
+				externalReferenceCode);
+
+			if (oAuth2AccessToken == null) {
+				oAuth2AccessToken = _getOAuth2AccessToken(
+					externalReferenceCode);
+
+				_oAuth2AccessTokens.put(
+					externalReferenceCode, oAuth2AccessToken);
+
+				return oAuth2AccessToken;
 			}
 
 			Instant instant = Instant.now();
 
-			Instant expiresAtInstant = _oAuth2AccessToken.getExpiresAt();
+			Instant expiresAtInstant = oAuth2AccessToken.getExpiresAt();
 
 			if ((expiresAtInstant == null) ||
 				expiresAtInstant.isBefore(instant.minusSeconds(300))) {
 
-				_oAuth2AccessToken = _getOAuth2AccessToken();
+				oAuth2AccessToken = _getOAuth2AccessToken(
+					externalReferenceCode);
+
+				_oAuth2AccessTokens.put(
+					externalReferenceCode, oAuth2AccessToken);
 			}
 
-			return _oAuth2AccessToken;
+			return oAuth2AccessToken;
 		}
 	}
 
-	public String getTokenType() {
-		OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken();
+	public String getTokenType(String externalReferenceCode) {
+		OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken(
+			externalReferenceCode);
 
 		if (oAuth2AccessToken == null) {
 			return null;
@@ -73,8 +90,9 @@ public class LiferayOAuth2AccessTokenConfiguration {
 		return tokenType.getValue();
 	}
 
-	public String getTokenValue() {
-		OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken();
+	public String getTokenValue(String externalReferenceCode) {
+		OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken(
+			externalReferenceCode);
 
 		if (oAuth2AccessToken == null) {
 			return null;
@@ -83,15 +101,17 @@ public class LiferayOAuth2AccessTokenConfiguration {
 		return oAuth2AccessToken.getTokenValue();
 	}
 
-	public void refresh() {
-		synchronized (_log) {
-			_oAuth2AccessToken = null;
-
-			_oAuth2AccessToken = getOAuth2AccessToken();
+	public void refresh(String externalReferenceCode) {
+		synchronized (_oAuth2AccessTokens) {
+			_oAuth2AccessTokens.put(
+				externalReferenceCode,
+				_getOAuth2AccessToken(externalReferenceCode));
 		}
 	}
 
-	private OAuth2AccessToken _getOAuth2AccessToken() {
+	private OAuth2AccessToken _getOAuth2AccessToken(
+		String externalReferenceCode) {
+
 		String liferayOauthApplicationExternalReferenceCodes =
 			_environment.getProperty(
 				"liferay.oauth.application.external.reference.codes");
@@ -139,7 +159,7 @@ public class LiferayOAuth2AccessTokenConfiguration {
 	}
 
 	private static final Log _log = LogFactory.getLog(
-		LiferayOAuth2AccessTokenConfiguration.class);
+		LiferayOAuth2AccessTokenManager.class);
 
 	@Autowired
 	private AuthorizedClientServiceOAuth2AuthorizedClientManager
@@ -149,5 +169,8 @@ public class LiferayOAuth2AccessTokenConfiguration {
 	private Environment _environment;
 
 	private OAuth2AccessToken _oAuth2AccessToken;
+
+	private final Map<String, OAuth2AccessToken> _oAuth2AccessTokens =
+		new HashMap<>();
 
 }
