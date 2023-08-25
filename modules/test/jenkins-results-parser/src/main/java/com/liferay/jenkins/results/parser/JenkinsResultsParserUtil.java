@@ -4511,7 +4511,7 @@ public class JenkinsResultsParserUtil {
 
 					if (retryPeriodOverride > _SECONDS_RETRY_PERIOD_MAX) {
 						throw new GitHubSecondaryRateLimitIOException(
-							retryPeriodOverride, ioException);
+							retryPeriodOverride, url, ioException);
 					}
 				}
 
