@@ -1,0 +1,71 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2023 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+package com.liferay.jenkins.results.parser.bui1d.run;
+
+import com.liferay.jenkins.results.parser.Build;
+import com.liferay.jenkins.results.parser.JenkinsMaster;
+
+import java.net.URL;
+
+import java.util.Objects;
+
+/**
+ * @author Michael Hashimoto
+ */
+public interface BuildRun {
+
+	public Build getBuild();
+
+	public int getBuildNumber();
+
+	public URL getBuildURL();
+
+	public JenkinsMaster getJenkinsMaster();
+
+	public long getJenkinsQueueId();
+
+	public Status getStatus();
+
+	public void setBuildNumber(int buildNumber);
+
+	public void setJenkinsMaster(JenkinsMaster jenkinsMaster);
+
+	public void setJenkinsQueueId(long queueId);
+
+	public void setStatus(Status status);
+
+	public void update();
+
+	public enum Status {
+
+		COMPLETED("completed"), MISSING("missing"), QUEUED("queued"),
+		REPORTING("reporting"), RUNNING("running"), STARTING("starting");
+
+		public static Status getByKey(String key) {
+			for (Status status : values()) {
+				if (!Objects.equals(key, status.getKey())) {
+					continue;
+				}
+
+				return status;
+			}
+
+			return null;
+		}
+
+		public String getKey() {
+			return _key;
+		}
+
+		private Status(String key) {
+			_key = key;
+		}
+
+		private final String _key;
+
+	}
+
+}
