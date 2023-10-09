@@ -433,6 +433,17 @@ public abstract class BaseParentBuild extends BaseBuild implements ParentBuild {
 	}
 
 	@Override
+	public void reset() {
+		super.reset();
+
+		if (_downstreamBuilds == null) {
+			getDownstreamBuilds();
+		}
+
+		_downstreamBuilds.clear();
+	}
+
+	@Override
 	public void update() {
 		if (skipUpdate()) {
 			return;
@@ -631,17 +642,6 @@ public abstract class BaseParentBuild extends BaseBuild implements ParentBuild {
 		}
 
 		return true;
-	}
-
-	@Override
-	protected void reset() {
-		super.reset();
-
-		if (_downstreamBuilds == null) {
-			getDownstreamBuilds();
-		}
-
-		_downstreamBuilds.clear();
 	}
 
 	@Override

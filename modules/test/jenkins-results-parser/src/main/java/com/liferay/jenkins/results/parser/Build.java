@@ -5,6 +5,8 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.liferay.jenkins.results.parser.bui1d.run.BuildRun;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -53,6 +55,8 @@ public interface Build {
 	public String getBuildDirPath();
 
 	public JSONObject getBuildJSONObject();
+
+	public JSONObject getBuildJSONObject(String tree);
 
 	public String getBuildName();
 
@@ -157,7 +161,9 @@ public interface Build {
 
 	public boolean hasGenericCIFailure();
 
-	public Invocation invoke();
+	public boolean hasMaxBuildRunCount();
+
+	public BuildRun invoke();
 
 	public boolean isApplyReinvokeRules();
 
@@ -183,11 +189,17 @@ public interface Build {
 
 	public String replaceBuildURL(String text);
 
+	public void reset();
+
 	public void setArchiveName(String archiveName);
 
 	public void setArchiveRootDir(File archiveRootDir);
 
 	public void setCompareToUpstream(boolean compareToUpstream);
+
+	public void setResult(String result);
+
+	public void setStatus(String status);
 
 	public void takeSlaveOffline(SlaveOfflineRule slaveOfflineRule);
 
@@ -216,43 +228,6 @@ public interface Build {
 		public String getUpstreamBranchName();
 
 		public String getUpstreamBranchSHA();
-
-	}
-
-	public class Invocation {
-
-		public Invocation(JenkinsMaster jenkinsMaster) {
-			_jenkinsMaster = jenkinsMaster;
-		}
-
-		public Invocation(JenkinsMaster jenkinsMaster, long queueId) {
-			_jenkinsMaster = jenkinsMaster;
-			_queueId = queueId;
-		}
-
-		public int getBuildNumber() {
-			return _buildNumber;
-		}
-
-		public JenkinsMaster getJenkinsMaster() {
-			return _jenkinsMaster;
-		}
-
-		public long getQueueId() {
-			return _queueId;
-		}
-
-		public void setBuildNumber(int buildNumber) {
-			_buildNumber = buildNumber;
-		}
-
-		public void setQueueId(long queueId) {
-			_queueId = queueId;
-		}
-
-		private int _buildNumber;
-		private final JenkinsMaster _jenkinsMaster;
-		private long _queueId;
 
 	}
 

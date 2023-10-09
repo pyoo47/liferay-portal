@@ -5,6 +5,8 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.liferay.jenkins.results.parser.bui1d.run.BuildRun;
+import com.liferay.jenkins.results.parser.bui1d.run.BuildRunFactory;
 import com.liferay.jenkins.results.parser.failure.message.generator.FailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.GenericFailureMessageGenerator;
 
@@ -150,16 +152,14 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public List<String> getBadBuildURLs() {
-		if (_invocations.size() <= 1) {
+		if (_buildRuns.size() <= 1) {
 			return Collections.emptyList();
 		}
 
 		List<String> badBuildURLs = new ArrayList<>();
 
-		for (Invocation invocation :
-				_invocations.subList(0, _invocations.size() - 2)) {
-
-			badBuildURLs.add(_getBuildURL(invocation));
+		for (BuildRun buildRun : _buildRuns.subList(0, _buildRuns.size() - 2)) {
+			badBuildURLs.add(_getBuildURL(buildRun));
 		}
 
 		return badBuildURLs;
@@ -313,14 +313,27 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
-	public int getBuildNumber() {
-		Invocation latestInvocation = _getLatestInvocation();
+	public JSONObject getBuildJSONObject(String tree) {
+		String urlSuffix = "api/json";
 
-		if (latestInvocation == null) {
+		String archiveFileContent = getArchiveFileContent(urlSuffix);
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(archiveFileContent)) {
+			return new JSONObject(archiveFileContent);
+		}
+
+		return JenkinsAPIUtil.getAPIJSONObject(getBuildURL(), tree);
+	}
+
+	@Override
+	public int getBuildNumber() {
+		BuildRun latestBuildRun = _getLatestBuildRun();
+
+		if (latestBuildRun == null) {
 			return -1;
 		}
 
-		return latestInvocation.getBuildNumber();
+		return latestBuildRun.getBuildNumber();
 	}
 
 	@Override
@@ -350,7 +363,7 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public String getBuildURL() {
-		return _getBuildURL(_getLatestInvocation());
+		return _getBuildURL(_getLatestBuildRun());
 	}
 
 	@Override
@@ -685,10 +698,10 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public JenkinsMaster getJenkinsMaster() {
-		Invocation latestInvocation = _getLatestInvocation();
+		BuildRun latestBuildRun = _getLatestBuildRun();
 
-		if (latestInvocation != null) {
-			return latestInvocation.getJenkinsMaster();
+		if (latestBuildRun != null) {
+			return latestBuildRun.getJenkinsMaster();
 		}
 
 		return null;
@@ -1205,7 +1218,16 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
-	public Invocation invoke() {
+	public boolean hasMaxBuildRunCount() {
+		if (_buildRuns.size() >= _BUILD_RUN_COUNT_MAX) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public BuildRun invoke() {
 		return _invoke(
 			_getInvokedBatchSize(), _getMinimumSlaveRAM(),
 			_getMaximumSlavesPerHost());
@@ -1214,7 +1236,7 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public boolean isApplyReinvokeRules() {
 		if ((isCompleted() && !isFailing()) || !isCompleted() ||
-			isFromArchive() || (getInvocationCount() >= INVOCATION_COUNT_MAX)) {
+			isFromArchive() || hasMaxBuildRunCount()) {
 
 			return false;
 		}
@@ -1358,7 +1380,7 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public void reinvoke(ReinvokeRule reinvokeRule) {
-		if (getInvocationCount() >= INVOCATION_COUNT_MAX) {
+		if (hasMaxBuildRunCount()) {
 			return;
 		}
 
@@ -1405,8 +1427,6 @@ public abstract class BaseBuild implements Build {
 		}
 
 		_invoke(_getInvokedBatchSize(), 24, _getMaximumSlavesPerHost());
-
-		setStatus("starting");
 	}
 
 	@Override
@@ -1437,6 +1457,16 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public void reset() {
+		consoleReadCursor = 0;
+		_duration = null;
+		_jenkinsConsoleTextLoader = null;
+		_jenkinsSlave = null;
+		_result = null;
+		_statusModifiedTime = 0;
+	}
+
+	@Override
 	public void setArchiveName(String archiveName) {
 		_archiveName = archiveName;
 	}
@@ -1459,6 +1489,33 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public void setCompareToUpstream(boolean compareToUpstream) {
+	}
+
+	@Override
+	public void setResult(String result) {
+		_result = result;
+	}
+
+	@Override
+	public void setStatus(String status) {
+		if (_isDifferent(status, _status)) {
+			_previousStatus = _status;
+
+			_status = status;
+
+			long previousStatusModifiedTime = _statusModifiedTime;
+
+			_statusModifiedTime =
+				JenkinsResultsParserUtil.getCurrentTimeMillis();
+
+			_statusDurations.put(
+				_previousStatus,
+				_statusModifiedTime - previousStatusModifiedTime);
+
+			if (isParentBuildRoot()) {
+				System.out.println(getBuildMessage());
+			}
+		}
 	}
 
 	@Override
@@ -1517,26 +1574,13 @@ public abstract class BaseBuild implements Build {
 			return;
 		}
 
-		String status = getStatus();
+		BuildRun latestBuildRun = _getLatestBuildRun();
 
-		if (status.equals("completed")) {
-			_runCompleted();
+		if (latestBuildRun == null) {
+			return;
 		}
-		else if (status.equals("missing")) {
-			_runMissing();
-		}
-		else if (status.equals("queued")) {
-			_runQueued();
-		}
-		else if (status.equals("reporting")) {
-			_runReporting();
-		}
-		else if (status.equals("running")) {
-			_runRunning();
-		}
-		else if (status.equals("starting")) {
-			_runStarting();
-		}
+
+		latestBuildRun.update();
 	}
 
 	public static class BuildDisplayNameComparator
@@ -2082,18 +2126,6 @@ public abstract class BaseBuild implements Build {
 		return _branchInformationMap.get(repositoryType);
 	}
 
-	protected JSONObject getBuildJSONObject(String tree) {
-		String urlSuffix = "api/json";
-
-		String archiveFileContent = getArchiveFileContent(urlSuffix);
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(archiveFileContent)) {
-			return new JSONObject(archiveFileContent);
-		}
-
-		return JenkinsAPIUtil.getAPIJSONObject(getBuildURL(), tree);
-	}
-
 	protected String getBuildMessage() {
 		if (_jobName != null) {
 			String status = getStatus();
@@ -2138,7 +2170,7 @@ public abstract class BaseBuild implements Build {
 			}
 
 			if (status.equals("running")) {
-				if (_invocations.size() > 1) {
+				if (_buildRuns.size() > 1) {
 					String previousBuildURL = _getPreviousBuildURL();
 
 					if (JenkinsResultsParserUtil.isURL(previousBuildURL)) {
@@ -2257,10 +2289,6 @@ public abstract class BaseBuild implements Build {
 		boolean showCommonFailuresCount) {
 
 		return getGitHubMessageJobResultsElement();
-	}
-
-	protected int getInvocationCount() {
-		return _invocations.size();
 	}
 
 	protected List<Element> getJenkinsReportBuildDurationsElements() {
@@ -2706,68 +2734,6 @@ public abstract class BaseBuild implements Build {
 		return testResults;
 	}
 
-	protected boolean isJenkinsBuildCompleted() {
-		JSONObject buildJSONObject = getBuildJSONObject("duration,result");
-
-		if (buildJSONObject == null) {
-			return false;
-		}
-
-		long duration = buildJSONObject.optLong("duration");
-		String result = buildJSONObject.optString("result");
-
-		if ((duration == 0) || JenkinsResultsParserUtil.isNullOrEmpty(result)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	protected boolean isJenkinsBuildQueued() {
-		try {
-			JSONObject queueItemJSONObject = _getQueueItemJSONObject();
-
-			if (queueItemJSONObject == null) {
-				return false;
-			}
-
-			return true;
-		}
-		catch (Exception exception) {
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"[", getBuildName(), "] Unable to get queue item"));
-		}
-
-		return false;
-	}
-
-	protected boolean isJenkinsBuildRunning() {
-		try {
-			JSONObject runningBuildJSONObject = _getRunningBuildJSONObject();
-
-			if (runningBuildJSONObject == null) {
-				return false;
-			}
-
-			Invocation latestInvocation = _getLatestInvocation();
-
-			latestInvocation.setBuildNumber(
-				runningBuildJSONObject.getInt("number"));
-
-			return true;
-		}
-		catch (Exception exception) {
-			exception.printStackTrace();
-
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"[", getBuildName(), "] Unable to get build item"));
-		}
-
-		return false;
-	}
-
 	protected boolean isParentBuildRoot() {
 		if (_parentBuild == null) {
 			return false;
@@ -2850,15 +2816,6 @@ public abstract class BaseBuild implements Build {
 		}
 	}
 
-	protected void reset() {
-		consoleReadCursor = 0;
-		_duration = null;
-		_jenkinsConsoleTextLoader = null;
-		_jenkinsSlave = null;
-		_result = null;
-		_statusModifiedTime = 0;
-	}
-
 	protected void setBuildURL(String buildURL) {
 		try {
 			buildURL = JenkinsResultsParserUtil.decode(buildURL);
@@ -2907,12 +2864,12 @@ public abstract class BaseBuild implements Build {
 		JenkinsMaster jenkinsMaster = JenkinsMaster.getInstance(
 			matcher.group("master"));
 
-		Invocation invocation = new Invocation(jenkinsMaster);
+		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
 
-		invocation.setBuildNumber(
-			Integer.parseInt(matcher.group("buildNumber")));
+		buildRun.setBuildNumber(Integer.parseInt(matcher.group("buildNumber")));
+		buildRun.setJenkinsMaster(jenkinsMaster);
 
-		_invocations.add(invocation);
+		_buildRuns.add(buildRun);
 
 		setJobName(matcher.group("jobName"));
 
@@ -2924,13 +2881,13 @@ public abstract class BaseBuild implements Build {
 
 		JSONObject buildJSONObject = getBuildJSONObject("queueId");
 
-		invocation.setQueueId(buildJSONObject.getLong("queueId"));
+		buildRun.setJenkinsQueueId(buildJSONObject.getLong("queueId"));
 
 		if (isCompleted()) {
-			setStatus("completed");
+			buildRun.setStatus(BuildRun.Status.COMPLETED);
 		}
 		else {
-			setStatus("running");
+			buildRun.setStatus(BuildRun.Status.RUNNING);
 		}
 	}
 
@@ -2958,11 +2915,13 @@ public abstract class BaseBuild implements Build {
 		JenkinsMaster jenkinsMaster = JenkinsMaster.getInstance(
 			invocationURLMatcher.group("master"));
 
-		Invocation invocation = new Invocation(jenkinsMaster);
+		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
+
+		buildRun.setJenkinsMaster(jenkinsMaster);
 
 		setJobName(invocationURLMatcher.group("jobName"));
 
-		_invocations.add(invocation);
+		_buildRuns.add(buildRun);
 
 		loadParametersFromQueryString(invocationURL);
 
@@ -2973,9 +2932,9 @@ public abstract class BaseBuild implements Build {
 		JSONObject jsonObject = JenkinsResultsParserUtil.invokeJenkinsBuild(
 			jenkinsMaster, getJobName(), getParameters());
 
-		invocation.setQueueId(jsonObject.getLong("queueId"));
+		buildRun.setJenkinsQueueId(jsonObject.getLong("queueId"));
 
-		setStatus("starting");
+		buildRun.setStatus(BuildRun.Status.STARTING);
 	}
 
 	protected void setJobName(String jobName) {
@@ -2990,31 +2949,6 @@ public abstract class BaseBuild implements Build {
 		}
 
 		_branchName = "master";
-	}
-
-	protected void setResult(String result) {
-		_result = result;
-	}
-
-	protected void setStatus(String status) {
-		if (_isDifferent(status, _status)) {
-			_previousStatus = _status;
-
-			_status = status;
-
-			long previousStatusModifiedTime = _statusModifiedTime;
-
-			_statusModifiedTime =
-				JenkinsResultsParserUtil.getCurrentTimeMillis();
-
-			_statusDurations.put(
-				_previousStatus,
-				_statusModifiedTime - previousStatusModifiedTime);
-
-			if (isParentBuildRoot()) {
-				System.out.println(getBuildMessage());
-			}
-		}
 	}
 
 	protected boolean skipUpdate() {
@@ -3054,8 +2988,6 @@ public abstract class BaseBuild implements Build {
 			new File(getArchiveRootDir(), path),
 			JenkinsResultsParserUtil.redact(replaceBuildURL(content)));
 	}
-
-	protected static final int INVOCATION_COUNT_MAX = 2;
 
 	protected static final int PIXELS_WIDTH_INDENT = 35;
 
@@ -3205,36 +3137,18 @@ public abstract class BaseBuild implements Build {
 		_archive(null, false, "testReport/api/json");
 	}
 
-	private String _getBuildURL(Invocation invocation) {
-		if (invocation == null) {
+	private String _getBuildURL(BuildRun buildRun) {
+		if (buildRun == null) {
 			return null;
 		}
 
-		JenkinsMaster jenkinsMaster = invocation.getJenkinsMaster();
-		int buildNumber = invocation.getBuildNumber();
+		URL buildURL = buildRun.getBuildURL();
 
-		if ((jenkinsMaster == null) || (buildNumber <= 0)) {
+		if (buildURL == null) {
 			return null;
 		}
 
-		String jobURL = JenkinsResultsParserUtil.combine(
-			"https://", jenkinsMaster.getName(), ".liferay.com/job/",
-			getJobName());
-
-		try {
-			jobURL = JenkinsResultsParserUtil.decode(jobURL);
-
-			return JenkinsResultsParserUtil.encode(
-				jobURL + "/" + buildNumber + "/");
-		}
-		catch (MalformedURLException | URISyntaxException exception) {
-			throw new RuntimeException("Unable to encode build URL", exception);
-		}
-		catch (UnsupportedEncodingException unsupportedEncodingException) {
-			throw new RuntimeException(
-				"Unable to decode job URL " + jobURL,
-				unsupportedEncodingException);
-		}
+		return buildURL + "/";
 	}
 
 	private int _getInvokedBatchSize() {
@@ -3263,12 +3177,12 @@ public abstract class BaseBuild implements Build {
 		return _invokedBatchSize;
 	}
 
-	private Invocation _getLatestInvocation() {
-		if (_invocations.isEmpty()) {
+	private BuildRun _getLatestBuildRun() {
+		if (_buildRuns.isEmpty()) {
 			return null;
 		}
 
-		return _invocations.get(_invocations.size() - 1);
+		return _buildRuns.get(_buildRuns.size() - 1);
 	}
 
 	private int _getMaximumSlavesPerHost() {
@@ -3306,141 +3220,16 @@ public abstract class BaseBuild implements Build {
 		return _minimumSlaveRAM;
 	}
 
+	private BuildRun _getPreviousBuildRun() {
+		if (_buildRuns.size() <= 1) {
+			return null;
+		}
+
+		return _buildRuns.get(_buildRuns.size() - 2);
+	}
+
 	private String _getPreviousBuildURL() {
-		return _getBuildURL(_getPreviousInvocation());
-	}
-
-	private Invocation _getPreviousInvocation() {
-		if (_invocations.size() <= 1) {
-			return null;
-		}
-
-		return _invocations.get(_invocations.size() - 2);
-	}
-
-	private JSONObject _getQueueItemJSONObject() {
-		try {
-			Invocation latestInvocation = _getLatestInvocation();
-
-			if (latestInvocation == null) {
-				return null;
-			}
-
-			JenkinsMaster jenkinsMaster = latestInvocation.getJenkinsMaster();
-
-			if (jenkinsMaster == null) {
-				return null;
-			}
-
-			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-				JenkinsResultsParserUtil.combine(
-					"http://", jenkinsMaster.getName(),
-					"/queue/api/json?tree=items[id]"),
-				false);
-
-			JSONArray queueItemsJSONArray = jsonObject.getJSONArray("items");
-
-			if (queueItemsJSONArray == null) {
-				return null;
-			}
-
-			for (int i = 0; i < queueItemsJSONArray.length(); i++) {
-				JSONObject queueItemJSONObject =
-					queueItemsJSONArray.getJSONObject(i);
-
-				if (Objects.equals(
-						queueItemJSONObject.getLong("id"),
-						latestInvocation.getQueueId())) {
-
-					return queueItemJSONObject;
-				}
-			}
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
-
-		return null;
-	}
-
-	private String _getResultFromJenkins() {
-		JSONObject buildJSONObject = getBuildJSONObject("duration,result");
-
-		if (buildJSONObject == null) {
-			return null;
-		}
-
-		long duration = buildJSONObject.optLong("duration");
-		String result = buildJSONObject.optString("result");
-
-		if ((duration == 0) || JenkinsResultsParserUtil.isNullOrEmpty(result)) {
-			return null;
-		}
-
-		return result;
-	}
-
-	private JSONObject _getRunningBuildJSONObject() {
-		Invocation latestInvocation = _getLatestInvocation();
-
-		if (latestInvocation == null) {
-			return null;
-		}
-
-		int page = 0;
-
-		while (true) {
-			JSONArray runningBuildsJSONArray = _getRunningBuildsJSONArray(page);
-
-			if (runningBuildsJSONArray.length() == 0) {
-				break;
-			}
-
-			for (int i = 0; i < runningBuildsJSONArray.length(); i++) {
-				JSONObject runningBuildJSONObject =
-					runningBuildsJSONArray.getJSONObject(i);
-
-				if (Objects.equals(
-						runningBuildJSONObject.getLong("queueId"),
-						latestInvocation.getQueueId())) {
-
-					return runningBuildJSONObject;
-				}
-			}
-
-			page++;
-		}
-
-		return null;
-	}
-
-	private JSONArray _getRunningBuildsJSONArray(final int page) {
-		Retryable<JSONArray> retryable = new Retryable<JSONArray>(
-			true, 2, 10, true) {
-
-			@Override
-			public JSONArray execute() {
-				String url = JenkinsResultsParserUtil.getLocalURL(
-					JenkinsResultsParserUtil.combine(
-						getJobURL(), "/api/json?tree=",
-						"allBuilds[number,queueId]{",
-						String.valueOf(page * 100), ",",
-						String.valueOf((page + 1) * 100), "}"));
-
-				try {
-					JSONObject jsonObject =
-						JenkinsResultsParserUtil.toJSONObject(url, false);
-
-					return jsonObject.getJSONArray("allBuilds");
-				}
-				catch (IOException ioException) {
-					throw new RuntimeException(ioException);
-				}
-			}
-
-		};
-
-		return retryable.executeWithRetries();
+		return _getBuildURL(_getPreviousBuildRun());
 	}
 
 	private List<Element> _getStopWatchRecordTableRowElements(
@@ -3600,7 +3389,7 @@ public abstract class BaseBuild implements Build {
 		}
 	}
 
-	private Invocation _invoke(
+	private BuildRun _invoke(
 		int invokedBatchSize, int minimumSlaveRAM, int maximumSlavesPerHost) {
 
 		JenkinsCohort jenkinsCohort = getJenkinsCohort();
@@ -3612,14 +3401,16 @@ public abstract class BaseBuild implements Build {
 		JSONObject jsonObject = JenkinsResultsParserUtil.invokeJenkinsBuild(
 			jenkinsMaster, getJobName(), getParameters());
 
-		Invocation invocation = new Invocation(
-			jenkinsMaster, jsonObject.getLong("queueId"));
+		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
 
-		_invocations.add(invocation);
+		buildRun.setJenkinsMaster(jenkinsMaster);
+		buildRun.setJenkinsQueueId(jsonObject.getLong("queueId"));
 
-		setStatus("starting");
+		_buildRuns.add(buildRun);
 
-		return invocation;
+		buildRun.setStatus(BuildRun.Status.STARTING);
+
+		return buildRun;
 	}
 
 	private boolean _isDifferent(String newValue, String oldValue) {
@@ -3638,96 +3429,7 @@ public abstract class BaseBuild implements Build {
 		return true;
 	}
 
-	private void _runCompleted() {
-		String result = getResult();
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(result)) {
-			result = _getResultFromJenkins();
-		}
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(result)) {
-			result = "MISSING";
-		}
-
-		setResult(result);
-
-		setStatus("completed");
-	}
-
-	private void _runMissing() {
-		setStatus("missing");
-
-		if (isJenkinsBuildQueued()) {
-			_runQueued();
-
-			return;
-		}
-
-		if (isJenkinsBuildRunning()) {
-			_runRunning();
-
-			return;
-		}
-
-		if (getInvocationCount() >= INVOCATION_COUNT_MAX) {
-			_runReporting();
-
-			return;
-		}
-
-		invoke();
-
-		_runStarting();
-	}
-
-	private void _runQueued() {
-		setStatus("queued");
-
-		if (isJenkinsBuildQueued()) {
-			return;
-		}
-
-		if (isJenkinsBuildRunning()) {
-			_runRunning();
-
-			return;
-		}
-
-		setStatus("missing");
-	}
-
-	private void _runReporting() {
-		setResult(_getResultFromJenkins());
-		setStatus("reporting");
-
-		isApplySlaveOfflineRules();
-
-		if (isApplyReinvokeRules()) {
-			_runStarting();
-
-			return;
-		}
-
-		_runCompleted();
-	}
-
-	private void _runRunning() {
-		setStatus("running");
-
-		if (!isJenkinsBuildCompleted()) {
-			return;
-		}
-
-		_runReporting();
-	}
-
-	private void _runStarting() {
-		setStatus("starting");
-
-		reset();
-
-		_runQueued();
-	}
+	private static final int _BUILD_RUN_COUNT_MAX = 2;
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
 		{new GenericFailureMessageGenerator()};
@@ -3781,8 +3483,8 @@ public abstract class BaseBuild implements Build {
 	private String _branchName;
 	private String _buildDescription;
 	private Boolean _buildDurationsEnabled;
+	private final List<BuildRun> _buildRuns = new ArrayList<>();
 	private Long _duration;
-	private final List<Invocation> _invocations = new ArrayList<>();
 	private int _invokedBatchSize;
 	private JenkinsCohort _jenkinsCohort;
 	private JenkinsConsoleTextLoader _jenkinsConsoleTextLoader;

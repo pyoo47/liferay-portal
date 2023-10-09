@@ -286,7 +286,7 @@ public class BatchBuild extends BaseParentBuild {
 
 	@Override
 	public boolean isApplyReinvokeRules() {
-		if (getInvocationCount() >= INVOCATION_COUNT_MAX) {
+		if (hasMaxBuildRunCount()) {
 			return false;
 		}
 
