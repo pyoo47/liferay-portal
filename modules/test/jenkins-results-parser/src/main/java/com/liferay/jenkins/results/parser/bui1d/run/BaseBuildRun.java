@@ -173,8 +173,6 @@ public abstract class BaseBuildRun implements BuildRun {
 	@Override
 	public void setStatus(Status status) {
 		_status = status;
-
-		_build.setStatus(status.getKey());
 	}
 
 	@Override
@@ -189,9 +187,6 @@ public abstract class BaseBuildRun implements BuildRun {
 		}
 		else if (status == Status.QUEUED) {
 			runQueued();
-		}
-		else if (status == Status.REPORTING) {
-			runReporting();
 		}
 		else if (status == Status.RUNNING) {
 			runRunning();
@@ -230,23 +225,13 @@ public abstract class BaseBuildRun implements BuildRun {
 	protected abstract boolean isJenkinsBuildRunning();
 
 	protected void runCompleted() {
-		String result = _build.getResult();
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(result)) {
-			result = getResultFromJenkins();
-		}
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(result)) {
-			result = "MISSING";
-		}
-
-		_build.setResult(result);
-
 		setStatus(Status.COMPLETED);
 	}
 
 	protected void runMissing() {
 		setStatus(Status.MISSING);
+
+		_build.setStatus(Status.MISSING.getKey());
 
 		if (isJenkinsBuildQueued()) {
 			runQueued();
@@ -260,19 +245,13 @@ public abstract class BaseBuildRun implements BuildRun {
 			return;
 		}
 
-		if (_build.hasMaxBuildRunCount()) {
-			runReporting();
-
-			return;
-		}
-
-		_build.invoke();
-
-		runStarting();
+		runCompleted();
 	}
 
 	protected void runQueued() {
 		setStatus(Status.QUEUED);
+
+		_build.setStatus(Status.QUEUED.getKey());
 
 		if (isJenkinsBuildQueued()) {
 			return;
@@ -285,36 +264,26 @@ public abstract class BaseBuildRun implements BuildRun {
 		}
 
 		setStatus(Status.MISSING);
+
+		_build.setStatus(Status.MISSING.getKey());
 	}
 
-	protected void runReporting() {
-		_build.setResult(getResultFromJenkins());
+	protected void runRunning() {
+		setStatus(Status.RUNNING);
 
-		setStatus(Status.REPORTING);
+		_build.setStatus(Status.RUNNING.getKey());
 
-		_build.isApplySlaveOfflineRules();
-
-		if (_build.isApplyReinvokeRules()) {
-			runStarting();
-
+		if (!isJenkinsBuildCompleted()) {
 			return;
 		}
 
 		runCompleted();
 	}
 
-	protected void runRunning() {
-		setStatus(Status.RUNNING);
-
-		if (!isJenkinsBuildCompleted()) {
-			return;
-		}
-
-		runReporting();
-	}
-
 	protected void runStarting() {
 		setStatus(Status.STARTING);
+
+		_build.setStatus(Status.STARTING.getKey());
 
 		_build.reset();
 

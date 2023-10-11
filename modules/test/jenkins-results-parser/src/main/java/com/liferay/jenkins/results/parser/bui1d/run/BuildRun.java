@@ -71,7 +71,7 @@ public interface BuildRun {
 	public enum Status {
 
 		COMPLETED("completed"), MISSING("missing"), QUEUED("queued"),
-		REPORTING("reporting"), RUNNING("running"), STARTING("starting");
+		RUNNING("running"), STARTING("starting");
 
 		public String getKey() {
 			return _key;
