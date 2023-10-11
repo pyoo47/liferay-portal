@@ -549,7 +549,9 @@ public abstract class BaseBuild implements Build {
 	public Element getGitHubMessageElement(boolean showCommonFailuresCount) {
 		String status = getStatus();
 
-		if (!status.equals("completed") && (getParentBuild() != null)) {
+		if ((status == null) ||
+			(!status.equals("completed") && (getParentBuild() != null))) {
+
 			return null;
 		}
 
@@ -2049,6 +2051,12 @@ public abstract class BaseBuild implements Build {
 	}
 
 	protected String getArchiveFileContent(String urlSuffix) {
+		String status = getStatus();
+
+		if ((status == null) || !status.equals("completed")) {
+			return null;
+		}
+
 		File archiveFile = getArchiveFile(urlSuffix);
 
 		if (!archiveFile.exists()) {
@@ -2958,7 +2966,7 @@ public abstract class BaseBuild implements Build {
 
 		String status = getStatus();
 
-		if (!status.equals("completed")) {
+		if ((status == null) || !status.equals("completed")) {
 			return false;
 		}
 
