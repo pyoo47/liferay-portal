@@ -34,9 +34,15 @@ public interface BuildRun {
 
 	public int getMinimumSlaveRAM();
 
+	public Result getResult();
+
 	public Status getStatus();
 
 	public void invoke();
+
+	public boolean isCompleted();
+
+	public boolean isFailing();
 
 	public void setBuildNumber(int buildNumber);
 
@@ -55,6 +61,12 @@ public interface BuildRun {
 	public void setStatus(Status status);
 
 	public void update();
+
+	public enum Result {
+
+		ABORTED, FAILURE, NOT_BUILT, SUCCESS, UNSTABLE
+
+	}
 
 	public enum Status {
 

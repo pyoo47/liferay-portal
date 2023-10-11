@@ -88,8 +88,51 @@ public abstract class BaseBuildRun implements BuildRun {
 	}
 
 	@Override
+	public Result getResult() {
+		if (_result != null) {
+			return _result;
+		}
+
+		if (!isCompleted()) {
+			return null;
+		}
+
+		String jenkinsResult = getResultFromJenkins();
+
+		if (JenkinsResultsParserUtil.isNullOrEmpty(jenkinsResult)) {
+			return null;
+		}
+
+		for (Result result : Result.values()) {
+			if (jenkinsResult.equals(result.toString())) {
+				_result = result;
+
+				break;
+			}
+		}
+
+		return _result;
+	}
+
+	@Override
 	public Status getStatus() {
 		return _status;
+	}
+
+	public boolean isCompleted() {
+		if (getStatus() == Status.COMPLETED) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isFailing() {
+		if (!isCompleted() || (getResult() == Result.SUCCESS)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -286,6 +329,7 @@ public abstract class BaseBuildRun implements BuildRun {
 	private long _jenkinsQueueId;
 	private int _maximumSlavesPerHost;
 	private int _minimumSlaveRAM;
+	private Result _result;
 	private Status _status;
 
 }
