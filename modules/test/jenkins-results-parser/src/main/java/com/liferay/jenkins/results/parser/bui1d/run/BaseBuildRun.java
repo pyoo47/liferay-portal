@@ -36,7 +36,8 @@ public abstract class BaseBuildRun implements BuildRun {
 			return null;
 		}
 
-		String jobURL = _jenkinsMaster.getURL() + "/job/" + _build.getJobName();
+		String jobURL =
+			_jenkinsMaster.getRemoteURL() + "job/" + _build.getJobName();
 
 		try {
 			return new URL(
