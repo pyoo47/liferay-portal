@@ -6,10 +6,10 @@
 package com.liferay.jenkins.results.parser.bui1d.run;
 
 import com.liferay.jenkins.results.parser.Build;
+import com.liferay.jenkins.results.parser.JenkinsCohort;
 import com.liferay.jenkins.results.parser.JenkinsMaster;
 
 import java.net.URL;
-
 import java.util.Objects;
 
 /**
@@ -23,6 +23,8 @@ public interface BuildRun {
 
 	public URL getBuildURL();
 
+	public JenkinsCohort getJenkinsCohort();
+
 	public JenkinsMaster getJenkinsMaster();
 
 	public long getJenkinsQueueId();
@@ -30,6 +32,8 @@ public interface BuildRun {
 	public Status getStatus();
 
 	public void setBuildNumber(int buildNumber);
+
+	public void setJenkinsCohort(JenkinsCohort jenkinsCohort);
 
 	public void setJenkinsMaster(JenkinsMaster jenkinsMaster);
 

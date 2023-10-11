@@ -6,6 +6,7 @@
 package com.liferay.jenkins.results.parser.bui1d.run;
 
 import com.liferay.jenkins.results.parser.Build;
+import com.liferay.jenkins.results.parser.JenkinsCohort;
 import com.liferay.jenkins.results.parser.JenkinsMaster;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.ParentBuild;
@@ -56,6 +57,19 @@ public abstract class BaseBuildRun implements BuildRun {
 	}
 
 	@Override
+	public JenkinsCohort getJenkinsCohort() {
+		if (_jenkinsCohort != null) {
+			return _jenkinsCohort;
+		}
+
+		if (_jenkinsMaster != null) {
+			_jenkinsCohort = _jenkinsMaster.getJenkinsCohort();
+		}
+
+		return _jenkinsCohort;
+	}
+
+	@Override
 	public JenkinsMaster getJenkinsMaster() {
 		return _jenkinsMaster;
 	}
@@ -73,6 +87,11 @@ public abstract class BaseBuildRun implements BuildRun {
 	@Override
 	public void setBuildNumber(int buildNumber) {
 		_buildNumber = buildNumber;
+	}
+
+	@Override
+	public void setJenkinsCohort(JenkinsCohort jenkinsCohort) {
+		_jenkinsCohort = jenkinsCohort;
 	}
 
 	@Override
