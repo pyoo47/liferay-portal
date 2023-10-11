@@ -162,6 +162,24 @@ public abstract class BaseBuildRun implements BuildRun {
 		_build = build;
 	}
 
+	protected String getResultFromJenkins() {
+		JSONObject buildJSONObject = _build.getBuildJSONObject(
+			"duration,result");
+
+		if (buildJSONObject == null) {
+			return null;
+		}
+
+		long duration = buildJSONObject.optLong("duration");
+		String result = buildJSONObject.optString("result");
+
+		if ((duration <= 0) || JenkinsResultsParserUtil.isNullOrEmpty(result)) {
+			return null;
+		}
+
+		return result;
+	}
+
 	protected abstract boolean isJenkinsBuildCompleted();
 
 	protected abstract boolean isJenkinsBuildQueued();
@@ -172,7 +190,7 @@ public abstract class BaseBuildRun implements BuildRun {
 		String result = _build.getResult();
 
 		if (JenkinsResultsParserUtil.isNullOrEmpty(result)) {
-			result = _getResultFromJenkins();
+			result = getResultFromJenkins();
 		}
 
 		if (JenkinsResultsParserUtil.isNullOrEmpty(result)) {
@@ -227,7 +245,7 @@ public abstract class BaseBuildRun implements BuildRun {
 	}
 
 	protected void runReporting() {
-		_build.setResult(_getResultFromJenkins());
+		_build.setResult(getResultFromJenkins());
 
 		setStatus(Status.REPORTING);
 
@@ -258,24 +276,6 @@ public abstract class BaseBuildRun implements BuildRun {
 		_build.reset();
 
 		runQueued();
-	}
-
-	private String _getResultFromJenkins() {
-		JSONObject buildJSONObject = _build.getBuildJSONObject(
-			"duration,result");
-
-		if (buildJSONObject == null) {
-			return null;
-		}
-
-		long duration = buildJSONObject.optLong("duration");
-		String result = buildJSONObject.optString("result");
-
-		if ((duration <= 0) || JenkinsResultsParserUtil.isNullOrEmpty(result)) {
-			return null;
-		}
-
-		return result;
 	}
 
 	private final Build _build;
