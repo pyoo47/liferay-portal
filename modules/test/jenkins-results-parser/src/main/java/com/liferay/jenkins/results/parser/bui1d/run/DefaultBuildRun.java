@@ -24,6 +24,28 @@ import org.json.JSONObject;
  */
 public class DefaultBuildRun extends BaseBuildRun {
 
+	@Override
+	public void invoke() {
+		Build build = getBuild();
+
+		JenkinsMaster jenkinsMaster = getJenkinsMaster();
+
+		if (jenkinsMaster == null) {
+			JenkinsCohort jenkinsCohort = getJenkinsCohort();
+
+			jenkinsMaster = jenkinsCohort.getMostAvailableJenkinsMaster(
+				getInvokedBatchSize(), getMinimumSlaveRAM(),
+				getMaximumSlavesPerHost());
+
+			setJenkinsMaster(jenkinsMaster);
+		}
+
+		JSONObject jsonObject = JenkinsResultsParserUtil.invokeJenkinsBuild(
+			jenkinsMaster, build.getJobName(), build.getParameters());
+
+		setJenkinsQueueId(jsonObject.getLong("queueId"));
+	}
+
 	protected DefaultBuildRun(Build build) {
 		super(build);
 	}

@@ -9,17 +9,10 @@ import com.liferay.jenkins.results.parser.Build;
 import com.liferay.jenkins.results.parser.JenkinsCohort;
 import com.liferay.jenkins.results.parser.JenkinsMaster;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.ParentBuild;
-import com.liferay.jenkins.results.parser.Retryable;
-
-import java.io.IOException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.util.Objects;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -57,6 +50,11 @@ public abstract class BaseBuildRun implements BuildRun {
 	}
 
 	@Override
+	public int getInvokedBatchSize() {
+		return _invokedBatchSize;
+	}
+
+	@Override
 	public JenkinsCohort getJenkinsCohort() {
 		if (_jenkinsCohort != null) {
 			return _jenkinsCohort;
@@ -80,6 +78,16 @@ public abstract class BaseBuildRun implements BuildRun {
 	}
 
 	@Override
+	public int getMaximumSlavesPerHost() {
+		return _maximumSlavesPerHost;
+	}
+
+	@Override
+	public int getMinimumSlaveRAM() {
+		return _minimumSlaveRAM;
+	}
+
+	@Override
 	public Status getStatus() {
 		return _status;
 	}
@@ -87,6 +95,11 @@ public abstract class BaseBuildRun implements BuildRun {
 	@Override
 	public void setBuildNumber(int buildNumber) {
 		_buildNumber = buildNumber;
+	}
+
+	@Override
+	public void setInvokedBatchSize(int invokedBatchSize) {
+		_invokedBatchSize = invokedBatchSize;
 	}
 
 	@Override
@@ -102,6 +115,16 @@ public abstract class BaseBuildRun implements BuildRun {
 	@Override
 	public void setJenkinsQueueId(long jenkinsQueueId) {
 		_jenkinsQueueId = jenkinsQueueId;
+	}
+
+	@Override
+	public void setMaximumSlavesPerHost(int maximumSlavesPerHost) {
+		_maximumSlavesPerHost = maximumSlavesPerHost;
+	}
+
+	@Override
+	public void setMinimumSlaveRAM(int minimumSlaveRAM) {
+		_minimumSlaveRAM = minimumSlaveRAM;
 	}
 
 	@Override
@@ -257,8 +280,12 @@ public abstract class BaseBuildRun implements BuildRun {
 
 	private final Build _build;
 	private int _buildNumber;
+	private int _invokedBatchSize;
+	private JenkinsCohort _jenkinsCohort;
 	private JenkinsMaster _jenkinsMaster;
 	private long _jenkinsQueueId;
+	private int _maximumSlavesPerHost;
+	private int _minimumSlaveRAM;
 	private Status _status;
 
 }

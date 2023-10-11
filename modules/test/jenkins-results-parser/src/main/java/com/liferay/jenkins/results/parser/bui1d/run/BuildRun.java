@@ -22,21 +22,35 @@ public interface BuildRun {
 
 	public URL getBuildURL();
 
+	public int getInvokedBatchSize();
+
 	public JenkinsCohort getJenkinsCohort();
 
 	public JenkinsMaster getJenkinsMaster();
 
 	public long getJenkinsQueueId();
 
+	public int getMaximumSlavesPerHost();
+
+	public int getMinimumSlaveRAM();
+
 	public Status getStatus();
 
+	public void invoke();
+
 	public void setBuildNumber(int buildNumber);
+
+	public void setInvokedBatchSize(int invokedBatchSize);
 
 	public void setJenkinsCohort(JenkinsCohort jenkinsCohort);
 
 	public void setJenkinsMaster(JenkinsMaster jenkinsMaster);
 
 	public void setJenkinsQueueId(long queueId);
+
+	public void setMaximumSlavesPerHost(int maximumSlavesPerHost);
+
+	public void setMinimumSlaveRAM(int minimumSlaveRAM);
 
 	public void setStatus(Status status);
 
