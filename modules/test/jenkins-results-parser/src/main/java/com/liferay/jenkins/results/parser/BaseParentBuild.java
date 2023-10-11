@@ -630,20 +630,6 @@ public abstract class BaseParentBuild extends BaseBuild implements ParentBuild {
 		return tableRowElements;
 	}
 
-	protected boolean isJenkinsBuildCompleted() {
-		if (!super.isJenkinsBuildCompleted()) {
-			return false;
-		}
-
-		for (Build downstreamBuild : getDownstreamBuilds()) {
-			if (!downstreamBuild.isCompleted()) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	@Override
 	protected boolean skipUpdate() {
 		if (isBuildModified() || hasModifiedDownstreamBuilds()) {
@@ -652,7 +638,7 @@ public abstract class BaseParentBuild extends BaseBuild implements ParentBuild {
 
 		String status = getStatus();
 
-		if (!status.equals("completed")) {
+		if ((status == null) || !status.equals("completed")) {
 			return false;
 		}
 

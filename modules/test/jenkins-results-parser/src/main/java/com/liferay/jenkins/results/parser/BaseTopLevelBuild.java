@@ -2321,8 +2321,6 @@ public abstract class BaseTopLevelBuild
 			String.valueOf(getDownstreamBuildCount("missing")), " Missing / ",
 			String.valueOf(getDownstreamBuildCount("queued")), " Queued / ",
 			String.valueOf(getDownstreamBuildCount("running")), " Running / ",
-			String.valueOf(getDownstreamBuildCount("reporting")),
-			" Reporting / ",
 			String.valueOf(getDownstreamBuildCount("completed")),
 			" Completed / ", String.valueOf(getDownstreamBuildCount(null)),
 			" Total ");
