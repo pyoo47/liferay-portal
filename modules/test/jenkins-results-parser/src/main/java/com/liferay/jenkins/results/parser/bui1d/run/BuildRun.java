@@ -10,7 +10,6 @@ import com.liferay.jenkins.results.parser.JenkinsCohort;
 import com.liferay.jenkins.results.parser.JenkinsMaster;
 
 import java.net.URL;
-import java.util.Objects;
 
 /**
  * @author Michael Hashimoto
@@ -47,18 +46,6 @@ public interface BuildRun {
 
 		COMPLETED("completed"), MISSING("missing"), QUEUED("queued"),
 		REPORTING("reporting"), RUNNING("running"), STARTING("starting");
-
-		public static Status getByKey(String key) {
-			for (Status status : values()) {
-				if (!Objects.equals(key, status.getKey())) {
-					continue;
-				}
-
-				return status;
-			}
-
-			return null;
-		}
 
 		public String getKey() {
 			return _key;
