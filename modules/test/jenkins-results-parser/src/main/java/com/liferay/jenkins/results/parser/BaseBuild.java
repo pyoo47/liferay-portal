@@ -2192,14 +2192,6 @@ public abstract class BaseBuild implements Build {
 				return sb.toString();
 			}
 
-			if (status.equals("reporting")) {
-				sb.append(" reporting at ");
-				sb.append(getBuildURL());
-				sb.append(".");
-
-				return sb.toString();
-			}
-
 			if (status.equals("running")) {
 				if (_buildRuns.size() > 1) {
 					String previousBuildURL = _getPreviousBuildURL();
