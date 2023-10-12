@@ -1439,7 +1439,19 @@ public abstract class BaseBuild implements Build {
 			}
 		}
 
-		_invoke(_getInvokedBatchSize(), 24, _getMaximumSlavesPerHost());
+		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
+
+		buildRun.setInvokedBatchSize(_getInvokedBatchSize());
+		buildRun.setJenkinsCohort(getJenkinsCohort());
+		buildRun.setMaximumSlavesPerHost(_getMaximumSlavesPerHost());
+		buildRun.setMinimumSlaveRAM(24);
+		buildRun.setStatus(BuildRun.Status.STARTING);
+
+		buildRun.invoke();
+
+		_addBuildRun(buildRun);
+
+		setStatus(BuildRun.Status.STARTING.getKey());
 	}
 
 	@Override
@@ -3425,30 +3437,6 @@ public abstract class BaseBuild implements Build {
 					testClassResult.getClassName(), testClassResult);
 			}
 		}
-	}
-
-	private BuildRun _invoke(
-		int invokedBatchSize, int minimumSlaveRAM, int maximumSlavesPerHost) {
-
-		JenkinsCohort jenkinsCohort = getJenkinsCohort();
-
-		JenkinsMaster jenkinsMaster =
-			jenkinsCohort.getMostAvailableJenkinsMaster(
-				invokedBatchSize, minimumSlaveRAM, maximumSlavesPerHost);
-
-		JSONObject jsonObject = JenkinsResultsParserUtil.invokeJenkinsBuild(
-			jenkinsMaster, getJobName(), getParameters());
-
-		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
-
-		buildRun.setJenkinsMaster(jenkinsMaster);
-		buildRun.setJenkinsQueueId(jsonObject.getLong("queueId"));
-
-		_addBuildRun(buildRun);
-
-		buildRun.setStatus(BuildRun.Status.STARTING);
-
-		return buildRun;
 	}
 
 	private boolean _isDifferent(String newValue, String oldValue) {
