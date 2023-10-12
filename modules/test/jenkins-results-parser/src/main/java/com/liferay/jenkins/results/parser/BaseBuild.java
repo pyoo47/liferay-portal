@@ -2880,17 +2880,19 @@ public abstract class BaseBuild implements Build {
 			setArchiveName(matcher.group("archiveName"));
 		}
 
-		JenkinsMaster jenkinsMaster = JenkinsMaster.getInstance(
-			matcher.group("master"));
+		setJobName(matcher.group("jobName"));
 
 		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
 
 		buildRun.setBuildNumber(Integer.parseInt(matcher.group("buildNumber")));
+
+		JenkinsMaster jenkinsMaster = JenkinsMaster.getInstance(
+			matcher.group("master"));
+
+		buildRun.setJenkinsCohort(jenkinsMaster.getJenkinsCohort());
 		buildRun.setJenkinsMaster(jenkinsMaster);
 
 		_addBuildRun(buildRun);
-
-		setJobName(matcher.group("jobName"));
 
 		loadParametersFromBuildJSONObject();
 
@@ -2902,12 +2904,15 @@ public abstract class BaseBuild implements Build {
 
 		buildRun.setJenkinsQueueId(buildJSONObject.getLong("queueId"));
 
+		BuildRun.Status buildRunStatus = BuildRun.Status.RUNNING;
+
 		if (isCompleted()) {
-			buildRun.setStatus(BuildRun.Status.COMPLETED);
+			buildRunStatus = BuildRun.Status.COMPLETED;
 		}
-		else {
-			buildRun.setStatus(BuildRun.Status.RUNNING);
-		}
+
+		buildRun.setStatus(buildRunStatus);
+
+		setStatus(buildRunStatus.getKey());
 	}
 
 	protected void setInvocationURL(String invocationURL) {
@@ -2924,36 +2929,45 @@ public abstract class BaseBuild implements Build {
 				unsupportedEncodingException);
 		}
 
-		Matcher invocationURLMatcher = invocationURLPattern.matcher(
+		Matcher invocationURLMatcher = _invocationURLPattern.matcher(
 			invocationURL);
 
 		if (!invocationURLMatcher.find()) {
 			throw new RuntimeException("Invalid invocation URL");
 		}
 
-		JenkinsMaster jenkinsMaster = JenkinsMaster.getInstance(
-			invocationURLMatcher.group("master"));
-
-		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
-
-		buildRun.setJenkinsMaster(jenkinsMaster);
+		loadParametersFromQueryString(invocationURL);
 
 		setJobName(invocationURLMatcher.group("jobName"));
 
-		_addBuildRun(buildRun);
+		JenkinsCohort jenkinsCohort = JenkinsCohort.getInstance(
+			invocationURLMatcher.group("cohortName"));
 
-		loadParametersFromQueryString(invocationURL);
+		String masterId = invocationURLMatcher.group("masterId");
 
-		_invokedBatchSize = _getInvokedBatchSize();
-		_maximumSlavesPerHost = _getMaximumSlavesPerHost();
-		_minimumSlaveRAM = _getMinimumSlaveRAM();
+		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
 
-		JSONObject jsonObject = JenkinsResultsParserUtil.invokeJenkinsBuild(
-			jenkinsMaster, getJobName(), getParameters());
+		buildRun.setInvokedBatchSize(_getInvokedBatchSize());
+		buildRun.setJenkinsCohort(jenkinsCohort);
+		buildRun.setMaximumSlavesPerHost(_getMaximumSlavesPerHost());
+		buildRun.setMinimumSlaveRAM(_getMinimumSlaveRAM());
 
-		buildRun.setJenkinsQueueId(jsonObject.getLong("queueId"));
+		if (JenkinsResultsParserUtil.isInteger(masterId)) {
+			JenkinsMaster jenkinsMaster = JenkinsMaster.getInstance(
+				jenkinsCohort.getName() + "-" + masterId);
+
+			if (jenkinsMaster != null) {
+				buildRun.setJenkinsMaster(jenkinsMaster);
+			}
+		}
+
+		buildRun.invoke();
 
 		buildRun.setStatus(BuildRun.Status.STARTING);
+
+		setStatus(BuildRun.Status.STARTING.getKey());
+
+		_addBuildRun(buildRun);
 	}
 
 	protected void setJobName(String jobName) {
@@ -3016,10 +3030,6 @@ public abstract class BaseBuild implements Build {
 	protected static final String URL_BASE_TEMP_MAP =
 		"http://cloud-10-0-0-31.lax.liferay.com/osb-jenkins-web/map/";
 
-	protected static final Pattern invocationURLPattern = Pattern.compile(
-		JenkinsResultsParserUtil.combine(
-			"\\w+://(?<master>[^/]+)/+job/+(?<jobName>[^/]+).*/",
-			"buildWithParameters\\?(?<queryString>.*)"));
 	protected static final Pattern jobNamePattern = Pattern.compile(
 		"(?<baseJob>[^\\(]+)\\((?<branchName>[^\\)]+)\\)");
 	protected static final Pattern stopWatchPattern = Pattern.compile(
@@ -3057,7 +3067,7 @@ public abstract class BaseBuild implements Build {
 
 		String status = getStatus();
 
-		if (!status.equals("completed")) {
+		if ((status == null) || !status.equals("completed")) {
 			readyToArchive = false;
 		}
 		else if (!(this instanceof TopLevelBuild)) {
@@ -3500,6 +3510,11 @@ public abstract class BaseBuild implements Build {
 		JenkinsResultsParserUtil.combine(
 			"\\w+://(?<master>[^/]+)/+job/+(?<jobName>[^/]+(/label=[^/]+)?)/",
 			"(?<buildNumber>\\d+)/?"));
+	private static final Pattern _invocationURLPattern = Pattern.compile(
+		JenkinsResultsParserUtil.combine(
+			"\\w+://(?<cohortName>test-\\d+)(-(?<masterId>\\d+))?",
+			"(\\.liferay\\.com)?/+job\\/+(?<jobName>[^\\/]+).*\\/",
+			"buildWithParameters\\?(?<queryString>.*)"));
 	private static final Pattern _testrayAttachmentURLPattern = Pattern.compile(
 		"\\[beanshell\\] Uploaded (?<url>https://testray.liferay.com/[^\\s]+)");
 	private static final Pattern _testrayS3ObjectURLPattern = Pattern.compile(
