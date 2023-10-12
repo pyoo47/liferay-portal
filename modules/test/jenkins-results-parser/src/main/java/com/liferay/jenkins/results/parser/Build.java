@@ -5,8 +5,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import com.liferay.jenkins.results.parser.bui1d.run.BuildRun;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -163,7 +161,7 @@ public interface Build {
 
 	public boolean hasMaxBuildRunCount();
 
-	public BuildRun invoke();
+	public void invoke();
 
 	public boolean isApplyReinvokeRules();
 

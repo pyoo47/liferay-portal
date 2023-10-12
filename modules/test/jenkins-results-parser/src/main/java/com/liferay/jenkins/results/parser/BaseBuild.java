@@ -1229,10 +1229,20 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
-	public BuildRun invoke() {
-		return _invoke(
-			_getInvokedBatchSize(), _getMinimumSlaveRAM(),
-			_getMaximumSlavesPerHost());
+	public void invoke() {
+		BuildRun buildRun = BuildRunFactory.newBuildRun(this);
+
+		buildRun.setInvokedBatchSize(_getInvokedBatchSize());
+		buildRun.setJenkinsCohort(getJenkinsCohort());
+		buildRun.setMaximumSlavesPerHost(_getMaximumSlavesPerHost());
+		buildRun.setMinimumSlaveRAM(_getMinimumSlaveRAM());
+		buildRun.setStatus(BuildRun.Status.STARTING);
+
+		buildRun.invoke();
+
+		_addBuildRun(buildRun);
+
+		setStatus(BuildRun.Status.STARTING.getKey());
 	}
 
 	@Override
@@ -2878,7 +2888,7 @@ public abstract class BaseBuild implements Build {
 		buildRun.setBuildNumber(Integer.parseInt(matcher.group("buildNumber")));
 		buildRun.setJenkinsMaster(jenkinsMaster);
 
-		_buildRuns.add(buildRun);
+		_addBuildRun(buildRun);
 
 		setJobName(matcher.group("jobName"));
 
@@ -2930,7 +2940,7 @@ public abstract class BaseBuild implements Build {
 
 		setJobName(invocationURLMatcher.group("jobName"));
 
-		_buildRuns.add(buildRun);
+		_addBuildRun(buildRun);
 
 		loadParametersFromQueryString(invocationURL);
 
@@ -3032,6 +3042,15 @@ public abstract class BaseBuild implements Build {
 	protected Long invokedTime;
 	protected Long startTime;
 	protected Element upstreamJobFailureMessageElement;
+
+	private void _addBuildRun(BuildRun buildRun) {
+		if (hasMaxBuildRunCount()) {
+			throw new RuntimeException(
+				"Unable to add BuildRuns to " + getBuildName());
+		}
+
+		_buildRuns.add(buildRun);
+	}
 
 	private void _archive(String content, boolean required, String urlSuffix) {
 		boolean readyToArchive = true;
@@ -3415,7 +3434,7 @@ public abstract class BaseBuild implements Build {
 		buildRun.setJenkinsMaster(jenkinsMaster);
 		buildRun.setJenkinsQueueId(jsonObject.getLong("queueId"));
 
-		_buildRuns.add(buildRun);
+		_addBuildRun(buildRun);
 
 		buildRun.setStatus(BuildRun.Status.STARTING);
 
