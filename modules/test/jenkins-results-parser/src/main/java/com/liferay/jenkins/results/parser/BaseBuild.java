@@ -1606,6 +1606,35 @@ public abstract class BaseBuild implements Build {
 		}
 
 		latestBuildRun.update();
+
+		if (_isLatestBuildRunCompleted()) {
+			isApplySlaveOfflineRules();
+
+			if (isApplyReinvokeRules()) {
+				return;
+			}
+
+			BuildRun.Result buildRunResult = latestBuildRun.getResult();
+
+			String buildResult;
+
+			if (buildRunResult == null) {
+				if (!hasMaxBuildRunCount()) {
+					invoke();
+
+					return;
+				}
+
+				buildResult = "MISSING";
+			}
+			else {
+				buildResult = buildRunResult.toString();
+			}
+
+			setResult(buildResult);
+
+			setStatus("completed");
+		}
 	}
 
 	public static class BuildDisplayNameComparator
