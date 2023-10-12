@@ -1237,8 +1237,9 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public boolean isApplyReinvokeRules() {
-		if ((isCompleted() && !isFailing()) || !isCompleted() ||
-			isFromArchive() || hasMaxBuildRunCount()) {
+		if ((_isLatestBuildRunCompleted() && !_isLatestBuildRunFailing()) ||
+			!_isLatestBuildRunCompleted() || isFromArchive() ||
+			hasMaxBuildRunCount()) {
 
 			return false;
 		}
@@ -1258,8 +1259,8 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public boolean isApplySlaveOfflineRules() {
-		if ((isCompleted() && !isFailing()) || !isCompleted() ||
-			isFromArchive()) {
+		if ((_isLatestBuildRunCompleted() && !_isLatestBuildRunFailing()) ||
+			!_isLatestBuildRunCompleted() || isFromArchive()) {
 
 			return false;
 		}
@@ -3435,6 +3436,26 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return true;
+	}
+
+	private boolean _isLatestBuildRunCompleted() {
+		BuildRun latestBuildRun = _getLatestBuildRun();
+
+		if (latestBuildRun.isCompleted()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _isLatestBuildRunFailing() {
+		BuildRun latestBuildRun = _getLatestBuildRun();
+
+		if (latestBuildRun.isFailing()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final int _BUILD_RUN_COUNT_MAX = 2;
