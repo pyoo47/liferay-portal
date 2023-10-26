@@ -717,31 +717,6 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
-	public JenkinsCohort getJenkinsCohort() {
-		if (_jenkinsCohort != null) {
-			return _jenkinsCohort;
-		}
-
-		TopLevelBuild topLevelBuild = getTopLevelBuild();
-
-		if (topLevelBuild != null) {
-			_jenkinsCohort = topLevelBuild.getJenkinsCohort();
-
-			return _jenkinsCohort;
-		}
-
-		String cohortName = JenkinsResultsParserUtil.getCohortName();
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(cohortName)) {
-			_jenkinsCohort = JenkinsCohort.getInstance(cohortName);
-
-			return _jenkinsCohort;
-		}
-
-		return null;
-	}
-
-	@Override
 	public JenkinsMaster getJenkinsMaster() {
 		if (_jenkinsMaster != null) {
 			return _jenkinsMaster;
@@ -1961,6 +1936,10 @@ public abstract class BaseBuild implements Build {
 	protected boolean archiveFileExists(String urlSuffix) {
 		File archiveFile = getArchiveFile(urlSuffix);
 
+		if (archiveFile == null) {
+			return false;
+		}
+
 		return archiveFile.exists();
 	}
 
@@ -2219,10 +2198,8 @@ public abstract class BaseBuild implements Build {
 				String jobURL = getJobURL();
 
 				if (JenkinsResultsParserUtil.isNullOrEmpty(jobURL)) {
-					JenkinsCohort jenkinsCohort = getJenkinsCohort();
-
 					jobURL = JenkinsResultsParserUtil.combine(
-						"https://", jenkinsCohort.getName(),
+						"https://", JenkinsResultsParserUtil.getCohortName(),
 						".liferay.com/job/", getJobName());
 				}
 
@@ -3264,8 +3241,6 @@ public abstract class BaseBuild implements Build {
 
 		setJenkinsMaster(jenkinsMaster);
 
-		setJenkinsCohort(jenkinsMaster.getJenkinsCohort());
-
 		setJobName(matcher.group("jobName"));
 
 		loadParametersFromBuildJSONObject();
@@ -3317,9 +3292,6 @@ public abstract class BaseBuild implements Build {
 
 		setJobName(invocationURLMatcher.group("jobName"));
 
-		JenkinsCohort jenkinsCohort = JenkinsCohort.getInstance(
-			invocationURLMatcher.group("cohortName"));
-
 		loadParametersFromQueryString(invocationURL);
 
 		String masterId = invocationURLMatcher.group("masterId");
@@ -3327,7 +3299,7 @@ public abstract class BaseBuild implements Build {
 		if (JenkinsResultsParserUtil.isInteger(masterId)) {
 			setJenkinsMaster(
 				JenkinsMaster.getInstance(
-					jenkinsCohort.getName() + "-" + masterId));
+					invocationURLMatcher.group("cohortName") + "-" + masterId));
 		}
 
 		setStatus("starting");

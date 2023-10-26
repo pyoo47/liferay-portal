@@ -26,9 +26,7 @@ public class DefaultBuildUpdater extends BaseBuildUpdater {
 		JenkinsMaster jenkinsMaster = build.getJenkinsMaster();
 
 		if (jenkinsMaster == null) {
-			JenkinsCohort jenkinsCohort = build.getJenkinsCohort();
-
-			jenkinsMaster = jenkinsCohort.getMostAvailableJenkinsMaster(
+			jenkinsMaster = _getMostAvailableJenkinsMaster(
 				build.getInvokedBatchSize(), build.getMinimumSlaveRAM(),
 				build.getMaximumSlavesPerHost());
 
@@ -42,12 +40,8 @@ public class DefaultBuildUpdater extends BaseBuildUpdater {
 	public void reinvoke() {
 		Build build = getBuild();
 
-		JenkinsCohort jenkinsCohort = build.getJenkinsCohort();
-
-		JenkinsMaster jenkinsMaster =
-			jenkinsCohort.getMostAvailableJenkinsMaster(
-				build.getInvokedBatchSize(), 24,
-				build.getMaximumSlavesPerHost());
+		JenkinsMaster jenkinsMaster = _getMostAvailableJenkinsMaster(
+			build.getInvokedBatchSize(), 24, build.getMaximumSlavesPerHost());
 
 		build.setJenkinsMaster(jenkinsMaster);
 
@@ -86,16 +80,16 @@ public class DefaultBuildUpdater extends BaseBuildUpdater {
 		JSONObject buildJSONObject = build.getBuildJSONObject("result");
 
 		if (buildJSONObject == null) {
-			return false;
+			return true;
 		}
 
 		String result = buildJSONObject.optString("result");
 
 		if (!Objects.equals(result, "SUCCESS")) {
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	@Override
@@ -197,6 +191,31 @@ public class DefaultBuildUpdater extends BaseBuildUpdater {
 		}
 
 		return buildParameters;
+	}
+
+	private JenkinsMaster _getMostAvailableJenkinsMaster(
+		int invokedBatchSize, int minimumSlaveRAM, int maxiumumSlavesPerHost) {
+
+		String jenkinsMastersBlacklist;
+
+		try {
+			jenkinsMastersBlacklist = JenkinsResultsParserUtil.getBuildProperty(
+				"jenkins.load.balancer.blacklist");
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+
+		String mostAvailableMasterURL =
+			JenkinsResultsParserUtil.getMostAvailableMasterURL(
+				JenkinsResultsParserUtil.combine(
+					"http://", JenkinsResultsParserUtil.getCohortName(),
+					".liferay.com"),
+				JenkinsResultsParserUtil.join(",", jenkinsMastersBlacklist),
+				invokedBatchSize, minimumSlaveRAM, maxiumumSlavesPerHost);
+
+		return JenkinsMaster.getInstance(
+			mostAvailableMasterURL.replaceAll("http://(.+)", "$1"));
 	}
 
 	private JSONObject _getQueueItemJSONObject() {
