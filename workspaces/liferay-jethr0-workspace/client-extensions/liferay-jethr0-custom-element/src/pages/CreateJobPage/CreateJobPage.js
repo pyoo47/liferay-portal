@@ -43,7 +43,7 @@ function CreateJobPage() {
 	function setJobParametersFromJobTypeKey(jobTypeKey) {
 		for (const jobType of jobTypes) {
 			if (jobType.key === jobTypeKey) {
-				let jobParameters = {};
+				const jobParameters = {};
 
 				jobType.parameterDefinitions.forEach((parameterDefinition) => {
 					jobParameters[parameterDefinition.key] = parameterDefinition.valueDefault;
@@ -86,7 +86,7 @@ function CreateJobPage() {
 			setJobParametersFromJobTypeKey(jobTypeKey);
 		}
 
-		let jobType = jobTypes.find((jobType) => {
+		const jobType = jobTypes.find((jobType) => {
 			return jobType.key === jobTypeKey;
 		});
 
