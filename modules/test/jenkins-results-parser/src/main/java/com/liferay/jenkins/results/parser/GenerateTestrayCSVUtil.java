@@ -99,6 +99,8 @@ public class GenerateTestrayCSVUtil {
 
 		sb.append("Unique failures\n");
 		sb.append(uniqueFailuresStringBuilder.toString());
+		sb.append("Did not run\n");
+		sb.append(didNotRunFailuresStringBuilder.toString());
 		sb.append("\n");
 		sb.append("Upstream failures\n");
 		sb.append(upstreamFailuresStringBuilder.toString());
