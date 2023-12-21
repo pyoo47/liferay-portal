@@ -26,7 +26,10 @@ public class JobDefinitionFactory {
 	}
 
 	public static JobDefinition newJobDefinition(JobEntity.Type type) {
-		if (type == JobEntity.Type.FIXPACK_BUILDER_PULL_REQUEST) {
+		if (type == JobEntity.Type.FILE_PROPAGATOR) {
+			return new FilePropagatorJobDefinition(type);
+		}
+		else if (type == JobEntity.Type.FIXPACK_BUILDER_PULL_REQUEST) {
 			return new FixpackBuilderPullRequestJobDefinition(type);
 		}
 		else if (type == JobEntity.Type.GENERATE_CI_SYSTEM_HISTORY_REPORT) {
@@ -46,6 +49,12 @@ public class JobDefinitionFactory {
 		}
 		else if (type == JobEntity.Type.JENKINS_PULL_REQUEST) {
 			return new JenkinsPullRequestJobDefinition(type);
+		}
+		else if (type == JobEntity.Type.LIFERAY_BINARIES_CACHE_UPDATER) {
+			return new LiferayBinariesCacheUpdaterJobDefinition(type);
+		}
+		else if (type == JobEntity.Type.MIRRORS_LOCAL_CACHE_PROPAGATOR) {
+			return new MirrorsLocalCachePropagatorJobDefinition(type);
 		}
 		else if (type == JobEntity.Type.PLUGINS_EXTRA_APPS) {
 			return new PluginsExtraAppsJobDefinition(type);
@@ -85,6 +94,12 @@ public class JobDefinitionFactory {
 		}
 		else if (type == JobEntity.Type.POSHI_RELEASE) {
 			return new PoshiReleaseJobDefinition(type);
+		}
+		else if (type == JobEntity.Type.PUBLISH_PORTAL_DOCKER_IMAGE) {
+			return new PublishPortalDockerImageJobDefinition(type);
+		}
+		else if (type == JobEntity.Type.PUBLISH_TESTRAY_REPORT) {
+			return new PublishTestrayReportJobDefinition(type);
 		}
 		else if (type == JobEntity.Type.MAINTENANCE_DAILY) {
 			return new MaintenanceDailyJobDefinition(type);
