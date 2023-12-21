@@ -41,7 +41,7 @@ public class OpenGitHubPullRequestEventHandler
 		_commentAutoCommentMessage();
 		_commentBroadcastMessage();
 
-		if (_checkForwardedPullRequest() ||
+		if (_checkBChanPullRequest() || _checkForwardedPullRequest() ||
 			_checkMergeSubrepositoryPullRequest()) {
 
 			return null;
@@ -56,6 +56,61 @@ public class OpenGitHubPullRequestEventHandler
 		EventHandlerContext eventHandlerContext, JSONObject messageJSONObject) {
 
 		super(eventHandlerContext, messageJSONObject);
+	}
+
+	private boolean _checkBChanPullRequest()
+		throws InvalidJSONException, IOException {
+
+		GitHubPullRequest gitHubPullRequest = getGitHubPullRequest();
+
+		GitHubUser receiverGitHubUser =
+			gitHubPullRequest.getReceiverGitHubUser();
+
+		Matcher portalRepositoryMatcher = _portalRepositoryPattern.matcher(
+			gitHubPullRequest.getBaseRepositoryName());
+
+		if (!Objects.equals(receiverGitHubUser.getName(), "brianchandotcom") ||
+			!portalRepositoryMatcher.find()) {
+
+			return false;
+		}
+
+		String headBranchName = gitHubPullRequest.getHeadBranchName();
+
+		Matcher releaseBranchNameMatcher = _releaseBranchNamePattern.matcher(
+			headBranchName);
+
+		if (releaseBranchNameMatcher.find()) {
+			return true;
+		}
+
+		if (headBranchName.startsWith("ee-")) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("CI is automatically triggering &quot;ci:test:sf&quot; ");
+			sb.append("for this pull to run Source Formatter.\n\nComment ");
+			sb.append("&quot;ci:test&quot; to run the full PR Tester for ");
+			sb.append("this pull.");
+
+			gitHubPullRequest.comment(sb.toString());
+		}
+		else {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("CI is automatically triggering &quot;ci:test:sf&quot; ");
+			sb.append("and &quot;ci:test:relevant&quot; for this pull to run ");
+			sb.append("Source Formatter and relevant tests.\n\nComment ");
+			sb.append("&quot;ci:test&quot; to run the full PR Tester for ");
+			sb.append("this pull.");
+
+			gitHubPullRequest.comment(sb.toString());
+
+			invokeJobEntity(createPortalPullRequestJobEntity("relevant"));
+		}
+
+		invokeJobEntity(createPortalPullRequestJobEntity("sf"));
+
+		return true;
 	}
 
 	private boolean _checkForwardedPullRequest()
@@ -262,6 +317,10 @@ public class OpenGitHubPullRequestEventHandler
 		"\\+(?<branchSHA>[0-9a-f]{40})");
 	private static final Pattern _ciTestAutoRecipientPattern = Pattern.compile(
 		"(?<userName>[^\\]]+)\\[(?<testSuites>[^\\]]+)\\]");
+	private static final Pattern _portalRepositoryPattern = Pattern.compile(
+		"liferay-portal(-ee)?");
+	private static final Pattern _releaseBranchNamePattern = Pattern.compile(
+		"release-\\d{4}\\.q\\d");
 
 	private static class GitRepo {
 
