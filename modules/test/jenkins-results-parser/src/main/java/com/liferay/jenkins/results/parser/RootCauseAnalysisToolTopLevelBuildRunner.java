@@ -694,37 +694,17 @@ public class RootCauseAnalysisToolTopLevelBuildRunner
 				_NAME_BUILD_PARAMETER_PORTAL_UPSTREAM_BRANCH_NAME + " is null");
 		}
 
-		String allowedPortalUpstreamBranchNames = getJobPropertyValue(
-			"allowed.portal.upstream.branch.names");
+		Matcher matcher = _portalUpstreamBranchNamePattern.matcher(
+			portalUpstreamBranchName);
 
-		if ((allowedPortalUpstreamBranchNames == null) ||
-			allowedPortalUpstreamBranchNames.isEmpty()) {
-
-			return;
-		}
-
-		List<String> allowedPortalUpstreamBranchNamesList = Arrays.asList(
-			allowedPortalUpstreamBranchNames.split(","));
-
-		if (!allowedPortalUpstreamBranchNamesList.contains(
-				portalUpstreamBranchName)) {
-
+		if (!matcher.find()) {
 			StringBuilder sb = new StringBuilder();
 
-			sb.append(_NAME_BUILD_PARAMETER_PORTAL_UPSTREAM_BRANCH_NAME);
-			sb.append(" must match one of the following: ");
-
-			sb.append("<ul>");
-
-			for (String allowedPortalUpstreamBranchName :
-					allowedPortalUpstreamBranchNamesList) {
-
-				sb.append("<li>");
-				sb.append(allowedPortalUpstreamBranchName);
-				sb.append("</li>");
-			}
-
-			sb.append("</ul>");
+			sb.append(portalUpstreamBranchName);
+			sb.append(" is not supported in RCA. ");
+			sb.append(
+				"Please make sure the PORTAL_UPSTREAM_BRANCH_NAME is valid ");
+			sb.append("or contact CI for assistance.");
 
 			failBuildRunner(sb.toString());
 		}
@@ -811,6 +791,9 @@ public class RootCauseAnalysisToolTopLevelBuildRunner
 			"https://github.com/(?<username>[^/]+)/(?<repositoryName>[^/]+)",
 			"/compare/(?<earliestSHA>[0-9a-f]{5,40})\\.{3}",
 			"(?<latestSHA>[0-9a-f]{5,40})"));
+	private static final Pattern _portalUpstreamBranchNamePattern =
+		Pattern.compile(
+			"(ee-6.\\d.(x|\\d+)|7.[0-4].x|master|release-\\d{4}.q\\d+)");
 	private static final Pattern _portalURLPattern = Pattern.compile(
 		"https://github.com/[^/]+/(?<repositoryName>[^/]+)/tree/.+");
 
