@@ -1673,6 +1673,18 @@ public class GitWorkingDirectory {
 		}
 	}
 
+	public String getReleaseUpstreamBranchName() {
+		String topLevelBuildURL = System.getenv("TOP_LEVEL_BUILD_URL");
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(topLevelBuildURL)) {
+			Build build = BuildFactory.newBuild(topLevelBuildURL, null);
+
+			return build.getParameterValue("GITHUB_UPSTREAM_BRANCH_NAME");
+		}
+
+		return null;
+	}
+
 	public RemoteGitBranch getRemoteGitBranch(
 		String remoteGitBranchName, GitRemote gitRemote) {
 
@@ -2270,6 +2282,16 @@ public class GitWorkingDirectory {
 		throws IOException {
 
 		setWorkingDirectory(workingDirectoryPath);
+
+		if (upstreamBranchName.equals("release")) {
+			String releaseUpstreamBranchName = getReleaseUpstreamBranchName();
+
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(
+					releaseUpstreamBranchName)) {
+
+				upstreamBranchName = releaseUpstreamBranchName;
+			}
+		}
 
 		_upstreamBranchName = upstreamBranchName;
 
