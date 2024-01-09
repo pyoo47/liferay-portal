@@ -955,44 +955,6 @@ public class GitWorkingDirectory {
 			localGitBranch.getName(), true, localGitBranch.getSHA());
 	}
 
-	public Set<File> findFiles(String fileName, String fileContentSnippet) {
-		if (JenkinsResultsParserUtil.isNullOrEmpty(fileName) ||
-			JenkinsResultsParserUtil.isNullOrEmpty(fileContentSnippet)) {
-
-			return null;
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("git grep ");
-		sb.append(fileContentSnippet);
-		sb.append(" | grep ");
-		sb.append(fileName);
-
-		GitUtil.ExecutionResult result = executeBashCommands(
-			5, 1000, 30 * 1000, sb.toString());
-
-		if (result.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this, "Unable to run: git grep");
-		}
-
-		Pattern pattern = Pattern.compile(
-			JenkinsResultsParserUtil.combine(
-				"(?<filePath>.+/", fileName, ")\\:.+"));
-
-		Matcher matcher = pattern.matcher(result.getStandardOut());
-
-		Set<File> files = new HashSet<>();
-
-		while (matcher.find()) {
-			files.add(
-				new File(getWorkingDirectory(), matcher.group("filePath")));
-		}
-
-		return files;
-	}
-
 	public void gc() {
 		int retries = 0;
 

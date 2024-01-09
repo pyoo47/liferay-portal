@@ -8,6 +8,7 @@ package com.liferay.jenkins.results.parser;
 import com.google.common.collect.Lists;
 import com.google.common.io.CountingInputStream;
 
+import com.liferay.jenkins.results.parser.GitWorkingDirectory.GitWorkingDirectoryRuntimeException;
 import com.liferay.poshi.core.pql.PQLEntityFactory;
 
 import java.io.BufferedOutputStream;
@@ -935,6 +936,43 @@ public class JenkinsResultsParserUtil {
 			else if (fileName.matches(regex)) {
 				files.add(file);
 			}
+		}
+
+		return files;
+	}
+
+	public static Set<File> findFiles(
+		String fileName, String fileContentSnippet) {
+
+		if (isNullOrEmpty(fileName) || isNullOrEmpty(fileContentSnippet)) {
+			return null;
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("git grep ");
+		sb.append(fileContentSnippet);
+		sb.append(" | grep ");
+		sb.append(fileName);
+
+		GitUtil.ExecutionResult result = executeBashCommands(
+			5, 1000, 30 * 1000, sb.toString());
+
+		if (result.getExitValue() != 0) {
+			throw new GitWorkingDirectory.GitWorkingDirectoryRuntimeException(
+				this, "Unable to run: git grep");
+		}
+
+		Pattern pattern = Pattern.compile(
+			combine("(?<filePath>.+/", fileName, ")\\:.+"));
+
+		Matcher matcher = pattern.matcher(result.getStandardOut());
+
+		Set<File> files = new HashSet<>();
+
+		while (matcher.find()) {
+			files.add(
+				new File(getWorkingDirectory(), matcher.group("filePath")));
 		}
 
 		return files;

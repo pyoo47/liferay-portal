@@ -297,7 +297,7 @@ public class MergePortalSubrepositoryUtil {
 		GitRemote subrepositoryUpstreamGitRemote =
 			subrepositoryGitWorkingDirectory.getUpstreamGitRemote();
 
-		Set<File> gitRepoFiles = portalGitWorkingDirectory.findFiles(
+		Set<File> gitRepoFiles = JenkinsResultsParserUtil.findFiles(
 			".gitrepo", subrepositoryUpstreamGitRemote.getRemoteURL());
 
 		for (File gitRepoFile : gitRepoFiles) {
