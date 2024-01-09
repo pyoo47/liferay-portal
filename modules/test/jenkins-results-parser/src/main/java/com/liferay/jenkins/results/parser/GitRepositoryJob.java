@@ -65,6 +65,30 @@ public abstract class GitRepositoryJob extends BaseJob {
 		return jsonObject;
 	}
 
+	public String getReleaseUpstreamBranchName(String jobName) {
+		String githubUpstreamBranchName = null;
+
+		if (jobName.contains("test-portal-acceptance-pullrequest")) {
+			githubUpstreamBranchName = System.getenv(
+				"GITHUB_UPSTREAM_BRANCH_NAME");
+
+			String jobEnvName = System.getenv("JOB_NAME");
+
+			if (jobEnvName.equals("publish-testray-report")) {
+				String topLevelBuildURL = System.getenv("TOP_LEVEL_BUILD_URL");
+
+				if (!JenkinsResultsParserUtil.isNullOrEmpty(topLevelBuildURL)) {
+					Build build = BuildFactory.newBuild(topLevelBuildURL, null);
+
+					githubUpstreamBranchName = build.getParameterValue(
+						"GITHUB_UPSTREAM_BRANCH_NAME");
+				}
+			}
+		}
+
+		return githubUpstreamBranchName;
+	}
+
 	public String getRepositoryName() {
 		String gitRepositoryDirPath = JenkinsResultsParserUtil.getCanonicalPath(
 			gitRepositoryDir);
@@ -100,9 +124,9 @@ public abstract class GitRepositoryJob extends BaseJob {
 			}
 		}
 
-		if (upstreamBranchName.contains("release")) {
-			String githubUpstreamBranchName = System.getenv(
-				"GITHUB_UPSTREAM_BRANCH_NAME");
+		if (upstreamBranchName.equals("release")) {
+			String githubUpstreamBranchName = getReleaseUpstreamBranchName(
+				jobName);
 
 			if (!JenkinsResultsParserUtil.isNullOrEmpty(
 					githubUpstreamBranchName)) {
