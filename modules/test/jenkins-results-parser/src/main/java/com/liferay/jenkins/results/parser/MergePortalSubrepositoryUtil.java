@@ -112,9 +112,7 @@ public class MergePortalSubrepositoryUtil {
 
 		sb.append(
 			JenkinsResultsParserUtil.getPathRelativeTo(
-				_getGitRepoFile(
-					portalGitWorkingDirectory,
-					subrepositoryGitWorkingDirectory),
+				_getGitRepoFile(subrepositoryGitWorkingDirectory),
 				portalGitWorkingDirectory.getWorkingDirectory()));
 		sb.append("'");
 
@@ -128,8 +126,7 @@ public class MergePortalSubrepositoryUtil {
 		GitWorkingDirectory subrepositoryGitWorkingDirectory,
 		String portalParentBranchSHA, String targetGitRepoCommitSHA) {
 
-		File gitRepoFile = _getGitRepoFile(
-			portalGitWorkingDirectory, subrepositoryGitWorkingDirectory);
+		File gitRepoFile = _getGitRepoFile(subrepositoryGitWorkingDirectory);
 
 		String gitRepoFilePath = JenkinsResultsParserUtil.getPathRelativeTo(
 			gitRepoFile, portalGitWorkingDirectory.getWorkingDirectory());
@@ -234,8 +231,7 @@ public class MergePortalSubrepositoryUtil {
 		GitWorkingDirectory subrepositoryGitWorkingDirectory,
 		String targetGitRepoCommitSHA) {
 
-		File gitRepoFile = _getGitRepoFile(
-			portalGitWorkingDirectory, subrepositoryGitWorkingDirectory);
+		File gitRepoFile = _getGitRepoFile(subrepositoryGitWorkingDirectory);
 
 		Properties gitRepoProperties = JenkinsResultsParserUtil.getProperties(
 			gitRepoFile);
@@ -291,7 +287,6 @@ public class MergePortalSubrepositoryUtil {
 	}
 
 	private static File _getGitRepoFile(
-		GitWorkingDirectory portalGitWorkingDirectory,
 		GitWorkingDirectory subrepositoryGitWorkingDirectory) {
 
 		GitRemote subrepositoryUpstreamGitRemote =
@@ -342,8 +337,7 @@ public class MergePortalSubrepositoryUtil {
 		GitWorkingDirectory subrepositoryGitWorkingDirectory) {
 
 		String relativeFilePath = JenkinsResultsParserUtil.getPathRelativeTo(
-			_getGitRepoFile(
-				portalGitWorkingDirectory, subrepositoryGitWorkingDirectory),
+			_getGitRepoFile(subrepositoryGitWorkingDirectory),
 			portalGitWorkingDirectory.getWorkingDirectory());
 
 		return relativeFilePath.replaceAll("/\\.gitrepo", "");
