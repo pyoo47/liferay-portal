@@ -527,7 +527,10 @@ public class EmailNotificationType extends BaseNotificationType {
 
 			Company company = _companyLocalService.getCompany(companyId);
 
-			template.put("portalURL", company.getPortalURL(groupId));
+			template.put(
+				NotificationFreemarkerTemplateConstants.
+					VARIABLE_NAME_PORTAL_URL,
+				company.getPortalURL(groupId));
 		}
 		finally {
 			ServiceContextThreadLocal.popServiceContext();

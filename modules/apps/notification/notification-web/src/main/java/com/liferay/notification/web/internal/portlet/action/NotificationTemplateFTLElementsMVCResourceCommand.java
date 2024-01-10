@@ -12,6 +12,7 @@ import com.liferay.info.field.type.InfoFieldType;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemFormProvider;
+import com.liferay.notification.constants.NotificationFreemarkerTemplateConstants;
 import com.liferay.notification.constants.NotificationPortletKeys;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -143,7 +144,9 @@ public class NotificationTemplateFTLElementsMVCResourceCommand
 		String label = _language.get(locale, "portal-url");
 
 		generalVariablesTemplateVariableGroup.addFieldVariable(
-			label, TemplateNode.class, "portalURL", label, "text", false, null);
+			label, TemplateNode.class,
+			NotificationFreemarkerTemplateConstants.VARIABLE_NAME_PORTAL_URL,
+			label, "text", false, null);
 
 		for (TemplateVariableGroup templateVariableGroup :
 				templateVariableGroupsMap.values()) {
