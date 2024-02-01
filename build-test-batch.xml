@@ -7238,9 +7238,19 @@ ${output.content}</echo>
 
 						<trycatch>
 							<try>
-								<ant antfile="build-test-playwright.xml" target="set-up-playwright-environment">
-									<property name="playwright.project.name" value="${playwright.project.name}" />
-								</ant>
+								<echo file="modules/test/playwright/playwright.properties">
+									liferay.home=${liferay.home}
+									liferay.portal.dir=${project.dir}
+									playwright.base.dir=${project.dir}/test/playwright
+									playwright.project.name=${playwright.project.name}
+								</echo>
+
+								<print-file file.name="modules/test/playwright/playwright.properties" />
+
+								<exec dir="${app.server.bin.dir}" executable="${npm.exec}">
+									<arg value="run" />
+									<arg value="setUpCI" />
+								</exec>
 
 								<start-docker-playwright />
 
@@ -7291,9 +7301,10 @@ ${output.content}</echo>
 							<finally>
 								<stop-docker-playwright />
 
-								<ant antfile="build-test-playwright.xml" target="tear-down-playwright-environment">
-									<property name="playwright.project.name" value="${playwright.project.name}" />
-								</ant>
+								<exec dir="${app.server.bin.dir}" executable="${npm.exec}">
+									<arg value="run" />
+									<arg value="tearDownCI" />
+								</exec>
 
 								<split-testsuites-junit-report test.suites.report.filepath="${playwright.dir}/test-results/TEST-playwright.xml" />
 							</finally>
