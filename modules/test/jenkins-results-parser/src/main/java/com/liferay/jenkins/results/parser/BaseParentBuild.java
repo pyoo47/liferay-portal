@@ -494,6 +494,40 @@ public abstract class BaseParentBuild extends BaseBuild implements ParentBuild {
 						return null;
 					}
 
+					@Override
+					public String toString() {
+						String status = downstreamBuild.getStatus();
+
+						StringBuilder sb = new StringBuilder();
+
+						sb.append("Updating downstream build ");
+						sb.append("status: ");
+						sb.append(status);
+						sb.append(" ");
+
+						Build.Invocation invocation =
+							downstreamBuild.getCurrentInvocation();
+
+						if (invocation != null) {
+							JenkinsMaster jenkinsMaster =
+								invocation.getJenkinsMaster();
+
+							if (jenkinsMaster != null) {
+								sb.append("Jenkins master: ");
+								sb.append(jenkinsMaster.getName());
+							}
+						}
+
+						String buildURL = downstreamBuild.getBuildURL();
+
+						if (buildURL != null) {
+							sb.append("build URL:");
+							sb.append(buildURL);
+						}
+
+						return sb.toString();
+					}
+
 				};
 
 			callables.add(callable);
