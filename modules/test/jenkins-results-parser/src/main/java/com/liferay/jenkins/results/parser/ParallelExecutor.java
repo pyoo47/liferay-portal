@@ -243,6 +243,28 @@ public class ParallelExecutor<T> {
 				JenkinsResultsParserUtil.toDurationString(
 					getAverageDurationMillis()));
 
+			boolean hasLongRunningTask = false;
+
+			for (Task<T> runningTask : _runningTasks) {
+				TaskCallable<T> runningTaskCallable = runningTask.getCallable();
+
+				if (runningTaskCallable.getDuration() > (1000 * 60 * 3)) {
+					if (!hasLongRunningTask) {
+						hasLongRunningTask = true;
+
+						sb.append("\n\n");
+					}
+
+					sb.append("Long running task: ");
+					sb.append(runningTaskCallable.toString());
+					sb.append(" has been running for ");
+					sb.append(
+						JenkinsResultsParserUtil.toDurationString(
+							runningTaskCallable.getDuration()));
+					sb.append("\n");
+				}
+			}
+
 			return sb.toString();
 		}
 
@@ -711,6 +733,11 @@ public class ParallelExecutor<T> {
 				}
 
 				return false;
+			}
+
+			@Override
+			public String toString() {
+				return _callable.toString();
 			}
 
 			private final Callable<T> _callable;
