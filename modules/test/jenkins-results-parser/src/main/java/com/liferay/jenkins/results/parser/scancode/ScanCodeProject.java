@@ -38,13 +38,11 @@ public class ScanCodeProject {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("curl ");
-		sb.append("-X POST ");
+		sb.append("--request POST ");
 		sb.append(_API_URL);
 		sb.append(_projectID);
 		sb.append("/add_pipeline/");
-		sb.append(" -H ");
-		sb.append(_CONTENT_TYPE);
-		sb.append(" -d ");
+		sb.append(" --data ");
 
 		JSONObject jsonObject = new JSONObject();
 
@@ -57,6 +55,8 @@ public class ScanCodeProject {
 		sb.append("'");
 		sb.append(jsonObject);
 		sb.append("'");
+		sb.append(" --header ");
+		sb.append(_CONTENT_TYPE);
 
 		Process process = JenkinsResultsParserUtil.executeBashCommands(
 			sb.toString());
@@ -209,10 +209,8 @@ public class ScanCodeProject {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("curl ");
-		sb.append("-X POST ");
+		sb.append("--request POST ");
 		sb.append(_API_URL);
-		sb.append(" -H ");
-		sb.append(_CONTENT_TYPE);
 
 		JSONObject jsonObject = null;
 
@@ -229,10 +227,12 @@ public class ScanCodeProject {
 			jsonObject = getMapDevelopToDeployJSONObject();
 		}
 
-		sb.append(" -d ");
+		sb.append(" --data ");
 		sb.append("'");
 		sb.append(jsonObject);
 		sb.append("'");
+		sb.append(" --header ");
+		sb.append(_CONTENT_TYPE);
 
 		Process process = JenkinsResultsParserUtil.executeBashCommands(
 			sb.toString());
@@ -333,10 +333,10 @@ public class ScanCodeProject {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("curl ");
-		sb.append("-X GET ");
+		sb.append("--request GET ");
 		sb.append(_API_URL);
 		sb.append(_projectID);
-		sb.append("/ -H ");
+		sb.append("/ --header ");
 		sb.append(_CONTENT_TYPE);
 
 		while (true) {
