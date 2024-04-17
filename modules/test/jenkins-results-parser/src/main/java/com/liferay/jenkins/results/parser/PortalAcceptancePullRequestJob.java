@@ -64,6 +64,27 @@ public class PortalAcceptancePullRequestJob
 	protected Set<String> getRawBatchNames() {
 		Set<String> batchNames = super.getRawBatchNames();
 
+		GitWorkingDirectory gitWorkingDirectory = getGitWorkingDirectory();
+
+		List<File> currentBranchModifiedFiles =
+			gitWorkingDirectory.getModifiedFilesList();
+
+		int modulesFileCount = 0;
+
+		for (File file : currentBranchModifiedFiles) {
+			if (file.getPath(
+				).contains(
+					"modules"
+				)) {
+
+				modulesFileCount++;
+			}
+		}
+
+		if (modulesFileCount == currentBranchModifiedFiles.size()) {
+			batchNames.remove("semantic-versioning-jdk8");
+		}
+
 		if (_isRelevantTestSuite() && _isPortalWebOnly()) {
 			String[] portalWebOnlyBatchNameMarkers = {
 				"compile-jsp", "functional", "portal-web", "source-format"
