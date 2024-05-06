@@ -9033,6 +9033,8 @@ junit.jvm.override.version=21</echo>
 	</target>
 
 	<target name="workspaces-compile-jdk8">
+		<download-gradle-wrapper-binary />
+		
 		<run-batch-test>
 			<test-action>
 				<local name="workspace.names" />
