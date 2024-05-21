@@ -20,6 +20,8 @@ import java.net.URL;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Michael Hashimoto
@@ -179,7 +181,21 @@ public class TestrayFactory {
 			return testrayServer;
 		}
 
-		testrayServer = new DefaultTestrayServer(testrayServerURL);
+		Matcher testray1URLMatcher = _testray1URLPattern.matcher(
+			testrayServerURL);
+		Matcher testray2URLMatcher = _testray2URLPattern.matcher(
+			testrayServerURL);
+
+		if (testray1URLMatcher.find()) {
+			testrayServer = new LegacyTestrayServer(testrayServerURL);
+		}
+		else if (testray2URLMatcher.find()) {
+			testrayServer = new SaaSTestrayServer(testray2URLMatcher.group());
+		}
+		else {
+			throw new RuntimeException(
+				"Invalid Testray URL: " + testrayServerURL);
+		}
 
 		_testrayServers.put(testrayServerURL, testrayServer);
 
@@ -211,6 +227,10 @@ public class TestrayFactory {
 		return _topLevelBuildTestrayCaseResults.get(testrayBuildID);
 	}
 
+	private static final Pattern _testray1URLPattern = Pattern.compile(
+		"https://testray\\.liferay\\.com");
+	private static final Pattern _testray2URLPattern = Pattern.compile(
+		"https://webserver-testray2.*\\.lfr\\.cloud");
 	private static final Map<Build, TestrayAttachmentRecorder>
 		_testrayAttachmentRecorders = new HashMap<>();
 	private static final Map<String, TestrayAttachmentUploader>

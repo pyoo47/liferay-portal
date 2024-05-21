@@ -17,18 +17,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
@@ -38,56 +33,6 @@ public abstract class BaseTestrayServer implements TestrayServer {
 	@Override
 	public JenkinsResultsParserUtil.HTTPAuthorization getHTTPAuthorization() {
 		return _httpAuthorization;
-	}
-
-	@Override
-	public TestrayCaseType getTestrayCaseType(String testrayCaseTypeName) {
-		if (_testrayCaseTypes != null) {
-			return _testrayCaseTypes.get(testrayCaseTypeName);
-		}
-
-		_testrayCaseTypes = new HashMap<>();
-
-		try {
-			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-				getURL() + "/home/-/testray/case_types.json");
-
-			JSONArray dataJSONArray = jsonObject.getJSONArray("data");
-
-			for (int i = 0; i < dataJSONArray.length(); i++) {
-				JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
-
-				_testrayCaseTypes.put(
-					dataJSONObject.getString("name"),
-					new TestrayCaseType(this, dataJSONObject));
-			}
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
-
-		return _testrayCaseTypes.get(testrayCaseTypeName);
-	}
-
-	@Override
-	public TestrayProject getTestrayProjectByID(long projectID) {
-		_initTestrayProjects();
-
-		return _testrayProjectsByID.get(projectID);
-	}
-
-	@Override
-	public TestrayProject getTestrayProjectByName(String projectName) {
-		_initTestrayProjects();
-
-		return _testrayProjectsByName.get(projectName);
-	}
-
-	@Override
-	public List<TestrayProject> getTestrayProjects() {
-		_initTestrayProjects();
-
-		return new ArrayList<>(_testrayProjectsByName.values());
 	}
 
 	@Override
@@ -106,6 +51,24 @@ public abstract class BaseTestrayServer implements TestrayServer {
 		if (TestrayS3Bucket.hasGoogleApplicationCredentials()) {
 			_importCaseResultsToGCP(topLevelBuild);
 		}
+	}
+
+	@Override
+	public String requestGet(String urlPath) throws IOException {
+		return JenkinsResultsParserUtil.toString(
+			getTestrayURL(urlPath), false,
+			JenkinsResultsParserUtil.HttpRequestMethod.GET, null,
+			getHTTPAuthorization());
+	}
+
+	@Override
+	public String requestPost(String urlPath, String requestData)
+		throws IOException {
+
+		return JenkinsResultsParserUtil.toString(
+			getTestrayURL(urlPath), false,
+			JenkinsResultsParserUtil.HttpRequestMethod.POST, requestData,
+			getHTTPAuthorization());
 	}
 
 	@Override
@@ -133,6 +96,12 @@ public abstract class BaseTestrayServer implements TestrayServer {
 
 	protected BaseTestrayServer(String urlString) {
 		try {
+			Matcher matcher = _urlPattern.matcher(urlString);
+
+			if (matcher.find()) {
+				urlString = matcher.group("url");
+			}
+
 			_url = new URL(urlString);
 		}
 		catch (MalformedURLException malformedURLException) {
@@ -150,6 +119,16 @@ public abstract class BaseTestrayServer implements TestrayServer {
 		}
 
 		return new File(workspace, "testray/results");
+	}
+
+	protected String getTestrayURL(String urlPath) {
+		Matcher matcher = _urlPathPattern.matcher(urlPath);
+
+		if (matcher.find()) {
+			urlPath = matcher.group("urlPath");
+		}
+
+		return getURL() + "/" + urlPath;
 	}
 
 	private void _importCaseResultsFromCI(TopLevelBuild topLevelBuild) {
@@ -278,62 +257,12 @@ public abstract class BaseTestrayServer implements TestrayServer {
 			"inbox/" + resultsTarGzFile.getName(), resultsTarGzFile);
 	}
 
-	private synchronized void _initTestrayProjects() {
-		if ((_testrayProjectsByID != null) &&
-			(_testrayProjectsByName != null)) {
-
-			return;
-		}
-
-		_testrayProjectsByID = new HashMap<>();
-		_testrayProjectsByName = new HashMap<>();
-
-		int current = 1;
-
-		while (true) {
-			try {
-				String projectAPIURL = JenkinsResultsParserUtil.combine(
-					String.valueOf(getURL()),
-					"/home/-/testray/projects.json?cur=",
-					String.valueOf(current), "&delta=", String.valueOf(_DELTA),
-					"&orderByCol=testrayProjectId");
-
-				JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-					projectAPIURL, true, getHTTPAuthorization());
-
-				JSONArray dataJSONArray = jsonObject.getJSONArray("data");
-
-				if (dataJSONArray.length() == 0) {
-					break;
-				}
-
-				for (int i = 0; i < dataJSONArray.length(); i++) {
-					JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
-
-					TestrayProject testrayProject = new TestrayProject(
-						this, dataJSONObject);
-
-					_testrayProjectsByID.put(
-						testrayProject.getID(), testrayProject);
-					_testrayProjectsByName.put(
-						testrayProject.getName(), testrayProject);
-				}
-			}
-			catch (IOException ioException) {
-				throw new RuntimeException(ioException);
-			}
-			finally {
-				current++;
-			}
-		}
-	}
-
-	private static final int _DELTA = 50;
+	private static final Pattern _urlPathPattern = Pattern.compile(
+		"/+(?<urlPath>.*)");
+	private static final Pattern _urlPattern = Pattern.compile(
+		"(?<url>https?://.*)/+");
 
 	private JenkinsResultsParserUtil.HTTPAuthorization _httpAuthorization;
-	private Map<String, TestrayCaseType> _testrayCaseTypes;
-	private Map<Long, TestrayProject> _testrayProjectsByID;
-	private Map<String, TestrayProject> _testrayProjectsByName;
 	private final URL _url;
 
 }

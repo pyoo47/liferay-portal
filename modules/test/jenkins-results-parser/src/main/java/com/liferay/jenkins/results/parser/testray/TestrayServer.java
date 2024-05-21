@@ -8,6 +8,8 @@ package com.liferay.jenkins.results.parser.testray;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.TopLevelBuild;
 
+import java.io.IOException;
+
 import java.net.URL;
 
 import java.util.List;
@@ -30,6 +32,11 @@ public interface TestrayServer {
 	public URL getURL();
 
 	public void importCaseResults(TopLevelBuild topLevelBuild);
+
+	public String requestGet(String urlPath) throws IOException;
+
+	public String requestPost(String urlPath, String requestData)
+		throws IOException;
 
 	public void setHTTPAuthorization(
 		JenkinsResultsParserUtil.HTTPAuthorization httpAuthorization);
