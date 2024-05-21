@@ -157,15 +157,28 @@ public class TestrayFactory {
 			testrayBuild, topLevelBuild, axisTestClassGroup);
 	}
 
+	public static TestrayCaseType newTestrayCaseType(
+		TestrayServer testrayServer, JSONObject jsonObject) {
+
+		if (testrayServer instanceof LegacyTestrayServer) {
+			return new LegacyTestrayCaseType(testrayServer, jsonObject);
+		}
+		else if (testrayServer instanceof SaaSTestrayServer) {
+			return new SaaSTestrayCaseType(testrayServer, jsonObject);
+		}
+
+		throw new RuntimeException(
+			"Unsupported Testray Server " + testrayServer);
+	}
+
 	public static TestrayProject newTestrayProject(
 		TestrayServer testrayServer, JSONObject jsonObject) {
 
 		if (testrayServer instanceof LegacyTestrayServer) {
-			return new LegacyTestrayProject(
-				testrayServer, jsonObject);
+			return new LegacyTestrayProject(testrayServer, jsonObject);
 		}
 		else if (testrayServer instanceof SaaSTestrayServer) {
-			return  new SaasTestrayProject(testrayServer, jsonObject);
+			return new SaasTestrayProject(testrayServer, jsonObject);
 		}
 
 		throw new RuntimeException(

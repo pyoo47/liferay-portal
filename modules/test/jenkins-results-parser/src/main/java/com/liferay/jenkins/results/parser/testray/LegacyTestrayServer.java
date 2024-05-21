@@ -41,7 +41,7 @@ public class LegacyTestrayServer extends BaseTestrayServer {
 
 				_testrayCaseTypes.put(
 					dataJSONObject.getString("name"),
-					new TestrayCaseType(this, dataJSONObject));
+					TestrayFactory.newTestrayCaseType(this, dataJSONObject));
 			}
 		}
 		catch (IOException ioException) {
