@@ -56,7 +56,7 @@ public class LegacyTestrayProject extends BaseTestrayProject {
 
 			if (jsonObject.has("data")) {
 				TestrayProductVersion newTestrayProductVersion =
-					new TestrayProductVersion(
+					TestrayFactory.newTestrayProductVersion(
 						this, jsonObject.getJSONObject("data"));
 
 				_testrayProductVersionsByID.put(
@@ -229,7 +229,8 @@ public class LegacyTestrayProject extends BaseTestrayProject {
 					JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
 
 					TestrayProductVersion testrayProductVersion =
-						new TestrayProductVersion(this, dataJSONObject);
+						TestrayFactory.newTestrayProductVersion(
+							this, dataJSONObject);
 
 					_testrayProductVersionsByID.put(
 						testrayProductVersion.getID(), testrayProductVersion);

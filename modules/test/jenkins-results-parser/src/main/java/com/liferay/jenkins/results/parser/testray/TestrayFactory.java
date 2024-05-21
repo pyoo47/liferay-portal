@@ -171,6 +171,20 @@ public class TestrayFactory {
 			"Unsupported Testray Server " + testrayServer);
 	}
 
+	public static TestrayProductVersion newTestrayProductVersion(
+		TestrayProject testrayProject, JSONObject jsonObject) {
+
+		if (testrayProject instanceof LegacyTestrayProject) {
+			return new LegacyTestrayProductVersion(testrayProject, jsonObject);
+		}
+		else if (testrayProject instanceof SaaSTestrayProject) {
+			return new SaaSTestrayProductVersion(testrayProject, jsonObject);
+		}
+
+		throw new RuntimeException(
+			"Unsupported Testray Project " + testrayProject);
+	}
+
 	public static TestrayProject newTestrayProject(
 		TestrayServer testrayServer, JSONObject jsonObject) {
 
@@ -178,7 +192,7 @@ public class TestrayFactory {
 			return new LegacyTestrayProject(testrayServer, jsonObject);
 		}
 		else if (testrayServer instanceof SaaSTestrayServer) {
-			return new SaasTestrayProject(testrayServer, jsonObject);
+			return new SaaSTestrayProject(testrayServer, jsonObject);
 		}
 
 		throw new RuntimeException(

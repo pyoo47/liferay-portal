@@ -12,9 +12,9 @@ import org.json.JSONObject;
 /**
  * @author Michael Hashimoto
  */
-public class SaasTestrayProject extends BaseTestrayProject {
+public class SaaSTestrayProject extends BaseTestrayProject {
 
-	public SaasTestrayProject(
+	public SaaSTestrayProject(
 		TestrayServer testrayServer, JSONObject jsonObject) {
 
 		super(testrayServer);
