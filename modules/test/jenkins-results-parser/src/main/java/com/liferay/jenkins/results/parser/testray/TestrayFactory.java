@@ -97,23 +97,18 @@ public class TestrayFactory {
 		return testrayAttachmentUploader;
 	}
 
-	public static TestrayBuild newTestrayBuild(String testrayBuildURL) {
-		TestrayBuild testrayBuild = _testrayBuilds.get(testrayBuildURL);
+	public static TestrayBuild newTestrayBuild(
+		TestrayRoutine testrayRoutine, JSONObject jsonObject) {
 
-		if (testrayBuild != null) {
-			return testrayBuild;
+		if (testrayRoutine instanceof LegacyTestrayRoutine) {
+			return new LegacyTestrayBuild(testrayRoutine, jsonObject);
+		}
+		else if (testrayRoutine instanceof SaaSTestrayRoutine) {
+			return new SaaSTestrayBuild(testrayRoutine, jsonObject);
 		}
 
-		try {
-			testrayBuild = new TestrayBuild(new URL(testrayBuildURL));
-
-			_testrayBuilds.put(testrayBuildURL, testrayBuild);
-
-			return testrayBuild;
-		}
-		catch (MalformedURLException malformedURLException) {
-			throw new RuntimeException(malformedURLException);
-		}
+		throw new RuntimeException(
+			"Unsupported Testray Routine " + testrayRoutine);
 	}
 
 	public static TestrayCaseResult newTestrayCaseResult(
@@ -305,8 +300,6 @@ public class TestrayFactory {
 		_testrayAttachmentRecorders = new HashMap<>();
 	private static final Map<String, TestrayAttachmentUploader>
 		_testrayAttachmentUploaders = new HashMap<>();
-	private static final Map<String, TestrayBuild> _testrayBuilds =
-		new HashMap<>();
 	private static final Map<String, TestrayRoutine> _testrayRoutines =
 		new HashMap<>();
 	private static final Map<String, TestrayServer> _testrayServers =

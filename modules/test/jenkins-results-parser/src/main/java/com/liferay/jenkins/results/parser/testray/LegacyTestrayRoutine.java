@@ -94,7 +94,8 @@ public class LegacyTestrayRoutine extends BaseTestrayRoutine {
 					sb.toString()));
 
 			if (jsonObject.has("data")) {
-				return new TestrayBuild(this, jsonObject.getJSONObject("data"));
+				return TestrayFactory.newTestrayBuild(
+					this, jsonObject.getJSONObject("data"));
 			}
 
 			String message = jsonObject.optString("message", "");
@@ -144,7 +145,8 @@ public class LegacyTestrayRoutine extends BaseTestrayRoutine {
 
 			JSONObject dataJSONObject = jsonObject.getJSONObject("data");
 
-			TestrayBuild testrayBuild = new TestrayBuild(this, dataJSONObject);
+			TestrayBuild testrayBuild = TestrayFactory.newTestrayBuild(
+				this, dataJSONObject);
 
 			_addToTestrayBuildMaps(testrayBuild);
 
@@ -193,7 +195,7 @@ public class LegacyTestrayRoutine extends BaseTestrayRoutine {
 				for (int i = 0; i < dataJSONArray.length(); i++) {
 					JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
 
-					TestrayBuild testrayBuild = new TestrayBuild(
+					TestrayBuild testrayBuild = TestrayFactory.newTestrayBuild(
 						this, dataJSONObject);
 
 					_addToTestrayBuildMaps(testrayBuild);
@@ -266,7 +268,7 @@ public class LegacyTestrayRoutine extends BaseTestrayRoutine {
 				for (int i = 0; i < dataJSONArray.length(); i++) {
 					JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
 
-					TestrayBuild testrayBuild = new TestrayBuild(
+					TestrayBuild testrayBuild = TestrayFactory.newTestrayBuild(
 						this, dataJSONObject);
 
 					if (_testrayBuildsByID.containsKey(testrayBuild.getID())) {
