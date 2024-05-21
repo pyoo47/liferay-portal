@@ -102,8 +102,9 @@ public class LegacyTestrayProject extends BaseTestrayProject {
 					"/home/-/testray/routines/add.json", sb.toString()));
 
 			if (jsonObject.has("data")) {
-				TestrayRoutine newTestrayRoutine = new TestrayRoutine(
-					this, jsonObject.getJSONObject("data"));
+				TestrayRoutine newTestrayRoutine =
+					TestrayFactory.newTestrayRoutine(
+						this, jsonObject.getJSONObject("data"));
 
 				_testrayRoutinesByID.put(getID(), newTestrayRoutine);
 				_testrayRoutinesByName.put(
@@ -281,8 +282,8 @@ public class LegacyTestrayProject extends BaseTestrayProject {
 				for (int i = 0; i < dataJSONArray.length(); i++) {
 					JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
 
-					TestrayRoutine testrayRoutine = new TestrayRoutine(
-						this, dataJSONObject);
+					TestrayRoutine testrayRoutine =
+						TestrayFactory.newTestrayRoutine(this, dataJSONObject);
 
 					_testrayRoutinesByID.put(
 						testrayRoutine.getID(), testrayRoutine);

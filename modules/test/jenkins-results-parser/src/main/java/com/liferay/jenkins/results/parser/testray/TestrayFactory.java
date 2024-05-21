@@ -207,7 +207,19 @@ public class TestrayFactory {
 		}
 
 		try {
-			testrayRoutine = new TestrayRoutine(new URL(testrayRoutineURL));
+			Matcher testray1URLMatcher = _testray1URLPattern.matcher(
+				testrayRoutineURL);
+			Matcher testray2URLMatcher = _testray2URLPattern.matcher(
+				testrayRoutineURL);
+
+			if (testray1URLMatcher.find()) {
+				testrayRoutine = new LegacyTestrayRoutine(
+					new URL(testrayRoutineURL));
+			}
+			else if (testray2URLMatcher.find()) {
+				testrayRoutine = new SaaSTestrayRoutine(
+					new URL(testrayRoutineURL));
+			}
 
 			_testrayRoutines.put(testrayRoutineURL, testrayRoutine);
 
@@ -216,6 +228,20 @@ public class TestrayFactory {
 		catch (MalformedURLException malformedURLException) {
 			throw new RuntimeException(malformedURLException);
 		}
+	}
+
+	public static TestrayRoutine newTestrayRoutine(
+		TestrayProject testrayProject, JSONObject jsonObject) {
+
+		if (testrayProject instanceof LegacyTestrayProject) {
+			return new LegacyTestrayRoutine(testrayProject, jsonObject);
+		}
+		else if (testrayProject instanceof SaaSTestrayProject) {
+			return new SaaSTestrayRoutine(testrayProject, jsonObject);
+		}
+
+		throw new RuntimeException(
+			"Unsupported Testray Project " + testrayProject);
 	}
 
 	public static TestrayServer newTestrayServer(String testrayServerURL) {
