@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
+ * SPDX-FileCopyrightText: (c) 2024 Liferay, Inc. https://liferay.com
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
@@ -21,10 +21,6 @@ import org.json.JSONObject;
  * @author Michael Hashimoto
  */
 public class LegacyTestrayServer extends BaseTestrayServer {
-
-	public LegacyTestrayServer(String urlString) {
-		super(urlString);
-	}
 
 	@Override
 	public TestrayCaseType getTestrayCaseType(String testrayCaseTypeName) {
@@ -76,6 +72,10 @@ public class LegacyTestrayServer extends BaseTestrayServer {
 		return new ArrayList<>(_testrayProjectsByName.values());
 	}
 
+	protected LegacyTestrayServer(String urlString) {
+		super(urlString);
+	}
+
 	private synchronized void _initTestrayProjects() {
 		if ((_testrayProjectsByID != null) &&
 			(_testrayProjectsByName != null)) {
@@ -107,8 +107,8 @@ public class LegacyTestrayServer extends BaseTestrayServer {
 				for (int i = 0; i < dataJSONArray.length(); i++) {
 					JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
 
-					TestrayProject testrayProject = new TestrayProject(
-						this, dataJSONObject);
+					TestrayProject testrayProject =
+						TestrayFactory.newTestrayProject(this, dataJSONObject);
 
 					_testrayProjectsByID.put(
 						testrayProject.getID(), testrayProject);

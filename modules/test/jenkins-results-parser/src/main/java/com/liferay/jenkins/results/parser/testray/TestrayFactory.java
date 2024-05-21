@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
+
 /**
  * @author Michael Hashimoto
  */
@@ -153,6 +155,21 @@ public class TestrayFactory {
 
 		return new BatchBuildTestrayCaseResult(
 			testrayBuild, topLevelBuild, axisTestClassGroup);
+	}
+
+	public static TestrayProject newTestrayProject(
+		TestrayServer testrayServer, JSONObject jsonObject) {
+
+		if (testrayServer instanceof LegacyTestrayServer) {
+			return new LegacyTestrayProject(
+				testrayServer, jsonObject);
+		}
+		else if (testrayServer instanceof SaaSTestrayServer) {
+			return  new SaasTestrayProject(testrayServer, jsonObject);
+		}
+
+		throw new RuntimeException(
+			"Unsupported Testray Server " + testrayServer);
 	}
 
 	public static TestrayRoutine newTestrayRoutine(String testrayRoutineURL) {
