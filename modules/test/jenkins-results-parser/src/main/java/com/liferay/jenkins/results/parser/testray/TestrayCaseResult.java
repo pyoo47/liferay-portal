@@ -172,11 +172,11 @@ public class TestrayCaseResult {
 
 		_testrayBuild = testrayBuild;
 		_topLevelBuild = topLevelBuild;
+
 		_jsonObject = new JSONObject();
 	}
 
 	private final JSONObject _jsonObject;
-
 	private Map<String, TestrayAttachment> _testrayAttachments;
 	private final TestrayBuild _testrayBuild;
 	private TestrayCase _testrayCase;
