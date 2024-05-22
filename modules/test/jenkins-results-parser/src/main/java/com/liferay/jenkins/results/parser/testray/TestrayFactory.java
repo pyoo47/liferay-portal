@@ -111,6 +111,20 @@ public class TestrayFactory {
 			"Unsupported Testray Routine " + testrayRoutine);
 	}
 
+	public static TestrayCase newTestrayCase(
+		TestrayProject testrayProject, JSONObject jsonObject) {
+
+		if (testrayProject instanceof LegacyTestrayProject) {
+			return new LegacyTestrayCase(testrayProject, jsonObject);
+		}
+		else if (testrayProject instanceof SaaSTestrayProject) {
+			return new SaaSTestrayCase(testrayProject, jsonObject);
+		}
+
+		throw new RuntimeException(
+			"Unsupported Testray Project " + testrayProject);
+	}
+
 	public static TestrayCaseResult newTestrayCaseResult(
 		TestrayBuild testrayBuild, JSONObject jsonObject) {
 

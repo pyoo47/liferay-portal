@@ -5,46 +5,23 @@
 
 package com.liferay.jenkins.results.parser.testray;
 
-import org.json.JSONObject;
-
 /**
  * @author Michael Hashimoto
  */
-public class TestrayCase {
+public interface TestrayCase {
 
-	public TestrayCase(TestrayProject testrayProject, JSONObject jsonObject) {
-		_testrayProject = testrayProject;
-		_jsonObject = jsonObject;
-	}
+	public String getComponent();
 
-	public String getComponent() {
-		JSONObject mainComponentJSONObject = _jsonObject.getJSONObject(
-			"mainComponent");
+	public String getID();
 
-		return mainComponentJSONObject.getString("name");
-	}
+	public String getName();
 
-	public String getID() {
-		return _jsonObject.optString("testrayCaseId");
-	}
+	public int getPriority();
 
-	public String getName() {
-		return _jsonObject.optString("name");
-	}
+	public String getTeamName();
 
-	public int getPriority() {
-		return _jsonObject.getInt("priority");
-	}
+	public TestrayProject getTestrayProject();
 
-	public String getTeamName() {
-		return _jsonObject.getString("testrayTeamName");
-	}
-
-	public String getType() {
-		return _jsonObject.getString("testrayCaseTypeName");
-	}
-
-	private final JSONObject _jsonObject;
-	private final TestrayProject _testrayProject;
+	public String getType();
 
 }
