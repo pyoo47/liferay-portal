@@ -15,10 +15,13 @@ import com.liferay.jenkins.results.parser.test.clazz.group.FunctionalAxisTestCla
 import com.liferay.jenkins.results.parser.test.clazz.group.JUnitAxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.PlaywrightAxisTestClassGroup;
 
+import java.io.File;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -264,6 +267,21 @@ public class TestrayFactory {
 
 		throw new RuntimeException(
 			"Unsupported Testray Project " + testrayProject);
+	}
+
+	public static TestrayRun newTestrayRun(
+		TestrayBuild testrayBuild, String batchName,
+		List<File> propertiesFiles) {
+
+		if (testrayBuild instanceof LegacyTestrayBuild) {
+			return new LegacyTestrayRun(
+				testrayBuild, batchName, propertiesFiles);
+		}
+		else if (testrayBuild instanceof SaaSTestrayBuild) {
+			return new SaaSTestrayRun(testrayBuild, batchName, propertiesFiles);
+		}
+
+		throw new RuntimeException("Unsupported Testray Build " + testrayBuild);
 	}
 
 	public static TestrayServer newTestrayServer(String testrayServerURL) {
