@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author Michael Hashimoto
  */
-public abstract class BuildTestrayCaseResult extends TestrayCaseResult {
+public abstract class BuildTestrayCaseResult extends BaseTestrayCaseResult {
 
 	public BuildTestrayCaseResult(
 		TestrayBuild testrayBuild, TopLevelBuild topLevelBuild) {

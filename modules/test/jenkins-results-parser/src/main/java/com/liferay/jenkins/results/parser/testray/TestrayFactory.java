@@ -112,6 +112,19 @@ public class TestrayFactory {
 	}
 
 	public static TestrayCaseResult newTestrayCaseResult(
+		TestrayBuild testrayBuild, JSONObject jsonObject) {
+
+		if (testrayBuild instanceof LegacyTestrayBuild) {
+			return new LegacyTestrayCaseResult(testrayBuild, jsonObject);
+		}
+		else if (testrayBuild instanceof SaaSTestrayBuild) {
+			return new SaaSTestrayCaseResult(testrayBuild, jsonObject);
+		}
+
+		throw new RuntimeException("Unsupported Testray Build " + testrayBuild);
+	}
+
+	public static TestrayCaseResult newTestrayCaseResult(
 		TestrayBuild testrayBuild, TopLevelBuild topLevelBuild,
 		AxisTestClassGroup axisTestClassGroup, TestClass testClass) {
 
