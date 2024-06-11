@@ -1971,13 +1971,6 @@ rerun your task.
 				</then>
 			</if>
 
-			<if>
-				<isset property="org.gradle.jvmargs[${gradle.server.memory}]" />
-				<then>
-					<propertycopy from="org.gradle.jvmargs[${gradle.server.memory}]" name="org.gradle.jvmargs" override="true" />
-				</then>
-			</if>
-
 			<echoproperties destfile="${gradle.properties.file}">
 				<propertyset>
 					<propertyref name="app.server.type" />
