@@ -58,7 +58,6 @@ import org.junit.runner.RunWith;
  * @author Maurice Sepe
  */
 @FeatureFlags("LPS-135430")
-@Ignore
 @RunWith(Arquillian.class)
 public class SugarCRMObjectEntryManagerImplTest
 	extends BaseObjectEntryManagerImplTestCase {
