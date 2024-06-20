@@ -12792,7 +12792,7 @@ captcha.enforce.disabled=true</echo>
 			</then>
 		</if>
 	</target>
-	
+
 	<target name="prepare-portlet-ext-properties">
 		<for list="${test.case.available.property.names}" param="test.case.available.property.name">
 			<sequential>
