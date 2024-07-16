@@ -43,6 +43,11 @@ public class TestClassGroupFactory {
 				testBaseDir);
 		}
 
+		if (batchTestClassGroup instanceof JSUnitModulesBatchTestClassGroup) {
+			return new JSUnitAxisTestClassGroup(
+				(JSUnitModulesBatchTestClassGroup)batchTestClassGroup);
+		}
+
 		if (batchTestClassGroup instanceof JUnitBatchTestClassGroup) {
 			return new JUnitAxisTestClassGroup(
 				(JUnitBatchTestClassGroup)batchTestClassGroup);
@@ -68,6 +73,11 @@ public class TestClassGroupFactory {
 
 		if (batchTestClassGroup instanceof FunctionalBatchTestClassGroup) {
 			return new FunctionalAxisTestClassGroup(
+				jsonObject, segmentTestClassGroup);
+		}
+
+		if (batchTestClassGroup instanceof JSUnitModulesBatchTestClassGroup) {
+			return new JSUnitAxisTestClassGroup(
 				jsonObject, segmentTestClassGroup);
 		}
 
