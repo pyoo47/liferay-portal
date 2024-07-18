@@ -231,6 +231,7 @@ public class PullRequestPortalTopLevelBuild
 
 			portalWorkspace.setBuildProfile(getBuildProfile());
 			portalWorkspace.setOSBAsahGitHubURL(_getOSBAsahGitHubURL());
+			portalWorkspace.setOSBFaroGitHubURL(_getOSBFaroGitHubURL());
 		}
 
 		WorkspaceGitRepository workspaceGitRepository =
@@ -463,6 +464,22 @@ public class PullRequestPortalTopLevelBuild
 
 		if (controllerBuild != null) {
 			return controllerBuild.getParameterValue("OSB_ASAH_GITHUB_URL");
+		}
+
+		return null;
+	}
+
+	private String _getOSBFaroGitHubURL() {
+		String osbFaroGitHubURL = getParameterValue("OSB_FARO_GITHUB_URL");
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(osbFaroGitHubURL)) {
+			return osbFaroGitHubURL;
+		}
+
+		Build controllerBuild = getControllerBuild();
+
+		if (controllerBuild != null) {
+			return controllerBuild.getParameterValue("OSB_FARO_GITHUB_URL");
 		}
 
 		return null;
