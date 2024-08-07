@@ -140,6 +140,8 @@ public abstract class BaseBuildDatabase implements BuildDatabase {
 		JSONObject workspacesJSONObject = _jsonObject.getJSONObject(
 			"workspaces");
 
+		System.out.println("PDY - getWorkspace - key:" + key);
+
 		return WorkspaceFactory.newWorkspace(
 			workspacesJSONObject.getJSONObject(key));
 	}

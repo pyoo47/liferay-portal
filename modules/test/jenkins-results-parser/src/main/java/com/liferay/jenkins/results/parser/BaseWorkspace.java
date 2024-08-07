@@ -258,6 +258,8 @@ public abstract class BaseWorkspace implements Workspace {
 		for (final String workspaceRepositoryDirName :
 				workspaceRepositoryDirNames.split(",")) {
 
+			System.out.println("PDY - BaseWorkspace - workspaceRepositoryDirName:" + workspaceRepositoryDirName);
+
 			_workspaceGitRepositories.put(
 				workspaceRepositoryDirName,
 				buildDatabase.getWorkspaceGitRepository(

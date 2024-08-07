@@ -67,6 +67,11 @@ public class WorkspaceFactory {
 		String gitDirectoryName = JenkinsResultsParserUtil.getGitDirectoryName(
 			repositoryName, upstreamBranchName);
 
+		System.out.println("PDY - newWorkspace - repositoryName:" +
+			repositoryName + " - upstreamBranchName:" + upstreamBranchName +
+			" - jobName: " + jobName + " - gitDirectoryName: " +
+			gitDirectoryName);
+
 		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
 
 		Workspace workspace = _workspaces.get(gitDirectoryName);
@@ -78,7 +83,9 @@ public class WorkspaceFactory {
 		}
 
 		if (buildDatabase.hasWorkspace(gitDirectoryName)) {
+			System.out.println("PDY - calling getWorkspace - gitDirectoryName: " + gitDirectoryName);
 			workspace = buildDatabase.getWorkspace(gitDirectoryName);
+			System.out.println("PDY - finished calling getWorkspace - gitDirectoryName: " + gitDirectoryName);
 
 			_workspaces.put(gitDirectoryName, workspace);
 
