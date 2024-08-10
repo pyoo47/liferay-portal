@@ -34,73 +34,34 @@ public abstract class BaseWorkspace implements Workspace {
 
 	@Override
 	public List<WorkspaceGitRepository> getWorkspaceGitRepositories() {
-		if (_workspaceGitRepositories != null) {
-			return new ArrayList<>(_workspaceGitRepositories.values());
+		List<WorkspaceGitRepository> workspaceGitRepositories = new ArrayList<>(
+			_workspaceGitRepositories.size());
+
+		for (String key : _workspaceGitRepositories.keySet()) {
+			workspaceGitRepositories.add(getWorkspaceGitRepository(key));
 		}
 
-		_workspaceGitRepositories = new HashMap<>();
-
-		String workspaceRepositoryDirNames = jsonObject.getString(
-			"workspace_repository_dir_names");
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(
-				workspaceRepositoryDirNames)) {
-
-			return new ArrayList<>(_workspaceGitRepositories.values());
-		}
-
-		List<Callable<WorkspaceGitRepository>> callables = new ArrayList<>();
-
-		for (final String workspaceRepositoryDirName :
-				workspaceRepositoryDirNames.split(",")) {
-
-			Callable<WorkspaceGitRepository> callable =
-				new Callable<WorkspaceGitRepository>() {
-
-					@Override
-					public WorkspaceGitRepository call() {
-						return GitRepositoryFactory.getWorkspaceGitRepository(
-							workspaceRepositoryDirName.trim());
-					}
-
-				};
-
-			callables.add(callable);
-		}
-
-		ParallelExecutor<WorkspaceGitRepository> parallelExecutor =
-			new ParallelExecutor<>(
-				callables, false, threadPoolExecutor, true,
-				"getWorkspaceGitRepositories");
-
-		try {
-			List<WorkspaceGitRepository> workspaceGitRepositories =
-				parallelExecutor.execute();
-
-			for (WorkspaceGitRepository workspaceGitRepository :
-					workspaceGitRepositories) {
-
-				_workspaceGitRepositories.put(
-					workspaceGitRepository.getDirectoryName(),
-					workspaceGitRepository);
-			}
-
-			return new ArrayList<>(_workspaceGitRepositories.values());
-		}
-		catch (TimeoutException timeoutException) {
-			throw new RuntimeException(timeoutException);
-		}
+		return workspaceGitRepositories;
 	}
 
 	@Override
 	public WorkspaceGitRepository getWorkspaceGitRepository(
 		String repositoryDirName) {
 
-		if (_workspaceGitRepositories == null) {
-			getWorkspaceGitRepositories();
+		WorkspaceGitRepository workspaceGitRepository =
+			_workspaceGitRepositories.get(repositoryDirName);
+
+		if (workspaceGitRepository == null) {
+			BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
+
+			workspaceGitRepository = buildDatabase.getWorkspaceGitRepository(
+				repositoryDirName);
+
+			_workspaceGitRepositories.put(
+				repositoryDirName, workspaceGitRepository);
 		}
 
-		return _workspaceGitRepositories.get(repositoryDirName);
+		return workspaceGitRepository;
 	}
 
 	@Override
@@ -248,22 +209,15 @@ public abstract class BaseWorkspace implements Workspace {
 				this.jsonObject.getString("primary_repository_name"),
 				this.jsonObject.getString("primary_upstream_branch_name"));
 
-		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
-
 		String workspaceRepositoryDirNames = jsonObject.getString(
 			"workspace_repository_dir_names");
 
 		_workspaceGitRepositories = new HashMap<>();
 
 		for (final String workspaceRepositoryDirName :
-				workspaceRepositoryDirNames.split(",")) {
+				workspaceRepositoryDirNames.split("\\s*,\\s*")) {
 
-			System.out.println("PDY - BaseWorkspace - workspaceRepositoryDirName:" + workspaceRepositoryDirName);
-
-			_workspaceGitRepositories.put(
-				workspaceRepositoryDirName,
-				buildDatabase.getWorkspaceGitRepository(
-					workspaceRepositoryDirName));
+			_workspaceGitRepositories.put(workspaceRepositoryDirName, null);
 		}
 	}
 
