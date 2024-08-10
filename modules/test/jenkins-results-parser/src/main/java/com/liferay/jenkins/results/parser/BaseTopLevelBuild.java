@@ -1119,6 +1119,21 @@ public abstract class BaseTopLevelBuild
 			buildFailureElements.add(
 				Dom4JUtil.getNewElement("h4", null, failureTitle));
 
+			System.out.println(
+				"PDY - BaseTopLevelBuild - allCurrentBuildFailureElements\n");
+
+			for (Element currentBuildFailureElement :
+					allCurrentBuildFailureElements) {
+
+				try {
+					System.out.println(
+						Dom4JUtil.format(currentBuildFailureElement));
+				}
+				catch (IOException ioException) {
+					ioException.printStackTrace();
+				}
+			}
+
 			buildFailureElements.add(
 				Dom4JUtil.getOrderedListElement(
 					allCurrentBuildFailureElements, maxFailureCount));

@@ -555,6 +555,11 @@ public abstract class BaseBuild implements Build {
 		for (FailureMessageGenerator failureMessageGenerator :
 				getFailureMessageGenerators()) {
 
+			System.out.println(
+				"PDY - Running failure message generator " +
+					failureMessageGenerator.getClass(
+					).getName());
+
 			try {
 				String failureMessage = failureMessageGenerator.getMessage(
 					this);
@@ -2383,8 +2388,15 @@ public abstract class BaseBuild implements Build {
 	}
 
 	protected Element getFailureMessageElement() {
+		System.out.println("PDY - 2 - getFailureMessageElement");
+
 		for (FailureMessageGenerator failureMessageGenerator :
 				getFailureMessageGenerators()) {
+
+			System.out.println(
+				"PDY - 2 - Running failure message generator " +
+					failureMessageGenerator.getClass(
+					).getName());
 
 			Element failureMessage = failureMessageGenerator.getMessageElement(
 				this);
