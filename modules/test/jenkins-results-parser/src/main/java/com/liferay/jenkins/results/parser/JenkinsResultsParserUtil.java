@@ -702,6 +702,13 @@ public class JenkinsResultsParserUtil {
 			_MILLIS_BASH_COMMAND_TIMEOUT_DEFAULT, commands);
 	}
 
+	public static Process executeBashCommands(File baseDir, String... commands)
+		throws IOException, TimeoutException {
+
+		return executeBashCommands(
+			true, baseDir, _MILLIS_BASH_COMMAND_TIMEOUT_DEFAULT, commands);
+	}
+
 	public static Process executeBashCommands(long timeout, String... commands)
 		throws IOException, TimeoutException {
 
@@ -1908,6 +1915,24 @@ public class JenkinsResultsParserUtil {
 
 	public static File getFileFromPathSnippet(
 		File baseDir, final String pathSnippet) {
+
+		baseDir = getCanonicalFile(baseDir);
+
+		try {
+			Process process = executeBashCommands(
+				baseDir, combine("git ls-files | grep \"", pathSnippet, "\""));
+
+			String output = readInputStream(process.getInputStream());
+
+			if (!isNullOrEmpty(output)) {
+				for (String line : output.split("\n")) {
+					return new File(baseDir, line);
+				}
+			}
+		}
+		catch (IOException | TimeoutException exception) {
+			System.out.println(exception.getMessage());
+		}
 
 		final List<File> matchingFiles = new ArrayList<>();
 
