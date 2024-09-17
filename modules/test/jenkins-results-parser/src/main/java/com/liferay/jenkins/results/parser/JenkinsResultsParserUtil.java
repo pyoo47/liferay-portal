@@ -1263,17 +1263,35 @@ public class JenkinsResultsParserUtil {
 
 		String topLevelBuildURL = System.getenv("TOP_LEVEL_BUILD_URL");
 
-		if (topLevelBuildURL == null) {
-			topLevelBuildURL = "";
+		if (topLevelBuildURL != null) {
+			String buildDirPath = getBuildDirPath(topLevelBuildURL);
+
+			if (buildDirPath != null) {
+				return buildDirPath;
+			}
 		}
 
-		Matcher matcher = _buildURLPattern.matcher(topLevelBuildURL);
+		return getBuildDirPath(buildNumber, jobName, masterHostname);
+	}
+
+	public static String getBuildDirPath(String buildURL) {
+		Matcher matcher = _buildURLPattern.matcher(buildURL);
 
 		if (matcher.find()) {
-			buildNumber = matcher.group("buildNumber");
-			jobName = matcher.group("jobName");
-			masterHostname = matcher.group("masterHostname");
+			return getBuildDirPath(
+				matcher.group("buildNumber"), matcher.group("jobName"),
+				matcher.group("masterHostname"));
 		}
+
+		return null;
+	}
+
+	public static String getBuildDirPath(
+		String buildNumber, String jobName, String masterHostname) {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("/tmp/jenkins/");
 
 		if (!isCINode() || isNullOrEmpty(buildNumber) ||
 			isNullOrEmpty(jobName) || isNullOrEmpty(masterHostname)) {
