@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -157,6 +159,24 @@ public class TestHistoryMap {
 				testsJSONArray.put(testJSONObject);
 			}
 
+			JSONArray testTasksJSONArray = new JSONArray();
+
+			for (TestTaskHistory testTaskHistory :
+					batchHistory.getTestTaskHistories()) {
+
+				JSONObject testJSONObject = new JSONObject();
+
+				testJSONObject.put(
+					"averageDuration", testTaskHistory.getAverageDuration()
+				).put(
+					"testTaskCount", testTaskHistory.getTestTaskCount()
+				).put(
+					"testTaskName", testTaskHistory.getTestTaskName()
+				);
+
+				testTasksJSONArray.put(testJSONObject);
+			}
+
 			JSONObject batchJSONObject = new JSONObject();
 
 			batchJSONObject.put(
@@ -165,6 +185,8 @@ public class TestHistoryMap {
 				"batchName", batchHistory.getBatchName()
 			).put(
 				"tests", testsJSONArray
+			).put(
+				"testTasks", testTasksJSONArray
 			);
 
 			batchesJSONArray.put(batchJSONObject);
@@ -371,6 +393,8 @@ public class TestHistoryMap {
 	private static final long _MAXIMUM_TEST_DURATION = 2 * 60 * 60 * 1000;
 
 	private static List<String> _excludedTestNameRegexes;
+	private static final Pattern _stopWatchGroupTaskNamePattern =
+		Pattern.compile("test\\.execution\\.duration(?<taskName>\\..+)");
 
 	private final Map<String, BatchHistory> _batchHistoryMap = new HashMap<>();
 	private final TestrayBuild _latestTestrayBuild;
@@ -409,6 +433,35 @@ public class TestHistoryMap {
 				}
 
 				testClassHistory.addTestClassReport(testClassReport);
+			}
+
+			StopWatchRecordsGroup stopWatchRecordsGroup =
+				downstreamBuildReport.getStopWatchRecordsGroup();
+
+			for (StopWatchRecord stopWatchRecord :
+					stopWatchRecordsGroup.getAllStopWatchRecords()) {
+
+				Matcher matcher = _stopWatchGroupTaskNamePattern.matcher(
+					stopWatchRecord.getName());
+
+				if (!matcher.find()) {
+					continue;
+				}
+
+				String taskName = matcher.group("taskName");
+
+				taskName = taskName.replaceAll("\\.", ":");
+
+				TestTaskHistory testTaskHistory = _testTaskHistoryMap.get(
+					taskName);
+
+				if (testTaskHistory == null) {
+					testTaskHistory = new TestTaskHistory(taskName);
+				}
+
+				testTaskHistory.addTestTaskStopWatchRecord(stopWatchRecord);
+
+				_testTaskHistoryMap.put(taskName, testTaskHistory);
 			}
 		}
 
@@ -501,6 +554,10 @@ public class TestHistoryMap {
 			return _testrayRun;
 		}
 
+		public List<TestTaskHistory> getTestTaskHistories() {
+			return new ArrayList<>(_testTaskHistoryMap.values());
+		}
+
 		private boolean _excludeTestClassReport(
 			TestClassReport testClassReport) {
 
@@ -538,6 +595,8 @@ public class TestHistoryMap {
 			new HashMap<>();
 		private TestrayCaseType _testrayCaseType;
 		private TestrayRun _testrayRun;
+		private final Map<String, TestTaskHistory> _testTaskHistoryMap =
+			new HashMap<>();
 
 	}
 
@@ -798,6 +857,56 @@ public class TestHistoryMap {
 		private final BatchHistory _batchHistory;
 		private final String _testName;
 		private final List<TestReport> _testReports = new ArrayList<>();
+
+	}
+
+	private class TestTaskHistory {
+
+		public TestTaskHistory(String testTaskName) {
+			_testTaskName = testTaskName;
+		}
+
+		public void addTestTaskStopWatchRecord(
+			StopWatchRecord stopWatchRecord) {
+
+			_testTaskStopWatchRecords.add(stopWatchRecord);
+		}
+
+		public long getAverageDuration() {
+			long count = 0;
+			long totalDuration = 0;
+
+			for (StopWatchRecord testTaskStopWatchRecord :
+					_testTaskStopWatchRecords) {
+
+				long duration = testTaskStopWatchRecord.getDuration();
+
+				if ((duration <= 0) || (duration >= _MAXIMUM_TEST_DURATION)) {
+					continue;
+				}
+
+				count++;
+				totalDuration += duration;
+			}
+
+			if (count == 0) {
+				return 0;
+			}
+
+			return totalDuration / count;
+		}
+
+		public int getTestTaskCount() {
+			return _testTaskStopWatchRecords.size();
+		}
+
+		public String getTestTaskName() {
+			return _testTaskName;
+		}
+
+		private final String _testTaskName;
+		private final List<StopWatchRecord> _testTaskStopWatchRecords =
+			new ArrayList<>();
 
 	}
 
