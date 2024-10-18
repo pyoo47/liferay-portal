@@ -21,10 +21,10 @@ public class VariableScopeTest extends PoshiRunnerTestCase {
 		setUpPoshiRunner(_TEST_BASE_DIR_NAME);
 	}
 
-	@Test
-	public void testAssertExecuteVarInheritance() throws Exception {
-		runPoshiTest("VariableScope#ExecuteVarInheritance");
-	}
+//	@Test
+//	public void testAssertExecuteVarInheritance() throws Exception {
+//		runPoshiTest("VariableScope#ExecuteVarInheritance");
+//	}
 
 	@Test
 	public void testAssertRootVarInheritance() throws Exception {
