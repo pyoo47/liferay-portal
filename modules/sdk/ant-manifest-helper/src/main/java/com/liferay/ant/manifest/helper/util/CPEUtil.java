@@ -18,34 +18,51 @@ import org.apache.tools.ant.Project;
 public class CPEUtil {
 
 	public static String getName(Project project) {
-		String patchVersion = "*";
-		String product = "portal";
-		String version =
-			ReleaseInfo.getVersion() +
-				project.getProperty("release.info.version.file.suffix");
+		try {
+			String patchVersion = "*";
+			String product = "portal";
 
-		if (ReleaseInfo.isDXP()) {
-			String versionDisplayName = ReleaseInfo.getVersionDisplayName();
+			String suffix = project.getProperty(
+				"release.info.version.file.suffix");
 
-			int index = versionDisplayName.lastIndexOf(StringPool.PERIOD);
+			System.out.println(
+				"DEBUG - release.info.version.file.suffix=" + suffix);
 
-			patchVersion = versionDisplayName.substring(index + 1);
+			String version =
+				ReleaseInfo.getVersion() +
+					project.getProperty("release.info.version.file.suffix");
 
-			if (patchVersion.endsWith(" LTS")) {
-				patchVersion = patchVersion.substring(
-					0, patchVersion.indexOf(" LTS"));
+			if (ReleaseInfo.isDXP()) {
+				String versionDisplayName = ReleaseInfo.getVersionDisplayName();
+
+				int index = versionDisplayName.lastIndexOf(StringPool.PERIOD);
+
+				patchVersion = versionDisplayName.substring(index + 1);
+
+				if (patchVersion.endsWith(" LTS")) {
+					patchVersion = patchVersion.substring(
+						0, patchVersion.indexOf(" LTS"));
+				}
+
+				product = "dxp";
+
+				version = versionDisplayName.substring(0, index);
+
+				version = version.toLowerCase();
 			}
 
-			product = "dxp";
-
-			version = versionDisplayName.substring(0, index);
-
-			version = version.toLowerCase();
+			return StringBundler.concat(
+				"cpe:2.3:a:liferay:", product, ":", version, ":", patchVersion,
+				":*:*:*:*:*:*");
 		}
+		catch (RuntimeException runtimeException) {
+			System.out.println(
+				"DEBUG - Runtime Exception " + runtimeException.getMessage());
 
-		return StringBundler.concat(
-			"cpe:2.3:a:liferay:", product, ":", version, ":", patchVersion,
-			":*:*:*:*:*:*");
+			runtimeException.printStackTrace();
+
+			throw runtimeException;
+		}
 	}
 
 }
