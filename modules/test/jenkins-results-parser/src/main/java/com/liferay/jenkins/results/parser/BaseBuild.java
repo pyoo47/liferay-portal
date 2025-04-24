@@ -437,24 +437,26 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public String getConsoleText() {
-		String archiveFileContent = getArchiveFileContent("consoleText");
+		synchronized (_invocations) {
+			String archiveFileContent = getArchiveFileContent("consoleText");
 
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(archiveFileContent)) {
-			return archiveFileContent;
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(archiveFileContent)) {
+				return archiveFileContent;
+			}
+
+			String buildURL = getBuildURL();
+
+			if (buildURL == null) {
+				return "";
+			}
+
+			if (_jenkinsConsoleTextLoader == null) {
+				_jenkinsConsoleTextLoader = new JenkinsConsoleTextLoader(
+					getBuildURL(), this instanceof TopLevelBuild);
+			}
+
+			return _jenkinsConsoleTextLoader.getConsoleText();
 		}
-
-		String buildURL = getBuildURL();
-
-		if (buildURL == null) {
-			return "";
-		}
-
-		if (_jenkinsConsoleTextLoader == null) {
-			_jenkinsConsoleTextLoader = new JenkinsConsoleTextLoader(
-				getBuildURL(), this instanceof TopLevelBuild);
-		}
-
-		return _jenkinsConsoleTextLoader.getConsoleText();
 	}
 
 	@Override
