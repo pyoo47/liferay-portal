@@ -3854,9 +3854,13 @@ information. Make sure to commit in all build-lib-versions results.
 
 	<target name="dist-jdk7">
 		<antcall target="setup-libs" />
+
 		<antcall target="setup-yarn" />
+
 		<antcall target="compile" />
+
 		<antcall target="install-portal-snapshots" />
+
 		<parallel threadCount="1" timeout="7200000">
 			<prepare-test-build-dist
 				app.server.type="${axis.variable}"
