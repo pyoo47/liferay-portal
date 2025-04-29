@@ -1186,11 +1186,7 @@ app.server.type=@{app.server.type}]]></echo>
 		<attribute default="true" name="setup.testable.tomcat" />
 
 		<sequential>
-			<antcall inheritAll="false" target="setup-libs" />
-
 			<antcall inheritAll="false" target="setup-sdk" />
-
-			<antcall inheritAll="false" target="setup-yarn" />
 
 			<execute>
 				tar --extract --verbose --gzip --file=liferay-portal-source.tar.gz
@@ -1244,8 +1240,6 @@ app.server.type=@{app.server.type}]]></echo>
 					</then>
 				</elseif>
 			</if>
-
-			<antcall inheritAll="false" target="install-portal-snapshots" />
 
 			<echo if:set="env.JENKINS_HOME">ANT_OPTS=${env.ANT_OPTS}</echo>
 
