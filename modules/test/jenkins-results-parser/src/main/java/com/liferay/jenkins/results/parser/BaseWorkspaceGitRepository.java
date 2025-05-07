@@ -6,6 +6,7 @@
 package com.liferay.jenkins.results.parser;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
@@ -782,6 +783,11 @@ public abstract class BaseWorkspaceGitRepository
 			CloudBucketUtil.copyS3File(
 				gitArchiveFile.getCanonicalPath(),
 				_getGitArchiveS3BucketPath());
+
+			Files.move(
+				getDirectory(),
+				new File(
+					baseRepositoryDir + "/" + getDirectoryName() + "-tmp"));
 
 			JenkinsResultsParserUtil.unzip(
 				new File(baseRepositoryDir, _getGitArchiveName()),
