@@ -9766,7 +9766,7 @@ information. Make sure to commit in all build services results.
 					<zipentry name="META-INF/MANIFEST.MF" zipfile="tools/sdk/dependencies/com.liferay.source.formatter/lib/com.liferay.source.formatter.jar" />
 				</loadproperties>
 
-				<echo>Running com.liferay.source.formatter.jar ${Bundle-Version}.</echo>
+				<echo>PDY: Running com.liferay.source.formatter.jar ${Bundle-Version}.</echo>
 
 				<ant dir="portal-impl" target="format-source-all">
 					<property name="source.auto.fix" value="false" />
@@ -9817,6 +9817,12 @@ information. Make sure to commit in all build services results.
 						<antcall target="setup-yarn" />
 					</else>
 				</if>
+
+				<loadproperties>
+					<zipentry name="META-INF/MANIFEST.MF" zipfile="tools/sdk/dependencies/com.liferay.source.formatter/lib/com.liferay.source.formatter.jar" />
+				</loadproperties>
+
+				<echo>PDY: Running com.liferay.source.formatter.jar ${Bundle-Version}.</echo>
 
 				<if>
 					<or>
