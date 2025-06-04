@@ -72,9 +72,20 @@
 			users.reminder.queries.custom.question.enabled=false
 			web.server.https.port=8443]]></echo>
 
-		<exec dir="${tck.home}/.." executable="git" failonerror="true">
-			<arg value="stash" />
-		</exec>
+		<if>
+			<and>
+				<isset property="env.MASTER_NETWORK_NAME" />
+				<or>
+					<equals arg1="${env.MASTER_NETWORK_NAME}" arg2="nuc-network" />
+					<equals arg1="${env.MASTER_NETWORK_NAME}" arg2="cloud-network" />
+				</or>
+			</and>
+			<then>
+				<exec dir="${tck.home}/.." executable="git" failonerror="true">
+					<arg value="stash" />
+				</exec>
+			</then>
+		</if>
 
 		<exec dir="${tck.home}/.." executable="mvn" failonerror="true">
 			<arg value="-Dmaven.javadoc.skip=true" />
