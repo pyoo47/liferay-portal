@@ -1,7 +1,7 @@
 # Caylent :: Liferay 
 
     Working on branch:
-    master-ci-6005-postgresq
+    master-ci-6005-postgresql
 
     ci-mvp-process/SampleApp_01/Jenkinsfile
 
