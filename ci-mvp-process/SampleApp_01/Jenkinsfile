@@ -27,7 +27,7 @@ spec:
     stage('Build with Maven') {
       steps {
         container('maven') {
-          dir('ci-mvp-process/SampleApp_01') {
+          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
             sh 'mvn -B package'
           }
         }
@@ -37,7 +37,7 @@ spec:
     stage('Run tests') {
       steps {
         container('maven') {
-          dir('ci-mvp-process/SampleApp_01') {
+          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
             sh 'mvn -B test'
           }
         }
@@ -48,7 +48,7 @@ spec:
   post {
     always {
       container('maven') {
-        dir('ci-mvp-process/SampleApp_01') {
+        dir('liferay-portal/ci-mvp-process/SampleApp_01') {
           junit '**/target/surefire-reports/*.xml'
         }
       }
