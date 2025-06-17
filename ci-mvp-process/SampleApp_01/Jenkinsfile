@@ -1,0 +1,58 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+    - name: maven
+      image: maven:3.9.6-eclipse-temurin-11
+      command:
+        - cat
+      tty: true
+"""
+    }
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        container('maven') {
+          git credentialsId: 'github-token-liferay-eks-mvp', url: 'https://github.com/caylent/Liferay-eks-mvp.git', branch: 'main'
+        }
+      }
+    }
+
+    stage('Build with Maven') {
+      steps {
+        container('maven') {
+          dir('ci-mod-process/SampleApp_01') {
+            sh 'mvn -B package'
+          }
+        }
+      }
+    }
+
+    stage('Run tests') {
+      steps {
+        container('maven') {
+          dir('ci-mod-process/SampleApp_01') {
+            sh 'mvn -B test'
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      container('maven') {
+        dir('ci-mod-process/SampleApp_01') {
+          junit '**/target/surefire-reports/*.xml'
+        }
+      }
+    }
+  }
+}
+
