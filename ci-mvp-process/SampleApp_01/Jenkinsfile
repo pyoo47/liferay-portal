@@ -29,7 +29,7 @@ spec:
     }
     */
 
-    stage('Build with Maven') {
+    stage('Validate directory structure') {
       steps {
         container('maven') {
           dir('liferay-portal/') {
@@ -72,6 +72,10 @@ spec:
         dir('liferay-portal/ci-mvp-process/SampleApp_01') {
           junit '**/target/surefire-reports/*.xml'
         }
+      }
+
+      container('maven') {
+        sh 'sleep 900' // Gives you 15 minutes to exec into the container
       }
     }
   }
