@@ -19,7 +19,7 @@ spec:
     stage('Checkout') {
       steps {
         container('maven') {
-          git credentialsId: 'github-token-liferay-eks-mvp', url: 'https://github.com/caylent/Liferay-eks-mvp.git', branch: 'main'
+          git credentialsId: 'github-pat-pei', url: 'https://github.com/caylent/Liferay-eks-mvp.git', branch: 'main'
         }
       }
     }

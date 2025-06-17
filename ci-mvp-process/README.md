@@ -3,6 +3,8 @@
     Working on branch:
     master-ci-6005-postgresq
 
+    ci-mvp-process/SampleApp_01/Jenkinsfile
+
 # Liferay-eks-mvp
 
 ## AWS Sandbox Tagging - Liferay
