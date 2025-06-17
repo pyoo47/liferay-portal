@@ -6,7 +6,7 @@ public class App {
 
         System.out.println("This goes through GitHub Actions to EKS.");
 
-        String myCommitNro = "01";
+        String myCommitNro = "02";
 
         System.out.println("This is the push " + myCommitNro + " in Master branch commit to GitHub.");
     }
