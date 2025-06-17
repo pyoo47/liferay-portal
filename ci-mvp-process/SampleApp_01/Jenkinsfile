@@ -32,7 +32,21 @@ spec:
     stage('Build with Maven') {
       steps {
         container('maven') {
+          dir('liferay-portal/') {
+            sh 'ls -al'
+          }
+          dir('liferay-portal/ci-mvp-process/') {
+            sh 'ls -al'
+          }
+        }
+      }
+    }
+
+    stage('Build with Maven') {
+      steps {
+        container('maven') {
           dir('liferay-portal/ci-mvp-process/SampleApp_01') {
+            sh 'ls -al'
             sh 'mvn -B package'
           }
         }
