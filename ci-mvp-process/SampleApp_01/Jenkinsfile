@@ -17,17 +17,19 @@ spec:
 
   stages {
 
-    /*
+    
     stage('Checkout') {
       steps {
         container('maven') {
-          git credentialsId: 'github-pat-pei', 
-                        url: 'https://github.com/pablo-inchausti-caylent/liferay-portal.git', 
-                     branch: 'master-ci-6005-postgresql'
+          dir('liferay-portal') {
+            git credentialsId: 'github-pat-pei', 
+                url: 'https://github.com/pablo-inchausti-caylent/liferay-portal.git', 
+                branch: 'master-ci-6005-postgresql'
+          }
         }
       }
     }
-    */
+    
 
     stage('Validate directory structure') {
       steps {
@@ -62,7 +64,7 @@ spec:
         }
       }
     }
-    
+
   }
 
 
@@ -76,7 +78,7 @@ spec:
       }
 
       container('maven') {
-        sh 'sleep 900' // Gives you 15 minutes to exec into the container
+        // sh 'sleep 900' // Gives you 15 minutes to exec into the container
       }
     }
   }
