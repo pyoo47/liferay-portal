@@ -11,7 +11,7 @@ pipeline {
           command:
           - sleep
           args:
-          - "60"
+          - "900"
       """
     }
   }
