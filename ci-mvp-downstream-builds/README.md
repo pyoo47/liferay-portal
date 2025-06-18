@@ -3,7 +3,7 @@
     Working on branch:
     master-ci-6005-postgresql
 
-    ci-mvp-upstream-builds/SampleApp_01/Jenkinsfile
+    ci-mvp-downstream-builds/Jenkinsfile
 
 # Liferay-eks-mvp
 
