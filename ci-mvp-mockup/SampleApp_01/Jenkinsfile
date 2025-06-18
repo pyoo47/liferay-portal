@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   stages {
-    stage('Trigger Upstreams') {
+    stage('Trigger Upstreams Builds ') {
       parallel {
         stage('Upstream 1') {
           steps {
