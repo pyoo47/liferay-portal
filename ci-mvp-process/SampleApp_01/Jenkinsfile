@@ -110,7 +110,9 @@ spec:
                 kubectl apply -f ${env.LIFERAY_RUNNER_STACK} -n liferay-jenkins
 
                 echo "📦 Get Into Liferay Runner Stack... 2"
-                kubectl exec -it liferay-runner-pod -n liferay-jenkins -c runner -- bash
+                kubectl exec liferay-runner-pod -n liferay-jenkins -c runner -- bash -c "kubectl get pods -A"
+
+                
             '''
           }
         }
