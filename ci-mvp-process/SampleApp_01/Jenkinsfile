@@ -98,6 +98,24 @@ spec:
       }
     }
     
+    stage('EFS Validation') {
+      steps {
+
+          sh 'ls -al'
+          sh 'echo "Hello from the agent container"'
+
+          sh '''
+            df -h
+            echo "🔍 Checking EFS mount at /home/jenkins/agent"
+            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+            echo "📄 Writing test file to EFS..."
+            date > /home/jenkins/agent/test-efs-bundle-$(date +%s).txt
+            ls -al /home/jenkins/agent
+          '''
+    
+      }
+    }
+
     stage('Run Kubectl - like docker compose v3 ') {
       steps {
         container('runner') {
@@ -116,9 +134,12 @@ spec:
                 kubectl exec liferay-runner-pod -n liferay-jenkins -c runner \
                     -- bash -c \"
                         kubectl get pods -A
+
+// build de bundle ... 
+
                       \"
             """
-            
+
           }
         }
       }
@@ -133,6 +154,59 @@ spec:
 
 
 }
+
+
+/*
+
+Build de Bundle
+	mkdir -p /opt/dev/projects/github
+
+	cd /opt/dev/projects/github
+
+
+	git clone --depth 1 --no-tags --quiet -b master-ci-6005-postgresql git@github.com:michaelhashimoto/liferay-portal.git
+	git clone --depth 1 --no-tags --quiet -b master git@github.com:liferay/liferay-jenkins-ee.git
+
+
+	cd /opt/dev/projects/github/liferay-portal
+
+	git clean -dfx
+
+	echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.${HOSTNAME}.properties
+
+	echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.${HOSTNAME}.properties
+	echo "mirrors.hostname=" >> build.${HOSTNAME}.properties
+
+	echo "java.jdk.default.runtime.version=jdk21" > test.${HOSTNAME}.properties
+
+	ant setup-profile-dxp
+
+	ant -f build-test-batch.xml dist-jdk7 -Daxis.variable=tomcat
+
+
+
+# COPY TO EFS 
+
+cp \ 
+/opt/dev/projects/github/liferay-portal/liferay-portal-bundle-tomcat.tar.gz \
+/home/jenkins/agent/
+
+cp \
+	/opt/dev/projects/github/liferay-portal/liferay-portal-source.tar.gz \
+	/home/jenkins/agent/
+
+	aws s3 cp --no-progress \
+		/opt/dev/projects/github/liferay-portal/liferay-portal-bundle-tomcat.tar.gz \
+		s3://liferayci-file-propagator/caylent/builds/[number]/liferay-portal-bundle-tomcat.tar.gz
+
+
+	aws s3 cp --no-progress \
+		/opt/dev/projects/github/liferay-portal/liferay-portal-source.tar.gz \
+		s3://liferayci-file-propagator/caylent/builds/[number]/liferay-portal-source.tar.gz
+
+
+
+*/
 
 
 /*
