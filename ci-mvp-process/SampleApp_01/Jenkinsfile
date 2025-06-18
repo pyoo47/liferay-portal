@@ -26,7 +26,7 @@ spec:
     AWS_ACCOUNT_ID='300374333822'
     AWS_REGION='us-east-2'
 
-    COMPOSE_FILE = '02-docker-compose.yaml'
+    LIFERAY_RUNNER_STACK = 'liferay-runner-stack.yaml'
 
   }
 
@@ -105,8 +105,11 @@ spec:
             echo '📦 Running Stacks with Kubectl ...'  
             sh '''
                 ls -la
-                kubectl apply -f liferay-runner-stack.yaml -n liferay-jenkins
 
+                echo "📦 Applying Liferay Runner Stack... 1"
+                kubectl apply -f ${env.LIFERAY_RUNNER_STACK} -n liferay-jenkins
+
+                echo "📦 Get Into Liferay Runner Stack... 2"
                 kubectl exec -it liferay-runner-pod -n liferay-jenkins -c runner -- bash
             '''
           }
