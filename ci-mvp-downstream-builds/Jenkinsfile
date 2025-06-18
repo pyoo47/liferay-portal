@@ -20,6 +20,14 @@ spec:
     }
   }
 
+  environment {
+    GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
+    GIT_BRANCH   = 'master-ci-6005-postgresql'
+
+    AWS_ACCOUNT_ID='300374333822'
+    AWS_REGION='us-east-2'
+    
+  }
 
   options {
     skipDefaultCheckout()
@@ -27,6 +35,37 @@ spec:
 
 
   stages {
+
+    stage('Print Environment') {
+      steps {
+        script {
+          echo "Branch: ${env.BRANCH_NAME}"
+          echo "Job Name: ${env.JOB_NAME}"
+          echo "Build Number: ${env.BUILD_NUMBER}"
+          echo "Workspace: ${env.WORKSPACE}"
+          echo "Git Commit: ${env.GIT_COMMIT}"
+        }
+      }
+    }
+
+    stage('Checkout Shallow') {
+      steps {
+        container('runner') {
+          checkout([
+            $class: 'GitSCM',
+            branches: [[name: "*/${env.GIT_BRANCH}"]],
+            userRemoteConfigs: [[
+              url: "${env.GIT_REPO_URL}",
+              credentialsId: 'github-pat-pei'
+            ]],
+            extensions: [
+              [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+            ]
+          ])
+        }
+      }
+    }
+    
     stage('Trigger Downstream Build ') {
       parallel {
         stage('Downstream Build 1') {
