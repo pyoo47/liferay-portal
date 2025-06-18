@@ -1,42 +1,21 @@
-# Caylent :: Liferay 
+# Caylent :: Liferay Mockup
 
     Working on branch:
     master-ci-6005-postgresql
 
-    ci-mvp-process/SampleApp_01/Jenkinsfile
+    ci-mvp-mockup/SampleApp_01/Jenkinsfile
 
 # Liferay-eks-mvp
 
-## AWS Sandbox Tagging - Liferay
+- Mockup 
 
-Tag the workloads to get the credits from Liferay MAP program:
+    with real integration integration to
 
-- Tag: map-migrated
-- Value: migJJYVOZAD8H
+    - SCM lifetay-portal (this repo) - branch master-ci-6005-postgresql
 
-Tag infrastructure with caylent:customer, if this infrastructure is for customer testing
-
-- caylent:owner     : (required) - caylent.com email
-- caylent:customer  :  Liferay, Inc
-- caylent:project   :  Liferay CI Process Modernization
-
-About the MVP:
-
-- caylent:workload  :  EKS Liferay Mvp
-- caylent:workload  :  EKS Liferay Config
-- caylent:workload  :  Jenkins on EKS
-- caylent:workload  :  Github Actions with EKS
-
-
-## AWS Sandbox Tagging - Summary
-
-master-ci-6005-postgresq
-
-    caylent:owner: pablo.inchausti@caylent.com
-    caylent:project: Liferay CI Process Modernization
-    caylent:workload: EKS Liferay Mvp
-    map-migrated: migJJYVOZAD8H
-
-## Recomendation
-
-- Switch to us-east-2 (Ohio) region, as it is consistently cheaper than us-east-1 for many spot instance types.
+    - EFS - Elasti File System
+    - ECR - Elastic Container Registry docker runners
+    - Downstream  Pipelines
+    
+    - S3 copy
+    
