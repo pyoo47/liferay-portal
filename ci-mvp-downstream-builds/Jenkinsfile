@@ -27,21 +27,21 @@ spec:
 
 
   stages {
-    stage('Trigger Upstreams Builds ') {
+    stage('Trigger Downstream Build ') {
       parallel {
-        stage('Upstream 1') {
+        stage('Downstream Build 1') {
           steps {
-            build job: 'SampleApp_01/upstream-job-1/master-ci-6005-postgresql', wait: true
+            build job: 'downstream-builds-1', wait: true
           }
         }
-        stage('Upstream 2') {
+        stage('Downstream Build 2') {
           steps {
-            build job: 'SampleApp_01/upstream-job-2/master-ci-6005-postgresql', wait: true
+            build job: 'downstream-builds-2', wait: true
           }
         }
-        stage('Upstream 3') {
+        stage('Downstream Build 3') {
           steps {
-            build job: 'SampleApp_01/upstream-job-3/master-ci-6005-postgresql', wait: true
+            build job: 'downstream-builds-3', wait: true
           }
         }
       }
@@ -49,7 +49,7 @@ spec:
 
     stage('Continue PoC') {
       steps {
-        echo '✅ All upstream jobs done. Proceeding with PoC...'
+        echo '✅ All Downstream Build jobs done. Proceeding with PoC...'
       }
     }
   }
@@ -57,10 +57,10 @@ spec:
 
 
 /*
-This Jenkinsfile is designed to trigger multiple upstream jobs in parallel.
-Each upstream job is executed in its own stage, allowing for concurrent execution.
-And the Wait option is set to true, ensuring that the pipeline waits for each upstream job to complete before proceeding.
+This Jenkinsfile is designed to trigger multiple Downstream Build jobs in parallel.
+Each Downstream Build job is executed in its own stage, allowing for concurrent execution.
+And the Wait option is set to true, ensuring that the pipeline waits for each Downstream Build job to complete before proceeding.
 This is useful for scenarios where you have multiple independent jobs that can run simultaneously, improving overall pipeline efficiency.
-After all upstream jobs are completed, the pipeline proceeds to the next stage, which can be used for further processing or deployment steps.
-This structure allows for a clear and organized approach to managing multiple upstream jobs within a single pipeline, making it easier to maintain and understand the flow of the CI/CD process.
+After all Downstream Build jobs are completed, the pipeline proceeds to the next stage, which can be used for further processing or deployment steps.
+This structure allows for a clear and organized approach to managing multiple Downstream Build jobs within a single pipeline, making it easier to maintain and understand the flow of the CI/CD process.
 */
