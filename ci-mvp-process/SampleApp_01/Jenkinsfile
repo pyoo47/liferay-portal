@@ -1,15 +1,55 @@
 pipeline {
-  agent any
+
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+    - name: maven
+      image: maven:3.9.6-eclipse-temurin-11
+      command:
+        - cat
+      tty: true
+"""
+    }
+  }
+
+  environment {
+    GIT_REPO_URL = 'https://github.com/your-org/your-repo.git'
+    GIT_BRANCH   = 'master-ci-6005-postgresql'
+  }
+  
+  options {
+    skipDefaultCheckout()
+  }
+
   stages {
-    stage('Init') {
+
+    stage('Checkout Shallow') {
       steps {
-        script {
-          // Load the helper from sibling folder
-          def envHelper = load '../jenkins-lib/prepareEnv.groovy'
-          envHelper.run('qa')
-        }
+        checkout([
+          $class: 'GitSCM',
+          branches: [[name: "*/${env.GIT_BRANCH}"]],
+          userRemoteConfigs: [[
+            url: "${env.GIT_REPO_URL}",
+            credentialsId: 'github-pat-pei'
+          ]],
+          extensions: [
+            [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+          ]
+        ])
+      }
+    }
+
+    stage('Print Files') {
+      steps {
+        sh 'ls -al'
       }
     }
   }
+
+
 }
 
