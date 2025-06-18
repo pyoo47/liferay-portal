@@ -23,6 +23,8 @@ spec:
     AWS_ACCOUNT_ID='300374333822'
     AWS_REGION='us-east-2'
 
+    COMPOSE_FILE = '02-docker-compose.yaml'
+
   }
 
   options {
@@ -52,10 +54,14 @@ spec:
     stage('ECR Login') {
       steps {
 
-    sh '''
-      aws ecr get-login-password --region "$AWS_REGION" | \
-        docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
-    '''
+        container('maven') {
+            sh '''
+              aws ecr get-login-password --region "$AWS_REGION" | \
+                docker login --username AWS \
+                        --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+            '''
+          
+        }
     
       }
     }
