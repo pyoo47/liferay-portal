@@ -1,28 +1,13 @@
-pipeline {
-  agent {
-    kubernetes {
-      yaml """
-      apiVersion: v1
-      kind: Pod
-      spec:
-        containers:
-        - name: busybox
-          image: busybox
-          command:
-          - sleep
-          args:
-          - "900"
-      """
-    }
-  }
-  stages {
-    stage('Test') {
-      steps {
-        container('busybox') {
-          sh 'echo Hello from agent && sleep 900'
-        }
-      }
-    }
-  }
-}
+// Load the helper from sibling folder
+def envHelper = load '../jenkins-lib/prepareEnv.groovy'
 
+pipeline {
+    agent any
+    stages {
+        stage('Init') {
+            steps {
+                envHelper.run('qa')  // call from jenkins-lib
+            }
+        }
+    }
+}
