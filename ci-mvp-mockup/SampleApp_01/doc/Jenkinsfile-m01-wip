@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   stages {
-    stage('Trigger Upstreams') {
+    stage('Trigger Upstreams Builds ') {
       parallel {
         stage('Upstream 1') {
           steps {
@@ -29,3 +29,14 @@ pipeline {
     }
   }
 }
+
+
+/*
+This Jenkinsfile is designed to trigger multiple upstream jobs in parallel.
+Each upstream job is executed in its own stage, allowing for concurrent execution.
+And the Wait option is set to true, ensuring that the pipeline waits for each upstream job to complete before proceeding.
+This is useful for scenarios where you have multiple independent jobs that can run simultaneously, improving overall pipeline efficiency.
+After all upstream jobs are completed, the pipeline proceeds to the next stage, which can be used for further processing or deployment steps.
+This structure allows for a clear and organized approach to managing multiple upstream jobs within a single pipeline, making it easier to maintain and understand the flow of the CI/CD process.
+*/
+
