@@ -31,17 +31,17 @@ spec:
       parallel {
         stage('Upstream 1') {
           steps {
-            build job: 'upstream-job-1', wait: true
+            build job: 'SampleApp_01/upstream-job-1/master-ci-6005-postgresql', wait: true
           }
         }
         stage('Upstream 2') {
           steps {
-            build job: 'upstream-job-2', wait: true
+            build job: 'SampleApp_01/upstream-job-2/master-ci-6005-postgresql', wait: true
           }
         }
         stage('Upstream 3') {
           steps {
-            build job: 'upstream-job-3', wait: true
+            build job: 'SampleApp_01/upstream-job-3/master-ci-6005-postgresql', wait: true
           }
         }
       }
