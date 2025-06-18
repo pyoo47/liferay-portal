@@ -105,6 +105,9 @@ spec:
 /*
 This Jenkinsfile run ok, and fast *(shallow clone)*, depth --1
 
+I'm using the 'checkout' step instead of 'git' step, because this
+is the way to have a shallow clone with depth 1 in a declarative pipeline.
+
 Whe have a clone with depth 1, and the files are in the workspace.
 The files are in the workspace, and we can run maven commands.
 

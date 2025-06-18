@@ -27,72 +27,21 @@ spec:
 
   stages {
 
-    stage('Checkout Shallow') {
+    stage('sh Commands in the agent') {
       steps {
 
-          checkout([
-            $class: 'GitSCM',
-            branches: [[name: "*/${env.GIT_BRANCH}"]],
-            userRemoteConfigs: [[
-              url: "${env.GIT_REPO_URL}",
-              credentialsId: 'github-pat-pei'
-            ]],
-            extensions: [
-              [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            ]
-          ])
+          sh 'ls -al'
         
       }
     }
 
   
 
-    stage('Build with Maven') {
-      steps {
-        container('maven') {
-          dir('ci-mvp-process/SampleApp_01') {
-            sh 'ls -al'
-            sh 'mvn -B package'
-          }
-        }
-      }
-    }
-
-    stage('Run tests') {
-      steps {
-        container('maven') {
-          dir('ci-mvp-process/SampleApp_01') {
-            sh 'mvn -B test'
-          }
-        }
-      }
-    }
+    
 
 
   }
 
 
-  post {
-    always {
-      container('maven') {
-        dir('ci-mvp-process/SampleApp_01') {
-          junit '**/target/surefire-reports/*.xml'
-        }
-      }
-    }
-  }
 
 }
-
-/*
-This Jenkinsfile run ok, and fast *(shallow clone)*, depth --1
-
-Whe have a clone with depth 1, and the files are in the workspace.
-The files are in the workspace, and we can run maven commands.
-
-Keep in mindt that the files are in the workspace,
-in ci-mvp-process/SampleApp_01/Jenkinsfile-wip:
-
-checkout scm don't create the directory 'liferay-portal'
-it create directly ci-mvp-process/SampleApp_01,
- */
