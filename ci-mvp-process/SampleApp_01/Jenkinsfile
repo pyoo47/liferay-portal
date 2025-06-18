@@ -31,6 +31,10 @@ spec:
       steps {
 
           sh 'ls -al'
+          sh 'echo "Hello from the agent container"'
+          sh 'pwd'
+          sh 'mount | grep efs || echo "EFS not mounted"'
+          sh 'df -h'
         
       }
     }
