@@ -4,7 +4,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.liferay</groupId>
-  <artifactId>sample-java-app-01</artifactId>
+  <artifactId>mockup-java-app-01</artifactId>
   <version>1.0.0</version>
 
   <properties>

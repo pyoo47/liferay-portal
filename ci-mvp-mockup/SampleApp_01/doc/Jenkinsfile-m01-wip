@@ -1,0 +1,31 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Trigger Upstreams') {
+      parallel {
+        stage('Upstream 1') {
+          steps {
+            build job: 'upstream-job-1', wait: true
+          }
+        }
+        stage('Upstream 2') {
+          steps {
+            build job: 'upstream-job-2', wait: true
+          }
+        }
+        stage('Upstream 3') {
+          steps {
+            build job: 'upstream-job-3', wait: true
+          }
+        }
+      }
+    }
+
+    stage('Continue PoC') {
+      steps {
+        echo '✅ All upstream jobs done. Proceeding with PoC...'
+      }
+    }
+  }
+}
