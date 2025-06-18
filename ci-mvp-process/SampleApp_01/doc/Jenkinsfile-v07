@@ -37,21 +37,6 @@ spec:
   stages {
 
 
-    stage('Print Environment') {
-      steps {
-        script {
-          // Print some common Jenkins env vars
-          echo "Branch: ${env.BRANCH_NAME}"
-          echo "Job Name: ${env.JOB_NAME}"
-          echo "Build Number: ${env.BUILD_NUMBER}"
-          echo "Workspace: ${env.WORKSPACE}"
-          echo "Git Commit: ${env.GIT_COMMIT}"
-        }
-        // Or print everything
-        sh 'printenv'
-      }
-    }
-
     stage('Install AWS CLI and Test IRSA (optional) ') {
       steps {
         container('runner') {
