@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liferay-runner-stack
+  namespace: liferay-jenkins
+spec:
+  containers:
+    - name: runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      tty: true
+      command: ["/bin/bash"]
+      hostname: runner
+
+    - name: test1
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      tty: true
+      command: ["/bin/bash"]
+      hostname: test1
+
+    - name: test2
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      tty: true
+      command: ["/bin/bash"]
+      hostname: test2
+
+    - name: test3
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      tty: true
+      command: ["/bin/bash"]
+      hostname: test3
+
+    - name: postgresql
+      image: postgres:16.3-bullseye
+      tty: true
+      env:
+        - name: POSTGRES_USER
+          value: "root"
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: "trust"
+      hostname: postgresql
+
+    - name: mysql
+      image: mysql:8.4.4
+      tty: true
+      command:
+        - "--character-set-server=utf8"
+        - "--connect_timeout=120"
+        - "--max_allowed_packet=104857600"
+        - "--wait_timeout=1200"
+        - "--tls-version=TLSv1.2"
+      env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "yes"
+      hostname: mysql
+      securityContext:
+        privileged: true
+
+  restartPolicy: Never
+
+  
