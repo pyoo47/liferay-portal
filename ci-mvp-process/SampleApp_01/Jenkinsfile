@@ -48,7 +48,7 @@ spec:
           echo "Git Commit: ${env.GIT_COMMIT}"
         }
         // Or print everything
-        sh 'printenv'
+        // sh 'printenv'
       }
     }
 
@@ -94,7 +94,7 @@ spec:
       }
     }
     
-    stage('Run Kubectl - like docker compose  ') {
+    stage('Run Kubectl - like docker compose v2 ') {
       steps {
 
         dir('ci-mvp-process/') {
