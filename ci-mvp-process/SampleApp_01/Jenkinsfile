@@ -102,18 +102,23 @@ spec:
       steps {
         container('runner') {
           dir('ci-mvp-process/') {
-            echo '📦 Running Stacks with Kubectl ...'  
-            sh '''
+
+
+
+            sh """
+                echo '📦 Running Stacks with Kubectl ...'
                 ls -la
 
                 echo "📦 Applying Liferay Runner Stack... 1"
                 kubectl apply -f ${env.LIFERAY_RUNNER_STACK} -n liferay-jenkins
 
                 echo "📦 Get Into Liferay Runner Stack... 2"
-                kubectl exec liferay-runner-pod -n liferay-jenkins -c runner -- bash -c "kubectl get pods -A"
-
-                
-            '''
+                kubectl exec liferay-runner-pod -n liferay-jenkins -c runner \
+                    -- bash -c \"
+                        kubectl get pods -A
+                      \"
+            """
+            
           }
         }
       }
