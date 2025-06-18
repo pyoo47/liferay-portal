@@ -8,7 +8,7 @@ pipeline {
   spec:
     containers:
       - name: runner
-        image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.2
+        image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.3
         command:
           - cat
         tty: true
