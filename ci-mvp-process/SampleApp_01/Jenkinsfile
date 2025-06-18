@@ -17,18 +17,52 @@ spec:
 
   stages {
 
+
+    stage('Print Environment') {
+      steps {
+        script {
+          // Print some common Jenkins env vars
+          echo "Branch: ${env.BRANCH_NAME}"
+          echo "Job Name: ${env.JOB_NAME}"
+          echo "Build Number: ${env.BUILD_NUMBER}"
+          echo "Workspace: ${env.WORKSPACE}"
+          echo "Git Commit: ${env.GIT_COMMIT}"
+        }
+        // Or print everything
+        sh 'printenv'
+      }
+    }
     
+
+    stage('Checkout') {
+      steps {
+        container('maven') {
+          dir('liferay-portal') {
+            // Manual git clone with depth 1
+            sh """
+              git init
+              git remote add origin https://github.com/pablo-inchausti-caylent/liferay-portal.git
+              git fetch --depth=1 origin ${env.BRANCH_NAME}
+              git checkout FETCH_HEAD
+            """
+          }
+        }
+      }
+    }
+
+    /*    
     stage('Checkout') {
       steps {
         container('maven') {
           dir('liferay-portal') {
             git credentialsId: 'github-pat-pei', 
                 url: 'https://github.com/pablo-inchausti-caylent/liferay-portal.git', 
-                branch: 'master-ci-6005-postgresql'
+                branch: ${env.BRANCH_NAME}
           }
         }
       }
     }
+    */
     
 
     stage('Validate directory structure') {
@@ -75,10 +109,6 @@ spec:
         dir('liferay-portal/ci-mvp-process/SampleApp_01') {
           junit '**/target/surefire-reports/*.xml'
         }
-      }
-
-      container('maven') {
-        // sh 'sleep 900' // Gives you 15 minutes to exec into the container
       }
     }
   }
