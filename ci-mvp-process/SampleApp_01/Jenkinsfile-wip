@@ -1,0 +1,116 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+    - name: maven
+      image: maven:3.9.6-eclipse-temurin-11
+      command:
+        - cat
+      tty: true
+"""
+    }
+  }
+
+  stages {
+
+
+    stage('Print Environment') {
+      steps {
+        script {
+          // Print some common Jenkins env vars
+          echo "Branch: ${env.BRANCH_NAME}"
+          echo "Job Name: ${env.JOB_NAME}"
+          echo "Build Number: ${env.BUILD_NUMBER}"
+          echo "Workspace: ${env.WORKSPACE}"
+          echo "Git Commit: ${env.GIT_COMMIT}"
+        }
+        // Or print everything
+        sh 'printenv'
+      }
+    }
+    
+
+    stage('Checkout') {
+      steps {
+        container('maven') {
+          dir('liferay-portal') {
+            // Manual git clone with depth 1
+            sh """
+              git init
+              git remote add origin https://github.com/pablo-inchausti-caylent/liferay-portal.git
+              git fetch --depth=1 origin ${env.BRANCH_NAME}
+              git checkout FETCH_HEAD
+            """
+          }
+        }
+      }
+    }
+
+    /*    
+    stage('Checkout') {
+      steps {
+        container('maven') {
+          dir('liferay-portal') {
+            git credentialsId: 'github-pat-pei', 
+                url: 'https://github.com/pablo-inchausti-caylent/liferay-portal.git', 
+                branch: ${env.BRANCH_NAME}
+          }
+        }
+      }
+    }
+    */
+    
+
+    stage('Validate directory structure') {
+      steps {
+        container('maven') {
+          dir('liferay-portal/') {
+            sh 'ls -al'
+          }
+          dir('liferay-portal/ci-mvp-process/') {
+            sh 'ls -al'
+          }
+        }
+      }
+    }
+
+    stage('Build with Maven') {
+      steps {
+        container('maven') {
+          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
+            sh 'ls -al'
+            sh 'mvn -B package'
+          }
+        }
+      }
+    }
+
+    stage('Run tests') {
+      steps {
+        container('maven') {
+          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
+            sh 'mvn -B test'
+          }
+        }
+      }
+    }
+
+  }
+
+
+
+  post {
+    always {
+      container('maven') {
+        dir('liferay-portal/ci-mvp-process/SampleApp_01') {
+          junit '**/target/surefire-reports/*.xml'
+        }
+      }
+    }
+  }
+}
+
