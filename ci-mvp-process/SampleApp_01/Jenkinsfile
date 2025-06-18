@@ -39,6 +39,7 @@ spec:
             ./aws/install || echo "✅ AWS CLI may already be installed"
             aws --version || true 
             aws sts get-caller-identity || echo "❌ AWS CLI not configured or IRSA not working"
+            aws s3 ls || echo "❌ AWS CLI S3 (IRSA) access not working"
           '''
         }
       }
