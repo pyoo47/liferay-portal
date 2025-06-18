@@ -36,7 +36,7 @@ pipeline {
 
     stage('Install AWS CLI and Test IRSA (optional) ') {
       steps {
-        container('maven') {
+        container('runner') {
           echo '📦 Installing AWS CLI  (if needed)...'
           sh '''
             aws --version || true 
@@ -50,7 +50,7 @@ pipeline {
 
     stage('Install Docker ') {
       steps {
-        container('maven') {
+        container('runner') {
           echo '📦 Installing Docker  (if needed)...'
           sh '''
               kubectl -version || true
@@ -65,7 +65,7 @@ pipeline {
 
     stage('ECR Login') {
       steps {
-        container('maven') {
+        container('runner') {
             sh '''
               aws ecr get-login-password --region "$AWS_REGION" | \
                 docker login --username AWS \
@@ -86,3 +86,16 @@ pipeline {
 
 
 }
+
+
+/*
+This Jenkinsfile uses a Kubernetes agent to run the pipeline steps.
+
+with a custom Docker image that includes kubectl as runner.
+300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.1
+
+
+It includes stages for installing AWS CLI, Docker, and logging into AWS ECR.
+The environment variables are set for the Git repository, AWS account, and region.
+
+*/
