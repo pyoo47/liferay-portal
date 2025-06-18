@@ -71,9 +71,8 @@ spec:
         container('runner') {
           echo '📦 Validate Kubectl ...'
           sh '''
-              kubectl -version || true
-              # docker-compose --version || true
-              # docker --version || true
+              kubectl  version || true
+              docker --version || true
           '''
         }
       }
@@ -121,15 +120,17 @@ spec:
         container('runner') {
           dir('ci-mvp-process/') {
 
-
-
-            sh """
+            sh '''
                 echo '📦 Running Stacks with Kubectl ...'
                 ls -la
+            '''
 
+            sh '''
                 echo "📦 Applying Liferay Runner Stack... 1"
-                kubectl apply -f ${env.LIFERAY_RUNNER_STACK} -n liferay-jenkins
+                kubectl apply -f $LIFERAY_RUNNER_STACK -n liferay-jenkins
+            '''
 
+            sh """
                 echo "📦 Get Into Liferay Runner Stack... 2"
                 kubectl exec liferay-runner-pod -n liferay-jenkins -c runner \
                     -- bash -c \"
