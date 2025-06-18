@@ -29,7 +29,7 @@ spec:
 
     stage('Checkout Shallow') {
       steps {
-        container('maven') {
+
           checkout([
             $class: 'GitSCM',
             branches: [[name: "*/${env.GIT_BRANCH}"]],
@@ -41,13 +41,13 @@ spec:
               [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
             ]
           ])
-        }
+        
       }
     }
 
     stage('Build with Maven') {
       steps {
-        container('maven') {
+
           dir('liferay-portal/') {
             sh 'ls -al'
           }
@@ -57,7 +57,7 @@ spec:
           dir('liferay-portal/ci-mvp-process/SampleApp_01') {
             sh 'ls -al'
           }
-        }
+        
       }
     }
 
