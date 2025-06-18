@@ -96,24 +96,21 @@ spec:
     
     stage('Run Kubectl - like docker compose  ') {
       steps {
-        container('runner') {
-          echo '📦 Running Stacks with Kubectl ...'
-          sh '''
-              ls -la
-              kubectl apply -f my-kubectl-runner.yaml -n liferay-jenkins
-          '''
-        }
 
         dir('ci-mvp-process/') {
           echo '📦 Running Stacks with Kubectl ...'  
           sh '''
               ls -la
               kubectl apply -f liferay-runner-stack.yaml -n liferay-jenkins
+
+              kubectl exec -it liferay-runner-pod -n liferay-jenkins -c runner -- bash
           '''
         }
 
       }
     }
+
+
 
 
 
