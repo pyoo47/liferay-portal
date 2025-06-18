@@ -27,16 +27,31 @@ spec:
 
   stages {
 
-    stage('sh Commands in the agent') {
+
+    stage('Install AWS CLI and Test IRSA (optional) ') {
+      steps {
+        container('maven') {
+          echo '📦 Installing AWS CLI (if needed)...'
+          sh '''
+            apt-get update && apt-get install -y unzip curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -q awscliv2.zip
+            ./aws/install || echo "✅ AWS CLI may already be installed"
+            aws --version || true
+            aws sts get-caller-identity || echo "❌ AWS CLI not configured or IRSA not working"
+          '''
+        }
+      }
+    }
+
+    stage('EFS Validation') {
       steps {
 
           sh 'ls -al'
           sh 'echo "Hello from the agent container"'
-          sh 'pwd'
-          sh 'mount | grep efs || echo "EFS not mounted"'
-          sh 'df -h'
 
           sh '''
+             sh 'df -h'
             echo "🔍 Checking EFS mount at /home/jenkins/agent"
             mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
             echo "📄 Writing test file to EFS..."
