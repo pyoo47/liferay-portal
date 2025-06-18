@@ -69,7 +69,7 @@ spec:
       }
     }
 
-    stage('Reading bundle from EFS') {
+    stage('Reading bundle from EFS -v1') {
       steps {
         container('runner') {
           sh '''
