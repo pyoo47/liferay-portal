@@ -53,18 +53,40 @@ spec:
 
     stage('Checkout Shallow') {
       steps {
+        echo '🔨 Simulating Checkout Shallow downstream-build-1...'
+        // container('runner') {
+        //   checkout([
+        //     $class: 'GitSCM',
+        //     branches: [[name: "*/${env.GIT_BRANCH}"]],
+        //     userRemoteConfigs: [[
+        //       url: "${env.GIT_REPO_URL}",
+        //       credentialsId: 'github-pat-pei'
+        //     ]],
+        //     extensions: [
+        //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+        //     ]
+        //   ])
+        // }
+      }
+    }
+
+    stage('Reading bundle from EFS') {
+      steps {
         container('runner') {
-          checkout([
-            $class: 'GitSCM',
-            branches: [[name: "*/${env.GIT_BRANCH}"]],
-            userRemoteConfigs: [[
-              url: "${env.GIT_REPO_URL}",
-              credentialsId: 'github-pat-pei'
-            ]],
-            extensions: [
-              [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            ]
-          ])
+          sh '''
+            ls -al
+            df -h
+            echo "🔍 Checking EFS mount at /home/jenkins/agent"
+            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+
+            ls -al /home/jenkins/agent
+
+            echo "📄 Reading test file from EFS..."
+            cat /home/jenkins/agent/test-efs-bundle.txt
+
+            echo "📄 Writing test file to EFS..."
+            date > /home/jenkins/agent/test-efs-bundle-build-1.txt
+          '''
         }
       }
     }

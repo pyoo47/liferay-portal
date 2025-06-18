@@ -97,7 +97,7 @@ spec:
     }
     
 
-    stage('EFS Validation') {
+    stage('EFS Copy Validation') {
       steps {
         container('runner') {
           sh '''

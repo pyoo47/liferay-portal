@@ -66,6 +66,25 @@ spec:
       }
     }
     
+
+    stage('Copy bundle to EFS') {
+      steps {
+        container('runner') {
+          sh '''
+            ls -al
+            df -h
+            echo "🔍 Checking EFS mount at /home/jenkins/agent"
+            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+
+            echo "📄 Writing test file to EFS..."
+            date > /home/jenkins/agent/test-efs-bundle.txt
+
+            ls -al /home/jenkins/agent
+          '''
+        }
+      }
+    }
+
     stage('Trigger Downstream Build ') {
       parallel {
         stage('Downstream Build 1') {
@@ -89,6 +108,21 @@ spec:
     stage('Continue PoC') {
       steps {
         echo '✅ All Downstream Build jobs done. Proceeding with PoC...'
+
+        sh '''
+            ls -al
+            df -h
+            echo "🔍 Checking EFS mount at /home/jenkins/agent"
+            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+
+            ls -al /home/jenkins/agent
+
+            echo "📄 Reading test file from EFS..."
+            cat /home/jenkins/agent/test-efs-bundle.txt
+
+            echo "📄 Reading All test files from EFS..."
+            cat /home/jenkins/agent/test-efs-bundle-*.txt          
+        '''
       }
     }
   }
