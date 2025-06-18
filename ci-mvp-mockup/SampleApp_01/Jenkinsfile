@@ -1,6 +1,6 @@
 pipeline {
 
-  
+
   agent {
     kubernetes {
       yaml """
@@ -31,17 +31,17 @@ spec:
       parallel {
         stage('Upstream 1') {
           steps {
-            build job: 'real-job-name-1', wait: true
+            build job: 'PoC-Jobs/upstream-job-1', wait: true
           }
         }
         stage('Upstream 2') {
           steps {
-            build job: 'real-job-name-2', wait: true
+            build job: 'PoC-Jobs/upstream-job-2', wait: true
           }
         }
         stage('Upstream 3') {
           steps {
-            build job: 'real-job-name-3', wait: true
+            build job: 'PoC-Jobs/upstream-job-3', wait: true
           }
         }
       }
