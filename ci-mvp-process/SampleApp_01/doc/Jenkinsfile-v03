@@ -43,39 +43,11 @@ spec:
       }
     }
 
-stage('Build with Maven') {
+    stage('Print Files') {
       steps {
-        container('maven') {
-          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
-            sh 'ls -al'
-            sh 'mvn -B package'
-          }
-        }
+        sh 'ls -al'
       }
     }
-
-    stage('Run tests') {
-      steps {
-        container('maven') {
-          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
-            sh 'mvn -B test'
-          }
-        }
-      }
-    }
-
-
-    stage('Deploy') {  
-      steps {
-        container('maven') {
-          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
-            sh 'mvn -B deploy'
-          }
-        }
-      }
-    }
-
-    
   }
 
 
@@ -84,5 +56,7 @@ stage('Build with Maven') {
 /*
 This Jenkinsfile run ok, and fast *(shallow clone)*, depth --1
 
+Whe have a clone with depth 1, and the files are in the workspace.
+The files are in the workspace, and we can run maven commands.
 
  */
