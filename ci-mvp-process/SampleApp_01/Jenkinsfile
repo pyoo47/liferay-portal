@@ -64,7 +64,7 @@ stage('Build with Maven') {
       }
     }
 
-
+    /*
     stage('Deploy') {  
       steps {
         container('maven') {
@@ -74,8 +74,9 @@ stage('Build with Maven') {
         }
       }
     }
+    */
 
-    
+
   }
 
 
