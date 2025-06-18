@@ -115,6 +115,7 @@ spec:
       }
     }
 
+
     stage('Run Kubectl - like docker compose v3 ') {
       steps {
         container('runner') {
@@ -159,7 +160,7 @@ spec:
             echo "🔍 Checking EFS mount at /home/jenkins/agent"
             mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
            
-            cp \ 
+            cp \
             /opt/dev/projects/github/liferay-portal/liferay-portal-bundle-tomcat.tar.gz \
             /home/jenkins/agent/
 
