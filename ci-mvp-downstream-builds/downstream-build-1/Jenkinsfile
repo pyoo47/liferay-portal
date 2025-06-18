@@ -29,20 +29,20 @@ spec:
   stages {
     stage('Prepare') {
       steps {
-        echo '🚀 Starting upstream-job-2'
+        echo '🚀 Starting downstream-build-1'
       }
     }
 
     stage('Build') {
       steps {
-        echo '🔨 Simulating build in upstream-job-2...'
+        echo '🔨 Simulating build in downstream-build-1...'
         sh 'sleep 5'
       }
     }
 
     stage('Complete') {
       steps {
-        echo '✅ upstream-job-2 completed successfully!'
+        echo '✅ downstream-build-1 completed successfully!'
       }
     }
   }

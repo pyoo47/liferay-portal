@@ -1,13 +1,13 @@
-# Caylent :: Liferay Mockup
+# Caylent :: Liferay Upstream Builds
 
     Working on branch:
     master-ci-6005-postgresql
 
-    ci-mvp-mockup/SampleApp_01/Jenkinsfile
+    ci-mvp-upstream-builds/SampleApp_01/Jenkinsfile
 
 # Liferay-eks-mvp
 
-- Mockup 
+- Upstream Builds 
 
     with real integration integration to
 
