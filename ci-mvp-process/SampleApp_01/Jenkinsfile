@@ -6,20 +6,20 @@ pipeline {
       kind: Pod
       spec:
         containers:
-        - name: maven
-          image: maven:3.9.4-eclipse-temurin-17
+        - name: busybox
+          image: busybox
           command:
-          - cat
-          tty: true
+          - sleep
+          args:
+          - "60"
       """
     }
   }
   stages {
-    stage('Test Connection') {
+    stage('Test') {
       steps {
-        container('maven') {
-          sh 'echo ✅ Jenkins is connected to EKS and running in a Kubernetes pod!'
-          sh 'mvn -v'
+        container('busybox') {
+          sh 'echo Hello from agent && sleep 30'
         }
       }
     }

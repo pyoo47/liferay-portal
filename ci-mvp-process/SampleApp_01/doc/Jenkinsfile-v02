@@ -1,0 +1,32 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+      apiVersion: v1
+      kind: Pod
+      spec:
+        containers:
+        - name: maven
+          image: maven:3.9.4-eclipse-temurin-17
+          command:
+          - cat
+          tty: true
+      """
+    }
+  }
+  stages {
+    stage('Test Connection') {
+      steps {
+        container('maven') {
+          sh 'echo ✅ Jenkins is connected to EKS and running in a Kubernetes pod!'
+          sh 'mvn -v'
+        }
+      }
+    }
+  }
+}
+
+
+/*
+Validate the Jenkins - EKS integration by running a simple Maven command
+*/
