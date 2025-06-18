@@ -45,7 +45,7 @@ spec:
       }
     }
 
-    stage('Build with Maven') {
+    stage('Validate Folder Structure') {
       steps {
 
           dir('') {
@@ -61,20 +61,7 @@ spec:
             sh 'ls -al'
           }
 
-          dir('liferay-portal/') {
-            echo 'Building Liferay Portal with Maven... 1'   
-            sh 'ls -al'
-          }
-          dir('liferay-portal/ci-mvp-process/') {
-            echo 'Building Liferay Portal with Maven... 2'   
-            sh 'ls -al'
-          }
-          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
-            echo 'Building Liferay Portal with Maven... 3'   
-            sh 'ls -al'
-          }
 
-        
       }
     }
 
