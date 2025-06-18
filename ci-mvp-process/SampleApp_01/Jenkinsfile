@@ -19,7 +19,7 @@ pipeline {
     stage('Test') {
       steps {
         container('busybox') {
-          sh 'echo Hello from agent && sleep 30'
+          sh 'echo Hello from agent && sleep 900'
         }
       }
     }
