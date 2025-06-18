@@ -45,39 +45,7 @@ spec:
       }
     }
 
-    stage('Build with Maven') {
-      steps {
-
-          dir('') {
-            echo 'Building Liferay Portal with Maven... 01'   
-            sh 'ls -al'
-          }
-          dir('ci-mvp-process/') {
-            echo 'Building Liferay Portal with Maven... 02'   
-            sh 'ls -al'
-          }
-          dir('ci-mvp-process/SampleApp_01') {
-            echo 'Building Liferay Portal with Maven... 03'   
-            sh 'ls -al'
-          }
-
-          dir('liferay-portal/') {
-            echo 'Building Liferay Portal with Maven... 1'   
-            sh 'ls -al'
-          }
-          dir('liferay-portal/ci-mvp-process/') {
-            echo 'Building Liferay Portal with Maven... 2'   
-            sh 'ls -al'
-          }
-          dir('liferay-portal/ci-mvp-process/SampleApp_01') {
-            echo 'Building Liferay Portal with Maven... 3'   
-            sh 'ls -al'
-          }
-
-        
-      }
-    }
-
+  
 
     stage('Build with Maven') {
       steps {
@@ -99,6 +67,7 @@ spec:
         }
       }
     }
+
 
   }
 
