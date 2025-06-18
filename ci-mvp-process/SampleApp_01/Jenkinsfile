@@ -54,32 +54,67 @@ spec:
 
     stage('Install AWS CLI and Test IRSA (optional) ') {
       steps {
-        container('runner') {
-          echo '📦 Installing AWS CLI  (if needed)...'
+          echo '📦 Validate AWS CLI and IRSA...'
           sh '''
             aws --version || true 
             aws sts get-caller-identity || echo "❌ AWS CLI not configured or IRSA not working"
             aws s3 ls || echo "❌ AWS CLI S3 (IRSA) access not working"
           '''
-        }
       }
     }
 
 
-    stage('Install Docker ') {
+    stage('Validate Kubectl ') {
       steps {
-        container('runner') {
-          echo '📦 Installing Docker  (if needed)...'
+          echo '📦 Validate Kubectl ...'
           sh '''
               kubectl -version || true
-              docker-compose --version || true
-              docker --version || true
+              # docker-compose --version || true
+              # docker --version || true
           '''
-        }
       }
     }
 
+
+    stage('Checkout Shallow') {
+      steps {
+
+          checkout([
+            $class: 'GitSCM',
+            branches: [[name: "*/${env.GIT_BRANCH}"]],
+            userRemoteConfigs: [[
+              url: "${env.GIT_REPO_URL}",
+              credentialsId: 'github-pat-pei'
+            ]],
+            extensions: [
+              [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+            ]
+          ])
+        
+      }
+    }
     
+    stage('Run Kubectl - like docker compose  ') {
+      steps {
+        container('runner') {
+          echo '📦 Running Stacks with Kubectl ...'
+          sh '''
+              ls -la
+              kubectl apply -f my-kubectl-runner.yaml -n liferay-jenkins
+          '''
+        }
+
+        dir('ci-mvp-process/') {
+          echo '📦 Running Stacks with Kubectl ...'  
+          sh '''
+              ls -la
+              kubectl apply -f liferay-runner-stack.yaml -n liferay-jenkins
+          '''
+        }
+
+      }
+    }
+
 
 
   }
