@@ -31,17 +31,17 @@ spec:
       parallel {
         stage('Downstream Build 1') {
           steps {
-            build job: 'downstream-builds-1', wait: true
+            build job: 'MVP-Downstream-Build-1', wait: true
           }
         }
         stage('Downstream Build 2') {
           steps {
-            build job: 'downstream-builds-2', wait: true
+            build job: 'MVP-Downstream-Build-2', wait: true
           }
         }
         stage('Downstream Build 3') {
           steps {
-            build job: 'downstream-builds-3', wait: true
+            build job: 'MVP-Downstream-Build-3', wait: true
           }
         }
       }
