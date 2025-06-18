@@ -52,7 +52,7 @@ spec:
           sh 'echo "Hello from the agent container"'
 
           sh '''
-             sh 'df -h'
+            df -h
             echo "🔍 Checking EFS mount at /home/jenkins/agent"
             mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
             echo "📄 Writing test file to EFS..."
