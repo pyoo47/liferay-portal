@@ -35,7 +35,15 @@ spec:
           sh 'pwd'
           sh 'mount | grep efs || echo "EFS not mounted"'
           sh 'df -h'
-        
+
+          sh '''
+            echo "🔍 Checking EFS mount at /home/jenkins/agent"
+            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+            echo "📄 Writing test file to EFS..."
+            date > /home/jenkins/agent/test-efs-$(date +%s).txt
+            ls -al /home/jenkins/agent
+          '''
+    
       }
     }
 
