@@ -26,7 +26,7 @@ spec:
     AWS_ACCOUNT_ID='300374333822'
     AWS_REGION='us-east-2'
 
-    LIFERAY_RUNNER_STACK = 'liferay-runner-stack.yaml'
+    LIFERAY_RUNNER_STACK = 'ci-mvp-process/liferay-runner-stack.yaml'
 
   }
 
@@ -72,7 +72,6 @@ spec:
           echo '📦 Validate Kubectl ...'
           sh '''
               kubectl  version || true
-              docker --version || true
           '''
         }
       }
@@ -97,21 +96,21 @@ spec:
       }
     }
     
+
     stage('EFS Validation') {
       steps {
-
-          sh 'ls -al'
-          sh 'echo "Hello from the agent container"'
-
+        container('runner') {
           sh '''
+            ls -al
             df -h
             echo "🔍 Checking EFS mount at /home/jenkins/agent"
             mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+
             echo "📄 Writing test file to EFS..."
             date > /home/jenkins/agent/test-efs-bundle-$(date +%s).txt
             ls -al /home/jenkins/agent
           '''
-    
+        }
       }
     }
 
@@ -119,7 +118,7 @@ spec:
     stage('Run Kubectl - like docker compose v3 ') {
       steps {
         container('runner') {
-          dir('ci-mvp-process/') {
+         
 
             sh '''
                 echo '📦 Running Stacks with Kubectl ...'
@@ -142,7 +141,7 @@ spec:
                       \"
             """
 
-          }
+          
         }
       }
     }
