@@ -1,13 +1,15 @@
-// Load the helper from sibling folder
-def envHelper = load '../jenkins-lib/prepareEnv.groovy'
-
 pipeline {
-    agent any
-    stages {
-        stage('Init') {
-            steps {
-                envHelper.run('qa')  // call from jenkins-lib
-            }
+  agent any
+  stages {
+    stage('Init') {
+      steps {
+        script {
+          // Load the helper from sibling folder
+          def envHelper = load '../jenkins-lib/prepareEnv.groovy'
+          envHelper.run('qa')
         }
+      }
     }
+  }
 }
+
