@@ -98,7 +98,7 @@ spec:
       }
     }
     
-    stage('Run Kubectl - like docker compose v2 ') {
+    stage('Run Kubectl - like docker compose v3 ') {
       steps {
         container('runner') {
           dir('ci-mvp-process/') {
