@@ -107,28 +107,35 @@ spec:
 
     stage('Trigger Downstream Builds (Dynamically)') {
       steps {
-        script {
-
-          def branch = 'master-ci-6005-postgresql'
-          def jobs = ["MVP-Downstream-Build-1/${branch}", 
-                      "MVP-Downstream-Build-2/${branch}",
-                      "MVP-Downstream-Build-3/${branch}"]
-          def parallelBuilds = [:]
-
-          for (int i = 0; i < jobs.size(); i++) {
-            def jobName = jobs[i]
-            parallelBuilds["Build ${i+1}"] = {
-              // ensure context is preserved
-              script {
-                echo "👉 Triggering downstream job: ${jobName}"
-                build job: jobName, wait: true
-              }
-            }
-          }
-
-          parallel parallelBuilds
+        container('runner') {
+          sh '''
+            echo "🔍 Dummy parallel"
+          '''
         }
       }
+      // steps {
+      //   script {
+
+      //     def branch = 'master-ci-6005-postgresql'
+      //     def jobs = ["MVP-Downstream-Build-1/${branch}", 
+      //                 "MVP-Downstream-Build-2/${branch}",
+      //                 "MVP-Downstream-Build-3/${branch}"]
+      //     def parallelBuilds = [:]
+
+      //     for (int i = 0; i < jobs.size(); i++) {
+      //       def jobName = jobs[i]
+      //       parallelBuilds["Build ${i+1}"] = {
+      //         // ensure context is preserved
+      //         script {
+      //           echo "👉 Triggering downstream job: ${jobName}"
+      //           build job: jobName, wait: true
+      //         }
+      //       }
+      //     }
+
+      //     parallel parallelBuilds
+      //   }
+      // }
     }
 
     stage('Continue PoC -v6') {
