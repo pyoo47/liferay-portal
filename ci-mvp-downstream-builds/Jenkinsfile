@@ -103,9 +103,9 @@ spec:
         script {
 
           def branch = 'master-ci-6005-postgresql'
-          def jobs = ['MVP-Downstream-Build-1/${branch}', 
-                      'MVP-Downstream-Build-2/${branch}',
-                      'MVP-Downstream-Build-3/${branch}']
+          def jobs = ["MVP-Downstream-Build-1/${branch}", 
+                      "MVP-Downstream-Build-2/${branch}",
+                      "MVP-Downstream-Build-3/${branch}"]
           def parallelBuilds = [:]
 
           for (int i = 0; i < jobs.size(); i++) {
