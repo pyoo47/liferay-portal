@@ -101,9 +101,11 @@ spec:
     stage('Trigger Downstream Builds (Dynamically)') {
       steps {
         script {
-          def jobs = ['MVP-Downstream-Build-1/master-ci-6005-postgresql', 
-                      'MVP-Downstream-Build-2/master-ci-6005-postgresql', 
-                      'MVP-Downstream-Build-3/master-ci-6005-postgresql']
+
+          def branch = 'master-ci-6005-postgresql'
+          def jobs = ['MVP-Downstream-Build-1/${branch}', 
+                      'MVP-Downstream-Build-2/${branch}',
+                      'MVP-Downstream-Build-3/${branch}']
           def parallelBuilds = [:]
 
           for (int i = 0; i < jobs.size(); i++) {
