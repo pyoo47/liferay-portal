@@ -109,7 +109,11 @@ spec:
           for (int i = 0; i < jobs.size(); i++) {
             def jobName = jobs[i]
             parallelBuilds["Build ${i+1}"] = {
-              build job: jobName, wait: true
+              // ensure context is preserved
+              script {
+                echo "👉 Triggering downstream job: ${jobName}"
+                build job: jobName, wait: true
+              }
             }
           }
 
