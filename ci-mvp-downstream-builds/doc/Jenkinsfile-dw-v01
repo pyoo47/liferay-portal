@@ -98,22 +98,22 @@ spec:
       }
     }
 
-    stage('Trigger Downstream Builds (Dynamically)') {
-      steps {
-        script {
-          def jobs = ['MVP-Downstream-Build-1', 
-                      'MVP-Downstream-Build-2', 
-                      'MVP-Downstream-Build-3']
-          def parallelBuilds = [:]
-
-          for (int i = 0; i < jobs.size(); i++) {
-            def jobName = jobs[i]
-            parallelBuilds["Build ${i+1}"] = {
-              build job: jobName, wait: true
-            }
+    stage('Trigger Downstream Build ') {
+      parallel {
+        stage('Downstream Build 1') {
+          steps {
+            build job: 'MVP-Downstream-Build-1', wait: true
           }
-
-          parallel parallelBuilds
+        }
+        stage('Downstream Build 2') {
+          steps {
+            build job: 'MVP-Downstream-Build-2', wait: true
+          }
+        }
+        stage('Downstream Build 3') {
+          steps {
+            build job: 'MVP-Downstream-Build-3', wait: true
+          }
         }
       }
     }
@@ -149,4 +149,7 @@ And the Wait option is set to true, ensuring that the pipeline waits for each Do
 This is useful for scenarios where you have multiple independent jobs that can run simultaneously, improving overall pipeline efficiency.
 After all Downstream Build jobs are completed, the pipeline proceeds to the next stage, which can be used for further processing or deployment steps.
 This structure allows for a clear and organized approach to managing multiple Downstream Build jobs within a single pipeline, making it easier to maintain and understand the flow of the CI/CD process.
+
+This workk almost well,
+There is a bug that the downnstream are fixed in the source code, so they are not dynamic.
 */
