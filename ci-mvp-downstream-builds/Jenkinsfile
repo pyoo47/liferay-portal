@@ -87,7 +87,7 @@ spec:
     }
     
 
-    stage('Copy bundle to EFS - v5') {
+    stage('Copy bundle to EFS - v6') {
       steps {
         container('runner') {
           sh '''
