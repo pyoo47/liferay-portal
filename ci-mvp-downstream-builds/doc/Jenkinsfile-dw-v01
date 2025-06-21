@@ -102,17 +102,17 @@ spec:
       parallel {
         stage('Downstream Build 1') {
           steps {
-            build job: 'MVP-Downstream-Build-1', wait: true
+            build job: 'MVP-Downstream-Builds/MVP-Downstream-Build-1/master-ci-6005-postgresql', wait: true
           }
         }
         stage('Downstream Build 2') {
           steps {
-            build job: 'MVP-Downstream-Build-2', wait: true
+            build job: 'MVP-Downstream-Builds/MVP-Downstream-Build-2/master-ci-6005-postgresql', wait: true
           }
         }
         stage('Downstream Build 3') {
           steps {
-            build job: 'MVP-Downstream-Build-3', wait: true
+            build job: 'MVP-Downstream-Builds/MVP-Downstream-Build-3/master-ci-6005-postgresql', wait: true
           }
         }
       }

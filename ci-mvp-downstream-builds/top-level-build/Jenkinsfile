@@ -116,10 +116,11 @@ spec:
       // steps {
       //   script {
 
+      //     def folder = 'MVP-Downstream-Builds'
       //     def branch = 'master-ci-6005-postgresql'
-      //     def jobs = ["MVP-Downstream-Build-1/${branch}", 
-      //                 "MVP-Downstream-Build-2/${branch}",
-      //                 "MVP-Downstream-Build-3/${branch}"]
+      //     def jobs = ["${folder}/MVP-Downstream-Build-1/${branch}", 
+      //                 "${folder}/MVP-Downstream-Build-2/${branch}",
+      //                 "${folder}/MVP-Downstream-Build-3/${branch}"]
       //     def parallelBuilds = [:]
 
       //     for (int i = 0; i < jobs.size(); i++) {
