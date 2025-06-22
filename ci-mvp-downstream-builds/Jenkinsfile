@@ -10,7 +10,7 @@ pipeline {
 
   stages {
 
-    stage('Print Environment - v02') {
+    stage('Print Environment - v03') {
       steps {
         script {
 
