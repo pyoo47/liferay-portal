@@ -1,6 +1,7 @@
 # Shared libs for Jenkins
 
-In theory - Shared Libs should have their own repositroy
+Shared Libs 
+    - Organized in modules and, in sahred repositorty
 
 # Resources
 

@@ -41,3 +41,8 @@ liferay-portal/
     └── top-level-build/
         ├── Jenkinsfile
         └── top-level-build.sh
+
+# Branchs
+
+    - master-ci-6005-postgresql         -  for top level build
+    - master-ci-6005-downstream-builds  -  for top downstream-builds
