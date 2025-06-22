@@ -1,5 +1,3 @@
-@Library('Liferay-Shared-Libs') _
-
 pipeline {
 
 
@@ -25,10 +23,6 @@ pipeline {
     stage('Print Environment') {
       steps {
         script {
-
-          log.info 'Starting'
-          log.warning 'Nothing to do!'
-
           echo "Branch: ${env.BRANCH_NAME}"
           echo "Job Name: ${env.JOB_NAME}"
           echo "Build Number: ${env.BUILD_NUMBER}"
@@ -148,10 +142,9 @@ pipeline {
 
 
 /*
-This Jenkinsfile is designed to trigger multiple Downstream Build jobs in parallel.
-Each Downstream Build job is executed in its own stage, allowing for concurrent execution.
-And the Wait option is set to true, ensuring that the pipeline waits for each Downstream Build job to complete before proceeding.
-This is useful for scenarios where you have multiple independent jobs that can run simultaneously, improving overall pipeline efficiency.
-After all Downstream Build jobs are completed, the pipeline proceeds to the next stage, which can be used for further processing or deployment steps.
-This structure allows for a clear and organized approach to managing multiple Downstream Build jobs within a single pipeline, making it easier to maintain and understand the flow of the CI/CD process.
+Jenkinsfile v01
+Status: Working ok
+- Initial version
+
+
 */
