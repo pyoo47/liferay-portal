@@ -35,6 +35,38 @@ pipeline {
     }
 
     
+
+     stage('Checkout Shallow') {
+      steps {
+        // container('runner') {
+        //   checkout([
+        //     $class: 'GitSCM',
+        //     branches: [[name: "*/${env.GIT_BRANCH}"]],
+        //     userRemoteConfigs: [[
+        //       url: "${env.GIT_REPO_URL}",
+        //       credentialsId: 'github-pat-pei'
+        //     ]],
+        //     extensions: [
+        //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+        //     ]
+        //   ])
+        // }
+
+          sh '''
+
+            echo "🔍 Checking EFS mount at /home/jenkins/agent"
+            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+
+            date > /home/jenkins/agent/git-repo-emulation-gz.txt
+            echo "📄 GitRepo emulation ." >> /home/jenkins/agent/git-repo-emulation-gz.txt
+
+            ls -al /home/jenkins/agent
+          '''
+        
+      }
+    }
+
+    
     stage('Decide What to Run') {
       steps {
         script {
