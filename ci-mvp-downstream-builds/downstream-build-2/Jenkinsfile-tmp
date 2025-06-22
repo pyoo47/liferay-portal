@@ -1,7 +1,31 @@
 pipeline {
 
   
-  agent any
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::300374333822:role/jenkins-irsa-role
+spec:
+  serviceAccountName: jenkins-agent
+  containers:
+    - name: runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.3
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+  volumes:
+    - name: efs-workspace
+      persistentVolumeClaim:
+        claimName: jenkins-efs-pvc
+"""
+    }
+  }
 
   environment {
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
@@ -54,7 +78,7 @@ pipeline {
     
     stage('Reading bundle from EFS') {
       steps {
-
+        container('runner') {
           sh '''
             ls -al
             df -h
@@ -70,7 +94,7 @@ pipeline {
             date > /home/jenkins/agent/test-efs-bundle-build-2.txt
           '''
         }
-      
+      }
     }
     
     stage('Build') {

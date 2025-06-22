@@ -1,7 +1,7 @@
 pipeline {
 
 
-  agent any
+  agent { label 'runner' }  
 
 
   environment {
@@ -48,6 +48,7 @@ pipeline {
         //   ])
         // }
 
+        container('runner') {
           sh '''
 
             echo "🔍 Checking EFS mount at /home/jenkins/agent"
@@ -58,14 +59,14 @@ pipeline {
 
             ls -al /home/jenkins/agent
           '''
-        
+        }
       }
     }
     
 
     stage('Copy bundle to EFS - v6') {
       steps {
-
+        container('runner') {
           sh '''
             ls -al
             df -h
@@ -77,17 +78,17 @@ pipeline {
 
             ls -al /home/jenkins/agent
           '''
-        
+        }
       }
     }
 
     stage('Trigger Downstream Builds (Dynamically)') {
       steps {
-
+        container('runner') {
           sh '''
             echo "🔍 Dummy parallel"
           '''
-        
+        }
       }
       // steps {
       //   script {
