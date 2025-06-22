@@ -17,7 +17,7 @@ pipeline {
         script {
 
 
-          echo "Testing Shared Libs - v5"
+          echo "Testing Shared Libs - v6"
 
           log.info 'Starting'
           log.warning 'Nothing to do!'
