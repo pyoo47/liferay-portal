@@ -1,0 +1,44 @@
+pipeline {
+
+  agent { label 'runner' }  
+
+  stages {
+    stage('Decide What to Run') {
+      steps {
+        script {
+            def changedFiles = sh(script: "git diff --name-only HEAD~1", 
+                            returnStdout: true).trim().split("\n")
+
+            def buildFolder  = 'MVP-Downstream-Builds'         // Build folder in Jenkins UI
+            def homeDir      = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
+            def branch       = 'master-ci-6005-postgresql'
+
+            def nameBuilds   = ["MVP Liferay Blueprint",
+                                "${buildFolder}/MVP-Downstream-Build-1", 
+                                "${buildFolder}/MVP-Downstream-Build-2", 
+                                "${buildFolder}/MVP-Downstream-Build-3"]
+
+            def dirBuilds   = ["${homeDir}/top-level-build/", 
+                               "${homeDir}/downstream-build-1", 
+                               "${homeDir}/downstream-build-2",
+                               "${homeDir}/downstream-build-3"]
+
+
+            for (int i = 0; i < dirBuilds.size(); i++) {
+                
+                def dirBuild  = dirBuilds[i]
+                def nameBuild = nameBuilds[i]
+
+                if (changedFiles.any { it.startsWith( dirBuild  ) }) {
+                    build job: "${nameBuild}/${branch}"
+                    echo "👉 Triggering downstream job: ${nameBuild}/${branch}" 
+                }
+            }
+
+        }
+      }
+    }
+  }
+}
+
+

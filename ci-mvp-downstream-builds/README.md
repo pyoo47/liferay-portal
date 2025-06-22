@@ -19,3 +19,25 @@
     
     - S3 copy
     
+# Folder structure
+
+liferay-portal/
+└── ci-mvp-downstream-builds/
+    ├── downstream-build-1/
+    │   ├── Jenkinsfile
+    │   └── down-build-1.sh
+    ├── downstream-build-2/
+    │   ├── Jenkinsfile
+    │   └── down-build-2.sh
+    ├── downstream-build-3/
+    │   ├── Jenkinsfile
+    │   └── down-build-3.sh
+    ├── downstream-build-4/
+    │   ├── Jenkinsfile
+    │   └── down-build-4.sh
+    ├── downstream-build-5/
+    │   ├── Jenkinsfile
+    │   └── down-build-5.sh
+    └── top-level-build/
+        ├── Jenkinsfile
+        └── top-level-build.sh
