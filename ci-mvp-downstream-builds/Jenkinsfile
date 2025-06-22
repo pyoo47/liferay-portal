@@ -1,6 +1,6 @@
 pipeline {
 
-  agent { label 'runner' }  
+  agent any
 
   stages {
     stage('Decide What to Run') {
@@ -13,16 +13,22 @@ pipeline {
             def homeDir      = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
             def branch       = 'master-ci-6005-postgresql'
 
+            // def nameBuilds   = ["MVP Liferay Blueprint",
+            //                     "${buildFolder}/MVP-Downstream-Build-1", 
+            //                     "${buildFolder}/MVP-Downstream-Build-2", 
+            //                     "${buildFolder}/MVP-Downstream-Build-3"]
+
+            // def dirBuilds   = ["${homeDir}/top-level-build/", 
+            //                    "${homeDir}/downstream-build-1", 
+            //                    "${homeDir}/downstream-build-2",
+            //                    "${homeDir}/downstream-build-3"]
+
+
             def nameBuilds   = ["MVP Liferay Blueprint",
-                                "${buildFolder}/MVP-Downstream-Build-1", 
-                                "${buildFolder}/MVP-Downstream-Build-2", 
-                                "${buildFolder}/MVP-Downstream-Build-3"]
+                                "${buildFolder}/MVP-Downstream-Build-2"]
 
             def dirBuilds   = ["${homeDir}/top-level-build/", 
-                               "${homeDir}/downstream-build-1", 
-                               "${homeDir}/downstream-build-2",
-                               "${homeDir}/downstream-build-3"]
-
+                               "${homeDir}/downstream-build-2"]
 
             for (int i = 0; i < dirBuilds.size(); i++) {
                 
