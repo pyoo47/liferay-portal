@@ -1,4 +1,4 @@
-@Library('Liferay-Shared-Libs') _
+@Library('Liferay-Global-Shared-Libs') _
 
 pipeline {
 
@@ -10,7 +10,7 @@ pipeline {
 
   stages {
 
-    stage('Print Environment - v01') {
+    stage('Print Environment - v02') {
       steps {
         script {
 
