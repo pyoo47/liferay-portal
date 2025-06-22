@@ -9,10 +9,6 @@ pipeline {
   environment {
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
     GIT_BRANCH   = 'master-ci-6005-postgresql'
-
-    AWS_ACCOUNT_ID='300374333822'
-    AWS_REGION='us-east-2'
-    
   }
 
   options {
@@ -22,7 +18,7 @@ pipeline {
 
   stages {
 
-    stage('Print Environment') {
+    stage('Print Environment - v Shared Libs') {
       steps {
         script {
 
