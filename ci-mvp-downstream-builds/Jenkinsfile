@@ -1,5 +1,5 @@
-// @Library('Liferay-Shared-Libs') _
-@Library('Liferay-QA-Shared-Libs') _
+@Library('Liferay-Shared-Libs') _
+// @Library('Liferay-QA-Shared-Libs') _
 // @Library('Liferay-Global-Shared-Libs') _
 
 pipeline {
