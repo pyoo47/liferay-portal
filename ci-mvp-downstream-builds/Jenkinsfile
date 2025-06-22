@@ -27,6 +27,7 @@ pipeline {
             //                    "${homeDir}/downstream-build-2",
             //                    "${homeDir}/downstream-build-3"]
 
+            echo "wip Triggering downstream job"
 
             def nameBuilds   = ["MVP Liferay Blueprint",
                                 "${buildFolder}/MVP-Downstream-Build-2"]
