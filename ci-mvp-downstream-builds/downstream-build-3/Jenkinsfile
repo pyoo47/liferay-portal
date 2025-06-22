@@ -27,13 +27,17 @@ spec:
     }
   }
 
+
   environment {
-    GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
-    GIT_BRANCH   = 'master-ci-6005-postgresql'
+    BUILD_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
+    BUILD_TEST_BRANCH   = 'master-ci-6005-downstream-builds'
 
     AWS_ACCOUNT_ID='300374333822'
     AWS_REGION='us-east-2'
-    
+
+    // DOWNSTREAM_BUILD_ID = "${env.BUILD_ID}"
+    DOWNSTREAM_BUILD_ID='downstream-build-3'
+
   }
 
   options {
@@ -46,7 +50,7 @@ spec:
     stage('Prepare') {
       steps {
         script {
-          echo '🚀 Starting downstream-build-3'
+          echo "🚀 Starting ${DOWNSTREAM_BUILD_ID}"
           // Print some common Jenkins env vars
           echo "Branch: ${env.BRANCH_NAME}"
           echo "Job Name: ${env.JOB_NAME}"
@@ -57,13 +61,30 @@ spec:
       }
     }
 
+    stage('Branch Guard') {
+      when {
+        expression {
+          // Skip this job if it's NOT on the expected branch
+          if (env.BRANCH_NAME != {env.BUILD_TEST_BRANCH}) {
+            echo "Skipped: This job only runs on 'master-ci-6005-downstream-builds'. Current: ${env.BRANCH_NAME}"
+            return false
+          }
+          return true
+        }
+      }
+      steps {
+        echo "Correct branch detected: ${env.BRANCH_NAME}"
+      }
+    }
+
     stage('Checkout Shallow') {
       steps {
-        echo '🔨 Simulating Checkout Shallow downstream-build-3...'
+        echo "🔨 Simulating Checkout Shallow ${DOWNSTREAM_BUILD_ID}"
+
         // container('runner') {
         //   checkout([
         //     $class: 'GitSCM',
-        //     branches: [[name: "*/${env.GIT_BRANCH}"]],
+        //     branches: [[name: "*/${env.BUILD_TEST_BRANCH}"]],
         //     userRemoteConfigs: [[
         //       url: "${env.GIT_REPO_URL}",
         //       credentialsId: 'github-pat-pei'
@@ -76,7 +97,7 @@ spec:
       }
     }
 
-    stage('Reading bundle from EFS -v1') {
+    stage('Reading bundle from EFS') {
       steps {
         container('runner') {
           sh '''
@@ -91,23 +112,22 @@ spec:
             cat /home/jenkins/agent/test-efs-bundle.txt
 
             echo "📄 Writing test file to EFS..."
-            date > /home/jenkins/agent/test-efs-bundle-build-3.txt
+            date > /home/jenkins/agent/test-efs-bundle-${DOWNSTREAM_BUILD_ID}.txt
           '''
         }
       }
     }
 
-
     stage('Build') {
       steps {
-        echo '🔨 Simulating build in downstream-build-3...'
+        echo "🔨 Simulating build in ${DOWNSTREAM_BUILD_ID}"
         sh 'sleep 5'
       }
     }
 
     stage('Complete') {
       steps {
-        echo '✅ downstream-build-3 completed successfully!'
+        echo "✅ ${DOWNSTREAM_BUILD_ID} completed successfully!"
       }
     }
   }
