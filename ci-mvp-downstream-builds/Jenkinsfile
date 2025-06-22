@@ -71,27 +71,24 @@ pipeline {
             def changedFiles = sh(script: "git diff --name-only HEAD~1", 
                             returnStdout: true).trim().split("\n")
 
-            def buildFolder  = 'MVP-Downstream-Builds'         // Build folder in Jenkins UI
-            def homeDir      = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
-            def branch       = 'master-ci-6005-postgresql'
+            def buildFolder      = 'MVP-Downstream-Builds'         // Build folder in Jenkins UI
+            def homeDir          = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
+            def topLevelBranch   = 'master-ci-6005-postgresql'
+            def downStreamBranch = 'master-ci-6005-downstream-builds'
 
-            // def nameBuilds   = ["MVP Liferay Blueprint",
-            //                     "${buildFolder}/MVP-Downstream-Build-1", 
-            //                     "${buildFolder}/MVP-Downstream-Build-2", 
-            //                     "${buildFolder}/MVP-Downstream-Build-3"]
+            def nameBuilds   = ["MVP Liferay Blueprint/${topLevelBranch}",
+                                "${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}", 
+                                "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}", 
+                                "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}"]
+
+            echo "wip Triggering downstream job"
 
             // def dirBuilds   = ["${homeDir}/top-level-build/", 
             //                    "${homeDir}/downstream-build-1", 
             //                    "${homeDir}/downstream-build-2",
             //                    "${homeDir}/downstream-build-3"]
 
-            echo "wip Triggering downstream job"
-
-            def nameBuilds   = ["MVP Liferay Blueprint",
-                                "${buildFolder}/MVP-Downstream-Build-2"]
-
-            def dirBuilds   = ["${homeDir}/top-level-build/", 
-                               "${homeDir}/downstream-build-2"]
+            def dirBuilds   = [ "${homeDir}/top-level-build/" ]
 
             for (int i = 0; i < dirBuilds.size(); i++) {
                 
@@ -99,8 +96,8 @@ pipeline {
                 def nameBuild = nameBuilds[i]
 
                 if (changedFiles.any { it.startsWith( dirBuild  ) }) {
-                    build job: "${nameBuild}/${branch}"
-                    echo "👉 Triggering downstream job: ${nameBuild}/${branch}" 
+                    build job: "${nameBuild}"
+                    echo "👉 Triggering downstream job: ${nameBuild}" 
                 }
             }
 
