@@ -65,7 +65,7 @@ pipeline {
     }
     
 
-    stage('Copy bundle to EFS - v7') {
+    stage('Copy bundle to EFS - v8') {
       steps {
 
           sh '''
