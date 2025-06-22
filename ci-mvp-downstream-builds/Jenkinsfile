@@ -1,3 +1,5 @@
+@Library('Liferay-Shared-Libs') _
+
 pipeline {
 
   agent any
@@ -8,9 +10,16 @@ pipeline {
 
   stages {
 
-    stage('Print Environment') {
+    stage('Print Environment - v Shared Libs - main') {
       steps {
         script {
+
+
+          echo "Testing Shared Libs"
+
+          log.info 'Starting'
+          log.warning 'Nothing to do!'
+
           echo "Branch: ${env.BRANCH_NAME}"
           echo "Job Name: ${env.JOB_NAME}"
           echo "Build Number: ${env.BUILD_NUMBER}"
