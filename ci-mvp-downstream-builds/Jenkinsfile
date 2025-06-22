@@ -1,4 +1,6 @@
-@Library('Liferay-Shared-Libs') _
+// @Library('Liferay-Shared-Libs') _
+// @Library('Liferay-QA-Shared-Libs') _
+@Library('Liferay-Global-Shared-Libs') _
 
 pipeline {
 
@@ -19,6 +21,7 @@ pipeline {
 
           log.info 'Starting'
           log.warning 'Nothing to do!'
+          sayHello 'World - v Shared Libs - main'
 
           echo "Branch: ${env.BRANCH_NAME}"
           echo "Job Name: ${env.JOB_NAME}"

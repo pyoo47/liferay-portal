@@ -1,5 +1,3 @@
-@Library('Liferay-Shared-Libs') _
-
 pipeline {
 
 
@@ -9,6 +7,10 @@ pipeline {
   environment {
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
     GIT_BRANCH   = 'master-ci-6005-postgresql'
+
+    AWS_ACCOUNT_ID='300374333822'
+    AWS_REGION='us-east-2'
+    
   }
 
   options {
@@ -18,16 +20,9 @@ pipeline {
 
   stages {
 
-    stage('Print Environment - v Shared Libs') {
+    stage('Print Environment') {
       steps {
         script {
-
-
-          echo "Testing Shared Libs"
-
-          log.info 'Starting'
-          log.warning 'Nothing to do!'
-
           echo "Branch: ${env.BRANCH_NAME}"
           echo "Job Name: ${env.JOB_NAME}"
           echo "Build Number: ${env.BUILD_NUMBER}"
@@ -70,7 +65,7 @@ pipeline {
     }
     
 
-    stage('Copy bundle to EFS - v8') {
+    stage('Copy bundle to EFS - v7') {
       steps {
 
           sh '''
