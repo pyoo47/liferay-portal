@@ -2,6 +2,10 @@ pipeline {
 
   agent any
 
+  options {
+    skipDefaultCheckout()
+  }
+
   stages {
     stage('Decide What to Run') {
       steps {
