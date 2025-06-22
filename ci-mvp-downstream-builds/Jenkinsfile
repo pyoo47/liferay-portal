@@ -1,6 +1,6 @@
 // @Library('Liferay-Shared-Libs') _
-// @Library('Liferay-QA-Shared-Libs') _
-@Library('Liferay-Global-Shared-Libs') _
+@Library('Liferay-QA-Shared-Libs') _
+// @Library('Liferay-Global-Shared-Libs') _
 
 pipeline {
 
@@ -17,7 +17,7 @@ pipeline {
         script {
 
 
-          echo "Testing Shared Libs - v4"
+          echo "Testing Shared Libs - v5"
 
           log.info 'Starting'
           log.warning 'Nothing to do!'
