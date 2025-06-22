@@ -10,16 +10,16 @@ pipeline {
 
   stages {
 
-    stage('Print Environment - Shared Libs') {
+    stage('Print Environment - v5') {
       steps {
         script {
 
 
-          echo "Testing Shared Libs - v6"
+          echo "Testing Shared Libs"
 
           log.info 'Starting'
           log.warning 'Nothing to do!'
-          sayHello 'World - v Shared Libs - main'
+
 
           echo "Branch: ${env.BRANCH_NAME}"
           echo "Job Name: ${env.JOB_NAME}"
