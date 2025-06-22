@@ -22,6 +22,9 @@ pipeline {
       steps {
         script {
 
+
+          echo "Testing Shared Libs"
+
           log.info 'Starting'
           log.warning 'Nothing to do!'
 
