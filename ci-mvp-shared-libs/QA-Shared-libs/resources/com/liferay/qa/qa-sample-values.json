@@ -1,9 +1,0 @@
-{
-    "coverage": "functional",
-    "description": "This is a test JSON file for QA shared libraries.",
-    "name": "QA Shared Libraries Test",
-    "version": "1.0.0",
-    "author": "Liferay QA Team",
-    "company": "Liferay Inc.",
-    "license": "MIT"
-}
