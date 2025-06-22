@@ -87,7 +87,7 @@ pipeline {
             //                    "${homeDir}/downstream-build-2",
             //                    "${homeDir}/downstream-build-3"]
 
-            def dirBuilds   = [ "${homeDir}/top-level-build/" ]
+            def dirBuilds   = [ ]
 
             for (int i = 0; i < dirBuilds.size(); i++) {
                 
