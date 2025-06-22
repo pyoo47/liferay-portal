@@ -45,6 +45,8 @@ spec:
           echo "Workspace: ${env.WORKSPACE}"
           echo "Git Commit: ${env.GIT_COMMIT}"
         }
+        // Or print everything
+        sh 'printenv'
       }
     }
 

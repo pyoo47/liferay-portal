@@ -29,6 +29,8 @@ pipeline {
           echo "Workspace: ${env.WORKSPACE}"
           echo "Git Commit: ${env.GIT_COMMIT}"
         }
+        // Or print everything
+        sh 'printenv'
       }
     }
 
@@ -63,7 +65,7 @@ pipeline {
     }
     
 
-    stage('Copy bundle to EFS - v6') {
+    stage('Copy bundle to EFS - v7') {
       steps {
 
           sh '''

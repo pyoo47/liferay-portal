@@ -7,6 +7,22 @@ pipeline {
   }
 
   stages {
+
+    stage('Print Environment') {
+      steps {
+        script {
+          echo "Branch: ${env.BRANCH_NAME}"
+          echo "Job Name: ${env.JOB_NAME}"
+          echo "Build Number: ${env.BUILD_NUMBER}"
+          echo "Workspace: ${env.WORKSPACE}"
+          echo "Git Commit: ${env.GIT_COMMIT}"
+        }
+        // Or print everything
+        sh 'printenv'
+      }
+    }
+
+    
     stage('Decide What to Run') {
       steps {
         script {
