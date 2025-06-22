@@ -10,13 +10,14 @@ pipeline {
 
   stages {
 
-    stage('Print Environment - v01') {
+    stage('Print Environment - v5') {
       steps {
         script {
 
+
           echo "Testing Shared Libs"
 
-          log.info 'Validation Liferay-Global-Shared-Libs'
+          log.info 'Starting'
           log.warning 'Nothing to do!'
 
 
@@ -106,4 +107,17 @@ pipeline {
   }
 }
 
+/*
 
+Status: Working ok Integrated with shared libraries
+Next Steps: EFS Validation, Git Repo Emulation, and more downstream jobs
+
+This Jenkinsfile is a version 01 of the dispatch job for MVP Downstream Builds.
+It is designed to trigger downstream jobs based on changes detected in specific directories.
+It includes stages for printing the environment, checking out a shallow copy of the repository,
+and deciding which downstream jobs to run based on the files that have changed.
+It uses shared libraries for logging and other utilities, and it is structured to be easily extendable
+for future enhancements or modifications.
+This Jenkinsfile is part of the CI/CD pipeline for the MVP project and is intended to be
+used in conjunction with other Jenkinsfiles and shared libraries to manage the build and deployment process.  
+*/
