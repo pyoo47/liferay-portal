@@ -68,8 +68,8 @@ spec:
 
     DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
     EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-    FILE_TARBALL_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
-
+    TARBALL_FILE_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+    TARBALL_FILE_PATH   = "/home/jenkins/local/${TARBALL_FILE_NAME}"
 
   }
 
@@ -155,11 +155,11 @@ spec:
 
             sh """
               echo '📦 Creating tarball without .git...'
-              # tar -czf ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME} -C ${DIR_LOCAL_CHECKOUT} .
-              tar --exclude='.git' -czf ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME} -C ${DIR_LOCAL_CHECKOUT} .
+              # tar -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
+              tar --exclude='.git' -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
               
               echo '📤 Initial workspace contents ... local and target EFS - Before copy tarball'
-              ls -al ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME}
+              ls -al ${TARBALL_FILE_PATH}
               ls -al ${EFS_WORKSPACE_DIR}/
             """
 
@@ -178,10 +178,10 @@ spec:
             sh """
               echo '📤 Copy tarball to EFS workspace...'
               mkdir -p "${EFS_WORKSPACE_DIR}"
-              cp ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME} "${EFS_WORKSPACE_DIR}/"
+              cp ${TARBALL_FILE_PATH} "${EFS_WORKSPACE_DIR}/"
 
               echo '📤 Final workspace contents ... local and target EFS - After copy tarball'
-              ls -al ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME}
+              ls -al ${TARBALL_FILE_PATH}
               ls -al ${EFS_WORKSPACE_DIR}/
             """
 

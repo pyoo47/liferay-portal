@@ -57,3 +57,12 @@ liferay-portal/
     -o jsonpath='{.items[-1:].metadata.name}')
 
     kubectl exec -it "$POD" -n liferay-jenkins -- /bin/bash
+
+    # Top 20 files in size
+    du -sh .[!.]* * | sort -hr | head -n 20
+
+# Commnads inside the pod
+
+    DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
+    EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    FILE_TARBALL_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
