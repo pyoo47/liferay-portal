@@ -112,26 +112,26 @@ spec:
       }
     }
 
-    // stage('Reading bundle from EFS') {
-    //   steps {
-    //     container('runner') {
-    //       sh '''
-    //         ls -al
-    //         df -h
-    //         echo "🔍 Checking EFS mount at /home/jenkins/agent"
-    //         mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+    stage('Reading bundle from EFS') {
+      steps {
+        container('runner') {
+          sh '''
+            ls -al
+            df -h
+            echo "🔍 Checking EFS mount at /home/jenkins/agent"
+            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
 
-    //         ls -al /home/jenkins/agent
+            ls -al /home/jenkins/agent
 
-    //         echo "📄 Reading test file from EFS..."
-    //         cat /home/jenkins/agent/test-efs-bundle.txt
+            echo "📄 Reading test file from EFS..."
+            cat /home/jenkins/agent/test-efs-bundle.txt
 
-    //         echo "📄 Writing test file to EFS..."
-    //         date > /home/jenkins/agent/test-efs-bundle-${DOWNSTREAM_BUILD_ID}.txt
-    //       '''
-    //     }
-    //   }
-    // }
+            echo "📄 Writing test file to EFS..."
+            date > /home/jenkins/agent/test-efs-bundle-${DOWNSTREAM_BUILD_ID}.txt
+          '''
+        }
+      }
+    }
 
     stage('Build') {
       steps {
