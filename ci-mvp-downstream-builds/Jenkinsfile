@@ -232,22 +232,22 @@ spec:
 
 
   
-    stage('Upload to S3 - Artifacts') {
+    // stage('Upload to S3 - Artifacts') {
 
-      steps {
-        container('runner') {
-          sh """
-            echo "📤 Uploading to S3..."
+    //   steps {
+    //     container('runner') {
+    //       sh """
+    //         echo "📤 Uploading to S3..."
 
-            aws s3 cp /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME} \
-              ${env.AWS_S3_URL_ARTIFACTS}/${BUILD_BUNDLE_DUMMY_NAME} || echo "❌ Upload failed"
+    //         aws s3 cp /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME} \
+    //           ${env.AWS_S3_URL_ARTIFACTS}/${BUILD_BUNDLE_DUMMY_NAME} || echo "❌ Upload failed"
 
-            aws s3 cp /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME} \
-              ${env.AWS_S3_URL_ARTIFACTS}/${BUILD_SOURCE_DUMMY_NAME} || echo "❌ Upload failed"
-          """
-        }
-      }
-    }
+    //         aws s3 cp /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME} \
+    //           ${env.AWS_S3_URL_ARTIFACTS}/${BUILD_SOURCE_DUMMY_NAME} || echo "❌ Upload failed"
+    //       """
+    //     }
+    //   }
+    // }
 
 
   }
