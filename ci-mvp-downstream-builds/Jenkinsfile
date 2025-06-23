@@ -131,12 +131,14 @@ spec:
         container('runner') {
           script {
 
+            def localCheckout = "/home/jenkins/local/checkout"
+
             sh """
               echo "🧹 Cleaning local checkout path..."
               rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
             """
 
-            dir(DIR_LOCAL_CHECKOUT) {
+            dir(localCheckout) {
 
               sh """
                 echo "🧹 Cleaning local checkout path..."
