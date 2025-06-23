@@ -114,19 +114,19 @@ spec:
 
     stage('Checkout Shallow') {
       steps {
-          container('runner') {
-            checkout([
-              $class: 'GitSCM',
-              branches: [[name: "*/${env.GIT_BRANCH}"]],
-              userRemoteConfigs: [[
-                url: "${env.GIT_REPO_URL}",
-                credentialsId: 'github-pat-pei'
-              ]],
-              extensions: [
-                [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-              ]
-            ])
-          }
+        // container('runner') {
+        //   checkout([
+        //     $class: 'GitSCM',
+        //     branches: [[name: "*/${env.GIT_BRANCH}"]],
+        //     userRemoteConfigs: [[
+        //       url: "${env.GIT_REPO_URL}",
+        //       credentialsId: 'github-pat-pei'
+        //     ]],
+        //     extensions: [
+        //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+        //     ]
+        //   ])
+        // }
 
           sh """
 
