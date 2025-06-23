@@ -57,7 +57,6 @@ spec:
     BUILD_SOURCE_DUMMY_NAME="dummy-${BUILD_SOURCE_NAME}"
 
     TEST_DUMMY_NAME="test-${DOWNSTREAM_BUILD_ID}-dummy.xml"
-    TEST_DUMMY_NAME="test-${DOWNSTREAM_BUILD_ID}-dummy.xml"
 
     // s3://liferayci-file-propagator-mvp/build/35/artifacts
     // s3://liferayci-file-propagator-mvp/build/35/tests
@@ -160,9 +159,9 @@ spec:
       steps {
         container('runner') {
           sh """
-            echo "📤 Uploading to S3..."
-            aws s3 cp /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME} \
-                  ${env.AWS_S3_URL_TESTS}/${BUILD_BUNDLE_DUMMY_NAME} || echo "❌ Upload failed"
+            echo "📤 Uploading tests to S3..."
+            aws s3 cp /home/jenkins/agent/${TEST_DUMMY_NAME} \
+                  ${env.AWS_S3_URL_TESTS}/${TEST_DUMMY_NAME} || echo "❌ Upload failed"
           """
         }
       }
