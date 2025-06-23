@@ -22,7 +22,7 @@ spec:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
     - name: runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.5
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.3
       command: ["cat"]
       tty: true
       volumeMounts:
@@ -82,7 +82,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v30 - with Runner 15.1 builds') {
+    stage('Print Environment - v30 - Runner 1.3 again builds') {
       steps {
         script {
 

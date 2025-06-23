@@ -55,7 +55,7 @@ liferay-portal/
     --selector=jenkins=agent \
     --sort-by=.metadata.creationTimestamp \
     -o jsonpath='{.items[-1:].metadata.name}')
-
+    echo $POD
     kubectl exec -it "$POD" -n liferay-jenkins -- /bin/bash
 
     # Top 20 files in size
