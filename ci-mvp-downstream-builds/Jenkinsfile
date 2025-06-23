@@ -120,18 +120,29 @@ spec:
     stage('Checkout Shallow') {
       steps {
           container('runner') {
-            checkout([
-              $class: 'GitSCM',
-              branches: [[name: "*/${env.GIT_BRANCH}"]],
-              userRemoteConfigs: [[
-                url: "${env.GIT_REPO_URL}",
-                credentialsId: 'github-pat-pei'
-              ]],
-              extensions: [
-                [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-              ]
-            ])
+
+            dir('/home/jenkins/tmp/local-checkout') {
+              checkout([
+                $class: 'GitSCM',
+                branches: [[name: "*/${env.GIT_BRANCH}"]],
+                userRemoteConfigs: [[
+                  url: "${env.GIT_REPO_URL}",
+                  credentialsId: 'github-pat-pei'
+                ]],
+                extensions: [
+                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+                ]
+              ])
+            }
           }
+
+          sh """
+            echo "📁 Copying from local-checkout to EFS workspace: ${env.WORKSPACE}"
+            cp -r /home/jenkins/tmp/local-checkout/. "${env.WORKSPACE}/"
+            echo "✅ Copied to EFS"
+            # rm -rf /home/jenkins/tmp/local-checkout
+          """
+
 
           sh """
 
