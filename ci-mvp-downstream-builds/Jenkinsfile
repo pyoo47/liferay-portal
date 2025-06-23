@@ -10,7 +10,7 @@ pipeline {
 
   stages {
 
-    stage('Print Environment - v03') {
+    stage('Print Environment - v04') {
       steps {
         script {
 
@@ -19,6 +19,7 @@ pipeline {
           log.info 'Validation Liferay-Global-Shared-Libs'
           log.warning 'Nothing to do!'
 
+          log.warning 'TODO - Read the EFS from a GUI ?'
 
           echo "Branch: ${env.BRANCH_NAME}"
           echo "Job Name: ${env.JOB_NAME}"
