@@ -99,46 +99,49 @@ spec:
     }
 
 
-  //   stage('Decide What to Run') {
-  //     steps {
-  //       script {
-  //           def changedFiles = sh(script: "git diff --name-only HEAD~1", 
-  //                           returnStdout: true).trim().split("\n")
+    // stage('Decide What to Run') {
+    //   steps {
+    //     script {
+    //         def changedFiles = sh(script: "git diff --name-only HEAD~1", 
+    //                         returnStdout: true).trim().split("\n")
 
-  //           def buildFolder      = 'MVP-Downstream-Builds'         // Build folder in Jenkins UI
-  //           def homeDir          = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
-  //           def topLevelBranch   = 'master-ci-6005-postgresql'
-  //           def downStreamBranch = 'master-ci-6005-downstream-builds'
+    //         def buildFolder      = 'MVP-Downstream-Builds'         // Build folder in Jenkins UI
+    //         def homeDir          = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
+    //         def topLevelBranch   = 'master-ci-6005-postgresql'
+    //         def downStreamBranch = 'master-ci-6005-downstream-builds'
 
-  //           def nameBuilds   = ["MVP Liferay Blueprint/${topLevelBranch}",
-  //                               "${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}", 
-  //                               "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}", 
-  //                               "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}"]
+    //         def nameBuilds   = ["MVP Liferay Blueprint/${topLevelBranch}",
+    //                             "${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}", 
+    //                             "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}", 
+    //                             "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}"]
 
-  //           echo "wip Triggering downstream job"
+    //         echo "wip Triggering downstream job"
 
-  //           // def dirBuilds   = ["${homeDir}/top-level-build/", 
-  //           //                    "${homeDir}/downstream-build-1", 
-  //           //                    "${homeDir}/downstream-build-2",
-  //           //                    "${homeDir}/downstream-build-3"]
+    //         // def dirBuilds   = ["${homeDir}/top-level-build/", 
+    //         //                    "${homeDir}/downstream-build-1", 
+    //         //                    "${homeDir}/downstream-build-2",
+    //         //                    "${homeDir}/downstream-build-3"]
 
-  //           def dirBuilds   = [ ]
+    //         def dirBuilds   = [ ]
 
-  //           for (int i = 0; i < dirBuilds.size(); i++) {
+    //         for (int i = 0; i < dirBuilds.size(); i++) {
                 
-  //               def dirBuild  = dirBuilds[i]
-  //               def nameBuild = nameBuilds[i]
+    //             def dirBuild  = dirBuilds[i]
+    //             def nameBuild = nameBuilds[i]
 
-  //               if (changedFiles.any { it.startsWith( dirBuild  ) }) {
-  //                   build job: "${nameBuild}"
-  //                   echo "👉 Triggering downstream job: ${nameBuild}" 
-  //               }
-  //           }
+    //             if (changedFiles.any { it.startsWith( dirBuild  ) }) {
+    //                 build job: "${nameBuild}"
+    //                 echo "👉 Triggering downstream job: ${nameBuild}" 
+    //             }
+    //         }
 
-  //       }
-  //     }
-  //   }
-  // }
+    //     }
+    //   }
+    // }
+
+
+
+  }
 
   
 }
