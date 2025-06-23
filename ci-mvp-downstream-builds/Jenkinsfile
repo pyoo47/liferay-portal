@@ -119,9 +119,21 @@ spec:
 
     stage('Checkout Shallow') {
       steps {
-          container('runner') {
+        container('runner') {
+          script {
+            def localCheckout = '/home/jenkins/tmp/local-checkout'
+            def efsWorkspace  = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+            def tarballName   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
 
-            dir('/home/jenkins/tmp/local-checkout') {
+            sh """
+              echo '🧹 Cleaning local checkout path...'
+              rm -rf ${localCheckout}
+              mkdir -p ${localCheckout}
+
+              echo '📥 Cloning repository into local path...'
+            """
+
+            dir(localCheckout) {
               checkout([
                 $class: 'GitSCM',
                 branches: [[name: "*/${env.GIT_BRANCH}"]],
@@ -134,37 +146,42 @@ spec:
                 ]
               ])
             }
+
+            sh """
+              echo '📦 Creating tarball...'
+              tar -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
+
+              echo '📤 Moving tarball to EFS workspace...'
+              mkdir -p "${efsWorkspace}"
+              mv ${localCheckout}/${tarballName} "${efsWorkspace}/"
+
+              echo '📂 Extracting tarball into workspace...'
+              tar -xzf "${efsWorkspace}/${tarballName}" -C "${efsWorkspace}/"
+
+              echo '📄 Final workspace contents:'
+              ls -al "${efsWorkspace}"
+            """
+
+
+            sh """
+
+              echo "🔍 Checking EFS mount at /home/jenkins/agent"
+              mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+
+              date > /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME}
+              echo "📄 GitRepo emulation ." >> /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME}
+
+              date > /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME}
+              echo "📄 GitRepo emulation ." >> /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME}
+              
+              ls -al /home/jenkins/agent
+            """
           }
-
-          sh """
-            echo "📁 Copying from local-checkout to EFS workspace: ${env.WORKSPACE}"
-            cp -r /home/jenkins/tmp/local-checkout/. "${env.WORKSPACE}/"
-            echo "✅ Copied to EFS"
-            # rm -rf /home/jenkins/tmp/local-checkout
-          """
-
-
-          sh """
-
-            echo "🔍 Checking EFS mount at /home/jenkins/agent"
-            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
-
-            date > /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME}
-            echo "📄 GitRepo emulation ." >> /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME}
-
-            date > /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME}
-            echo "📄 GitRepo emulation ." >> /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME}
-            
-            ls -al /home/jenkins/agent
-          """
-        
+        }
       }
     }
 
-
-
-
-
+  
     stage('Decide What to Run') {
       steps {
         script {
