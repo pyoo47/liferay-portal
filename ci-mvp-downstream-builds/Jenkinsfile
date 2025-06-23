@@ -120,7 +120,7 @@ spec:
       }
     }
     
-    
+
     stage('Checkout Shallow') {
       steps {
         container('runner') {
@@ -251,7 +251,25 @@ spec:
 
   }
 
+    
+  post {
+    always {
+      container('runner') {
+        script {
+          def podName = env.NODE_NAME
+          sh """
+            echo "🛑 Build complete. Pod is: ${podName}"
+            echo "Run this to debug:"
+            echo "kubectl exec -it ${podName} -n liferay-jenkins -- bash"
+            sleep 3600
+          """
+        }
+      }
+    }
+  }
   
+
+
 }
 
 
