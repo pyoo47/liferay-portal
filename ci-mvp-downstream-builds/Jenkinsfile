@@ -155,8 +155,8 @@ spec:
               mkdir -p "${efsWorkspace}"
               mv ${localCheckout}/${tarballName} "${efsWorkspace}/"
 
-              echo '📂 Extracting tarball into workspace...'
-              tar -xzf "${efsWorkspace}/${tarballName}" -C "${efsWorkspace}/"
+              echo '📂 I don't need to Extracting tarball into workspace...'
+              # tar -xzf "${efsWorkspace}/${tarballName}" -C "${efsWorkspace}/"
 
               echo '📄 Final workspace contents:'
               ls -al "${efsWorkspace}"
