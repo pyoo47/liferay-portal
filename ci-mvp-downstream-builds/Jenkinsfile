@@ -12,6 +12,8 @@ metadata:
     eks.amazonaws.com/role-arn: arn:aws:iam::300374333822:role/jenkins-irsa-role
 spec:
   serviceAccountName: jenkins-agent
+  securityContext:
+    fsGroup: 1000
   containers:
     - name: jnlp
       image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4

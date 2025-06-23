@@ -151,6 +151,32 @@ ERROR: (2)
                 - mountPath: /home/jenkins/agent
                   name: efs-workspace
 
+ERROR: (3)
+      java.io.IOException: The specified working directory 
+      should be fully accessible to the remoting executable (RWX): /home/jenkins/agent
+            
+      // RTA: This error indicates that the Jenkins agent does not have the necessary permissions to access the EFS mount.
+      // Ensure that the EFS mount point has the correct permissions set for the Jenkins user.
+      // You can check the permissions by running `ls -ld /home/jenkins/agent` in the container.
+
+      This means the directory /home/jenkins/agent was mounted, 
+      but permissions were wrong — it’s not writable by the Jenkins user in the jnlp container.
+
+      Explicitly set securityContext in your pod template to ensure the directory 
+      is owned by the jenkins user (UID 1000):
+      (key part is `fsGroup: 1000`)
+
+            spec:
+              serviceAccountName: jenkins-agent
+              securityContext:
+                fsGroup: 1000
+              containers:
+                - name: jnlp
+                  image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
+                  volumeMounts:
+                    - mountPath: /home/jenkins/agent
+                      name: efs-workspace
+
 Purpose:
 - It validates the EFS mount by checking if the directory is mounted.
 - It creates a file in the EFS to confirm write access.
