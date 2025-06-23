@@ -134,11 +134,14 @@ spec:
             sh """
               echo "🧹 Cleaning local checkout path..."
               rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
-
-              echo '📥 Cloning repository into local path...'
             """
 
             dir(DIR_LOCAL_CHECKOUT) {
+
+              sh """
+                echo "🧹 Cleaning local checkout path..."
+                pwd
+              """
               checkout([
                 $class: 'GitSCM',
                 branches: [[name: "*/${env.GIT_BRANCH}"]],
