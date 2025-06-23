@@ -59,7 +59,8 @@ liferay-portal/
     kubectl exec -it "$POD" -n liferay-jenkins -- /bin/bash
 
     # Top 20 files in size
-    du -sh .[!.]* * | sort -hr | head -n 20
+    alias duse='du -sh .[!.]* * | sort -hr | head -n 20 '
+    alias ll='ls -alh '
 
 # Commnads inside the pod
 
