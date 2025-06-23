@@ -36,7 +36,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v04') {
+    stage('Print Environment - v05') {
       steps {
         script {
 
