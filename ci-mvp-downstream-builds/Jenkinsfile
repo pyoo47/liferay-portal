@@ -154,7 +154,8 @@ spec:
             sh """
               echo '📦 Creating tarball...'
               tar -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
-
+              tar --exclude='.git' -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
+              
               echo '📤 Moving tarball to EFS workspace...'
               mkdir -p "${efsWorkspace}"
               mv ${localCheckout}/${tarballName} "${efsWorkspace}/"
