@@ -171,20 +171,19 @@ spec:
         }
       }
     }
-  }
 
-
-  stage('Upload to S3') {
-    steps {
-      container('runner') {
-        sh '''
-          echo "📤 Uploading to S3..."
-          aws s3 cp /home/jenkins/agent/git-repo-emulation-gz.txt \
-                  s3://liferayci-file-propagator-mvp/build/35/artifacts/git-repo-emulation-gz.txt
-        '''
+  
+    stage('Upload to S3') {
+      steps {
+        container('runner') {
+          sh '''
+            echo "📤 Uploading to S3..."
+            aws s3 cp /home/jenkins/agent/git-repo-emulation-gz.txt \
+                    s3://liferayci-file-propagator-mvp/build/35/artifacts/git-repo-emulation-gz.txt
+          '''
+        }
       }
     }
-  }
 
 
 

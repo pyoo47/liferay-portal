@@ -44,6 +44,12 @@ spec:
     // DOWNSTREAM_BUILD_ID = "${env.BUILD_ID}"
     DOWNSTREAM_BUILD_ID='downstream-build-1'
 
+    AWS_S3_BUCKET='liferayci-file-propagator-mvp'
+    AWS_S3_PATH='build'
+
+    AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/artifacts"
+    AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/tests"
+    
   }
 
   options {
@@ -63,6 +69,9 @@ spec:
           echo "Build Number: ${env.BUILD_NUMBER}"
           echo "Workspace: ${env.WORKSPACE}"
           echo "Git Commit: ${env.GIT_COMMIT}"
+
+          echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
+          echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
         }
       }
     }
