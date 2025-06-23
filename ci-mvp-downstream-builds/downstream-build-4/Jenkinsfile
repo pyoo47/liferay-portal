@@ -8,6 +8,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: jenkins-efs-agent
+  securityContext:
+    fsGroup: 1000
   labels:
     jenkins: agent
 spec:
@@ -25,10 +27,14 @@ spec:
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
         claimName: jenkins-efs-pvc
+    - name: workspace-volume
+      emptyDir: {}
 """
     }
   }
