@@ -34,6 +34,23 @@ spec:
     }
   }
 
+
+  environment {
+    GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
+    GIT_BRANCH   = 'master-ci-6005-postgresql'
+
+    AWS_ACCOUNT_ID='300374333822'
+    AWS_REGION='us-east-2'
+
+    AWS_S3_BUCKET='liferayci-file-propagator-mvp'
+    AWS_S3_PATH='build'
+    
+    // AWS_S3_URL="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}"
+    // s3://liferayci-file-propagator-mvp/build/35/artifacts
+    // s3://liferayci-file-propagator-mvp/test/35/artifacts
+
+  }
+
   options {
     skipDefaultCheckout()
   }
@@ -81,7 +98,7 @@ spec:
     }
     
 
-     stage('Checkout Shallow') {
+    stage('Checkout Shallow') {
       steps {
         // container('runner') {
         //   checkout([
@@ -112,6 +129,18 @@ spec:
     }
 
 
+
+    stage('Upload to S3') {
+      steps {
+        container('runner') {
+          sh '''
+            echo "📤 Uploading to S3..."
+            aws s3 cp /home/jenkins/agent/git-repo-emulation-gz.txt \
+                    s3://liferayci-file-propagator-mvp/build/35/artifacts/git-repo-emulation-gz.txt
+          '''
+        }
+      }
+    }
 
 
 
