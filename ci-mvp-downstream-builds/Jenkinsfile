@@ -201,13 +201,17 @@ spec:
             def nameBuilds = [
               "${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}",
               "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}",
-              "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}"
+              "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}",
+              "${buildFolder}/MVP-Downstream-Build-4/${downStreamBranch}",
+              "${buildFolder}/MVP-Downstream-Build-5/${downStreamBranch}"
             ]
 
             def dirBuilds = [
               "${homeDir}/downstream-build-1",
               "${homeDir}/downstream-build-2",
-              "${homeDir}/downstream-build-3"
+              "${homeDir}/downstream-build-3",
+              "${homeDir}/downstream-build-4",
+              "${homeDir}/downstream-build-5"
             ]
 
             def parallelJobs = [:]
