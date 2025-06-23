@@ -66,6 +66,11 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
+    DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
+    EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    TARBALL_FILE_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+    TARBALL_FILE_PATH   = "/home/jenkins/local/${TARBALL_FILE_NAME}"
+
   }
 
   options {
@@ -77,7 +82,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v26 - with DWS buidls') {
+    stage('Print Environment - v30 - Runner 1.3 again builds') {
       steps {
         script {
 
@@ -127,45 +132,62 @@ spec:
           script {
 
             def localCheckout = "/home/jenkins/local/checkout"
-            def efsWorkspace  = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-            def tarballName   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
 
             sh """
               echo "🧹 Cleaning local checkout path..."
-              rm -rf ${localCheckout} && mkdir -p ${localCheckout}
-
-              echo '📥 Cloning repository into local path...'
+              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
             """
 
-            // dir(localCheckout) {
-            //   checkout([
-            //     $class: 'GitSCM',
-            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
-            //     userRemoteConfigs: [[
-            //       url: "${env.GIT_REPO_URL}",
-            //       credentialsId: 'github-pat-pei'
-            //     ]],
-            //     extensions: [
-            //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            //     ]
-            //   ])
-            // }
+            dir(localCheckout) {
+
+              sh """
+                echo "🧹 Cleaning local checkout path..."
+                pwd
+              """
+              checkout([
+                $class: 'GitSCM',
+                branches: [[name: "*/${env.GIT_BRANCH}"]],
+                userRemoteConfigs: [[
+                  url: "${env.GIT_REPO_URL}",
+                  credentialsId: 'github-pat-pei'
+                ]],
+                extensions: [
+                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+                ]
+              ])
+            }
 
 
             sh """
               echo '📦 Creating tarball without .git...'
-              # tar -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
-              tar --exclude='.git' -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
+              # tar -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
+              tar --exclude='.git' -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
+              
+              echo '📤 Initial workspace contents ... local and target EFS - Before copy tarball'
+              ls -al ${TARBALL_FILE_PATH}
+              ls -al ${EFS_WORKSPACE_DIR}/
+            """
 
-              echo '📤 Moving tarball to EFS workspace...'
-              mkdir -p "${efsWorkspace}"
-              mv ${localCheckout}/${tarballName} "${efsWorkspace}/"
+           
+          }
+        }
+      }
+    }
 
-              echo '📂 Skipping extraction for now...'
-              # tar -xzf "${efsWorkspace}/${tarballName}" -C "${efsWorkspace}/"
+  
+    stage('Tarball to EFS Workspace') {
+      steps {
+        container('runner') {
+          script {
 
-              echo '📄 Final workspace contents:'
-              ls -al "${efsWorkspace}"
+            sh """
+              echo '📤 Copy tarball to EFS workspace...'
+              mkdir -p "${EFS_WORKSPACE_DIR}"
+              cp ${TARBALL_FILE_PATH} "${EFS_WORKSPACE_DIR}/"
+
+              echo '📤 Final workspace contents ... local and target EFS - After copy tarball'
+              ls -al ${TARBALL_FILE_PATH}
+              ls -al ${EFS_WORKSPACE_DIR}/
             """
 
             sh """
@@ -186,7 +208,8 @@ spec:
       }
     }
 
-  
+
+
     stage('Decide What to Run') {
       steps {
         script {
