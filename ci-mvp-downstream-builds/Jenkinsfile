@@ -59,7 +59,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v15 with mount EFS') {
+    stage('Print Environment - v16 with mount EFS') {
       steps {
         script {
 
@@ -134,6 +134,9 @@ spec:
     }
 
 
+
+
+
     stage('Decide What to Run') {
       steps {
         script {
@@ -173,6 +176,8 @@ spec:
       }
     }
 
+
+
   
     stage('Upload to S3') {
       steps {
@@ -185,7 +190,6 @@ spec:
         }
       }
     }
-
 
 
   }
