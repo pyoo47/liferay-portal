@@ -2,7 +2,24 @@
 
 pipeline {
 
-  agent any
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::300374333822:role/jenkins-irsa-role
+spec:
+  serviceAccountName: jenkins-agent
+  containers:
+    - name: runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.3
+      command: ["cat"]
+      tty: true
+"""
+    }
+  }
 
   options {
     skipDefaultCheckout()
@@ -10,7 +27,7 @@ pipeline {
 
   stages {
 
-    stage('Print Environment - v04') {
+    stage('Print Environment - v01') {
       steps {
         script {
 
@@ -28,10 +45,27 @@ pipeline {
           echo "Git Commit: ${env.GIT_COMMIT}"
         }
         // Or print everything
-        sh 'printenv'
+        // sh 'printenv'
       }
     }
 
+    stage('Validate AWS Cli, IRSA and Kubectl (optional) ') {
+      steps {
+        container('runner') {
+          echo '📦 Validate AWS CLI and IRSA...'
+          sh '''
+            aws --version || true 
+            aws sts get-caller-identity || echo "❌ AWS CLI not configured or IRSA not working"
+            aws s3 ls || echo "❌ AWS CLI S3 (IRSA) access not working"
+          '''
+
+          echo '📦 Validate Kubectl ...'
+          sh '''
+              kubectl  version || true
+          '''
+        }
+      }
+    }
     
 
      stage('Checkout Shallow') {
@@ -106,7 +140,7 @@ pipeline {
   //   }
   // }
 
-
+  
 }
 
 
