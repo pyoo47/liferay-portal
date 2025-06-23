@@ -34,7 +34,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v01') {
+    stage('Print Environment - v02') {
       steps {
         script {
 
@@ -119,6 +119,14 @@ spec:
 This Jenkinsfile is an EFS Validation script 
 Current status:
 - The agent used not is mounting successfully the EFS.
+
+ERROR:
+    [PodInfo] liferay-jenkins/mvp-liferay-blueprint-master-ci-6005-postgresql-61-sqlj0--r7wgs
+      Container [jnlp] waiting [ContainerCreating] No message
+      Container [runner] waiting [ContainerCreating] No message
+      Pod [Pending][ContainersNotReady] containers with unready status: [runner jnlp]
+
+
 
 Purpose:
 - It validates the EFS mount by checking if the directory is mounted.
