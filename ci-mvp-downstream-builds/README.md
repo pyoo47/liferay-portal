@@ -47,3 +47,23 @@ liferay-portal/
 
     - master-ci-6005-postgresql         -  for top level build
     - master-ci-6005-downstream-builds  -  for top downstream-builds
+
+# Last Pod Build
+
+
+    POD=$(kubectl get pods -n liferay-jenkins \
+    --selector=jenkins=agent \
+    --sort-by=.metadata.creationTimestamp \
+    -o jsonpath='{.items[-1:].metadata.name}')
+
+    kubectl exec -it "$POD" -n liferay-jenkins -- /bin/bash
+
+    # Top 20 files in size
+    alias duse='du -sh .[!.]* * | sort -hr | head -n 20 '
+    alias ll='ls -alh '
+
+# Commnads inside the pod
+
+    DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
+    EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    FILE_TARBALL_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
