@@ -28,10 +28,14 @@ spec:
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
         claimName: jenkins-efs-pvc
+    - name: workspace-volume
+      emptyDir: {}
 """
     }
   }
@@ -116,19 +120,19 @@ spec:
       }
     }
     
-
+    
     stage('Checkout Shallow') {
       steps {
         container('runner') {
           script {
-            def localCheckout = '/home/jenkins/tmp/local-checkout'
+
+            def localCheckout = "/home/jenkins/local/checkout"
             def efsWorkspace  = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
             def tarballName   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
 
             sh """
-              echo '🧹 Cleaning local checkout path...'
-              rm -rf ${localCheckout}
-              mkdir -p ${localCheckout}
+              echo "🧹 Cleaning local checkout path..."
+              rm -rf ${localCheckout} && mkdir -p ${localCheckout}
 
               echo '📥 Cloning repository into local path...'
             """
