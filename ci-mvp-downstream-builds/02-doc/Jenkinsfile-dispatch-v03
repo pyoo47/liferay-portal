@@ -143,37 +143,34 @@ spec:
             // def changedFiles = sh(script: "git diff --name-only HEAD~1", 
             //                         returnStdout: true).trim().split("\n")
 
-            def buildFolder      = 'MVP-Downstream-Builds'
-            def homeDir          = 'ci-mvp-downstream-builds'
+            def buildFolder      = 'MVP-Downstream-Builds'         // Build folder in Jenkins UI
+            def homeDir          = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
             def topLevelBranch   = 'master-ci-6005-postgresql'
             def downStreamBranch = 'master-ci-6005-downstream-builds'
 
-            def nameBuilds = [
-              "${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}",
-              "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}",
-              "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}"
-            ]
+            def nameBuilds   = ["${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}", 
+                                "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}", 
+                                "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}"]
 
-            def dirBuilds = [
-              "${homeDir}/downstream-build-1",
-              "${homeDir}/downstream-build-2",
-              "${homeDir}/downstream-build-3"
-            ]
+            echo "wip Triggering downstream job"
 
-            def parallelJobs = [:]
+            def dirBuilds   = ["${homeDir}/downstream-build-1", 
+                               "${homeDir}/downstream-build-2",
+                               "${homeDir}/downstream-build-3"]
 
             for (int i = 0; i < dirBuilds.size(); i++) {
-              def idx = i // Required for proper closure capture
-              def dirBuild  = dirBuilds[idx]
-              def nameBuild = nameBuilds[idx]
+                
+                def dirBuild  = dirBuilds[i]
+                def nameBuild = nameBuilds[i]
 
-              parallelJobs["Run-${idx + 1}"] = {
-                echo "👉 Triggering downstream job: ${nameBuild}"
                 build job: "${nameBuild}"
-              }
+                echo "👉 ALWAYS ! - Triggering downstream job: ${nameBuild}" 
+                
+                // if (changedFiles.any { it.startsWith( dirBuild  ) }) {
+                //     build job: "${nameBuild}"
+                //     echo "👉 Triggering downstream job: ${nameBuild}" 
+                // }
             }
-
-            parallel parallelJobs
 
         }
       }
