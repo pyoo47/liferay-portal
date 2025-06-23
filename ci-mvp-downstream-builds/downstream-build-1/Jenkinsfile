@@ -136,11 +136,14 @@ spec:
 
             ls -al /home/jenkins/agent
 
-            echo "📄 Reading test file from EFS..."
-            cat /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME} || echo "❌ Test file not found"
+            echo "📄 Reading Bundle file from EFS..."
+            cat /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME} || echo "❌ Bundle file not found"
+
+            echo "📄 Reading Source file from EFS..."
+            cat /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME} || echo "❌ Source file not found"
 
             echo "📄 Writing test file to EFS..."
-            date > /home/jenkins/agent/test-efs-bundle-${DOWNSTREAM_BUILD_ID}.txt
+            date > /home/jenkins/agent/${TEST_DUMMY_NAME}
           """
         }
       }
