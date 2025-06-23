@@ -57,7 +57,6 @@ spec:
     BUILD_SOURCE_DUMMY_NAME="dummy-${BUILD_SOURCE_NAME}"
 
     TEST_DUMMY_NAME="test-${DOWNSTREAM_BUILD_ID}-dummy.xml"
-    TEST_DUMMY_NAME="test-${DOWNSTREAM_BUILD_ID}-dummy.xml"
 
     // s3://liferayci-file-propagator-mvp/build/35/artifacts
     // s3://liferayci-file-propagator-mvp/build/35/tests
