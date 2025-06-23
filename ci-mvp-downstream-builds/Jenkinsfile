@@ -59,7 +59,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v15 with mount EFS') {
+    stage('Print Environment - v16 with mount EFS') {
       steps {
         script {
 
@@ -134,18 +134,7 @@ spec:
     }
 
 
-  
-    stage('Upload to S3') {
-      steps {
-        container('runner') {
-          sh """
-            echo "📤 Uploading to S3..."
-            aws s3 cp /home/jenkins/agent/git-repo-emulation-gz.txt \
-              ${env.AWS_S3_URL_ARTIFACTS}/git-repo-emulation-gz.txt || echo "❌ Upload failed"
-          """
-        }
-      }
-    }
+
 
 
     stage('Decide What to Run') {
@@ -188,6 +177,19 @@ spec:
     }
 
 
+
+  
+    stage('Upload to S3') {
+      steps {
+        container('runner') {
+          sh """
+            echo "📤 Uploading to S3..."
+            aws s3 cp /home/jenkins/agent/git-repo-emulation-gz.txt \
+              ${env.AWS_S3_URL_ARTIFACTS}/git-repo-emulation-gz.txt || echo "❌ Upload failed"
+          """
+        }
+      }
+    }
 
 
   }
