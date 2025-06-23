@@ -34,32 +34,13 @@ spec:
     }
   }
 
-
-  environment {
-    GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
-    GIT_BRANCH   = 'master-ci-6005-postgresql'
-
-    AWS_ACCOUNT_ID='300374333822'
-    AWS_REGION='us-east-2'
-
-    AWS_S3_BUCKET='liferayci-file-propagator-mvp'
-    AWS_S3_PATH='build'
-
-    AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/artifacts"
-    AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/tests"
-
-    // s3://liferayci-file-propagator-mvp/build/35/artifacts
-    // s3://liferayci-file-propagator-mvp/build/35/tests
-
-  }
-
   options {
     skipDefaultCheckout()
   }
 
   stages {
 
-    stage('Print Environment - v15 with mount EFS') {
+    stage('Print Environment - v12 with mount EFS') {
       steps {
         script {
 
@@ -75,9 +56,6 @@ spec:
           echo "Build Number: ${env.BUILD_NUMBER}"
           echo "Workspace: ${env.WORKSPACE}"
           echo "Git Commit: ${env.GIT_COMMIT}"
-
-          echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
-          echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
         }
         // Or print everything
         // sh 'printenv'
@@ -103,7 +81,7 @@ spec:
     }
     
 
-    stage('Checkout Shallow') {
+     stage('Checkout Shallow') {
       steps {
         // container('runner') {
         //   checkout([
@@ -134,57 +112,6 @@ spec:
     }
 
 
-    stage('Decide What to Run') {
-      steps {
-        script {
-            // def changedFiles = sh(script: "git diff --name-only HEAD~1", 
-            //                         returnStdout: true).trim().split("\n")
-
-            def buildFolder      = 'MVP-Downstream-Builds'         // Build folder in Jenkins UI
-            def homeDir          = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
-            def topLevelBranch   = 'master-ci-6005-postgresql'
-            def downStreamBranch = 'master-ci-6005-downstream-builds'
-
-            def nameBuilds   = ["${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}", 
-                                "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}", 
-                                "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}"]
-
-            echo "wip Triggering downstream job"
-
-            def dirBuilds   = ["${homeDir}/downstream-build-1", 
-                               "${homeDir}/downstream-build-2",
-                               "${homeDir}/downstream-build-3"]
-
-            for (int i = 0; i < dirBuilds.size(); i++) {
-                
-                def dirBuild  = dirBuilds[i]
-                def nameBuild = nameBuilds[i]
-
-                build job: "${nameBuild}"
-                echo "👉 ALWAYS ! - Triggering downstream job: ${nameBuild}" 
-                
-                // if (changedFiles.any { it.startsWith( dirBuild  ) }) {
-                //     build job: "${nameBuild}"
-                //     echo "👉 Triggering downstream job: ${nameBuild}" 
-                // }
-            }
-
-        }
-      }
-    }
-
-  
-    stage('Upload to S3') {
-      steps {
-        container('runner') {
-          sh """
-            echo "📤 Uploading to S3..."
-            aws s3 cp /home/jenkins/agent/git-repo-emulation-gz.txt \
-              ${env.AWS_S3_URL_ARTIFACTS}/git-repo-emulation-gz.txt || echo "❌ Upload failed"
-          """
-        }
-      }
-    }
 
 
 
