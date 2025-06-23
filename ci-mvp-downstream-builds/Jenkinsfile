@@ -179,7 +179,7 @@ spec:
           sh '''
             echo "📤 Uploading to S3..."
             aws s3 cp /home/jenkins/agent/git-repo-emulation-gz.txt \
-                    s3://liferayci-file-propagator-mvp/build/35/artifacts/git-repo-emulation-gz.txt
+                    ${env.AWS_S3_URL_ARTIFACTS}/git-repo-emulation-gz.txt || echo "❌ Upload failed"
           '''
         }
       }
