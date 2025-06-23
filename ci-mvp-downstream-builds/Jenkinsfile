@@ -66,6 +66,7 @@ spec:
 
   options {
     skipDefaultCheckout()
+    customWorkspace "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
   }
 
   stages {
