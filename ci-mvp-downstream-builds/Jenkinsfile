@@ -51,8 +51,8 @@ spec:
     BUILD_BUNDLE_NAME='liferay-portal-bundle-tomcat.tar.gz'
     BUILD_SOURCE_NAME='liferay-portal-source.tar.gz'
 
-    BUILD_BUNDLE_DUMMY_NAME='dummy-${BUILD_BUNDLE_NAME}'
-    BUILD_SOURCE_DUMMY_NAME='dummy-${BUILD_SOURCE_NAME}'
+    BUILD_BUNDLE_DUMMY_NAME="dummy-${BUILD_BUNDLE_NAME}"
+    BUILD_SOURCE_DUMMY_NAME="dummy-${BUILD_SOURCE_NAME}"
 
     // s3://liferayci-file-propagator-mvp/build/35/artifacts
     // s3://liferayci-file-propagator-mvp/build/35/tests
@@ -191,7 +191,8 @@ spec:
 
 
   
-    stage('Upload to S3') {
+    stage('Upload to S3 - Artifacts') {
+
       steps {
         container('runner') {
           sh """
