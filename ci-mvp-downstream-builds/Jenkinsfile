@@ -173,7 +173,7 @@ spec:
               }
             }
 
-            parallel parallelJobs
+            parallel parallelJobs.   // ← Jenkins waits for all to finish here
 
         }
       }
