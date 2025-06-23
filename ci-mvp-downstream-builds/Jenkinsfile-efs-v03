@@ -5,12 +5,6 @@ pipeline {
   agent {
     kubernetes {
       yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  name: jenkins-efs-agent
-  labels:
-    jenkins: agent
 spec:
   serviceAccountName: jenkins-agent
   securityContext:
@@ -42,7 +36,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v12 with mount EFS') {
+    stage('Print Environment - v05') {
       steps {
         script {
 
@@ -129,8 +123,12 @@ Current status:
 - The agent used not is mounting successfully the EFS.
 
 ERROR:
-- The script checks if the EFS is mounted, 
-  ERROR permision 
+    [PodInfo] liferay-jenkins/mvp-liferay-blueprint-master-ci-6005-postgresql-61-sqlj0--r7wgs
+      Container [jnlp] waiting [ContainerCreating] No message
+      Container [runner] waiting [ContainerCreating] No message
+      Pod [Pending][ContainersNotReady] containers with unready status: [runner jnlp]
+
+
 
 Purpose:
 - It validates the EFS mount by checking if the directory is mounted.
