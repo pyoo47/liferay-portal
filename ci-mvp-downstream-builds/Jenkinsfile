@@ -68,7 +68,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v22 - with DWS buidls') {
+    stage('Print Environment - v23 - with DWS buidls') {
       steps {
         script {
 
