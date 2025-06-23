@@ -151,22 +151,22 @@ spec:
               ])
             }
 
+
             sh """
-              echo '📦 Creating tarball...'
-              tar -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
+              echo '📦 Creating tarball without .git...'
+              # tar -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
               tar --exclude='.git' -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
-              
+
               echo '📤 Moving tarball to EFS workspace...'
               mkdir -p "${efsWorkspace}"
               mv ${localCheckout}/${tarballName} "${efsWorkspace}/"
 
-              echo '📂 I don't need to Extracting tarball into workspace...'
+              echo '📂 Skipping extraction for now...'
               # tar -xzf "${efsWorkspace}/${tarballName}" -C "${efsWorkspace}/"
 
               echo '📄 Final workspace contents:'
               ls -al "${efsWorkspace}"
             """
-
 
             sh """
 
