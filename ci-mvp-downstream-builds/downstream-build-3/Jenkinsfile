@@ -7,11 +7,17 @@ pipeline {
 apiVersion: v1
 kind: Pod
 metadata:
-  annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::300374333822:role/jenkins-irsa-role
+  name: jenkins-efs-agent
+  labels:
+    jenkins: agent
 spec:
   serviceAccountName: jenkins-agent
   containers:
+    - name: jnlp
+      image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
     - name: runner
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.3
       command: ["cat"]
@@ -38,6 +44,12 @@ spec:
     // DOWNSTREAM_BUILD_ID = "${env.BUILD_ID}"
     DOWNSTREAM_BUILD_ID='downstream-build-3'
 
+    AWS_S3_BUCKET='liferayci-file-propagator-mvp'
+    AWS_S3_PATH='build'
+
+    AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/artifacts"
+    AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/tests"
+    
   }
 
   options {
@@ -57,6 +69,9 @@ spec:
           echo "Build Number: ${env.BUILD_NUMBER}"
           echo "Workspace: ${env.WORKSPACE}"
           echo "Git Commit: ${env.GIT_COMMIT}"
+
+          echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
+          echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
         }
       }
     }
