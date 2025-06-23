@@ -34,7 +34,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v02') {
+    stage('Print Environment - v03') {
       steps {
         script {
 
@@ -56,23 +56,23 @@ spec:
       }
     }
 
-    stage('Validate AWS Cli, IRSA and Kubectl (optional) ') {
-      steps {
-        container('runner') {
-          echo '📦 Validate AWS CLI and IRSA...'
-          sh '''
-            aws --version || true 
-            aws sts get-caller-identity || echo "❌ AWS CLI not configured or IRSA not working"
-            aws s3 ls || echo "❌ AWS CLI S3 (IRSA) access not working"
-          '''
+    // stage('Validate AWS Cli, IRSA and Kubectl (optional) ') {
+    //   steps {
+    //     container('runner') {
+    //       echo '📦 Validate AWS CLI and IRSA...'
+    //       sh '''
+    //         aws --version || true 
+    //         aws sts get-caller-identity || echo "❌ AWS CLI not configured or IRSA not working"
+    //         aws s3 ls || echo "❌ AWS CLI S3 (IRSA) access not working"
+    //       '''
 
-          echo '📦 Validate Kubectl ...'
-          sh '''
-              kubectl  version || true
-          '''
-        }
-      }
-    }
+    //       echo '📦 Validate Kubectl ...'
+    //       sh '''
+    //           kubectl  version || true
+    //       '''
+    //     }
+    //   }
+    // }
     
 
      stage('Checkout Shallow') {
