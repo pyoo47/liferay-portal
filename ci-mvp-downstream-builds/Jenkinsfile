@@ -13,8 +13,6 @@ metadata:
     jenkins: agent
 spec:
   serviceAccountName: jenkins-agent
-  securityContext:
-    fsGroup: 1000
   containers:
     - name: jnlp
       image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
@@ -128,9 +126,8 @@ This Jenkinsfile is an EFS Validation script
 Current status:
 - The agent used not is mounting successfully the EFS.
 
-ERROR:
-- The script checks if the EFS is mounted, 
-  ERROR permision 
+Status:
+- This Jenkinsfile works fine - the EFS is mounted fs was change permision to write only for test purposes.
 
 Purpose:
 - It validates the EFS mount by checking if the directory is mounted.
