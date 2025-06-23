@@ -66,6 +66,11 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
+    DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
+    EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    FILE_TARBALL_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+
+
   }
 
   options {
@@ -126,18 +131,14 @@ spec:
         container('runner') {
           script {
 
-            def localCheckout = "/home/jenkins/local/checkout"
-            def efsWorkspace  = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-            def tarballName   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
-
             sh """
               echo "🧹 Cleaning local checkout path..."
-              rm -rf ${localCheckout} && mkdir -p ${localCheckout}
+              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
 
               echo '📥 Cloning repository into local path...'
             """
 
-            dir(localCheckout) {
+            dir(DIR_LOCAL_CHECKOUT) {
               checkout([
                 $class: 'GitSCM',
                 branches: [[name: "*/${env.GIT_BRANCH}"]],
@@ -154,26 +155,34 @@ spec:
 
             sh """
               echo '📦 Creating tarball without .git...'
-              # tar -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
-              tar --exclude='.git' -czf ${localCheckout}/${tarballName} -C ${localCheckout} .
+              # tar -czf ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME} -C ${DIR_LOCAL_CHECKOUT} .
+              tar --exclude='.git' -czf ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME} -C ${DIR_LOCAL_CHECKOUT} .
               
-              echo '📤 Source Local tarball ...'
-              ls -al ${localCheckout}/${tarballName}
+              echo '📤 Initial workspace contents ... local and target EFS - Before copy tarball'
+              ls -al ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME}
+              ls -al ${EFS_WORKSPACE_DIR}/
+            """
 
+           
+          }
+        }
+      }
+    }
 
-              echo '📤 Moving tarball to EFS workspace...'
-              mkdir -p "${efsWorkspace}"
-              # mv ${localCheckout}/${tarballName} "${efsWorkspace}/"
-              cp ${localCheckout}/${tarballName} "${efsWorkspace}/"
+  
+    stage('Tarball to EFS Workspace') {
+      steps {
+        container('runner') {
+          script {
 
-              echo '📤 Dest EFS tarball ...'
-              ls -al ${efsWorkspace}/
+            sh """
+              echo '📤 Copy tarball to EFS workspace...'
+              mkdir -p "${EFS_WORKSPACE_DIR}"
+              cp ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME} "${EFS_WORKSPACE_DIR}/"
 
-              echo '📂 Skipping extraction for now...'
-              # tar -xzf "${efsWorkspace}/${tarballName}" -C "${efsWorkspace}/"
-
-              echo '📄 Final workspace contents:'
-              ls -al "${efsWorkspace}"
+              echo '📤 Final workspace contents ... local and target EFS - After copy tarball'
+              ls -al ${DIR_LOCAL_CHECKOUT}/${FILE_TARBALL_NAME}
+              ls -al ${EFS_WORKSPACE_DIR}/
             """
 
             sh """
@@ -194,7 +203,8 @@ spec:
       }
     }
 
-  
+
+
     stage('Decide What to Run') {
       steps {
         script {
