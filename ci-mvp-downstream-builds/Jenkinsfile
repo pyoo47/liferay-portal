@@ -5,11 +5,6 @@ pipeline {
   agent {
     kubernetes {
       yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::300374333822:role/jenkins-irsa-role
 spec:
   serviceAccountName: jenkins-agent
   securityContext:
