@@ -137,8 +137,8 @@ spec:
     stage('Decide What to Run') {
       steps {
         script {
-            def changedFiles = sh(script: "git diff --name-only HEAD~1", 
-                                    returnStdout: true).trim().split("\n")
+            // def changedFiles = sh(script: "git diff --name-only HEAD~1", 
+            //                         returnStdout: true).trim().split("\n")
 
             def buildFolder      = 'MVP-Downstream-Builds'         // Build folder in Jenkins UI
             def homeDir          = 'ci-mvp-downstream-builds'      // Home directory in Jenkins Agent
@@ -163,10 +163,10 @@ spec:
                 build job: "${nameBuild}"
                 echo "👉 ALWAYS ! - Triggering downstream job: ${nameBuild}" 
                 
-                if (changedFiles.any { it.startsWith( dirBuild  ) }) {
-                    build job: "${nameBuild}"
-                    echo "👉 Triggering downstream job: ${nameBuild}" 
-                }
+                // if (changedFiles.any { it.startsWith( dirBuild  ) }) {
+                //     build job: "${nameBuild}"
+                //     echo "👉 Triggering downstream job: ${nameBuild}" 
+                // }
             }
 
         }
