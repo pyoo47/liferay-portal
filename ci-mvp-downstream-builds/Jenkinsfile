@@ -121,7 +121,7 @@ spec:
     }
     
 
-    stage('Checkout Shallow - same yesterday') {
+    stage('Checkout Shallow - today with SCM ') {
       steps {
         container('runner') {
           script {
@@ -137,19 +137,19 @@ spec:
               echo '📥 Cloning repository into local path...'
             """
 
-            // dir(localCheckout) {
-            //   checkout([
-            //     $class: 'GitSCM',
-            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
-            //     userRemoteConfigs: [[
-            //       url: "${env.GIT_REPO_URL}",
-            //       credentialsId: 'github-pat-pei'
-            //     ]],
-            //     extensions: [
-            //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            //     ]
-            //   ])
-            // }
+            dir(localCheckout) {
+              checkout([
+                $class: 'GitSCM',
+                branches: [[name: "*/${env.GIT_BRANCH}"]],
+                userRemoteConfigs: [[
+                  url: "${env.GIT_REPO_URL}",
+                  credentialsId: 'github-pat-pei'
+                ]],
+                extensions: [
+                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+                ]
+              ])
+            }
 
 
             sh """
