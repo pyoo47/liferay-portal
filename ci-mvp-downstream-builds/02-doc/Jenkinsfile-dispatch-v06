@@ -1,7 +1,5 @@
 @Library('Liferay-Global-Shared-Libs') _
 
-
-
 pipeline {
 
   agent {
@@ -195,32 +193,83 @@ spec:
     stage('Dynamic Downstream Builds') {
       steps {
         script {
-                        
-            /**
-            * Shared Library: TestBuildEnum.TestBuild
-            * Allow use commit messages to trigger tests individually.
-            * Examples, using TestBuild enum: 
-            *
-            *   - [test: test-01-unit]     → Run test-01-unit
-            *   - [test: test-02-func]     → Run test-02-func
-            *   - [test: test-03-db]       → Run test-03-db
-            *   - [test: test-04-unit]     → Run test-04-unit
-            *   - [test: test-05-unit]     → Run test-05-unit
-            *   - [test: ALL]              → Run all tests in parallel
-            *   - [test: NONE]             → Skip all tests
-            *
-            */
             
-            import com.liferay.TestBuild
+            /**
+              * Use commit messages to trigger tests individually.
+              * Examples, using TestBuild enum: 
+              *
+              *   - [test: test-01-unit]     → Run test-01-unit
+              *   - [test: test-02-func]     → Run test-02-func
+              *   - [test: test-03-db]       → Run test-03-db
+              *   - [test: test-04-unit]     → Run test-04-unit
+              *   - [test: test-05-unit]     → Run test-05-unit
+              *   - [test: ALL]              → Run all tests in parallel
+              *   - [test: NONE]             → Skip all tests
+              *
+              * Combined messages are also supported:
+              *   - [test: test-01-unit, test-02-func]
+              *   - [test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]
+              *
+              * TestBuild enum to manage downstream builds
+              * echo TestBuild.TEST_02.getFullJobPath()   // MVP-Downstream-Builds/MVP-Downstream-Build-2/master-ci-6005-downstream-builds
+              * echo TestBuild.TEST_03.getFullDirPath()   // ci-mvp-downstream-builds/downstream-build-3
+              */
+            enum TestBuild {
 
-            def commitMessage = "[test: test-01-unit, test-03-db]"
-            // def commitMessage = "[test: NONE ]"
-            // def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                static final String BUILD_FOLDER = 'MVP-Downstream-Builds'
+                static final String HOME_DIR = 'ci-mvp-downstream-builds'
+                static final String BRANCH = 'master-ci-6005-downstream-builds'
+
+                ALL("", "", ""),
+                TEST_01("test-01-unit", "MVP-Downstream-Build-1", "downstream-build-1"),
+                TEST_02("test-02-func", "MVP-Downstream-Build-2", "downstream-build-2"),
+                TEST_03("test-03-db",   "MVP-Downstream-Build-3", "downstream-build-3"),
+                TEST_04("test-04-unit", "MVP-Downstream-Build-4", "downstream-build-4"),
+                TEST_05("test-05-unit", "MVP-Downstream-Build-5", "downstream-build-5"),
+                NONE("", "", "");
+
+                final String label
+                final String jobName
+                final String dir
+
+                TestBuild(String label, String jobName, String dir) {
+                    this.label = label
+                    this.jobName = jobName
+                    this.dir = dir
+                }
+
+                String getFullJobPath() {
+                    return "${BUILD_FOLDER}/${jobName}/${BRANCH}"
+                }
+
+                String getFullDirPath() {
+                    return "${HOME_DIR}/${dir}"
+                }
+
+                static List<TestBuild> getAll() {
+                    return values().findAll { it.label } // Returns only real test builds
+                }
+
+                static List<TestBuild> fromCommitMessage(String commitMsg) {
+                    def matcher = commitMsg =~ /\[test:\s*(.*?)\]/
+                    if (!matcher.find()) return getAll() // Default to ALL if not specified
+
+                    def tokens = matcher.group(1).split(',')
+                                        .collect { it.trim().toLowerCase() }
+
+                    if (tokens.contains('all')) return getAll()
+                    if (tokens.contains('none')) return []
+
+                    return getAll().findAll { test ->
+                      test.label.toLowerCase() in tokens
+                    }
+                }
+            }
+
+
+            def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
 
             def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
-
-            echo "✅ Selected: ${selectedTests*.label.join(', ')}"
-
             def parallelJobs = [:]
 
             selectedTests.each { test ->
