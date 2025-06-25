@@ -200,11 +200,11 @@ spec:
             echo "🔄 Version 2.0 - (Docker image 1.5) ..."
             
             
-            // def commitMessage = "[test: test-01-unit, test-03-db]"
+            
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
-
-            def commitMessage = "[test: ALL ]"
+            // def commitMessage = "[test: ALL ]"
+            def commitMessage = "[test: test-01-unit, test-03-db]"
 
             try {
               commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
@@ -261,21 +261,21 @@ spec:
   }
 
     
-  // post {
-  //   always {
-  //     container('runner') {
-  //       script {
-  //         def podName = env.NODE_NAME
-  //         sh """
-  //           echo "🛑 Build complete. Pod is: ${podName}"
-  //           echo "Run this to debug:"
-  //           echo "kubectl exec -it ${podName} -n liferay-jenkins -- bash"
-  //           sleep 3600
-  //         """
-  //       }
-  //     }
-  //   }
-  // }
+  post {
+    always {
+      container('runner') {
+        script {
+          def podName = env.NODE_NAME
+          sh """
+            echo "🛑 Build complete. Pod is: ${podName}"
+            echo "Run this to debug:"
+            echo "kubectl exec -it ${podName} -n liferay-jenkins -- bash"
+            sleep 3600
+          """
+        }
+      }
+    }
+  }
   
 
 
