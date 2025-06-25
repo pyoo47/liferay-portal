@@ -77,7 +77,8 @@ spec:
 
   options {
     skipDefaultCheckout()
-    ws "/home/jenkins/local/checkout"
+    ws "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    // ws "/home/jenkins/local/checkout"
     
   }
 
@@ -118,8 +119,11 @@ spec:
     stage('Validate AWS Cli, IRSA and Kubectl (optional) ') {
       steps {
         container('runner') {
+
           echo '📦 Validate AWS CLI and IRSA...'
-          echo "🔄 Using (Docker image 2.1) ... Version 24.0 "
+
+          echo "🔄 Starting dynamic downstream builds based on commit message..."
+          echo "🔄 Using (Docker image 2.1) ... UPDATE to Version 2.5 "
 
           sh '''
             aws --version || true 
