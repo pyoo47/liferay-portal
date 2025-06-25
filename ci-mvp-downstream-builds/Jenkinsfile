@@ -163,10 +163,18 @@ spec:
               ])
             }
 
-            sh """
-              echo "🧹 Do I finish - Reading local checkout path..."
-              ls -la ${DIR_LOCAL_CHECKOUT}
-            """
+            def items = ['alpha', 'beta', 'gamma', 'beta', 'gamma']
+            for (item in items) {
+              sleep 200
+              echo "waiting Item: ${item}"
+
+              sh """
+                echo "🧹 Do I finish - Reading local checkout path..."
+                ls -la ${DIR_LOCAL_CHECKOUT}
+              """
+              
+            }
+            
           }
         }
       }
