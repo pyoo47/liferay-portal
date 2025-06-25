@@ -122,6 +122,8 @@ spec:
 
           echo '📦 Validate AWS CLI and IRSA...'
 
+          echo 'Using (Docker image 2.1) ... UPDATE to Version 2.6 '
+
           sh '''
             aws --version || true 
             aws sts get-caller-identity || echo "❌ AWS CLI not configured or IRSA not working"
@@ -163,10 +165,6 @@ spec:
               ])
             }
 
-            sh """
-              echo "🧹 Do I finish - Reading local checkout path..."
-              ls -la ${DIR_LOCAL_CHECKOUT}
-            """
           }
         }
       }
@@ -189,7 +187,7 @@ spec:
                ls -al ${DIR_LOCAL_CHECKOUT}
               echo "📂 Local checkout contents:"
                
-              pigz --version || echo '❌ pigz not found'
+              echo "pigz --version || echo '❌ pigz not found'"
 
               echo '📦 Creating tarball without .git...'
               # tar -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
@@ -211,7 +209,12 @@ spec:
               echo "🔍 Checking EFS mount at /home/jenkins/agent"
               mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
 
+              date > /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME}
+              echo "📄 GitRepo emulation ." >> /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME}
 
+              date > /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME}
+              echo "📄 GitRepo emulation ." >> /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME}
+              
               ls -al /home/jenkins/agent
             """
           }
