@@ -149,19 +149,38 @@ spec:
               echo '📥 Cloning repository into local path...'
             """
 
-            dir(DIR_LOCAL_CHECKOUT) {
-              checkout([
-                $class: 'GitSCM',
-                branches: [[name: "*/${env.GIT_BRANCH}"]],
-                userRemoteConfigs: [[
-                  url: "${env.GIT_REPO_URL}",
-                  credentialsId: 'github-pat-pei'
-                ]],
-                extensions: [
-                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-                ]
-              ])
+            dir("${DIR_LOCAL_CHECKOUT}") {
+              withCredentials([usernamePassword(
+                credentialsId: 'github-pat-pei',
+                passwordVariable: 'GIT_PASSWORD',
+                usernameVariable: 'GIT_USERNAME'
+              )]) {
+                sh """
+                  echo "🧹 Cleaning checkout directory..."
+                  rm -rf ./*
+
+                  echo "📥 Cloning repository using shallow fetch..."
+                  git init
+                  git remote add origin https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git
+                  git fetch --depth=1 origin ${env.GIT_BRANCH}
+                  git checkout FETCH_HEAD
+                """
+              }
             }
+
+            // dir(DIR_LOCAL_CHECKOUT) {
+            //   checkout([
+            //     $class: 'GitSCM',
+            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
+            //     userRemoteConfigs: [[
+            //       url: "${env.GIT_REPO_URL}",
+            //       credentialsId: 'github-pat-pei'
+            //     ]],
+            //     extensions: [
+            //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+            //     ]
+            //   ])
+            // }
 
             sh """
               echo "🧹 Do I finish - Reading local checkout path..."
