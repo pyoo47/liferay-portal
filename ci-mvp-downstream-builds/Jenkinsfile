@@ -197,7 +197,7 @@ spec:
         script {
                         
             echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Version 2.0 - (Docker image 1.5) ..."
+            echo "🔄 Version 2.1 - (Docker image 1.5) ..."
             
             
             
