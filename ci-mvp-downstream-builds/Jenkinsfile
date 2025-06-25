@@ -156,6 +156,9 @@ spec:
 
 
             sh """
+               ls -al ${localCheckout}
+              echo "📂 Local checkout contents:"
+               
               echo '📦 Creating tarball without .git...'
               # tar -czf /home/jenkins/local/${tarballName} -C ${localCheckout} .
               tar --exclude='.git' -czf /home/jenkins/local/${tarballName} -C ${localCheckout} .
