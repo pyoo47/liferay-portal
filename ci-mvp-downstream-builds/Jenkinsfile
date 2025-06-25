@@ -149,32 +149,19 @@ spec:
               echo '📥 Cloning repository into local path...'
             """
 
-            withCredentials([usernamePassword(
-              credentialsId: 'github-pat-pei',
-              usernameVariable: 'GIT_USERNAME',
-              passwordVariable: 'GIT_PASSWORD'
-            )]) {
-              dir('/home/jenkins/local/checkout') {
-                sh '''
-                  git clone https://$GIT_USERNAME:$GIT_PASSWORD@github.com/pablo-inchausti-caylent/liferay-portal.git .
-                '''
-              }
+            dir(DIR_LOCAL_CHECKOUT) {
+              checkout([
+                $class: 'GitSCM',
+                branches: [[name: "*/${env.GIT_BRANCH}"]],
+                userRemoteConfigs: [[
+                  url: "${env.GIT_REPO_URL}",
+                  credentialsId: 'github-pat-pei'
+                ]],
+                extensions: [
+                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+                ]
+              ])
             }
-            
-
-            // dir(DIR_LOCAL_CHECKOUT) {
-            //   checkout([
-            //     $class: 'GitSCM',
-            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
-            //     userRemoteConfigs: [[
-            //       url: "${env.GIT_REPO_URL}",
-            //       credentialsId: 'github-pat-pei'
-            //     ]],
-            //     extensions: [
-            //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            //     ]
-            //   ])
-            // }
 
             sh """
               echo "🧹 Do I finish - Reading local checkout path..."
