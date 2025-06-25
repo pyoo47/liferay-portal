@@ -89,12 +89,11 @@ spec:
         script {
 
           echo "Environment Variables:"
-          echo "Branch      : ${env.BRANCH_NAME}"
-          echo "Job Name    : ${env.JOB_NAME}"
+          echo "Branch: ${env.BRANCH_NAME}"
+          echo "Job Name: ${env.JOB_NAME}"
           echo "Build Number: ${env.BUILD_NUMBER}"
-          echo "Workspace   : ${env.WORKSPACE}"
-          echo "Git Commit  : ${env.GIT_COMMIT}"
-          echo "Node Name   : ${env.NODE_NAME}"
+          echo "Workspace: ${env.WORKSPACE}"
+          echo "Git Commit: ${env.GIT_COMMIT}"
 
           echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
           echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
@@ -104,7 +103,7 @@ spec:
           log.info    'Validation Shared Libs Integration'
           log.warning 'Liferay-Global-Shared-Libs is working fine'
           
-          echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
+          echo "kubectl exec -it ${podName} -n liferay-jenkins -- bash"
         }
         // Or print everything
         // sh 'printenv'
