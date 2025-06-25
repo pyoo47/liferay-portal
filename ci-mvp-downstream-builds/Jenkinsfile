@@ -119,6 +119,8 @@ spec:
       steps {
         container('runner') {
           echo '📦 Validate AWS CLI and IRSA...'
+          echo "🔄 Using (Docker image 2.1) ... Version 23.0 "
+
           sh '''
             aws --version || true 
             aws sts get-caller-identity || echo "❌ AWS CLI not configured or IRSA not working"
