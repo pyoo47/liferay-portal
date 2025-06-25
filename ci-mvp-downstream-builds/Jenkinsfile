@@ -68,8 +68,10 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
-
-
+    DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
+    EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    TARBALL_FILE_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+    TARBALL_FILE_PATH   = "/home/jenkins/local/${TARBALL_FILE_NAME}"
 
   }
 
@@ -86,11 +88,7 @@ spec:
       steps {
         script {
 
-          echo "Testing Shared Libs"
-
-          log.info 'Validation Shared Libs Integration'
-          log.warning 'Liferay-Global-Shared-Libs is working fine'
-
+          echo "Environment Variables:"
           echo "Branch: ${env.BRANCH_NAME}"
           echo "Job Name: ${env.JOB_NAME}"
           echo "Build Number: ${env.BUILD_NUMBER}"
@@ -99,6 +97,13 @@ spec:
 
           echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
           echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
+
+          echo "Testing Shared Libs"
+
+          log.info    'Validation Shared Libs Integration'
+          log.warning 'Liferay-Global-Shared-Libs is working fine'
+          
+          echo "kubectl exec -it ${podName} -n liferay-jenkins -- bash"
         }
         // Or print everything
         // sh 'printenv'
@@ -129,18 +134,21 @@ spec:
         container('runner') {
           script {
 
-            def localCheckout = "/home/jenkins/local/checkout"
-            def efsWorkspace  = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+
+    // TARBALL_FILE_PATH   = "/home/jenkins/local/${TARBALL_FILE_NAME}"
+
+            def repoCheckoutDir = "/home/jenkins/local/checkout"
+
             def tarballName   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
 
             sh """
               echo "🧹 Cleaning local checkout path..."
-              rm -rf ${localCheckout} && mkdir -p ${localCheckout}
+              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
 
               echo '📥 Cloning repository into local path...'
             """
 
-            dir(localCheckout) {
+            dir(repoCheckoutDir) {
               checkout([
                 $class: 'GitSCM',
                 branches: [[name: "*/${env.GIT_BRANCH}"]],
@@ -156,22 +164,22 @@ spec:
 
 
             sh """
-               ls -al ${localCheckout}
+               ls -al ${DIR_LOCAL_CHECKOUT}
               echo "📂 Local checkout contents:"
                
               echo '📦 Creating tarball without .git...'
-              # tar -czf /home/jenkins/local/${tarballName} -C ${localCheckout} .
-              tar --exclude='.git' -czf /home/jenkins/local/${tarballName} -C ${localCheckout} .
+              # tar -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
+              tar --exclude='.git' -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
 
               echo '📤 Moving tarball to EFS workspace...'
-              mkdir -p "${efsWorkspace}"
-              mv /home/jenkins/local/${tarballName} "${efsWorkspace}/"
+              mkdir -p "${EFS_WORKSPACE_DIR}"
+              mv ${TARBALL_FILE_PATH} "${EFS_WORKSPACE_DIR}/"
 
               echo '📂 Skipping extraction for now...'
-              # tar -xzf "/home/jenkins/local/${tarballName}" -C "${efsWorkspace}/"
+              # tar -xzf "${TARBALL_FILE_PATH}" -C "${EFS_WORKSPACE_DIR}/"
 
               echo '📄 Final workspace contents:'
-              ls -al "${efsWorkspace}"
+              ls -al "${EFS_WORKSPACE_DIR}"
             """
 
             sh """
