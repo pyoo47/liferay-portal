@@ -144,27 +144,12 @@ spec:
         container('runner') {
           script {
 
-            // def repoCheckoutDir = "/home/jenkins/local/checkout"
-            
             sh """
               echo "🧹 Cleaning local checkout path..."
               rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
 
               echo '📥 Cloning repository into local path...'
             """
-
-            // checkout([
-            //   $class: 'GitSCM',
-            //   branches: [[name: "*/${env.GIT_BRANCH}"]],
-            //   userRemoteConfigs: [[
-            //     url: "${env.GIT_REPO_URL}",
-            //     credentialsId: 'github-pat-pei'
-            //   ]],
-            //   extensions: [
-            //     [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            //   ]
-            // ])
-          
 
             dir(DIR_LOCAL_CHECKOUT) {
               checkout([
@@ -179,6 +164,23 @@ spec:
                 ]
               ])
             }
+
+          }
+        }
+      }
+    }
+
+
+
+    stage('Post Checkout - using the files ') {
+      steps {
+        container('runner') {
+          script {
+
+            sh """
+              echo "🧹 Reading local checkout path..."
+              ls -la ${DIR_LOCAL_CHECKOUT}
+            """
 
 
             sh """
@@ -220,7 +222,7 @@ spec:
       }
     }
 
-  
+
     stage('Dynamic Downstream Builds') {
       steps {
         script {
