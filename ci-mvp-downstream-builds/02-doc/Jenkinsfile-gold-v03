@@ -154,21 +154,6 @@ spec:
               rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
             """
 
-            // // Do the Git checkout
-            // dir(DIR_LOCAL_CHECKOUT) {
-            //   checkout([
-            //     $class: 'GitSCM',
-            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
-            //     userRemoteConfigs: [[
-            //       url: "${env.GIT_REPO_URL}",
-            //       credentialsId: 'github-pat-pei'
-            //     ]],
-            //     extensions: [
-            //       [$class: 'CloneOption', shallow: true, depth: 1, timeout: 10]
-            //     ]
-            //   ])
-            // }
-
             withCredentials([
               usernamePassword(
                 credentialsId: 'github-pat-pei',
@@ -192,7 +177,7 @@ spec:
               echo '📦 Creating tarball (excluding .git)...'
               tar --exclude='.git' \
                    --use-compress-program=pigz \
-                   -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
+                   -cf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
             """
 
 
@@ -206,21 +191,21 @@ spec:
   }
 
     
-  post {
-    always {
-      container('runner') {
-        script {
+  // post {
+  //   always {
+  //     container('runner') {
+  //       script {
           
-          sh """
-            echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
-            echo "Run this to debug:"
-            echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
-            sleep 3600
-          """
-        }
-      }
-    }
-  }
+  //         sh """
+  //           echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
+  //           echo "Run this to debug:"
+  //           echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
+  //           sleep 3600
+  //         """
+  //       }
+  //     }
+  //   }
+  // }
   
 
 
