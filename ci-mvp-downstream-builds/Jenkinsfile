@@ -77,8 +77,8 @@ spec:
 
   options {
     skipDefaultCheckout()
-    ws "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-    // ws "/home/jenkins/local/checkout"
+    // ws "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    ws "/home/jenkins/local/checkout"
     
   }
 
@@ -122,8 +122,7 @@ spec:
 
           echo '📦 Validate AWS CLI and IRSA...'
 
-          echo "🔄 Starting dynamic downstream builds based on commit message..."
-          echo "🔄 Using (Docker image 2.1) ... UPDATE to Version 2.5 "
+          echo 'Using (Docker image 2.1) ... UPDATE to Version 2.6 '
 
           sh '''
             aws --version || true 
