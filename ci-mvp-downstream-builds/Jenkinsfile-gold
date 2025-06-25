@@ -66,9 +66,6 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
-
-
-
   }
 
   options {
@@ -193,92 +190,41 @@ spec:
     stage('Dynamic Downstream Builds') {
       steps {
         script {
-            
-            /**
-              * Use commit messages to trigger tests individually.
-              * Examples, using TestBuild enum: 
-              *
-              *   - [test: test-01-unit]     → Run test-01-unit
-              *   - [test: test-02-func]     → Run test-02-func
-              *   - [test: test-03-db]       → Run test-03-db
-              *   - [test: test-04-unit]     → Run test-04-unit
-              *   - [test: test-05-unit]     → Run test-05-unit
-              *   - [test: ALL]              → Run all tests in parallel
-              *   - [test: NONE]             → Skip all tests
-              *
-              * Combined messages are also supported:
-              *   - [test: test-01-unit, test-02-func]
-              *   - [test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]
-              *
-              * TestBuild enum to manage downstream builds
-              * echo TestBuild.TEST_02.getFullJobPath()   // MVP-Downstream-Builds/MVP-Downstream-Build-2/master-ci-6005-downstream-builds
-              * echo TestBuild.TEST_03.getFullDirPath()   // ci-mvp-downstream-builds/downstream-build-3
-              */
-            enum TestBuild {
+            // def changedFiles = sh(script: "git diff --name-only HEAD~1", 
+            //                         returnStdout: true).trim().split("\n")
 
-                static final String BUILD_FOLDER = 'MVP-Downstream-Builds'
-                static final String HOME_DIR = 'ci-mvp-downstream-builds'
-                static final String BRANCH = 'master-ci-6005-downstream-builds'
+            def buildFolder      = 'MVP-Downstream-Builds'
+            def homeDir          = 'ci-mvp-downstream-builds'
+            def topLevelBranch   = 'master-ci-6005-postgresql'
+            def downStreamBranch = 'master-ci-6005-downstream-builds'
 
-                ALL("", "", ""),
-                TEST_01("test-01-unit", "MVP-Downstream-Build-1", "downstream-build-1"),
-                TEST_02("test-02-func", "MVP-Downstream-Build-2", "downstream-build-2"),
-                TEST_03("test-03-db",   "MVP-Downstream-Build-3", "downstream-build-3"),
-                TEST_04("test-04-unit", "MVP-Downstream-Build-4", "downstream-build-4"),
-                TEST_05("test-05-unit", "MVP-Downstream-Build-5", "downstream-build-5"),
-                NONE("", "", "");
+            def nameBuilds = [
+              "${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}",
+              "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}",
+              "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}",
+              "${buildFolder}/MVP-Downstream-Build-4/${downStreamBranch}",
+              "${buildFolder}/MVP-Downstream-Build-5/${downStreamBranch}"
+            ]
 
-                final String label
-                final String jobName
-                final String dir
+            def dirBuilds = [
+              "${homeDir}/downstream-build-1",
+              "${homeDir}/downstream-build-2",
+              "${homeDir}/downstream-build-3",
+              "${homeDir}/downstream-build-4",
+              "${homeDir}/downstream-build-5"
+            ]
 
-                TestBuild(String label, String jobName, String dir) {
-                    this.label = label
-                    this.jobName = jobName
-                    this.dir = dir
-                }
-
-                String getFullJobPath() {
-                    return "${BUILD_FOLDER}/${jobName}/${BRANCH}"
-                }
-
-                String getFullDirPath() {
-                    return "${HOME_DIR}/${dir}"
-                }
-
-                static List<TestBuild> getAll() {
-                    return values().findAll { it.label } // Returns only real test builds
-                }
-
-                static List<TestBuild> fromCommitMessage(String commitMsg) {
-                    def matcher = commitMsg =~ /\[test:\s*(.*?)\]/
-                    if (!matcher.find()) return getAll() // Default to ALL if not specified
-
-                    def tokens = matcher.group(1).split(',')
-                                        .collect { it.trim().toLowerCase() }
-
-                    if (tokens.contains('all')) return getAll()
-                    if (tokens.contains('none')) return []
-
-                    return getAll().findAll { test ->
-                      test.label.toLowerCase() in tokens
-                    }
-                }
-            }
-
-            def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
-
-            def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
             def parallelJobs = [:]
 
-            selectedTests.each { test ->
-                parallelJobs["Run-${test.label}"] = {
-                    echo "👉 Running: ${test.label}"
-                    echo "🔧 Job Path: ${test.fullJobPath}"
-                    echo "📁 Directory: ${test.fullDirPath}"
+            for (int i = 0; i < dirBuilds.size(); i++) {
+              def idx = i // Required for proper closure capture
+              def dirBuild  = dirBuilds[idx]
+              def nameBuild = nameBuilds[idx]
 
-                    build job: test.fullJobPath
-                }
+              parallelJobs["Run-${idx + 1}"] = {
+                echo "👉 Triggering downstream job: ${nameBuild}"
+                build job: "${nameBuild}"
+              }
             }
 
             parallel parallelJobs   // ← Jenkins waits for all to finish here
