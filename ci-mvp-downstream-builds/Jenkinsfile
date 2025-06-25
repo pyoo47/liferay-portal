@@ -70,7 +70,7 @@ spec:
 
     DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
     EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-    TARBALL_FILE_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+    TARBALL_FILE_NAME   = "liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
     TARBALL_FILE_PATH   = "/home/jenkins/local/${TARBALL_FILE_NAME}"
 
   }
@@ -137,13 +137,52 @@ spec:
     }
     
 
-    stage('Checkout and Compress') {
+    stage('Checkout') {
       steps {
         container('runner') {
           script {
             // Define explicitly if not already
             def DIR_LOCAL_CHECKOUT = '/home/jenkins/local/checkout'
-            def TARBALL_FILE_PATH = "/home/jenkins/local/liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+            def TARBALL_FILE_PATH = "/home/jenkins/local/liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
+
+            echo "📂 DIR_LOCAL_CHECKOUT: ${DIR_LOCAL_CHECKOUT}"
+            echo "📦 TARBALL_FILE_PATH: ${TARBALL_FILE_PATH}"
+
+            // Clean the target folder
+            sh """
+              echo '🧹 Cleaning checkout folder...'
+              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
+            """
+
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'github-pat-pei',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_PASSWORD'
+              )
+            ]) {
+              sh """
+                echo '📥 Manual clone in container context...'
+                git clone --depth=1 \
+                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                     ${DIR_LOCAL_CHECKOUT}
+              """
+            }
+          }
+
+        }
+      }
+    }
+
+
+
+    stage('Source Code Compress') {
+      steps {
+        container('runner') {
+          script {
+            // Define explicitly if not already
+            def DIR_LOCAL_CHECKOUT = '/home/jenkins/local/checkout'
+            def TARBALL_FILE_PATH = "/home/jenkins/local/liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
 
             echo "📂 DIR_LOCAL_CHECKOUT: ${DIR_LOCAL_CHECKOUT}"
             echo "📦 TARBALL_FILE_PATH: ${TARBALL_FILE_PATH}"
