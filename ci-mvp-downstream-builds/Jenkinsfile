@@ -140,19 +140,19 @@ spec:
               echo '📥 Cloning repository into local path...'
             """
 
-            // dir(localCheckout) {
-            //   checkout([
-            //     $class: 'GitSCM',
-            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
-            //     userRemoteConfigs: [[
-            //       url: "${env.GIT_REPO_URL}",
-            //       credentialsId: 'github-pat-pei'
-            //     ]],
-            //     extensions: [
-            //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            //     ]
-            //   ])
-            // }
+            dir(localCheckout) {
+              checkout([
+                $class: 'GitSCM',
+                branches: [[name: "*/${env.GIT_BRANCH}"]],
+                userRemoteConfigs: [[
+                  url: "${env.GIT_REPO_URL}",
+                  credentialsId: 'github-pat-pei'
+                ]],
+                extensions: [
+                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+                ]
+              ])
+            }
 
 
             sh """
@@ -195,14 +195,15 @@ spec:
         script {
                         
             echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Version 2.1 - (Docker image 2.0) ..."
+            echo "🔄 Version 2.1 - (Docker image 2.) ..."
             
             
             
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: ALL ]"
-            def commitMessage = "[test: test-01-unit, test-03-db]"
+            // def commitMessage = "[test: test-01-unit, test-03-db]"
+            def commitMessage = "[test: test-01-unit]"
 
             try {
               commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
