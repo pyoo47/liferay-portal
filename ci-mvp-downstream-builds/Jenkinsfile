@@ -78,7 +78,7 @@ spec:
   options {
     skipDefaultCheckout()
     // ws "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-    ws "/home/jenkins/local/"
+    // ws "/home/jenkins/local/"
     
   }
 
@@ -144,7 +144,7 @@ spec:
         container('runner') {
           script {
 
-            def repoCheckoutDir = "/home/jenkins/local/checkout"
+            // def repoCheckoutDir = "/home/jenkins/local/checkout"
             
             sh """
               echo "🧹 Cleaning local checkout path..."
@@ -153,32 +153,32 @@ spec:
               echo '📥 Cloning repository into local path...'
             """
 
-            checkout([
-              $class: 'GitSCM',
-              branches: [[name: "*/${env.GIT_BRANCH}"]],
-              userRemoteConfigs: [[
-                url: "${env.GIT_REPO_URL}",
-                credentialsId: 'github-pat-pei'
-              ]],
-              extensions: [
-                [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-              ]
-            ])
+            // checkout([
+            //   $class: 'GitSCM',
+            //   branches: [[name: "*/${env.GIT_BRANCH}"]],
+            //   userRemoteConfigs: [[
+            //     url: "${env.GIT_REPO_URL}",
+            //     credentialsId: 'github-pat-pei'
+            //   ]],
+            //   extensions: [
+            //     [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+            //   ]
+            // ])
           
 
-            // dir(repoCheckoutDir) {
-            //   checkout([
-            //     $class: 'GitSCM',
-            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
-            //     userRemoteConfigs: [[
-            //       url: "${env.GIT_REPO_URL}",
-            //       credentialsId: 'github-pat-pei'
-            //     ]],
-            //     extensions: [
-            //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            //     ]
-            //   ])
-            // }
+            dir(DIR_LOCAL_CHECKOUT) {
+              checkout([
+                $class: 'GitSCM',
+                branches: [[name: "*/${env.GIT_BRANCH}"]],
+                userRemoteConfigs: [[
+                  url: "${env.GIT_REPO_URL}",
+                  credentialsId: 'github-pat-pei'
+                ]],
+                extensions: [
+                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+                ]
+              ])
+            }
 
 
             sh """
