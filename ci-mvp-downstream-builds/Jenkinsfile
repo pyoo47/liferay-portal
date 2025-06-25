@@ -154,19 +154,34 @@ spec:
               rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
             """
 
-            // Do the Git checkout
-            dir(DIR_LOCAL_CHECKOUT) {
-              checkout([
-                $class: 'GitSCM',
-                branches: [[name: "*/${env.GIT_BRANCH}"]],
-                userRemoteConfigs: [[
-                  url: "${env.GIT_REPO_URL}",
-                  credentialsId: 'github-pat-pei'
-                ]],
-                extensions: [
-                  [$class: 'CloneOption', shallow: true, depth: 1, timeout: 10]
-                ]
-              ])
+            // // Do the Git checkout
+            // dir(DIR_LOCAL_CHECKOUT) {
+            //   checkout([
+            //     $class: 'GitSCM',
+            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
+            //     userRemoteConfigs: [[
+            //       url: "${env.GIT_REPO_URL}",
+            //       credentialsId: 'github-pat-pei'
+            //     ]],
+            //     extensions: [
+            //       [$class: 'CloneOption', shallow: true, depth: 1, timeout: 10]
+            //     ]
+            //   ])
+            // }
+
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'github-pat-pei',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_PASSWORD'
+              )
+            ]) {
+              sh """
+                echo '📥 Manual clone in container context...'
+                git clone --depth=1 \
+                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                     ${DIR_LOCAL_CHECKOUT}
+              """
             }
 
             // Debug output: show contents
