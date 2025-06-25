@@ -150,7 +150,7 @@ spec:
 
             // Clean the target folder
             sh """
-              echo '🧹 Version 2...'
+              echo '🧹 Version 3...'
               echo '🧹 Cleaning checkout folder...'
               rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
             """
