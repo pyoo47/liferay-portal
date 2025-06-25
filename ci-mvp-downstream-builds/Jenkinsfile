@@ -192,10 +192,14 @@ spec:
     }
 
   
-    stage('Dynamic Downstream Builds - v03 docker 1.5') {
+    stage('Dynamic Downstream Builds') {
       steps {
         script {
                         
+            echo "🔄 Starting dynamic downstream builds based on commit message..."
+            echo "🔄 Version 2.0 - (Docker image 1.5) ..."
+            
+            
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
