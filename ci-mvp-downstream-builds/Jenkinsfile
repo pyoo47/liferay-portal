@@ -199,8 +199,16 @@ spec:
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
-            
-            def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+
+            def commitMessage = "[test: ALL ]"
+
+            try {
+              commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+              echo "📩 Commit message found: ${commitMessage}"
+            } catch (e) {
+              echo "⚠️ Could not retrieve commit message. Using default: ${commitMessage}"
+              echo "🔍 Reason: ${e.getMessage()}"
+            }
 
             def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
 
