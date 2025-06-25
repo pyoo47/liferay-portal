@@ -196,26 +196,11 @@ spec:
       steps {
         script {
                         
-            /**
-            * Shared Library: TestBuildEnum.TestBuild
-            * Allow use commit messages to trigger tests individually.
-            * Examples, using TestBuild enum: 
-            *
-            *   - [test: test-01-unit]     → Run test-01-unit
-            *   - [test: test-02-func]     → Run test-02-func
-            *   - [test: test-03-db]       → Run test-03-db
-            *   - [test: test-04-unit]     → Run test-04-unit
-            *   - [test: test-05-unit]     → Run test-05-unit
-            *   - [test: ALL]              → Run all tests in parallel
-            *   - [test: NONE]             → Skip all tests
-            *
-            */
-            
-  
-
-            def commitMessage = "[test: test-01-unit, test-03-db]"
+            // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: NONE ]"
-            // def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+            // def commitMessage = "[test: ALL ]"
+            
+            def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
 
             def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
 
