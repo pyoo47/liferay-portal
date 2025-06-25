@@ -149,7 +149,7 @@ spec:
               echo '📥 Cloning repository into local path...'
             """
 
-            dir(DIR_LOCAL_CHECKOUT) {
+            ws("${DIR_LOCAL_CHECKOUT}") {
               checkout([
                 $class: 'GitSCM',
                 branches: [[name: "*/${env.GIT_BRANCH}"]],
@@ -162,30 +162,6 @@ spec:
                 ]
               ])
             }
-
-            def items = ['alpha', 'beta', 'gamma', 'beta', 'gamma']
-            for (item in items) {
-              sleep 200
-              echo "waiting Item: ${item}"
-
-              sh """
-                echo "🧹 Do I finish - Reading local checkout path..."
-                ls -la ${DIR_LOCAL_CHECKOUT}
-              """
-              
-            }
-            
-          }
-        }
-      }
-    }
-
-
-
-    stage('Post Checkout - using the files ') {
-      steps {
-        container('runner') {
-          script {
 
             sh """
               echo "🧹 Reading local checkout path..."
