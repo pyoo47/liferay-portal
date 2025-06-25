@@ -1,6 +1,6 @@
 @Library('Liferay-Global-Shared-Libs') _
 
-
+import com.liferay.TestBuild
 
 pipeline {
 
@@ -211,7 +211,7 @@ spec:
             *
             */
             
-            import com.liferay.TestBuild
+  
 
             def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: NONE ]"
