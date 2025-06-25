@@ -77,7 +77,8 @@ spec:
 
   options {
     skipDefaultCheckout()
-    ws "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    ws "/home/jenkins/local/checkout"
+    
   }
 
 
@@ -155,10 +156,10 @@ spec:
                 credentialsId: 'github-pat-pei'
               ]],
               extensions: [
-                [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10],
-                [$class: 'RelativeTargetDirectory', relativeTargetDir: 'local/checkout']
+                [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
               ]
             ])
+          
 
             // dir(repoCheckoutDir) {
             //   checkout([
