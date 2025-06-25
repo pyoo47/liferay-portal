@@ -24,7 +24,7 @@ spec:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
     - name: runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.5
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.3
       command: ["cat"]
       tty: true
       volumeMounts:
@@ -192,14 +192,10 @@ spec:
     }
 
   
-    stage('Dynamic Downstream Builds') {
+    stage('Dynamic Downstream Builds - v02') {
       steps {
         script {
                         
-            echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Version 2.0 - (Docker image 1.5) ..."
-            
-            
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
@@ -298,3 +294,12 @@ Purpose:
 
 */
 
+
+/*
+This is a Golden Image Jenkinsfile
+
+Golev v01 - plus varable integration based on commit message
+
+- It is used to test the Golden Image for the MVP Downstream Builds.
+- It was use for the demo on Monday 2025-06-23
+*/

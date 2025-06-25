@@ -1,7 +1,5 @@
 @Library('Liferay-Global-Shared-Libs') _
 
-import com.liferay.TestBuild
-
 pipeline {
 
   agent {
@@ -24,7 +22,7 @@ spec:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
     - name: runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.5
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:1.3
       command: ["cat"]
       tty: true
       volumeMounts:
@@ -59,8 +57,8 @@ spec:
     BUILD_BUNDLE_NAME='liferay-portal-bundle-tomcat.tar.gz'
     BUILD_SOURCE_NAME='liferay-portal-source.tar.gz'
 
-    BUILD_BUNDLE_DUMMY_NAME="bundle-${BUILD_BUNDLE_NAME}"
-    BUILD_SOURCE_DUMMY_NAME="bundle-${BUILD_SOURCE_NAME}"
+    BUILD_BUNDLE_DUMMY_NAME="dummy-${BUILD_BUNDLE_NAME}"
+    BUILD_SOURCE_DUMMY_NAME="dummy-${BUILD_SOURCE_NAME}"
 
     // s3://liferayci-file-propagator-mvp/build/35/artifacts
     // s3://liferayci-file-propagator-mvp/build/35/tests
@@ -68,8 +66,10 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
-
-
+    DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
+    EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    TARBALL_FILE_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+    TARBALL_FILE_PATH   = "/home/jenkins/local/${TARBALL_FILE_NAME}"
 
   }
 
@@ -82,7 +82,7 @@ spec:
 
   stages {
 
-    stage('Print Environment - v30 - change top level branch') {
+    stage('Print Environment - v30 - Runner 1.3 again builds') {
       steps {
         script {
 
@@ -103,7 +103,7 @@ spec:
           echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
         }
         // Or print everything
-        sh 'printenv'
+        // sh 'printenv'
       }
     }
 
@@ -126,51 +126,68 @@ spec:
     }
     
 
-    stage('Checkout Shallow - today with SCM ') {
+    stage('Checkout Shallow') {
       steps {
         container('runner') {
           script {
 
             def localCheckout = "/home/jenkins/local/checkout"
-            def efsWorkspace  = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-            def tarballName   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
 
             sh """
               echo "🧹 Cleaning local checkout path..."
-              rm -rf ${localCheckout} && mkdir -p ${localCheckout}
-
-              echo '📥 Cloning repository into local path...'
+              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
             """
 
-            // dir(localCheckout) {
-            //   checkout([
-            //     $class: 'GitSCM',
-            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
-            //     userRemoteConfigs: [[
-            //       url: "${env.GIT_REPO_URL}",
-            //       credentialsId: 'github-pat-pei'
-            //     ]],
-            //     extensions: [
-            //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-            //     ]
-            //   ])
-            // }
+            dir(localCheckout) {
+
+              sh """
+                echo "🧹 Cleaning local checkout path..."
+                pwd
+              """
+              checkout([
+                $class: 'GitSCM',
+                branches: [[name: "*/${env.GIT_BRANCH}"]],
+                userRemoteConfigs: [[
+                  url: "${env.GIT_REPO_URL}",
+                  credentialsId: 'github-pat-pei'
+                ]],
+                extensions: [
+                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+                ]
+              ])
+            }
 
 
             sh """
               echo '📦 Creating tarball without .git...'
-              # tar -czf /home/jenkins/local/${tarballName} -C ${localCheckout} .
-              tar --exclude='.git' -czf /home/jenkins/local/${tarballName} -C ${localCheckout} .
+              # tar -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
+              tar --exclude='.git' -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
+              
+              echo '📤 Initial workspace contents ... local and target EFS - Before copy tarball'
+              ls -al ${TARBALL_FILE_PATH}
+              ls -al ${EFS_WORKSPACE_DIR}/
+            """
 
-              echo '📤 Moving tarball to EFS workspace...'
-              mkdir -p "${efsWorkspace}"
-              mv /home/jenkins/local/${tarballName} "${efsWorkspace}/"
+           
+          }
+        }
+      }
+    }
 
-              echo '📂 Skipping extraction for now...'
-              # tar -xzf "/home/jenkins/local/${tarballName}" -C "${efsWorkspace}/"
+  
+    stage('Tarball to EFS Workspace') {
+      steps {
+        container('runner') {
+          script {
 
-              echo '📄 Final workspace contents:'
-              ls -al "${efsWorkspace}"
+            sh """
+              echo '📤 Copy tarball to EFS workspace...'
+              mkdir -p "${EFS_WORKSPACE_DIR}"
+              cp ${TARBALL_FILE_PATH} "${EFS_WORKSPACE_DIR}/"
+
+              echo '📤 Final workspace contents ... local and target EFS - After copy tarball'
+              ls -al ${TARBALL_FILE_PATH}
+              ls -al ${EFS_WORKSPACE_DIR}/
             """
 
             sh """
@@ -191,44 +208,42 @@ spec:
       }
     }
 
-  
-    stage('Dynamic Downstream Builds') {
+
+
+    stage('Decide What to Run') {
       steps {
         script {
-                        
-            echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Version 2.0 - (Docker image 1.5) ..."
-            
-            
-            // def commitMessage = "[test: test-01-unit, test-03-db]"
-            // def commitMessage = "[test: NONE ]"
-            // def commitMessage = "[test: ALL ]"
+            // def changedFiles = sh(script: "git diff --name-only HEAD~1", 
+            //                         returnStdout: true).trim().split("\n")
 
-            def commitMessage = "[test: ALL ]"
+            def buildFolder      = 'MVP-Downstream-Builds'
+            def homeDir          = 'ci-mvp-downstream-builds'
+            def topLevelBranch   = 'master-ci-6005-postgresql'
+            def downStreamBranch = 'master-ci-6005-downstream-builds'
 
-            try {
-              commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
-              echo "📩 Commit message found: ${commitMessage}"
-            } catch (e) {
-              echo "⚠️ Could not retrieve commit message. Using default: ${commitMessage}"
-              echo "🔍 Reason: ${e.getMessage()}"
-            }
+            def nameBuilds = [
+              "${buildFolder}/MVP-Downstream-Build-1/${downStreamBranch}",
+              "${buildFolder}/MVP-Downstream-Build-2/${downStreamBranch}",
+              "${buildFolder}/MVP-Downstream-Build-3/${downStreamBranch}"
+            ]
 
-            def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
-
-            echo "✅ Selected: ${selectedTests*.label.join(', ')}"
+            def dirBuilds = [
+              "${homeDir}/downstream-build-1",
+              "${homeDir}/downstream-build-2",
+              "${homeDir}/downstream-build-3"
+            ]
 
             def parallelJobs = [:]
 
-            selectedTests.each { test ->
-                def jobPath = TestBuild.getFullJobPath(test)
-                def dirPath = TestBuild.getFullDirPath(test)
+            for (int i = 0; i < dirBuilds.size(); i++) {
+              def idx = i // Required for proper closure capture
+              def dirBuild  = dirBuilds[idx]
+              def nameBuild = nameBuilds[idx]
 
-                echo "👉 Running: ${test.label}"
-                echo "🔧 Job Path: ${jobPath}"
-                echo "📁 Directory: ${dirPath}"
-
-                build job: jobPath
+              parallelJobs["Run-${idx + 1}"] = {
+                echo "👉 Triggering downstream job: ${nameBuild}"
+                build job: "${nameBuild}"
+              }
             }
 
             parallel parallelJobs   // ← Jenkins waits for all to finish here
@@ -240,42 +255,42 @@ spec:
 
 
   
-    // stage('Upload to S3 - Artifacts') {
+    stage('Upload to S3 - Artifacts') {
 
-    //   steps {
-    //     container('runner') {
-    //       sh """
-    //         echo "📤 Uploading to S3..."
+      steps {
+        container('runner') {
+          sh """
+            echo "📤 Uploading to S3..."
 
-    //         aws s3 cp /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME} \
-    //           ${env.AWS_S3_URL_ARTIFACTS}/${BUILD_BUNDLE_DUMMY_NAME} || echo "❌ Upload failed"
+            aws s3 cp /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME} \
+              ${env.AWS_S3_URL_ARTIFACTS}/${BUILD_BUNDLE_DUMMY_NAME} || echo "❌ Upload failed"
 
-    //         aws s3 cp /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME} \
-    //           ${env.AWS_S3_URL_ARTIFACTS}/${BUILD_SOURCE_DUMMY_NAME} || echo "❌ Upload failed"
-    //       """
-    //     }
-    //   }
-    // }
+            aws s3 cp /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME} \
+              ${env.AWS_S3_URL_ARTIFACTS}/${BUILD_SOURCE_DUMMY_NAME} || echo "❌ Upload failed"
+          """
+        }
+      }
+    }
 
 
   }
 
     
-  // post {
-  //   always {
-  //     container('runner') {
-  //       script {
-  //         def podName = env.NODE_NAME
-  //         sh """
-  //           echo "🛑 Build complete. Pod is: ${podName}"
-  //           echo "Run this to debug:"
-  //           echo "kubectl exec -it ${podName} -n liferay-jenkins -- bash"
-  //           sleep 3600
-  //         """
-  //       }
-  //     }
-  //   }
-  // }
+  post {
+    always {
+      container('runner') {
+        script {
+          def podName = env.NODE_NAME
+          sh """
+            echo "🛑 Build complete. Pod is: ${podName}"
+            echo "Run this to debug:"
+            echo "kubectl exec -it ${podName} -n liferay-jenkins -- bash"
+            sleep 3600
+          """
+        }
+      }
+    }
+  }
   
 
 
