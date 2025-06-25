@@ -24,7 +24,7 @@ spec:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
     - name: runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:2.0
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/my-custom-kubectl:2.1
       command: ["cat"]
       tty: true
       volumeMounts:
@@ -195,7 +195,7 @@ spec:
         script {
                         
             echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Using (Docker image 2.0) ... Version 2.4 "
+            echo "🔄 Using (Docker image 2.1) ... Version 2.4 "
             
             def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
