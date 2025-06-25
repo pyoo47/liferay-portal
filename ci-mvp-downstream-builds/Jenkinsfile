@@ -78,7 +78,7 @@ spec:
   options {
     skipDefaultCheckout()
     // ws "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-    ws "/home/jenkins/local/checkout"
+    ws "/home/jenkins/local/"
     
   }
 
