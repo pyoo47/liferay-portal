@@ -224,13 +224,14 @@ spec:
             def parallelJobs = [:]
 
             selectedTests.each { test ->
-                parallelJobs["Run-${test.label}"] = {
-                    echo "👉 Running: ${test.label}"
-                    echo "🔧 Job Path: ${test.fullJobPath}"
-                    echo "📁 Directory: ${test.fullDirPath}"
+                def jobPath = TestBuild.getFullJobPath(test)
+                def dirPath = TestBuild.getFullDirPath(test)
 
-                    build job: test.fullJobPath
-                }
+                echo "👉 Running: ${test.label}"
+                echo "🔧 Job Path: ${jobPath}"
+                echo "📁 Directory: ${dirPath}"
+
+                build job: jobPath
             }
 
             parallel parallelJobs   // ← Jenkins waits for all to finish here
