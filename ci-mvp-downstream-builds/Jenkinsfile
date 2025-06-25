@@ -88,16 +88,19 @@ spec:
       steps {
         script {
 
-          echo "Environment Variables:"
-          echo "Branch      : ${env.BRANCH_NAME}"
-          echo "Job Name    : ${env.JOB_NAME}"
-          echo "Build Number: ${env.BUILD_NUMBER}"
-          echo "Workspace   : ${env.WORKSPACE}"
-          echo "Git Commit  : ${env.GIT_COMMIT}"
-          echo "Node Name   : ${env.NODE_NAME}"
+          echo """
+          Environment Variables:
+          Branch      : ${env.BRANCH_NAME}
+          Job Name    : ${env.JOB_NAME}
+          Build Number: ${env.BUILD_NUMBER}
+          Workspace   : ${env.WORKSPACE}
+          Git Commit  : ${env.GIT_COMMIT}
+          Node Name   : ${env.NODE_NAME}
 
-          echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
-          echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
+          AWS_S3_URL_ARTIFACTS : ${env.AWS_S3_URL_ARTIFACTS}
+          AWS_S3_URL_TESTS     : ${env.AWS_S3_URL_TESTS}
+          """
+
 
           echo "Testing Shared Libs"
 
@@ -135,9 +138,7 @@ spec:
         container('runner') {
           script {
 
-
             def repoCheckoutDir = "/home/jenkins/local/checkout"
-
             
             sh """
               echo "🧹 Cleaning local checkout path..."
@@ -146,25 +147,40 @@ spec:
               echo '📥 Cloning repository into local path...'
             """
 
-            dir(repoCheckoutDir) {
-              checkout([
-                $class: 'GitSCM',
-                branches: [[name: "*/${env.GIT_BRANCH}"]],
-                userRemoteConfigs: [[
-                  url: "${env.GIT_REPO_URL}",
-                  credentialsId: 'github-pat-pei'
-                ]],
-                extensions: [
-                  [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-                ]
-              ])
-            }
+            checkout([
+              $class: 'GitSCM',
+              branches: [[name: "*/${env.GIT_BRANCH}"]],
+              userRemoteConfigs: [[
+                url: "${env.GIT_REPO_URL}",
+                credentialsId: 'github-pat-pei'
+              ]],
+              extensions: [
+                [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10],
+                [$class: 'RelativeTargetDirectory', relativeTargetDir: 'local/checkout']
+              ]
+            ])
+
+            // dir(repoCheckoutDir) {
+            //   checkout([
+            //     $class: 'GitSCM',
+            //     branches: [[name: "*/${env.GIT_BRANCH}"]],
+            //     userRemoteConfigs: [[
+            //       url: "${env.GIT_REPO_URL}",
+            //       credentialsId: 'github-pat-pei'
+            //     ]],
+            //     extensions: [
+            //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
+            //     ]
+            //   ])
+            // }
 
 
             sh """
                ls -al ${DIR_LOCAL_CHECKOUT}
               echo "📂 Local checkout contents:"
                
+              echo "pigz --version || echo '❌ pigz not found'"
+
               echo '📦 Creating tarball without .git...'
               # tar -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
               tar --exclude='.git' -czf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
