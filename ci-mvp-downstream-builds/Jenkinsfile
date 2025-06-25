@@ -197,11 +197,10 @@ spec:
             echo "🔄 Starting dynamic downstream builds based on commit message..."
             echo "🔄 Using (Docker image 2.0) ... Version 2.2 "
             
-            // def commitMessage = "[test: NONE ]"
-            // def commitMessage = "[test: ALL ]"
+            def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
-            def commitMessage = "[test: test-01-unit]"
+            // def commitMessage = "[test: test-01-unit]"
 
             try {
               commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
