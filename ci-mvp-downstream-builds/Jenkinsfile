@@ -135,12 +135,9 @@ spec:
           script {
 
 
-    // TARBALL_FILE_PATH   = "/home/jenkins/local/${TARBALL_FILE_NAME}"
-
             def repoCheckoutDir = "/home/jenkins/local/checkout"
 
-            def tarballName   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
-
+            
             sh """
               echo "🧹 Cleaning local checkout path..."
               rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
