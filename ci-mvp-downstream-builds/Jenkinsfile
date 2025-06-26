@@ -76,7 +76,7 @@ spec:
     TARBALL_GIT_NAME    = "liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
     TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
 
-    EFS_MOUNT_PATH                = "/home/jenkins/agent/"
+    EFS_MOUNT_PATH                = "/home/jenkins/agent"
     EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.CUSTOM_BUILD_NUMBER}"
     EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
     EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
@@ -204,6 +204,7 @@ spec:
               echo '🧹 Version 4...'
               echo '🧹 Cleaning checkout folder...'
               rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+              ls -la ${LOCAL_DIR_CHECKOUT}
             """
 
             echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
