@@ -210,7 +210,7 @@ spec:
               echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
               echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
             
-              echo '📂 Folders ..  out source code (emulated)...
+              echo '📂 Folders ..  out source code (emulated)...'
               ls -la /home/jenkins/
               ls -la /home/jenkins/local
               ls -la /home/jenkins/local/checkout
