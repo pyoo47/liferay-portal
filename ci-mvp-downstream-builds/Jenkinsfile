@@ -225,7 +225,12 @@ spec:
               ls -al ${LOCAL_DIR_CHECKOUT}
               ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}   
 
-              tar -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+
+              echo '📦 Extracting tarball (with pigz)...'
+              # tar       -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+              tar -I pigz -xvf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+
+
               echo '📂 Extracted contents:  '
               ls -al ${LOCAL_DIR_CHECKOUT}
               echo '📂 Checking out source code (emulated) done...'
