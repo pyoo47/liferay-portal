@@ -113,6 +113,17 @@ spec:
 
           echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
           echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
+
+          echo "PARAMETERS: "
+          echo "  PARENT_BUILD_NUMBER: ${params.PARENT_BUILD_NUMBER}"
+          echo "  PARENT_GIT_COMMIT: ${params.PARENT_GIT_COMMIT}"
+          echo "  TARBALL_GIT_NAME: ${params.TARBALL_GIT_NAME}"
+          echo "  TARBALL_GIT_REPO: ${params.TARBALL_GIT_REPO}"
+          echo "  EFS_MOUNT_PATH: ${params.EFS_MOUNT_PATH}"
+          echo "  EFS_LIFERAY_ARTIFACT_FOLDER: ${params.EFS_LIFERAY_ARTIFACT_FOLDER}"
+          echo "  EFS_LIFERAY_ARTIFACT_REPOS: ${params.EFS_LIFERAY_ARTIFACT_REPOS}"
+          echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}"
+          echo "  EFS_LIFERAY_ARTIFACT_TEST: ${params.EFS_LIFERAY_ARTIFACT_TEST}"         
         }
       }
     }
@@ -137,7 +148,7 @@ spec:
       steps {
         
           sh """
-            echo '📂 EFS workspace contents:'
+            echo '📂 EFS workspace contents: (v1)'
             ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
             ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
 
