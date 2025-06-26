@@ -89,10 +89,10 @@ spec:
     string(name: 'TARBALL_GIT_NAME',             defaultValue: "${env.TARBALL_GIT_NAME}")
     string(name: 'TARBALL_GIT_REPO',             defaultValue: "${env.TARBALL_GIT_REPO}")
     string(name: 'EFS_MOUNT_PATH',               defaultValue: "/home/jenkins/agent")
-    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: "${DEFAULT_LIFERAY_ARTIFACT_FOLDER}")
-    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: "${DEFAULT_LIFERAY_ARTIFACT_FOLDER}/repo-github")
-    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: "${DEFAULT_LIFERAY_ARTIFACT_FOLDER}/bundles")
-    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: "${DEFAULT_LIFERAY_ARTIFACT_FOLDER}/tests")
+    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}")
+    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/repo-github")
+    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/bundles")
+    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/tests")
   }
 
   options {
