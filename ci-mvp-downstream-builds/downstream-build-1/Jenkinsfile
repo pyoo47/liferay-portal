@@ -71,11 +71,13 @@ spec:
     // liferay-portal-source.tar.gz         (~1.2gb) 
 
 
-
     LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
 
-    TARBALL_GIT_NAME    = "liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
-    TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
+    DEFAULT_BUILD_NUMBER = 1
+    TARBALL_GIT_NAME     = "liferay-portal-repo-${DEFAULT_BUILD_NUMBER}.tar.gz"
+    TARBALL_GIT_REPO     = "/home/jenkins/local/${TARBALL_GIT_NAME}"
+
+    DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${DEFAULT_BUILD_NUMBER}"
   }
 
 
@@ -86,11 +88,11 @@ spec:
     string(name: 'PARENT_GIT_COMMIT'),
     string(name: 'TARBALL_GIT_NAME',             defaultValue: "${env.TARBALL_GIT_NAME}"),
     string(name: 'TARBALL_GIT_REPO',             defaultValue: "${env.TARBALL_GIT_REPO}"),
-    string(name: 'EFS_MOUNT_PATH',               defaultValue: "/home/jenkins/agent/"),
-    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: "/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}"),
-    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: "/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/repo-github"),
-    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: "/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/bundles"),
-    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: "/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/tests")
+    string(name: 'EFS_MOUNT_PATH',               defaultValue: "/home/jenkins/agent"),
+    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: "${DEFAULT_LIFERAY_ARTIFACT_FOLDER}"),
+    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: "${DEFAULT_LIFERAY_ARTIFACT_FOLDER}/repo-github"),
+    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: "${DEFAULT_LIFERAY_ARTIFACT_FOLDER}/bundles"),
+    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: "${DEFAULT_LIFERAY_ARTIFACT_FOLDER}/tests")
   }
 
   options {
