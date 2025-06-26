@@ -53,12 +53,8 @@ spec:
     AWS_S3_BUCKET='liferayci-file-propagator-mvp'
     AWS_S3_PATH='build'
 
-
-    // CUSTOM_BUILD_NUMBER = "${env.BUILD_NUMBER}"
-    CUSTOM_BUILD_NUMBER = "1"
-
-    AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.CUSTOM_BUILD_NUMBER}/artifacts"
-    AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.CUSTOM_BUILD_NUMBER}/tests"
+    AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/artifacts"
+    AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/tests"
 
     BUILD_BUNDLE_NAME='liferay-portal-bundle-tomcat.tar.gz'
     BUILD_SOURCE_NAME='liferay-portal-source.tar.gz'
@@ -73,11 +69,11 @@ spec:
     // liferay-portal-source.tar.gz         (~1.2gb)
 
     LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
-    TARBALL_GIT_NAME    = "liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+    TARBALL_GIT_NAME    = "liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
     TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
 
     EFS_MOUNT_PATH                = "/home/jenkins/agent/"
-    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.CUSTOM_BUILD_NUMBER}"
+    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.BUILD_NUMBER}"
     EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
     EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
     EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
@@ -100,7 +96,7 @@ spec:
           Environment Variables:
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
-          Build Number: ${env.CUSTOM_BUILD_NUMBER}
+          Build Number: ${env.BUILD_NUMBER}
           Workspace   : ${env.WORKSPACE}
           Git Commit  : ${env.GIT_COMMIT}
           Node Name   : ${env.NODE_NAME}
@@ -147,35 +143,35 @@ spec:
       steps {
         container('runner') {
           script {
-            // // Define explicitly if not already
-            // def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
-            // def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+            // Define explicitly if not already
+            def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
+            def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
 
-            // echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-            // echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
+            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+            echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
 
-            // // Clean the target folder
-            // sh """
-            //   echo '🧹 Version 4...'
-            //   echo '🧹 Cleaning checkout folder...'
-            //   rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
-            // """
+            // Clean the target folder
+            sh """
+              echo '🧹 Version 4...'
+              echo '🧹 Cleaning checkout folder...'
+              rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+            """
 
-            // withCredentials([
-            //   usernamePassword(
-            //     credentialsId: 'github-pat-pei',
-            //     usernameVariable: 'GIT_USERNAME',
-            //     passwordVariable: 'GIT_PASSWORD'
-            //   )
-            // ]) {
-            //   sh """
-            //     echo '📥 Manual clone in container context...'
-            //     git clone --depth=1 \
-            //               --branch ${env.GIT_BRANCH} \
-            //          https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
-            //          ${LOCAL_DIR_CHECKOUT}
-            //   """
-            // }
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'github-pat-pei',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_PASSWORD'
+              )
+            ]) {
+              sh """
+                echo '📥 Manual clone in container context...'
+                git clone --depth=1 \
+                          --branch ${env.GIT_BRANCH} \
+                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                     ${LOCAL_DIR_CHECKOUT}
+              """
+            }
           }
 
         }
@@ -188,39 +184,40 @@ spec:
       steps {
         container('runner') {
           script {
-
             // Define explicitly if not already
             def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
-            def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
-
-            // Clean the target folder
-            sh """
-              echo '🧹 Version 4...'
-              echo '🧹 Cleaning checkout folder...'
-              rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
-            """
+            def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
 
             echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
             echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
 
+            // Debug output: show contents
+            sh "echo '📂 Contents after checkout:' && ls -al ${LOCAL_DIR_CHECKOUT} && du -sh ${LOCAL_DIR_CHECKOUT}"
+
+            // Compress to tar.gz (using pigz for faster compression - paralell multicore 8x faster) )
+            sh """
+              echo '📦 Creating tarball (excluding .git)...'
+              tar --exclude='.git' \
+                   --use-compress-program=pigz \
+                   -cf ${TARBALL_GIT_REPO} -C ${LOCAL_DIR_CHECKOUT} .
+            """
+            
+            // Confirm tarball
+            sh "ls -lh ${TARBALL_GIT_REPO} || echo '❌ Tarball not created'"
 
             // Move tarball to EFS workspace
             sh """
-              echo '📂 EFS workspace contents: (v1)'
-              cp ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+              echo '📤 Moving tarball to EFS workspace... '
+              mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS} && echo '📂 EFS workspace contents:'
 
-              echo '📂 EFS workspace and local contents:'
-              ls -al ${LOCAL_DIR_CHECKOUT}
+              ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
+
+              mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
+              mv ${TARBALL_GIT_REPO} ${EFS_LIFERAY_ARTIFACT_REPOS}/
+              
+              echo '📂 EFS workspace contents:'
               ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}   
-
-              tar -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
-              echo '📂 Extracted contents:  '
-              ls -al ${LOCAL_DIR_CHECKOUT}
-              echo '📂 Checking out source code (emulated) done...'
-              rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME}
-              echo '📂 Source code ready in ${LOCAL_DIR_CHECKOUT}'
               """
-
           }
         }
       }
@@ -263,7 +260,7 @@ spec:
 
                 build job: jobPath, 
                       parameters: [
-                        string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
+                        string(name: 'PARENT_BUILD_NUMBER', value: env.BUILD_NUMBER),
                         string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
                         string(name: 'TARBALL_GIT_NAME', value: TARBALL_GIT_NAME),
                         string(name: 'TARBALL_GIT_REPO', value: TARBALL_GIT_REPO),
