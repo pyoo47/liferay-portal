@@ -260,10 +260,7 @@ spec:
 
                 build job: jobPath, 
                       parameters: [
-                        string(name: 'PARENT_BUILD_NUMBER', value: env.BUILD_NUMBER),
-                        string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
-                        string(name: 'TARBALL_GIT_NAME', value: TARBALL_GIT_NAME),
-                        string(name: 'TARBALL_GIT_REPO', value: TARBALL_GIT_REPO),
+                        string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER),
                         string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
                         string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
                         string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),

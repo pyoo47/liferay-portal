@@ -68,20 +68,18 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
-    LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
-    TARBALL_GIT_NAME    = "liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
-    TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
-
-    EFS_MOUNT_PATH                = "/home/jenkins/agent/"
-    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.BUILD_NUMBER}"
-    EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
-    EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
-    EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
+    DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
+    EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    TARBALL_FILE_NAME   = "liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
+    TARBALL_FILE_PATH   = "/home/jenkins/local/${TARBALL_FILE_NAME}"
 
   }
 
   options {
     skipDefaultCheckout()
+    // ws "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+    // ws "/home/jenkins/local/"
+    
   }
 
 
@@ -144,17 +142,17 @@ spec:
         container('runner') {
           script {
             // Define explicitly if not already
-            def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
-            def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
+            def DIR_LOCAL_CHECKOUT = '/home/jenkins/local/checkout'
+            def TARBALL_FILE_PATH = "/home/jenkins/local/liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
 
-            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-            echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
+            echo "📂 DIR_LOCAL_CHECKOUT: ${DIR_LOCAL_CHECKOUT}"
+            echo "📦 TARBALL_FILE_PATH: ${TARBALL_FILE_PATH}"
 
             // Clean the target folder
             sh """
               echo '🧹 Version 4...'
               echo '🧹 Cleaning checkout folder...'
-              rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
             """
 
             withCredentials([
@@ -167,9 +165,8 @@ spec:
               sh """
                 echo '📥 Manual clone in container context...'
                 git clone --depth=1 \
-                          --branch ${env.GIT_BRANCH} \
                      https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
-                     ${LOCAL_DIR_CHECKOUT}
+                     ${DIR_LOCAL_CHECKOUT}
               """
             }
           }
@@ -185,119 +182,75 @@ spec:
         container('runner') {
           script {
             // Define explicitly if not already
-            def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
-            def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
+            def DIR_LOCAL_CHECKOUT = '/home/jenkins/local/checkout'
+            def TARBALL_FILE_PATH = "/home/jenkins/local/liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
 
-            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-            echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
+            echo "📂 DIR_LOCAL_CHECKOUT: ${DIR_LOCAL_CHECKOUT}"
+            echo "📦 TARBALL_FILE_PATH: ${TARBALL_FILE_PATH}"
+
+            // Clean the target folder
+            sh """
+              echo '🧹 Cleaning checkout folder...'
+              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
+            """
+
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'github-pat-pei',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_PASSWORD'
+              )
+            ]) {
+              sh """
+                echo '📥 Manual clone in container context...'
+                git clone --depth=1 \
+                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                     ${DIR_LOCAL_CHECKOUT}
+              """
+            }
 
             // Debug output: show contents
-            sh "echo '📂 Contents after checkout:' && ls -al ${LOCAL_DIR_CHECKOUT} && du -sh ${LOCAL_DIR_CHECKOUT}"
+            sh "echo '📂 Contents after checkout:' && ls -al ${DIR_LOCAL_CHECKOUT} && du -sh ${DIR_LOCAL_CHECKOUT}"
 
             // Compress to tar.gz (using pigz for faster compression - paralell multicore 8x faster) )
             sh """
               echo '📦 Creating tarball (excluding .git)...'
               tar --exclude='.git' \
                    --use-compress-program=pigz \
-                   -cf ${TARBALL_GIT_REPO} -C ${LOCAL_DIR_CHECKOUT} .
+                   -cf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
             """
-            
+
+
             // Confirm tarball
-            sh "ls -lh ${TARBALL_GIT_REPO} || echo '❌ Tarball not created'"
-
-            // Move tarball to EFS workspace
-            sh """
-              echo '📤 Moving tarball to EFS workspace... '
-              mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS} && echo '📂 EFS workspace contents:'
-
-              ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
-
-              mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
-              mv ${TARBALL_GIT_REPO} ${EFS_LIFERAY_ARTIFACT_REPOS}/
-              
-              echo '📂 EFS workspace contents:'
-              ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}   
-              """
+            sh "ls -lh ${TARBALL_FILE_PATH} || echo '❌ Tarball not created'"
           }
         }
       }
     }
 
-
-    stage('Dynamic Downstream Builds') {
-      steps {
-        script {
-                        
-            echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Using (Docker image 2.1) ... Version 2.5 "
-            
-            // def commitMessage = "[test: NONE ]"
-            // def commitMessage = "[test: ALL ]"
-            // def commitMessage = "[test: test-01-unit, test-03-db]"
-            def commitMessage = "[test: test-01-unit]"
-
-            try {
-              commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
-              echo "📩 Commit message found: ${commitMessage}"
-            } catch (e) {
-              echo "⚠️ Could not retrieve commit message. Using default: ${commitMessage}"
-              echo "🔍 Reason: ${e.getMessage()}"
-            }
-
-            def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
-
-            echo "✅ Selected: ${selectedTests*.label.join(', ')}"
-
-            def parallelJobs = [:]
-
-            selectedTests.each { test ->
-                def jobPath = TestBuild.getFullJobPath(test)
-                def dirPath = TestBuild.getFullDirPath(test)
-
-                echo "👉 Running: ${test.label}"
-                echo "🔧 Job Path: ${jobPath}"
-                echo "📁 Directory: ${dirPath}"
-
-                build job: jobPath, 
-                      parameters: [
-                        string(name: 'PARENT_BUILD_NUMBER', value: env.BUILD_NUMBER),
-                        string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
-                        string(name: 'TARBALL_GIT_NAME', value: TARBALL_GIT_NAME),
-                        string(name: 'TARBALL_GIT_REPO', value: TARBALL_GIT_REPO),
-                        string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
-                        string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
-                        string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
-                        string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
-                      ]
-            }
-
-            parallel parallelJobs   // ← Jenkins waits for all to finish here
-
-        }
-      }
-    }
-
   }
 
-
-  post {
-    always {
-      container('runner') {
-        script {
+    
+  // post {
+  //   always {
+  //     container('runner') {
+  //       script {
           
-          sh """
-            echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
-            echo "Run this to debug:"
-            echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
-            sleep 3600
-          """
-        }
-      }
-    }
-  }
-
+  //         sh """
+  //           echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
+  //           echo "Run this to debug:"
+  //           echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
+  //           sleep 3600
+  //         """
+  //       }
+  //     }
+  //   }
+  // }
   
+
+
 }
+
 
 /*
 This Jenkinsfile is an EFS Validation script 
