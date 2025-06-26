@@ -302,7 +302,7 @@ spec:
 
   post {
     always {
-      container('runner') {
+      // container('runner') {
         script {
           
           sh """
@@ -312,7 +312,7 @@ spec:
             sleep 7200
           """
         }
-      }
+      // }
     }
   }
 
