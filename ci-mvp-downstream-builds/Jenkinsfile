@@ -147,6 +147,13 @@ spec:
       steps {
         container('runner') {
           script {
+
+            // Clean the target folder
+            sh """
+              echo '🧹 Dummy...'
+              echo '🧹 Checkout Dummy - I'using tar.bz from builder-1...'
+            """
+            
             // // Define explicitly if not already
             // def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
             // def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
