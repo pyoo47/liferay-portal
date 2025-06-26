@@ -72,11 +72,9 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
-    LOCAL_MOUNT_PATH  = "/home/jenkins/local/checkout"
-
-    LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
+    LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
     TARBALL_GIT_NAME    = "liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
-    TARBALL_GIT_REPO    = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME}"
+    TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
 
     EFS_MOUNT_PATH                = "/home/jenkins/agent"
     EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.CUSTOM_BUILD_NUMBER}"
@@ -156,58 +154,35 @@ spec:
               echo '🧹 Dummy...'
               echo '🧹 Checkout Dummy - using tar.bz from builder-1...'
             """
-       
-            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-            echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
+            // // Define explicitly if not already
+            // def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
+            // def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
 
-            // Clean the target folder
-            sh """
-              echo '🧹 Version 4...'
-              echo '🧹 Cleaning checkout folder...'
-              rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
-            """
+            // echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+            // echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
 
-            withCredentials([
-              usernamePassword(
-                credentialsId: 'github-pat-pei',
-                usernameVariable: 'GIT_USERNAME',
-                passwordVariable: 'GIT_PASSWORD'
-              )
-            ]) {
-              // sh """
-              //   echo '📥 Manual clone in container context...'
-              //   git clone --depth=1 \
-              //             --branch ${env.GIT_BRANCH} \
-              //        https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
-              //        ${LOCAL_DIR_CHECKOUT}
+            // // Clean the target folder
+            // sh """
+            //   echo '🧹 Version 4...'
+            //   echo '🧹 Cleaning checkout folder...'
+            //   rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+            // """
 
-              //   git clone --depth=1 \
-              //             --branch master \
-              //         https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/liferay/liferay-jenkins-ee.git \
-              //         ${LOCAL_DIR_CHECKOUT}
-              
-              // """
-
-
-              sh """
-                echo '📥 Manual clone in container context...'
-
-                git clone --depth=1 \
-                          --branch master \
-                      https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/liferay/liferay-jenkins-ee.git \
-                      ${LOCAL_DIR_CHECKOUT}
-              
-              """
-
-            }
-
-            sh """
-              echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
-              echo "Run this to debug:"
-              echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
-              sleep 7200
-            """
-            
+            // withCredentials([
+            //   usernamePassword(
+            //     credentialsId: 'github-pat-pei',
+            //     usernameVariable: 'GIT_USERNAME',
+            //     passwordVariable: 'GIT_PASSWORD'
+            //   )
+            // ]) {
+            //   sh """
+            //     echo '📥 Manual clone in container context...'
+            //     git clone --depth=1 \
+            //               --branch ${env.GIT_BRANCH} \
+            //          https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+            //          ${LOCAL_DIR_CHECKOUT}
+            //   """
+            // }
           }
 
         }
@@ -221,6 +196,10 @@ spec:
         container('runner') {
           script {
 
+            // Define explicitly if not already
+            def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
+            def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+
             // Clean the target folder
             sh """
               echo '🧹 Version 5.00 ...'
@@ -231,7 +210,13 @@ spec:
             
               echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
               echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
-                          
+            
+              echo '📂 Folders ..  out source code (emulated)...'
+              ls -la /home/jenkins/
+              ls -la /home/jenkins/local
+              ls -la /home/jenkins/local/checkout
+              echo '📂 Checking out source code (emulated)...'
+              
               # Move tarball to EFS workspace
 
               echo '📂 EFS workspace contents: (v1)'
