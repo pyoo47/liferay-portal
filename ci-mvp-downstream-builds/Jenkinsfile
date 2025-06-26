@@ -267,28 +267,23 @@ spec:
       }
     }
 
-
-
-  }
-
-    
-  post {
-    always {
-      container('runner') {
-        script {
-          
-          sh """
-            echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
-            echo "Run this to debug:"
-            echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
-            sleep 3600
-          """
+    post {
+      always {
+        container('runner') {
+          script {
+            
+            sh """
+              echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
+              echo "Run this to debug:"
+              echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
+              sleep 3600
+            """
+          }
         }
       }
     }
-  }
-  
 
+  }
 
 }
 
