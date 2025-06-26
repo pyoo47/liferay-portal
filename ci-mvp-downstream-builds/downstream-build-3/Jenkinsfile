@@ -69,6 +69,30 @@ spec:
 
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb) 
+
+
+    LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
+
+    DEFAULT_BUILD_NUMBER = 1
+    TARBALL_GIT_NAME     = "liferay-portal-repo-${DEFAULT_BUILD_NUMBER}.tar.gz"
+    TARBALL_GIT_REPO     = "/home/jenkins/local/${TARBALL_GIT_NAME}"
+
+    DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${DEFAULT_BUILD_NUMBER}"
+  }
+
+
+
+
+  parameters {
+    string(name: 'PARENT_BUILD_NUMBER')
+    string(name: 'PARENT_GIT_COMMIT')
+    string(name: 'TARBALL_GIT_NAME',             defaultValue: "${env.TARBALL_GIT_NAME}")
+    string(name: 'TARBALL_GIT_REPO',             defaultValue: "${env.TARBALL_GIT_REPO}")
+    string(name: 'EFS_MOUNT_PATH',               defaultValue: "/home/jenkins/agent")
+    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}")
+    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/repo-github")
+    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/bundles")
+    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/tests")
   }
 
   options {
@@ -91,6 +115,17 @@ spec:
 
           echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
           echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
+
+          echo "PARAMETERS: "
+          echo "  PARENT_BUILD_NUMBER: ${params.PARENT_BUILD_NUMBER}"
+          echo "  PARENT_GIT_COMMIT: ${params.PARENT_GIT_COMMIT}"
+          echo "  TARBALL_GIT_NAME: ${params.TARBALL_GIT_NAME}"
+          echo "  TARBALL_GIT_REPO: ${params.TARBALL_GIT_REPO}"
+          echo "  EFS_MOUNT_PATH: ${params.EFS_MOUNT_PATH}"
+          echo "  EFS_LIFERAY_ARTIFACT_FOLDER: ${params.EFS_LIFERAY_ARTIFACT_FOLDER}"
+          echo "  EFS_LIFERAY_ARTIFACT_REPOS: ${params.EFS_LIFERAY_ARTIFACT_REPOS}"
+          echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}"
+          echo "  EFS_LIFERAY_ARTIFACT_TEST: ${params.EFS_LIFERAY_ARTIFACT_TEST}"         
         }
       }
     }
@@ -111,23 +146,34 @@ spec:
       }
     }
 
-    stage('Checkout Shallow') {
+    stage('Source Code Receive') {
       steps {
-        echo "🔨 Simulating Checkout Shallow ${DOWNSTREAM_BUILD_ID}"
+        
+          sh """
+            echo '📂 EFS workspace contents: (v1)'
+            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
+            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
 
-        // container('runner') {
-        //   checkout([
-        //     $class: 'GitSCM',
-        //     branches: [[name: "*/${env.BUILD_TEST_BRANCH}"]],
-        //     userRemoteConfigs: [[
-        //       url: "${env.GIT_REPO_URL}",
-        //       credentialsId: 'github-pat-pei'
-        //     ]],
-        //     extensions: [
-        //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-        //     ]
-        //   ])
-        // }
+            # Clean the Local directory 
+            echo '🧹 Version 4.1..'
+            echo '🧹 Cleaning checkout folder...'
+            rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+
+            cp ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+
+            ls -al ${LOCAL_DIR_CHECKOUT}
+            echo '📦 Extracting tarball (with pigz)...'
+            # tar         -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+            tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+
+            echo '📂 Extracted contents:  '
+            ls -al ${LOCAL_DIR_CHECKOUT}
+            echo '📂 Checking out source code (emulated) done...'
+            rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME}
+            echo '📂 Source code ready in ${LOCAL_DIR_CHECKOUT}'
+            
+          """
+
       }
     }
 
