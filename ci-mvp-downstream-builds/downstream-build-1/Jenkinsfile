@@ -154,8 +154,8 @@ spec:
             ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
             ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
 
-            # Clean the Local directory
-            echo '🧹 Version 4...'
+            # Clean the Local directory 
+            echo '🧹 Version 4.1..'
             echo '🧹 Cleaning checkout folder...'
             rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
 
