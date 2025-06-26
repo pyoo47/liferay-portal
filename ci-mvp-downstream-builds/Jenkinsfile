@@ -204,15 +204,14 @@ spec:
               echo '🧹 Version 4...'
               echo '🧹 Cleaning checkout folder...'
               rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+              
               ls -la ${LOCAL_DIR_CHECKOUT}
-            """
-
-            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-            echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
-
-
-            // Move tarball to EFS workspace
-            sh """
+            
+              echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+              echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
+            
+              # Move tarball to EFS workspace
+              
               echo '📂 EFS workspace contents: (v1)'
               cp ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
 
