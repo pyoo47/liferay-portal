@@ -129,6 +129,11 @@ spec:
           sh '''
               kubectl  version || true
           '''
+
+          echo '📦 Install some commands ...'
+          sh '''
+              alias ll=' ls -lah --color=auto '
+          '''
         }
       }
     }
@@ -145,29 +150,11 @@ spec:
             echo "📂 DIR_LOCAL_CHECKOUT: ${DIR_LOCAL_CHECKOUT}"
             echo "📦 TARBALL_FILE_PATH: ${TARBALL_FILE_PATH}"
 
-            // Clean the target folder
             sh """
               echo '🧹 Version 4...'
-              echo '🧹 Cleaning checkout folder...'
-              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
+              echo '🧹 Echo dummy Checkout...'
             """
-
-            withCredentials([
-              usernamePassword(
-                credentialsId: 'github-pat-pei',
-                usernameVariable: 'GIT_USERNAME',
-                passwordVariable: 'GIT_PASSWORD'
-              )
-            ]) {
-              sh """
-                echo '📥 Manual clone in container context...'
-                git clone --depth=1 \
-                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
-                     ${DIR_LOCAL_CHECKOUT}
-              """
-            }
           }
-
         }
       }
     }
@@ -185,41 +172,10 @@ spec:
             echo "📂 DIR_LOCAL_CHECKOUT: ${DIR_LOCAL_CHECKOUT}"
             echo "📦 TARBALL_FILE_PATH: ${TARBALL_FILE_PATH}"
 
-            // Clean the target folder
             sh """
-              echo '🧹 Cleaning checkout folder...'
-              rm -rf ${DIR_LOCAL_CHECKOUT} && mkdir -p ${DIR_LOCAL_CHECKOUT}
+              echo '🧹 Version 4...'
+              echo '🧹 Source Code Compress ...'
             """
-
-            withCredentials([
-              usernamePassword(
-                credentialsId: 'github-pat-pei',
-                usernameVariable: 'GIT_USERNAME',
-                passwordVariable: 'GIT_PASSWORD'
-              )
-            ]) {
-              sh """
-                echo '📥 Manual clone in container context...'
-                git clone --depth=1 \
-                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
-                     ${DIR_LOCAL_CHECKOUT}
-              """
-            }
-
-            // Debug output: show contents
-            sh "echo '📂 Contents after checkout:' && ls -al ${DIR_LOCAL_CHECKOUT} && du -sh ${DIR_LOCAL_CHECKOUT}"
-
-            // Compress to tar.gz (using pigz for faster compression - paralell multicore 8x faster) )
-            sh """
-              echo '📦 Creating tarball (excluding .git)...'
-              tar --exclude='.git' \
-                   --use-compress-program=pigz \
-                   -cf ${TARBALL_FILE_PATH} -C ${DIR_LOCAL_CHECKOUT} .
-            """
-
-
-            // Confirm tarball
-            sh "ls -lh ${TARBALL_FILE_PATH} || echo '❌ Tarball not created'"
           }
         }
       }
@@ -228,21 +184,20 @@ spec:
   }
 
     
-  // post {
-  //   always {
-  //     container('runner') {
-  //       script {
-          
-  //         sh """
-  //           echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
-  //           echo "Run this to debug:"
-  //           echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
-  //           sleep 3600
-  //         """
-  //       }
-  //     }
-  //   }
-  // }
+  post {
+    always {
+      container('runner') {
+        script {
+          sh """
+            echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
+            echo "Run this to debug:"
+            echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
+            sleep 3600   # 1 hour 60m x 60s
+          """
+        }
+      }
+    }
+  }
   
 
 

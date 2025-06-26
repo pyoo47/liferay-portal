@@ -162,6 +162,7 @@ spec:
               sh """
                 echo '📥 Manual clone in container context...'
                 git clone --depth=1 \
+                          --branch ${env.GIT_BRANCH} \
                      https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
                      ${DIR_LOCAL_CHECKOUT}
               """
