@@ -218,10 +218,10 @@ spec:
               echo '📂 EFS workspace contents:'
               ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}   
               """
+          }
         }
       }
-    }
-
+ }
 
 
     stage('Dynamic Downstream Builds') {
@@ -285,8 +285,8 @@ spec:
 
   }
 
+  
 }
-
 
 /*
 This Jenkinsfile is an EFS Validation script 
