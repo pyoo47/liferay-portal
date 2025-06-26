@@ -70,6 +70,10 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb) 
 
+
+
+    LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
+
     TARBALL_GIT_NAME    = "liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
     TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
   }
@@ -134,19 +138,24 @@ spec:
         
           sh """
             echo '📂 EFS workspace contents:'
-            ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}   
-
-            cp ${EFS_LIFERAY_ARTIFACT_REPOS}/
-
-LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
-
-
-            echo '📤 Moving tarball to EFS workspace... '
-            mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS} && echo '📂 EFS workspace contents:'
-
             ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
+            ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
 
-            mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
+            // Clean the Local directory
+            echo '🧹 Version 4...'
+            echo '🧹 Cleaning checkout folder...'
+            rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+
+            cp ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+
+            ls -al ${LOCAL_DIR_CHECKOUT}
+            echo '📦 Extracting tarball...'
+            tar -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+            echo '📂 Extracted contents:  '
+            ls -al ${LOCAL_DIR_CHECKOUT}
+            echo '📂 Checking out source code (emulated) done...'
+            rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME}
+            echo '📂 Source code ready in ${LOCAL_DIR_CHECKOUT}'
             
           """
 
