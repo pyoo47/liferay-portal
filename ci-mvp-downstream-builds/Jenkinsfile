@@ -153,7 +153,7 @@ spec:
               echo '🧹 Dummy...'
               echo '🧹 Checkout Dummy - I'using tar.bz from builder-1...'
             """
-            
+
             // // Define explicitly if not already
             // def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
             // def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
@@ -202,7 +202,7 @@ spec:
 
             // Clean the target folder
             sh """
-              echo '🧹 Version 4...'
+              echo '🧹 Version 5...'
               echo '🧹 Cleaning checkout folder...'
               rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
             """
