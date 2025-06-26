@@ -231,10 +231,10 @@ spec:
             echo "🔄 Starting dynamic downstream builds based on commit message..."
             echo "🔄 Using (Docker image 2.1) ... Version 2.5 "
             
-            def commitMessage = "[test: NONE ]"
+            // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
-            // def commitMessage = "[test: test-01-unit]"
+            def commitMessage = "[test: test-01-unit]"
 
             try {
               commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
@@ -258,7 +258,14 @@ spec:
                 echo "🔧 Job Path: ${jobPath}"
                 echo "📁 Directory: ${dirPath}"
 
-                build job: jobPath
+                build job: jobPath, 
+                      parameters: [
+                        string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER),
+                        string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
+                        string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
+                        string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
+                        string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
+                      ]
             }
 
             parallel parallelJobs   // ← Jenkins waits for all to finish here
@@ -269,7 +276,7 @@ spec:
 
   }
 
-  
+
   post {
     always {
       container('runner') {
@@ -285,8 +292,6 @@ spec:
       }
     }
   }
-
-  
 
   
 }

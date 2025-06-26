@@ -69,6 +69,13 @@ spec:
 
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb) 
+
+    EFS_MOUNT_PATH                = "/home/jenkins/agent/"
+    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/workspace/build-${env.BUILD_NUMBER}"
+    EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
+    EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
+    EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
+
   }
 
   options {
@@ -111,23 +118,11 @@ spec:
       }
     }
 
-    stage('Checkout Shallow') {
+    stage('Source Code Receive') {
       steps {
         echo "🔨 Simulating Checkout Shallow ${DOWNSTREAM_BUILD_ID}"
 
-        // container('runner') {
-        //   checkout([
-        //     $class: 'GitSCM',
-        //     branches: [[name: "*/${env.BUILD_TEST_BRANCH}"]],
-        //     userRemoteConfigs: [[
-        //       url: "${env.GIT_REPO_URL}",
-        //       credentialsId: 'github-pat-pei'
-        //     ]],
-        //     extensions: [
-        //       [$class: 'CloneOption', shallow: true, depth: 1, noTags: false, reference: '', timeout: 10]
-        //     ]
-        //   ])
-        // }
+
       }
     }
 
