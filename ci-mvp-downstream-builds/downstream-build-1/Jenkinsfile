@@ -70,17 +70,23 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb) 
 
-
+    TARBALL_GIT_NAME    = "liferay-portal-repo-${env.BUILD_NUMBER}.tar.gz"
+    TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
   }
+
+
+
 
   parameters {
     string(name: 'PARENT_BUILD_NUMBER'),
     string(name: 'PARENT_GIT_COMMIT'),
-    string(name: 'EFS_MOUNT_PATH',               defaultValue: '/home/jenkins/agent/'),
-    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: '/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}'),
-    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: '/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/repo-github'),
-    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: '/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/bundles'),
-    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: '/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/tests')
+    string(name: 'TARBALL_GIT_NAME',             defaultValue: "${env.TARBALL_GIT_NAME}"),
+    string(name: 'TARBALL_GIT_REPO',             defaultValue: "${env.TARBALL_GIT_REPO}"),
+    string(name: 'EFS_MOUNT_PATH',               defaultValue: "/home/jenkins/agent/"),
+    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: "/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}"),
+    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: "/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/repo-github"),
+    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: "/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/bundles"),
+    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: "/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/tests")
   }
 
   options {
@@ -125,8 +131,24 @@ spec:
 
     stage('Source Code Receive') {
       steps {
-        echo "🔨 Simulating Checkout Shallow ${DOWNSTREAM_BUILD_ID}"
+        
+          sh """
+            echo '📂 EFS workspace contents:'
+            ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}   
 
+            cp ${EFS_LIFERAY_ARTIFACT_REPOS}/
+
+LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
+
+
+            echo '📤 Moving tarball to EFS workspace... '
+            mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS} && echo '📂 EFS workspace contents:'
+
+            ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
+
+            mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
+            
+          """
 
       }
     }

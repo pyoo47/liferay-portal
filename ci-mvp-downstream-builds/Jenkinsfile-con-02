@@ -73,7 +73,7 @@ spec:
     TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
 
     EFS_MOUNT_PATH                = "/home/jenkins/agent/"
-    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/workspace/build-${env.BUILD_NUMBER}"
+    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.BUILD_NUMBER}"
     EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
     EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
     EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
