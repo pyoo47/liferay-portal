@@ -70,12 +70,17 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb) 
 
-    EFS_MOUNT_PATH                = "/home/jenkins/agent/"
-    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/workspace/build-${env.BUILD_NUMBER}"
-    EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
-    EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
-    EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
 
+  }
+
+  parameters {
+    string(name: 'PARENT_BUILD_NUMBER'),
+    string(name: 'PARENT_GIT_COMMIT'),
+    string(name: 'EFS_MOUNT_PATH',               defaultValue: '/home/jenkins/agent/'),
+    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: '/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}'),
+    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: '/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/repo-github'),
+    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: '/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/bundles'),
+    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: '/home/jenkins/agent/liferay-artifacts/build-${env.BUILD_NUMBER}/tests')
   }
 
   options {

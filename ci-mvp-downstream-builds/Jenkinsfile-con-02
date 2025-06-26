@@ -73,7 +73,7 @@ spec:
     TARBALL_GIT_REPO    = "/home/jenkins/local/${TARBALL_GIT_NAME}"
 
     EFS_MOUNT_PATH                = "/home/jenkins/agent/"
-    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.BUILD_NUMBER}"
+    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/workspace/build-${env.BUILD_NUMBER}"
     EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
     EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
     EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
@@ -260,8 +260,7 @@ spec:
 
                 build job: jobPath, 
                       parameters: [
-                        string(name: 'PARENT_BUILD_NUMBER', value: env.BUILD_NUMBER),
-                        string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
+                        string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER),
                         string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
                         string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
                         string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
