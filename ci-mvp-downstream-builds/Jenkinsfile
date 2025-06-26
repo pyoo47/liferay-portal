@@ -115,8 +115,8 @@ spec:
           echo "Running on Node: ${env.NODE_NAME} - ${env.NODE_NAME}" > info.txt
           echo "Testing Shared Libs"
 
-          log.info    'Validation Shared Libs Integration'
-          log.warning 'Liferay-Global-Shared-Libs is working fine'
+          // log.info    'Validation Shared Libs Integration'
+          // log.warning 'Liferay-Global-Shared-Libs is working fine'
           
           echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
         }
