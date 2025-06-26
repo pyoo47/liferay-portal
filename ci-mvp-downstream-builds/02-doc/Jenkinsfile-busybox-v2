@@ -11,11 +11,11 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: jenkins-efs-agent
-  securityContext:
-    fsGroup: 1000
   labels:
     jenkins: agent
 spec:
+  securityContext:
+    fsGroup: 1000
   serviceAccountName: jenkins-agent
   containers:
     - name: jnlp
@@ -96,6 +96,9 @@ spec:
       steps {
         script {
 
+          sh 'sudo chown -R jenkins:jenkins /opt/dev || true'
+
+
           echo """
           Environment Variables:
           Branch      : ${env.BRANCH_NAME}
@@ -153,35 +156,35 @@ spec:
               echo '🧹 Dummy...'
               echo '🧹 Checkout Dummy - using tar.bz from builder-1...'
             """
-            // // Define explicitly if not already
-            // def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
-            // def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+            // Define explicitly if not already
+            def LOCAL_DIR_CHECKOUT = '/home/jenkins/local/checkout'
+            def TARBALL_GIT_REPO = "/home/jenkins/local/liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
 
-            // echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-            // echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
+            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+            echo "📦 TARBALL_GIT_REPO: ${TARBALL_GIT_REPO}"
 
-            // // Clean the target folder
-            // sh """
-            //   echo '🧹 Version 4...'
-            //   echo '🧹 Cleaning checkout folder...'
-            //   rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
-            // """
+            // Clean the target folder
+            sh """
+              echo '🧹 Version 4...'
+              echo '🧹 Cleaning checkout folder...'
+              rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+            """
 
-            // withCredentials([
-            //   usernamePassword(
-            //     credentialsId: 'github-pat-pei',
-            //     usernameVariable: 'GIT_USERNAME',
-            //     passwordVariable: 'GIT_PASSWORD'
-            //   )
-            // ]) {
-            //   sh """
-            //     echo '📥 Manual clone in container context...'
-            //     git clone --depth=1 \
-            //               --branch ${env.GIT_BRANCH} \
-            //          https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
-            //          ${LOCAL_DIR_CHECKOUT}
-            //   """
-            // }
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'github-pat-pei',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_PASSWORD'
+              )
+            ]) {
+              sh """
+                echo '📥 Manual clone in container context...'
+                git clone --depth=1 \
+                          --branch ${env.GIT_BRANCH} \
+                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                     ${LOCAL_DIR_CHECKOUT}
+              """
+            }
           }
 
         }
@@ -201,7 +204,7 @@ spec:
 
             // Clean the target folder
             sh """
-              echo '🧹 Version 5.00 ...'
+              echo '🧹 Version 4...'
               echo '🧹 Cleaning checkout folder...'
               rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
               
@@ -309,7 +312,7 @@ spec:
             echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
             echo "Run this to debug:"
             echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
-            sleep 7200
+            sleep 3600
           """
         }
       }
