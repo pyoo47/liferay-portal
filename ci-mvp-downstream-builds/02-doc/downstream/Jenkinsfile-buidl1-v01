@@ -150,22 +150,20 @@ spec:
       steps {
         
           sh """
-            echo '📂 EFS workspace contents: (v1)'
+            echo '📂 EFS workspace contents: (v2)'
             ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
             ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
 
-            # Clean the Local directory 
-            echo '🧹 Version 4.1..'
+            // Clean the Local directory
+            echo '🧹 Version 4...'
             echo '🧹 Cleaning checkout folder...'
             rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
 
             cp ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
 
             ls -al ${LOCAL_DIR_CHECKOUT}
-            echo '📦 Extracting tarball (with pigz)...'
-            # tar         -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
-            tar -I pigz -xvf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
-
+            echo '📦 Extracting tarball...'
+            tar -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
             echo '📂 Extracted contents:  '
             ls -al ${LOCAL_DIR_CHECKOUT}
             echo '📂 Checking out source code (emulated) done...'
