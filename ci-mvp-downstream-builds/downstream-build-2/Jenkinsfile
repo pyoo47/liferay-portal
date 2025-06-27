@@ -148,7 +148,8 @@ spec:
 
     stage('Source Code Receive') {
       steps {
-        
+        container('runner') {
+
           sh """
             echo '📂 EFS workspace contents: (v1)'
             ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
@@ -174,6 +175,7 @@ spec:
             
           """
 
+        }
       }
     }
 
