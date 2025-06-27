@@ -197,7 +197,7 @@ spec:
                 git clone --depth=1 \
                           --branch ${env.GIT_BRANCH} \
                      https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
-                     ${LOCAL_DIR_CHECKOUT}
+                     ${LOCAL_DIR_CHECKOUT}/liferay-portal
               """
 
               // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
