@@ -32,11 +32,6 @@ spec:
           name: efs-workspace
         - mountPath: /home/jenkins/local
           name: workspace-volume
-      resources:
-        requests:
-          ephemeral-storage: "4Gi"
-        limits:
-          ephemeral-storage: "16Gi"
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
@@ -44,6 +39,10 @@ spec:
     - name: workspace-volume
       emptyDir: {}
 """
+
+      defaultContainer 'runner'
+      // defaultContainer 'jnlp' // Use this if you want to use the jnlp container for steps
+      // defaultContainer 'docker' // Use this if you want to use the docker container for steps
 
     }
   }
@@ -127,14 +126,7 @@ spec:
           log.info    'Validation Shared Libs Integration'
           log.warning 'Liferay-Global-Shared-Libs is working fine'
           
-          echo """
-            For Debug Options
-            export POD_NAME=${env.NODE_NAME}
-            export POD_NAMESPACE=liferay-jenkins
-            export CONTAINER_NAME=runner
-            kubectl cp ~/.ssh $POD_NAME:/home/jenkins/ -c $CONTAINER_NAME -n $POD_NAMESPACE
-            kubectl exec -it $POD_NAME  -c $CONTAINER_NAME -n $POD_NAMESPACE -- bash
-          """
+          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
         }
         // Or print everything
         // sh 'printenv'
@@ -143,7 +135,8 @@ spec:
 
     stage('Validate AWS Cli, IRSA and Kubectl (optional) ') {
       steps {
-        container('runner') {        
+        
+
           echo '📦 Validate AWS CLI and IRSA...'
 
           sh '''
@@ -156,14 +149,14 @@ spec:
           sh '''
               kubectl  version || true
           '''
-        }
+        
       }
     }
     
 
     stage('Checkout') {
       steps {
-        container('runner') {
+        
           script {
 
             // Clean the target folder
@@ -209,12 +202,8 @@ spec:
             //     """
             // }
             
-
-            input message: 'Continue the pipeline?', ok: 'Yes, proceed'
-            
           }
 
-        }
         
       }
     }
@@ -223,23 +212,8 @@ spec:
 
     stage('Source Code Compress') {
       steps {
-        container('runner') {
+        
           script {
-
-
-            def userChoice = input(
-              message: 'Select build option',
-              parameters: [
-                choice(name: 'OPTION', choices: ['Build', 'Skip'], description: 'Choose an action')
-              ]
-            )
-
-            if (userChoice == 'Skip') {
-              echo 'Build skipped by user.'
-              currentBuild.result = 'SUCCESS'
-              return
-            }
-
 
             // Clean the target folder
             sh """
@@ -272,12 +246,23 @@ spec:
               echo '📂 Source code ready in ${LOCAL_DIR_CHECKOUT}'
               """
 
-           
+              
+              sh """
+                echo "LET's GO HERE WITH BUSY BOX x 7200"
+                echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
+                echo "Run this to debug:"
 
+                echo "export POD_NAME=${env.NODE_NAME}"
+                echo "export POD_NAMESPACE=liferay-jenkins"
+                echo "export CONTAINER_NAME=runner"
+                echo "kubectl cp ~/.ssh $POD_NAME:/home/jenkins/ -c $CONTAINER_NAME -n $POD_NAMESPACE"
+                echo "kubectl exec -it $POD_NAME  -c $CONTAINER_NAME -n $POD_NAMESPACE -- bash"
+
+                sleep 7200
+              """
 
           }
         
-        }
       }
     }
 
@@ -338,15 +323,24 @@ spec:
   }
 
 
-  post {
-    always {
-
-      input message: 'Finish the pipeline?', ok: 'Yes, proceed'
-      echo "🔚 Pipeline completed. Cleaning up workspace..."
-
-
-    }
-  }
+  // post {
+  //   always {
+  //     container('runner') {
+  //       script {
+  //         sh """
+  //           echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
+  //           echo "Run this to debug:"
+  //           echo "export POD_NAME=${env.NODE_NAME}"
+  //           echo "export POD_NAMESPACE=liferay-jenkins"
+  //           echo "export CONTAINER_NAME=runner"
+  //           echo "kubectl cp ~/.ssh $POD_NAME:/home/jenkins/ -c $CONTAINER_NAME -n $POD_NAMESPACE"
+  //           echo "kubectl exec -it $POD_NAME  -c $CONTAINER_NAME -n $POD_NAMESPACE -- bash"
+  //           sleep 7200
+  //         """
+  //       }
+  //     }
+  //   }
+  // }
 
   
 }
