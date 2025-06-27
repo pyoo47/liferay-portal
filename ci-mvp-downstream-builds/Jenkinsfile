@@ -251,7 +251,13 @@ spec:
                 echo "LET's GO HERE WITH BUSY BOX x 7200"
                 echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
                 echo "Run this to debug:"
-                echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+
+                echo "export POD_NAME=${env.NODE_NAME}"
+                echo "export POD_NAMESPACE=liferay-jenkins"
+                echo "export CONTAINER_NAME=runner"
+                echo "kubectl cp ~/.ssh $POD_NAME:/home/jenkins/ -c $CONTAINER_NAME -n $POD_NAMESPACE"
+                echo "kubectl exec -it $POD_NAME  -c $CONTAINER_NAME -n $POD_NAMESPACE -- bash"
+
                 sleep 7200
               """
 
@@ -321,11 +327,14 @@ spec:
   //   always {
   //     container('runner') {
   //       script {
-          
   //         sh """
   //           echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
   //           echo "Run this to debug:"
-  //           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+  //           echo "export POD_NAME=${env.NODE_NAME}"
+  //           echo "export POD_NAMESPACE=liferay-jenkins"
+  //           echo "export CONTAINER_NAME=runner"
+  //           echo "kubectl cp ~/.ssh $POD_NAME:/home/jenkins/ -c $CONTAINER_NAME -n $POD_NAMESPACE"
+  //           echo "kubectl exec -it $POD_NAME  -c $CONTAINER_NAME -n $POD_NAMESPACE -- bash"
   //           sleep 7200
   //         """
   //       }
