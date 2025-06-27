@@ -4,25 +4,44 @@ import com.liferay.TestBuild
 
 pipeline {
 
-agent {
-  kubernetes {
-    label 'jenkins-jenkins-agent'
-    yaml """
+  agent {
+    kubernetes {
+      yaml """
 apiVersion: v1
 kind: Pod
 metadata:
+  name: jenkins-efs-agent
   labels:
     jenkins: agent
-    app.kubernetes.io/component: jenkins-jenkins-agent
 spec:
+  serviceAccountName: jenkins-agent
+  securityContext:
+    fsGroup: 1000
   containers:
-  - name: runner
-    image: ubuntu
-    command: ['sleep', 'infinity']
-    tty: true
+    - name: jnlp
+      image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+    - name: runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:1.0.3
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
+  volumes:
+    - name: efs-workspace
+      persistentVolumeClaim:
+        claimName: jenkins-efs-pvc
+    - name: workspace-volume
+      emptyDir: {}
 """
     }
-}
+  }
+
 
   environment {
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
