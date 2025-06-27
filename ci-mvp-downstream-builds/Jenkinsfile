@@ -103,7 +103,7 @@ spec:
     EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
 
 
-    DOCKER_CONTAINER_RUNNER_MICHAEL = 'aws-caylent-runner'.    // From Michael
+    DOCKER_CONTAINER_RUNNER_MICHAEL = 'aws-caylent-runner'    // From Michael
     DOCKER_CONTAINER_RUNNER_PEI     = 'aws-liferay-runner'     // Created by PEI
 
     DOCKER_CONTAINER_RUNNER        = "${DOCKER_CONTAINER_RUNNER_MICHAEL}" // Default to Michael's runner
