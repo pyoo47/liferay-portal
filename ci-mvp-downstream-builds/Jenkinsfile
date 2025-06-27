@@ -72,7 +72,6 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
-sh(script: "git rev-parse HEAD", returnStdout: true).trim()
 
     LOCAL_MOUNT_PATH  = "/home/jenkins/local/checkout"
 
