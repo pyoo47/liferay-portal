@@ -127,14 +127,20 @@ spec:
           log.info    'Validation Shared Libs Integration'
           log.warning 'Liferay-Global-Shared-Libs is working fine'
           
+
           echo """
-            For Debug Options
-            export POD_NAME=${env.NODE_NAME}
-            export POD_NAMESPACE=liferay-jenkins
-            export CONTAINER_NAME=runner
-            kubectl cp ~/.ssh $POD_NAME:/home/jenkins/ -c $CONTAINER_NAME -n $POD_NAMESPACE
-            kubectl exec -it $POD_NAME  -c $CONTAINER_NAME -n $POD_NAMESPACE -- bash
+          For Debug Options:
+
+          export POD_NAME=${env.NODE_NAME}
+          export POD_NAMESPACE=liferay-jenkins
+          export CONTAINER_NAME=runner
+
+          kubectl cp ~/.ssh \$POD_NAME:/home/jenkins/.ssh -c \$CONTAINER_NAME -n \$POD_NAMESPACE
+          kubectl exec -it \$POD_NAME -c \$CONTAINER_NAME -n \$POD_NAMESPACE -- bash
           """
+
+
+
         }
         // Or print everything
         // sh 'printenv'
@@ -182,6 +188,8 @@ spec:
               rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
             """
 
+            input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
+
             withCredentials([
               usernamePassword(
                 credentialsId: 'github-pat-pei',
@@ -210,7 +218,7 @@ spec:
             // }
             
 
-            input message: 'Continue the pipeline?', ok: 'Yes, proceed'
+           
             
           }
 
@@ -343,8 +351,7 @@ spec:
 
       input message: 'Finish the pipeline?', ok: 'Yes, proceed'
       echo "🔚 Pipeline completed. Cleaning up workspace..."
-
-
+    
     }
   }
 
