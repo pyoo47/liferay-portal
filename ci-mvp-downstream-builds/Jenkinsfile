@@ -106,8 +106,6 @@ spec:
     stage('Print Environment') {
       steps {
         script {
-
-
           echo """
           Environment Variables:
           Branch      : ${env.BRANCH_NAME}
@@ -122,12 +120,10 @@ spec:
           """
 
           sh "echo 'Running on Node: ${env.NODE_NAME} - ${env.NODE_NAME}' > info.txt"
-          echo "Testing Shared Libs"
-
-          log.info    'Validation Shared Libs Integration'
+          
+          log.info    'Testing Shared Libs (log.info) Validation Shared Libs Integration'
           log.warning 'Liferay-Global-Shared-Libs is working fine'
           
-
           echo """
           For Debug Options:
 
@@ -138,17 +134,10 @@ spec:
           kubectl cp ~/.ssh \$POD_NAME:/home/jenkins/.ssh -c \$CONTAINER_NAME -n \$POD_NAMESPACE
           kubectl exec -it \$POD_NAME -c \$CONTAINER_NAME -n \$POD_NAMESPACE -- bash
           """
-
-
-
         }
         // Or print everything
         // sh 'printenv'
-      }
-    }
-
-    stage('Validate AWS Cli, IRSA and Kubectl (optional) ') {
-      steps {
+        
         container('runner') {        
           echo '📦 Validate AWS CLI and IRSA...'
 
@@ -158,20 +147,15 @@ spec:
             aws s3 ls || echo "❌ AWS CLI S3 (IRSA) access not working"
           '''
         }
+
       }
     }
-    
 
-    stage('Checkout') {
+    
+    stage('Checkout liferay-portal') {
       steps {
         container('runner') {
           script {
-
-            // Clean the target folder
-            sh """
-              echo '🧹 Dummy...'
-              echo '🧹 Checkout Dummy - using tar.bz from builder-1...'
-            """
        
             echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
             echo "📦 TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
@@ -183,7 +167,7 @@ spec:
               rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
             """
 
-            input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
+           // input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
 
             withCredentials([
               usernamePassword(
@@ -223,6 +207,88 @@ spec:
     }
 
 
+    stage('Checkout liferay-portal') {
+      steps {
+        container('runner') {
+          script {
+       
+            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+            echo "📦 TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
+
+            // Clean the target folder
+            sh """
+              echo '🧹 Version 4...'
+              echo '🧹 Cleaning checkout folder...'
+              rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+            """
+
+           // input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
+
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'github-pat-pei',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_PASSWORD'
+              )
+            ]) {
+              sh """
+                echo '📥 Manual clone in container context...'
+                git clone --depth=1 \
+                          --branch ${env.GIT_BRANCH} \
+                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                     ${LOCAL_DIR_CHECKOUT}/liferay-portal
+              """
+
+              // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+            }
+ 
+          }
+        }
+        
+      }
+    }
+
+
+
+    stage('Checkout liferay-jenkins-ee') {
+      steps {
+        container('runner') {
+          script {
+       
+            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+            echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
+
+            // sshagent(['GitHub-ssh-pei']) {
+            //     sh """
+            //       git clone --depth=1 \
+            //                 --branch master \
+            //                 git@github.com/liferay/liferay-jenkins-ee.git \
+            //                 ${LOCAL_DIR_CHECKOUT} 
+            //     """
+            // }
+            
+            sh """
+              echo '📂 EFS workspace and local contents:'
+              ls -al ${LOCAL_DIR_CHECKOUT}
+              ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
+
+              echo '📂 EFS workspace copy liferay-jenkins-ee to local'
+              cp ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME_EE} ${LOCAL_DIR_CHECKOUT}
+              
+              echo '📦 Extracting tarball (with pigz)...'
+              tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE} -C ${LOCAL_DIR_CHECKOUT}
+              
+              echo '📂 Remove tar.gz ...'
+              rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}
+
+              echo '📂 New Extracted contents:  '
+              ls -al ${LOCAL_DIR_CHECKOUT}
+            """ 
+          }
+        }
+      }
+    }
+
 
     stage('Source Code Compress') {
       steps {
@@ -230,21 +296,20 @@ spec:
           script {
 
 
-            def userChoice = input(
-              message: 'Select build option',
-              parameters: [
-                choice(name: 'OPTION', choices: ['Build', 'Skip'], description: 'Choose an action')
-              ]
-            )
+            // def userChoice = input(
+            //   message: 'Select build option',
+            //   parameters: [
+            //     choice(name: 'OPTION', choices: ['Build', 'Skip'], description: 'Choose an action')
+            //   ]
+            // )
 
-            if (userChoice == 'Skip') {
-              echo 'Build skipped by user.'
-              currentBuild.result = 'SUCCESS'
-              return
-            }
+            // if (userChoice == 'Skip') {
+            //   echo 'Build skipped by user.'
+            //   currentBuild.result = 'SUCCESS'
+            //   return
+            // }
 
 
-            // Clean the target folder
             sh """
               echo '🧹 Version 5.00 ...'
               ls -la ${LOCAL_DIR_CHECKOUT}
@@ -273,9 +338,7 @@ spec:
               echo '📂 Checking out source code (emulated) done...'
               rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}
               echo '📂 Source code ready in ${LOCAL_DIR_CHECKOUT}'
-              """
-
-           
+            """
 
 
           }
