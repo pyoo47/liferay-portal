@@ -23,7 +23,16 @@ spec:
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
-    - name: runner
+    - name: aws-caylent-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume         
+    - name: aws-liferay-runner
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
       command: ["cat"]
       tty: true
@@ -32,6 +41,7 @@ spec:
           name: efs-workspace
         - mountPath: /home/jenkins/local
           name: workspace-volume
+          readOnly: true
       resources:
         requests:
           ephemeral-storage: "4Gi"
@@ -47,7 +57,6 @@ spec:
 
     }
   }
-
 
   environment {
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
@@ -93,6 +102,15 @@ spec:
     EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
     EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
 
+
+    DOCKER_CONTAINER_RUNNER_MICHAEL = 'aws-caylent-runner'.    // From Michael
+    DOCKER_CONTAINER_RUNNER_PEI     = 'aws-liferay-runner'     // Created by PEI
+
+    DOCKER_CONTAINER_RUNNER        = "${DOCKER_CONTAINER_RUNNER_MICHAEL}" // Default to Michael's runner
+
+
+
+
   }
 
   options {
@@ -131,14 +149,14 @@ spec:
           export POD_NAMESPACE=liferay-jenkins
           export CONTAINER_NAME=runner
 
-          kubectl cp ~/.ssh \$POD_NAME:/home/jenkins/.ssh -c \$CONTAINER_NAME -n \$POD_NAMESPACE
+          # kubectl cp ~/.ssh \$POD_NAME:/home/jenkins/.ssh -c \$CONTAINER_NAME -n \$POD_NAMESPACE
           kubectl exec -it \$POD_NAME -c \$CONTAINER_NAME -n \$POD_NAMESPACE -- bash
           """
         }
         // Or print everything
         // sh 'printenv'
         
-        container('runner') {        
+        container("${DOCKER_CONTAINER_RUNNER}") {        
           echo '📦 Validate AWS CLI and IRSA...'
 
           sh '''
@@ -154,7 +172,7 @@ spec:
     
     stage('Checkout liferay-portal') {
       steps {
-        container('runner') {
+        container("${DOCKER_CONTAINER_RUNNER}") {
           script {
        
             echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
@@ -197,7 +215,7 @@ spec:
 
     stage('Checkout liferay-jenkins-ee') {
       steps {
-        container('runner') {
+        container("${DOCKER_CONTAINER_RUNNER}") {
           script {
        
             echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
@@ -237,7 +255,7 @@ spec:
 
     stage('Source Code Compress') {
       steps {
-        container('runner') {
+        container("${DOCKER_CONTAINER_RUNNER}") {
           script {
 
 
