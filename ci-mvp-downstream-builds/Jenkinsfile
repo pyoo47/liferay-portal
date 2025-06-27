@@ -10,7 +10,7 @@ pipeline {
 apiVersion: v1
 kind: Pod
 metadata:
-  name: jenkins-efs-agent
+  name: jenkins-jenkins-agent
   labels:
     jenkins: agent
 spec:
