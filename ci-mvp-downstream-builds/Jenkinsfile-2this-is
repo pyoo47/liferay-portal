@@ -110,8 +110,8 @@ spec:
       steps {
         script {
           echo """
-          Environment Variables (v3):
-          
+          Environment Variables (v2):
+          Setup 4 y 8 gb
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}

@@ -10,7 +10,7 @@ pipeline {
 apiVersion: v1
 kind: Pod
 metadata:
-  name: jenkins-jenkins-agent
+  name: jenkins-efs-agent
   labels:
     jenkins: agent
 spec:
@@ -98,7 +98,7 @@ spec:
 
 
           echo """
-          Environment Variables (gold-02-version) - v1.0.3
+          Environment Variables (gold-02-version) - v1.0.5
           -----------------------------------:
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
