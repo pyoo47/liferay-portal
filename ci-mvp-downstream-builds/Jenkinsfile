@@ -44,9 +44,9 @@ spec:
           readOnly: true
       resources:
         requests:
-          ephemeral-storage: "8Gi"
+          ephemeral-storage: "4Gi"
         limits:
-          ephemeral-storage: "32Gi"
+          ephemeral-storage: "8Gi"
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
@@ -126,6 +126,7 @@ spec:
         script {
           echo """
           Environment Variables (v2):
+          Setup 4 y 8 gb
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
