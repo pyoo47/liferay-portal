@@ -109,7 +109,7 @@ spec:
           log.info    'Validation Shared Libs Integration'
           log.warning 'Liferay-Global-Shared-Libs is working fine'
           
-          echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
+          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
         }
         // Or print everything
         // sh 'printenv'
