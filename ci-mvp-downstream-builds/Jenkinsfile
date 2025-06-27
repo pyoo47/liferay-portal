@@ -4,25 +4,10 @@ import com.liferay.TestBuild
 
 pipeline {
 
-  
   agent {
-    kubernetes {
-      yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  name: jenkins-efs-agent
-  labels:
-    app.kubernetes.io/component: jenkins-jenkins-agent
-spec:
-  serviceAccountName: jenkins-agent
-  securityContext:
-    runAsUser: 1000
-    fsGroup: 1000
-"""
-    }
-  }
-
+  label 'jenkins-jenkins-agent'
+}
+ 
 
   environment {
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
