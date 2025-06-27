@@ -72,6 +72,8 @@ spec:
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
     // liferay-portal-source.tar.gz         (~1.2gb)
 
+sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+
     LOCAL_MOUNT_PATH  = "/home/jenkins/local/checkout"
 
     LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
@@ -181,16 +183,18 @@ spec:
               //        https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
               //        ${LOCAL_DIR_CHECKOUT}
               // """
+
+              // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
             }
 
-            sshagent(['GitHub-ssh-pei']) {
-                sh """
-                  git clone --depth=1 \
-                            --branch master \
-                            git@github.com/liferay/liferay-jenkins-ee.git \
-                            ${LOCAL_DIR_CHECKOUT} 
-                """
-            }
+            // sshagent(['GitHub-ssh-pei']) {
+            //     sh """
+            //       git clone --depth=1 \
+            //                 --branch master \
+            //                 git@github.com/liferay/liferay-jenkins-ee.git \
+            //                 ${LOCAL_DIR_CHECKOUT} 
+            //     """
+            // }
 
           
 
