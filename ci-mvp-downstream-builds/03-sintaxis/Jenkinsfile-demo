@@ -1,0 +1,62 @@
+pipeline {
+  agent any
+  stages {
+    stage('User Choice') {
+      steps {
+        script {
+          CHOICE = input(
+            message: 'Which path to follow?',
+            parameters: [
+              choice(name: 'OPTION', choices: ['Build', 'Deploy'], description: 'Select an action')
+            ]
+          )
+        }
+      }
+    }
+
+    stage('Build Stage') {
+      when {
+        expression { return CHOICE == 'Build' }
+      }
+      steps {
+        echo 'Running Build Stage'
+      }
+    }
+
+    stage('Deploy Stage') {
+      when {
+        expression { return CHOICE == 'Deploy' }
+      }
+      steps {
+        echo 'Running Deploy Stage'
+      }
+    }
+
+    stage('Follow-up for Build') {
+      when {
+        expression { return CHOICE == 'Build' }
+      }
+      steps {
+        echo "Doing build-related follow-up..."
+      }
+    }
+
+    stage('Follow-up for Deploy') {
+      when {
+        expression { return CHOICE == 'Deploy' }
+      }
+      steps {
+        echo "Doing deploy-related follow-up..."
+      }
+    }
+
+    finally {
+      stage('Final Stage') {
+        steps {
+          echo 'This stage runs regardless of the choice made.'
+        }
+      }
+    }
+    
+  }
+}
