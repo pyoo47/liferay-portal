@@ -39,6 +39,11 @@ spec:
     - name: workspace-volume
       emptyDir: {}
 """
+
+      defaultContainer 'runner'
+      // defaultContainer 'jnlp' // Use this if you want to use the jnlp container for steps
+      // defaultContainer 'docker' // Use this if you want to use the docker container for steps
+
     }
   }
 
@@ -130,7 +135,7 @@ spec:
 
     stage('Validate AWS Cli, IRSA and Kubectl (optional) ') {
       steps {
-        container('runner') {
+        
 
           echo '📦 Validate AWS CLI and IRSA...'
 
@@ -144,14 +149,14 @@ spec:
           sh '''
               kubectl  version || true
           '''
-        }
+        
       }
     }
     
 
     stage('Checkout') {
       steps {
-        container('runner') {
+        
           script {
 
             // Clean the target folder
@@ -199,7 +204,7 @@ spec:
             
           }
 
-        }
+        
       }
     }
 
@@ -207,7 +212,7 @@ spec:
 
     stage('Source Code Compress') {
       steps {
-        container('runner') {
+        
           script {
 
             // Clean the target folder
@@ -251,7 +256,7 @@ spec:
               """
 
           }
-        }
+        
       }
     }
 
