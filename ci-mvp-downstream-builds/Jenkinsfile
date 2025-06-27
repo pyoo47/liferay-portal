@@ -98,7 +98,8 @@ spec:
 
 
           echo """
-          Environment Variables:
+          Environment Variables (gold-02-version) - v1.0.0
+          -----------------------------------:
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
