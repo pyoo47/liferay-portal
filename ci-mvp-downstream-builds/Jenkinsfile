@@ -1,3 +1,7 @@
+@Library('Liferay-Global-Shared-Libs') _
+
+import com.liferay.TestBuild
+
 pipeline {
 
   agent {
@@ -90,7 +94,7 @@ spec:
 
   stages {
 
-    stage('Print Environment v2') {
+    stage('Print Environment') {
       steps {
         script {
 
@@ -108,9 +112,11 @@ spec:
           AWS_S3_URL_TESTS     : ${env.AWS_S3_URL_TESTS}
           """
 
-          echo "Running on Node: ${env.NODE_NAME} - ${env.NODE_NAME}" > info.txt
+          sh "echo 'Running on Node: ${env.NODE_NAME} - ${env.NODE_NAME}' > info.txt"
           echo "Testing Shared Libs"
 
+          log.info    'Validation Shared Libs Integration'
+          log.warning 'Liferay-Global-Shared-Libs is working fine'
           
           echo "kubectl exec -it ${env.NODE_NAME} -n liferay-jenkins -- bash"
         }
@@ -185,6 +191,8 @@ spec:
                             ${LOCAL_DIR_CHECKOUT} 
                 """
             }
+
+          
 
             sh """
               echo "🛑 Build complete. Pod is: ${env.NODE_NAME}"
@@ -274,34 +282,34 @@ spec:
               echo "🔍 Reason: ${e.getMessage()}"
             }
 
-            // def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
+            def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
 
-            // echo "✅ Selected: ${selectedTests*.label.join(', ')}"
+            echo "✅ Selected: ${selectedTests*.label.join(', ')}"
 
-            // def parallelJobs = [:]
+            def parallelJobs = [:]
 
-            // selectedTests.each { test ->
-            //     def jobPath = TestBuild.getFullJobPath(test)
-            //     def dirPath = TestBuild.getFullDirPath(test)
+            selectedTests.each { test ->
+                def jobPath = TestBuild.getFullJobPath(test)
+                def dirPath = TestBuild.getFullDirPath(test)
 
-            //     echo "👉 Running: ${test.label}"
-            //     echo "🔧 Job Path: ${jobPath}"
-            //     echo "📁 Directory: ${dirPath}"
+                echo "👉 Running: ${test.label}"
+                echo "🔧 Job Path: ${jobPath}"
+                echo "📁 Directory: ${dirPath}"
 
-            //     build job: jobPath, 
-            //           parameters: [
-            //             string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
-            //             string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
-            //             string(name: 'TARBALL_GIT_NAME', value: TARBALL_GIT_NAME),
-            //             string(name: 'TARBALL_GIT_REPO', value: TARBALL_GIT_REPO),
-            //             string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
-            //             string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
-            //             string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
-            //             string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
-            //           ]
-            // }
+                build job: jobPath, 
+                      parameters: [
+                        string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
+                        string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
+                        string(name: 'TARBALL_GIT_NAME', value: TARBALL_GIT_NAME),
+                        string(name: 'TARBALL_GIT_REPO', value: TARBALL_GIT_REPO),
+                        string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
+                        string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
+                        string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
+                        string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
+                      ]
+            }
 
-            // parallel parallelJobs   // ← Jenkins waits for all to finish here
+            parallel parallelJobs   // ← Jenkins waits for all to finish here
 
         }
       }
