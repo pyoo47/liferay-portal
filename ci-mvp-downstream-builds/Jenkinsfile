@@ -266,7 +266,7 @@ spec:
         script {
                         
             echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Using (Docker image 2.1) ... Version 2.5 "
+            echo "🔄 Using (Docker image 2.1) ... Version 3.0 "
             
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
