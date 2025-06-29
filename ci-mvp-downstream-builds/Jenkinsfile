@@ -37,7 +37,7 @@ spec:
     stage('Sanity Check') {
       steps {
         container('build') {
-          sh 'echo ✅ Minimal pod scheduled successfully! (after restar jenkins)'
+          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.0 '
         }
       }
     }
