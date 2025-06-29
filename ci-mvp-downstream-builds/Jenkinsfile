@@ -137,7 +137,7 @@ spec:
       steps {
         script {
           echo """
-          Environment Variables (v2) 1.0.1:
+          Environment Variables (v2) 1.0.2:
           Setup 4 y 8 gb
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
