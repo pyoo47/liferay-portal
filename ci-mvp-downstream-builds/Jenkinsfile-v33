@@ -13,45 +13,52 @@ metadata:
   name: jenkins-efs-agent
   labels:
     jenkins: agent
-
 spec:
   serviceAccountName: jenkins-agent
   securityContext:
     fsGroup: 1000
   containers:
+    - name: jnlp
+      image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
     - name: aws-caylent-runner
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      command: ["cat"]
+      tty: true
       resources:
         requests:
+          cpu: "8"
           memory: "8Gi"
-          cpu: "8"
         limits:
+          cpu: "16"
           memory: "16Gi"
-          cpu: "8"
       volumeMounts:
-      - mountPath: /home/jenkins/agent
-        name: efs-workspace
-      - mountPath: /home/jenkins/local
-        name: workspace-volume
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
       resources:
         requests:
           ephemeral-storage: "20Gi"
         limits:
           ephemeral-storage: "70Gi"
-      env:
-        - name: ANT_OPTS
-          value: "-Xmx8192m"
-        - name: JAVA_OPTS
-          value: "-Xmx8192m"
-  nodeSelector:
-    jenkins-role: agent
-  tolerations:
-    - key: "jenkins-role"
-      operator: "Equal"
-      value: "agent"
-      effect: "NoSchedule"
-
-
+    - name: aws-liferay-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
+          readOnly: true
+      resources:
+        requests:
+          ephemeral-storage: "20Gi"
+        limits:
+          ephemeral-storage: "70Gi"
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
