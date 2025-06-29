@@ -1,5 +1,12 @@
-pipeline {
+/**
+  * This demos shows how to use the `input` step in a Jenkins pipeline to allow user choice
+  *
+  */
+  
+  pipeline {
+  
   agent any
+  
   stages {
     stage('User Choice') {
       steps {
