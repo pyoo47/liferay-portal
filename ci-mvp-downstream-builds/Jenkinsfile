@@ -23,16 +23,16 @@ spec:
       tty: true
       resources:
         requests:
-          memory: "8Gi"
-          cpu: "8"
+          memory: "6Gi"     
+          cpu: "6"          
         limits:
-          memory: "16Gi"
+          memory: "8Gi"
           cpu: "8"
       env:
         - name: ANT_OPTS
-          value: "-Xmx8192m"
+          value: "-Xmx6144m"
         - name: JAVA_OPTS
-          value: "-Xmx8192m"
+          value: "-Xmx6144m"
   nodeSelector:
     jenkins-role: agent
   tolerations:
