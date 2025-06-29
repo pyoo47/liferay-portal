@@ -12,11 +12,34 @@
   *                                      Limit.  (16 vCPU and 16Gi memory)
   *                                      Used.   ( - vCPU and. 9Gi memory)
   *
-  * Todo:
-  *   - Run Unit Tests
-  *   - Run Func Tests
-  *   - Run bbdd Tests
+  * - I was also able to run the following tests, on the same pod:
+  *   - Run Unit Tests (0 min - 59 sec)
+  *   - Run Func Tests (6 min - 30 sec)
+  *   - Run bbdd Tests (3 min - 43 sec)
   *
+  * - Methodology:
+  *   - Starting the build with a Git Commit Push
+  *   - Jenkins agent pod is scheduled and assigned an m5.4xlarge instance
+  *   - The pod has 3 containers:
+  *     - jnlp: Jenkins inbound agent
+  *     - build: Alpine container for basic operations
+  *     - aws-caylent-runner: Custom container with AWS Caylent Runner
+  *   - Pause the pipeline to allow manual inspection
+  *     - Kubectl exec into the aws-caylent-runner container
+  *     - Run the build commands manually
+  *       - Build the bundle using the AWS Caylent Runner
+  *       - Run the unit tests
+  *       - Run the functional tests
+  *       - Run the database tests
+  *   - Successfully built the bundle and ran all tests
+  *
+  * - Artifacts:
+  *   - About Artifacts uploaded to S3, I wasn't able yet because lack of permissions on IRSA configuration
+  *     to upload the following:
+  *     - Bundle: s3://liferayci-file-propagator-mvp/
+  *
+  *   - Next steps is increase automation by integrating the build commands into the Jenkins pipeline
+  * 
   * Status: ✅ Minimal pod scheduled successfully
   */
 pipeline {
