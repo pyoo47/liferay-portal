@@ -32,14 +32,25 @@
   *       - Run the functional tests
   *       - Run the database tests
   *   - Successfully built the bundle and ran all tests
+  *   - Monitoring
+  *       - I'm usig tools K9s, Lens and kubectl to monitor the pod
+  *       - Also, AWS Console to monitor the EKS cluster and the pod's resource usage
+  *       -       AND EC2 instance metrics in the AWS Console EC2 Dashboard
   *
-  * - Artifacts:
-  *   - About Artifacts uploaded to S3, I wasn't able yet because lack of permissions on IRSA configuration
-  *     to upload the following:
-  *     - Bundle: s3://liferayci-file-propagator-mvp/
-  *
-  *   - Next steps is increase automation by integrating the build commands into the Jenkins pipeline
-  * 
+  * - NEXT Steps:
+  *   - Artifacts:
+  *     - About Artifacts uploaded to S3, I wasn't able yet because lack of permissions on IRSA configuration
+  *       to upload the following:
+  *       - Bundle: s3://liferayci-file-propagator-mvp/
+  *   - EFS
+  *     - I was not able to mount the EFS volume on the pod, so I used the local workspace
+  *   - Automation
+  *     - Next steps is increase automation by integrating the build commands into the Jenkins pipeline
+  *   - Security
+  *     - Remove the ssh key from the AWS Caylent Runner container
+  *   - Orchestration
+  *     - Invoking Downstream Builds from the main pipeline
+  *  
   * Status: ✅ Minimal pod scheduled successfully
   */
 pipeline {
