@@ -1,7 +1,7 @@
 pipeline {
   agent {
     kubernetes {
-      label 'liferay-agent'
+      label 'liferay-agent-test'
       defaultContainer 'build'
       yaml """
 apiVersion: v1
@@ -9,30 +9,19 @@ kind: Pod
 spec:
   containers:
     - name: jnlp
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      image: jenkins/inbound-agent:latest
       resources:
         requests:
-          memory: "2Gi"
-          cpu: "1"
-        limits:
-          memory: "4Gi"
-          cpu: "2"
+          memory: "512Mi"
+          cpu: "500m"
     - name: build
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      image: alpine
       command: ['cat']
       tty: true
       resources:
         requests:
-          memory: "6Gi"
-          cpu: "6"
-        limits:
-          memory: "8Gi"
-          cpu: "8"
-      env:
-        - name: ANT_OPTS
-          value: "-Xmx6144m"
-        - name: JAVA_OPTS
-          value: "-Xmx6144m"
+          memory: "1Gi"
+          cpu: "1"
   nodeSelector:
     jenkins-role: agent
   tolerations:
@@ -45,11 +34,10 @@ spec:
   }
 
   stages {
-    stage('Build') {
+    stage('Sanity Check') {
       steps {
         container('build') {
-          sh 'echo "🔧 Starting build..."'
-          sh 'java -version'
+          sh 'echo ✅ Minimal pod scheduled successfully!'
         }
       }
     }
