@@ -1,6 +1,6 @@
 /**
   * Jenkinsfile for Liferay MVP Downstream Builds
-  * Version: 1.0.3
+  * Version: 1.0.0
   * This Jenkinsfile defines a minimal pod configuration for testing purposes.
   *
   * Satus: ✅ Minimal pod scheduled successfully
@@ -44,7 +44,7 @@ spec:
     stage('Sanity Check') {
       steps {
         container('build') {
-          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.3 '
+          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.0 '
         }
       }
     }

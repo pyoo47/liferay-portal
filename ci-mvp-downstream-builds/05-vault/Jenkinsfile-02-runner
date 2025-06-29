@@ -7,8 +7,17 @@
   *  
   $ Result:
   * - I was able to build the bundle doing ssh (kubectl exe) on the AWS Caylent Runner container
+  * -               - Duration: 30 mins. on a m5.4xlarge with: 
+  *                                      Request ( 8 vCPU and  8Gi memory)
+  *                                      Limit.  (16 vCPU and 16Gi memory)
+  *                                      Used.   ( - vCPU and. 9Gi memory)
   *
-  * Satus: ✅ Minimal pod scheduled successfully
+  * Todo:
+  *   - Run Unit Tests
+  *   - Run Func Tests
+  *   - Run bbdd Tests
+  *
+  * Status: ✅ Minimal pod scheduled successfully
   */
 pipeline {
   agent {
