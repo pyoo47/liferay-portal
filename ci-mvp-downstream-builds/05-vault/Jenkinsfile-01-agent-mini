@@ -21,8 +21,6 @@ spec:
         requests:
           memory: "512Mi"
           cpu: "500m"
-
-
     - name: build
       image: alpine
       command: ['cat']
@@ -31,21 +29,6 @@ spec:
         requests:
           memory: "1Gi"
           cpu: "1"
-
-
-    - name: aws-caylent-runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
-      command: ["cat"]
-      tty: true
-      resources:
-        requests:
-          cpu: "8"
-          memory: "8Gi"
-        limits:
-          cpu: "16"
-          memory: "16Gi"
-
-
   nodeSelector:
     jenkins-role: agent
   tolerations:
@@ -65,27 +48,7 @@ spec:
         }
       }
     }
-
-    stage('Run AWS Caylent Runner') {
-      steps {
-        container('aws-caylent-runner') {
-          sh 'echo Running AWS Caylent Runner...'
-          // Add commands to run the AWS Caylent Runner here
-        }
-      }
-    }
-
-
   }
-
-
-  post {
-    always {
-      input message: 'Finish the pipeline?', ok: 'Yes, proceed'
-      echo "🔚 Pipeline completed. Cleaning up workspace..."
-    
-    }
-  }
-
-
 }
+
+
