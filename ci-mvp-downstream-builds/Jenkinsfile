@@ -1,8 +1,8 @@
 pipeline {
   agent {
     kubernetes {
-      label 'liferay-agent-test'
-      defaultContainer 'build'
+      label 'liferay-fasfdsaagent-test-fsafdssfd'
+      defaultContainer 'build-fdsafasdfd'
       yaml """
 apiVersion: v1
 kind: Pod
@@ -37,7 +37,7 @@ spec:
     stage('Sanity Check') {
       steps {
         container('build') {
-          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.1 '
+          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.2 '
         }
       }
     }
