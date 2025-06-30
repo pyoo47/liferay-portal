@@ -17,6 +17,11 @@
   *   - Run Func Tests (6 min - 30 sec)
   *   - Run bbdd Tests (3 min - 43 sec)
   *
+  *
+  * - EFS
+  *   - I was able to mount the EFS volume and the local workspace with the aws-liferay-container definition
+  *
+  *
   * - Methodology:
   *   - Starting the build with a Git Commit Push
   *   - Jenkins agent pod is scheduled and assigned an m5.4xlarge instance
@@ -42,8 +47,6 @@
   *     - About Artifacts uploaded to S3, I wasn't able yet because lack of permissions on IRSA configuration
   *       to upload the following:
   *       - Bundle: s3://liferayci-file-propagator-mvp/
-  *   - EFS
-  *     - I was not able to mount the EFS volume on the pod, so I used the local workspace
   *   - Automation
   *     - Next steps is increase automation by integrating the build commands into the Jenkins pipeline
   *   - Security
@@ -52,15 +55,9 @@
   *     - Invoking Downstream Builds from the main pipeline
   *   - Shared Libraries
   *     - Testing Shared Libraries integration
-  *   - Credentials 
-  *     - Using Jenkins credentials for SCM Checkout
   *
   * Status: ✅ Minimal pod scheduled successfully
   */
-@Library('Liferay-Global-Shared-Libs') _
-
-import com.liferay.TestBuild
-
 pipeline {
   agent {
     kubernetes {
@@ -86,7 +83,6 @@ spec:
 
 
   containers:
-
 
     - name: jnlp
       image: jenkins/inbound-agent:latest
@@ -163,7 +159,6 @@ spec:
       steps {
         script {
 
-
           echo """
           Environment Variables:
           Branch      : ${env.BRANCH_NAME}
@@ -176,9 +171,6 @@ spec:
 
           echo "Running on Node: ${env.NODE_NAME} - ${env.JOB_NAME}" > info.txt
           echo "Testing Shared Libs"
-
-          log.info    'Validation Shared Libs Integration'
-          log.warning 'Liferay-Global-Shared-Libs is working fine'
           
           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
         }
@@ -218,3 +210,4 @@ spec:
 
 
 }
+
