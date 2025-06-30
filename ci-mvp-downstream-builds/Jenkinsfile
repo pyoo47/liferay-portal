@@ -129,8 +129,8 @@ spec:
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
-        - mountPath: /home/jenkins/local
-          name: workspace-volume
+        # - mountPath: /home/jenkins/local
+        #   name: workspace-volume
 
 
 
@@ -219,8 +219,13 @@ spec:
           Workspace   : ${env.WORKSPACE}
           Node Name   : ${env.NODE_NAME}
           """
-
-
+          
+          if (log) {
+            log.info('Validation Shared Libs Integration')
+            log.warning('Liferay-Global-Shared-Libs is working fine')
+          } else {
+            echo "WARNING: Shared Libs not available, skipping log validation."
+          }
 
           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
         }
