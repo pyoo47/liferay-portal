@@ -300,37 +300,63 @@ spec:
 
 
 
-
-    stage('EFS liferay-portal') {
+    stage('Build the Bundle') {
       when {
-        expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_EFS }
+        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
       }
       steps {
         container('aws-caylent-runner') {
-          script {
+          dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+            script {
               sh """
-                echo '📥 Doing EFS liferay-portal ... '
+                echo '📦 Building the Bundle... (v2)'
+                echo '📂 Current Directory:'
+                pwd
+                ls -la
+
+                echo '🔨 Running Build Script...'
+                
+
               """
+            }
           }
+          
+
         }
       }
     }
 
 
-    stage('EFS liferay-jenkins-ee') {
-      when {
-        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
-      }
-      steps {
-        container('aws-caylent-runner') {
-          script {
-              sh """
-                echo '📥 Doing EFS liferay-jenkins-ee ... '
-              """
-          }
-        }
-      }
-    }
+    // stage('EFS liferay-portal') {
+    //   when {
+    //     expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_EFS }
+    //   }
+    //   steps {
+    //     container('aws-caylent-runner') {
+    //       script {
+    //           sh """
+    //             echo '📥 Doing EFS liferay-portal ... '
+    //           """
+    //       }
+    //     }
+    //   }
+    // }
+
+
+    // stage('EFS liferay-jenkins-ee') {
+    //   when {
+    //     expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
+    //   }
+    //   steps {
+    //     container('aws-caylent-runner') {
+    //       script {
+    //           sh """
+    //             echo '📥 Doing EFS liferay-jenkins-ee ... '
+    //           """
+    //       }
+    //     }
+    //   }
+    // }
 
 
   }
