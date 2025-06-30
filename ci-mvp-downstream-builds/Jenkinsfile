@@ -263,7 +263,7 @@ spec:
 
 
 
-    stage('Build the Bundle - Step 0') {
+    stage('Build the Bundle - Step 0 (ant setup-profile-dxp)') {
 
       steps {
         container('aws-caylent-runner') {
@@ -291,17 +291,6 @@ spec:
                   ant setup-profile-dxp
 
                 """ 
-
-                // I get this error when I try to run the setup-profile-dxp
-                // setup-profile-dxp:
-                // [exec] Cloning into 'git-clone-profile-dxp'...
-                // [exec] Host key verification failed.
-                // [exec] fatal: Could not read from remote repository.
-                // [exec] 
-                // [exec] Please make sure you have the correct access rights
-                // [exec] and the repository exists.
-                // I need the ssh key 
-
             }
 
          // }
@@ -312,6 +301,38 @@ spec:
     }
   
 
+
+
+
+    stage('Build the Bundle - Step 1 (ant -f build-test-batch.xml dist-jdk7)') {
+
+      steps {
+        container('aws-caylent-runner') {
+
+          // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+
+
+            script {
+                sh """
+                  echo '📥 Build the Bundle - Step 1 ... '
+                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
+                  ls -a
+                  pwd     
+
+                  cd /opt/dev/projects/github/liferay-portal
+
+                  ant -f build-test-batch.xml dist-jdk7 -Daxis.variable=tomcat
+
+                """ 
+            }
+
+         // }
+
+
+        }
+      }
+    }
+  
 
 
 
