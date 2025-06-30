@@ -115,13 +115,13 @@ spec:
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
-        # resources:
-        #   requests:
-        #     cpu: "8"
-        #     memory: "8Gi"
-        #   limits:
-        #     cpu: "16"
-        #     memory: "16Gi"
+          resources:
+            requests:
+              cpu: "8"
+              memory: "8Gi"
+            limits:
+              cpu: "16"
+              memory: "16Gi"
 
 
 
@@ -265,6 +265,16 @@ spec:
     }
 
   
+    stage('Checkout liferay-jenkins-ee') {
+      steps {
+        container('aws-caylent-runner') {
+          script {
+
+
+
+          }
+      }
+    }
 
 
 
