@@ -171,9 +171,7 @@ spec:
           Environment Variables:
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
-          # Build Number: ${env.CUSTOM_BUILD_NUMBER}
           Workspace   : ${env.WORKSPACE}
-          # Git Commit  : ${env.GIT_COMMIT}
           Node Name   : ${env.NODE_NAME}
           """
 
