@@ -233,19 +233,6 @@ spec:
           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
         }
 
-        container('aws-caylent-runner') {
-          sh """
-            echo "📤 Readinf from S3..."
-            aws s3 ls ${env.AWS_S3_URL_TESTS}/${TEST_DUMMY_NAME} || echo "❌ AWS s3 ls failed"
-          """
-        }
-        container('aws-liferay-runner') {
-          sh """
-            echo "📤 Readinf from S3..."
-            aws s3 ls ${env.AWS_S3_URL_TESTS}/${TEST_DUMMY_NAME} || echo "❌ AWS s3 ls failed"
-          """
-        }
-
       }
     }
 
