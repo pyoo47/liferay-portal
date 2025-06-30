@@ -304,3 +304,26 @@ pigz -dc github-repo-liferay-portal-pigz.tar.gz | tar -xvf -
 
 cp github-repo-liferay-jenkins-ee.tar.gz s3://liferayci-file-propagator/repo/
 cp github-repo-liferay-portal.tar.gz     s3://liferayci-file-propagator/repo/
+
+
+
+
+
+setup-profile-dxp:
+[exec] Cloning into 'git-clone-profile-dxp'...
+[exec] Host key verification failed.
+[exec] fatal: Could not read from remote repository.
+[exec] 
+[exec] Please make sure you have the correct access rights
+[exec] and the repository exists.
+   
+   
+   
+
+BUILD FAILED
+/opt/dev/projects/github/liferay-portal/build.xml:942: Task [exec] failed after [3] attempts; giving up.
+Error messages:
+exec returned: 128
+exec returned: 128
+exec returned: 128
+exec returned: 128
