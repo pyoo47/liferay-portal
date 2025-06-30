@@ -232,7 +232,8 @@ spec:
     stage('Run AWS Caylent Runner') {
       steps {
         container('aws-caylent-runner') {
-          sh 'echo Running AWS Caylent Runner...'
+          // sh 'echo Running AWS Caylent Runner...'
+          echo 'Running AWS Liferay Runner...'
         }
       }
     }
