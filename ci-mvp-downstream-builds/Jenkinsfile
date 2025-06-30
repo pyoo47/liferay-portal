@@ -223,36 +223,36 @@ spec:
               sh """
                 echo '📥 Doing EFS liferay-jenkins-ee ... '
               """
-       
-            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-            echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
+        
+              echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+              echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
 
-            // sshagent(['GitHub-ssh-pei']) {
-            //     sh """
-            //       git clone --depth=1 \
-            //                 --branch master \
-            //                 git@github.com/liferay/liferay-jenkins-ee.git \
-            //                 ${LOCAL_DIR_CHECKOUT} 
-            //     """
-            // }
-            
-            sh """
-              echo '📂 EFS workspace and local contents:'
-              ls -al ${LOCAL_DIR_CHECKOUT}
-              ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
-
-              echo '📂 EFS workspace copy liferay-jenkins-ee to local'
-              cp ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME_EE} ${LOCAL_DIR_CHECKOUT}
+              // sshagent(['GitHub-ssh-pei']) {
+              //     sh """
+              //       git clone --depth=1 \
+              //                 --branch master \
+              //                 git@github.com/liferay/liferay-jenkins-ee.git \
+              //                 ${LOCAL_DIR_CHECKOUT} 
+              //     """
+              // }
               
-              echo '📦 Extracting tarball (with pigz)...'
-              tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE} -C ${LOCAL_DIR_CHECKOUT}
-              
-              echo '📂 Remove tar.gz ...'
-              rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}
+              sh """
+                echo '📂 EFS workspace and local contents:'
+                ls -al ${LOCAL_DIR_CHECKOUT}
+                ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
 
-              echo '📂 New Extracted contents:  '
-              ls -al ${LOCAL_DIR_CHECKOUT}
-            """ 
+                echo '📂 EFS workspace copy liferay-jenkins-ee to local'
+                cp ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME_EE} ${LOCAL_DIR_CHECKOUT}
+                
+                echo '📦 Extracting tarball (with pigz)...'
+                tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE} -C ${LOCAL_DIR_CHECKOUT}
+                
+                echo '📂 Remove tar.gz ...'
+                rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}
+
+                echo '📂 New Extracted contents:  '
+                ls -al ${LOCAL_DIR_CHECKOUT}
+              """ 
           }
         }
 
