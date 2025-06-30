@@ -288,6 +288,7 @@ spec:
                 echo '📥 Doing Checkout liferay-jenkins-ee ... '
               """
           }
+        }
       }
     }
 
