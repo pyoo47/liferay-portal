@@ -110,6 +110,9 @@ spec:
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
       command: ["cat"]
       tty: true
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
       resources:
         requests:
           cpu: "8"
@@ -168,18 +171,22 @@ spec:
           Environment Variables:
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
-          Build Number: ${env.CUSTOM_BUILD_NUMBER}
+          # Build Number: ${env.CUSTOM_BUILD_NUMBER}
           Workspace   : ${env.WORKSPACE}
-          Git Commit  : ${env.GIT_COMMIT}
+          # Git Commit  : ${env.GIT_COMMIT}
           Node Name   : ${env.NODE_NAME}
           """
 
           echo "Running on Node: ${env.NODE_NAME} - ${env.JOB_NAME}" > info.txt
           echo "Testing Shared Libs"
 
-          log.info    'Validation Shared Libs Integration'
-          log.warning 'Liferay-Global-Shared-Libs is working fine'
-          
+          if (log) {
+            log.info('Validation Shared Libs Integration')
+            log.warning('Liferay-Global-Shared-Libs is working fine')
+          } else {
+            echo "WARNING: Shared Libs not available, skipping log validation."
+          }
+
           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
         }
 
