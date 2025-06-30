@@ -199,12 +199,12 @@ spec:
                       https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
                       ${LOCAL_DIR_CHECKOUT}/liferay-portal
                 
-                   cd ${LOCAL_DIR_CHECKOUT}/liferay-portal
+                   
                 """
 
 
                          //  ${LOCAL_DIR_CHECKOUT}/liferay-portal
-                   env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                  // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
 
                   //  COMMIT_MESSAGE = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                   // echo "📦 GIT_COMMIT: ${COMMIT_MESSAGE}"
@@ -357,6 +357,16 @@ spec:
                   cp ${TARBALL_GIT_REPO_EE} ${EFS_LIFERAY_ARTIFACT_REPOS}
 
                   ls -a ${EFS_LIFERAY_ARTIFACT_REPOS} 
+
+
+                  echo '📦 Creating tarball (excluding .git)...'
+
+                  cd ${TARBALL_GIT_REPO_PL}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
+                  cd ${TARBALL_GIT_REPO_EE}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
+
+                  tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
+                  tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
+
                 """ 
 
             }
