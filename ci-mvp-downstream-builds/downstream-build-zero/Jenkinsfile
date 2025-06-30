@@ -48,7 +48,7 @@ spec:
     AWS_REGION='us-east-2'
 
     // DOWNSTREAM_BUILD_ID = "${env.BUILD_ID}"
-    DOWNSTREAM_BUILD_ID='downstream-build-1'
+    DOWNSTREAM_BUILD_ID='downstream-build-zero'
 
     AWS_S3_BUCKET='liferayci-file-propagator-mvp'
     AWS_S3_PATH='build'
