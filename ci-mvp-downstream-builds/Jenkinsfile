@@ -186,6 +186,14 @@ spec:
     EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
     EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
 
+    DO_LIFERAY_PORTAL_CHECKOUT    = 'do_liferay-portal-Checkout'
+    DO_LIFERAY_PORTAL_EFS         = 'do_liferay-portal-EFS'
+
+    DO_LIFERAY_JENKINS_EE_CHECKOUT = 'do_liferay-jenkins-ee-Checkout'
+    DO_LIFERAY_JENKINS_EE_EFS      = 'do_liferay-jenkins-ee-EFS'
+
+
+
   }
 
 
@@ -224,12 +232,15 @@ spec:
 
 
     stage('Checkout liferay-portal') {
+      when {
+        expression { return env.CHOICE == DO_LIFERAY_PORTAL_CHECKOUT }
+      }
       steps {
         container('aws-caylent-runner') {
           script {
        
-            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-            echo "📦 TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
+            echo "📂 Checkout :: LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+            echo "📦 Checkout :: TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
 
             // Clean the target folder
             sh """
@@ -264,19 +275,55 @@ spec:
       }
     }
 
+
   
     stage('Checkout liferay-jenkins-ee') {
+      when {
+        expression { return env.CHOICE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
+      }
       steps {
         container('aws-caylent-runner') {
           script {
-
-
-
+              sh """
+                echo '📥 Doing Checkout liferay-jenkins-ee ... '
+              """
           }
       }
     }
 
 
+
+
+    stage('EFS liferay-portal') {
+      when {
+        expression { return env.CHOICE == DO_LIFERAY_PORTAL_EFS }
+      }
+      steps {
+        container('aws-caylent-runner') {
+          script {
+              sh """
+                echo '📥 Doing EFS liferay-portal ... '
+              """
+          }
+        }
+      }
+    }
+
+
+    stage('EFS liferay-jenkins-ee') {
+      when {
+        expression { return env.CHOICE == DO_LIFERAY_JENKINS_EE_EFS }
+      }
+      steps {
+        container('aws-caylent-runner') {
+          script {
+              sh """
+                echo '📥 Doing EFS liferay-jenkins-ee ... '
+              """
+          }
+        }
+      }
+    }
 
 
   }
