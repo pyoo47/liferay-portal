@@ -40,8 +40,8 @@ spec:
 
 
 
-    - name: aws-liferay-runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:3.0.2-keys
+    - name: aws-caylent-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:2.0.1-keys
       command: ["cat"]
       tty: true
       volumeMounts:
@@ -167,7 +167,7 @@ spec:
       }
       steps {
 
-        container('aws-liferay-runner') {
+        container('aws-caylent-runner') {
 
           
             script {
@@ -218,7 +218,7 @@ spec:
         expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
       }
       steps {
-        container('aws-liferay-runner') {
+        container('aws-caylent-runner') {
           script {
               sh """
                 echo '📥 Doing EFS liferay-jenkins-ee ... '
@@ -265,7 +265,7 @@ spec:
     stage('Build the Bundle - Step 0') {
 
       steps {
-        container('aws-liferay-runner') {
+        container('aws-caylent-runner') {
 
           // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
 
