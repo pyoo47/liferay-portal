@@ -231,7 +231,7 @@ spec:
               //     sh """
               //       git clone --depth=1 \
               //                 --branch master \
-              //                 git@github.com/liferay/liferay-jenkins-ee.git \
+              //                 git@github.com:liferay/liferay-jenkins-ee.git \
               //                 ${LOCAL_DIR_CHECKOUT} 
               //     """
               // }
@@ -244,7 +244,7 @@ spec:
 
                 git clone --depth 1 --no-tags --quiet \
                           --branch master \
-                          git@github.com/liferay/liferay-jenkins-ee.git \
+                          git@github.com:liferay/liferay-jenkins-ee.git \
                           ${LOCAL_DIR_CHECKOUT} 
               """
 
