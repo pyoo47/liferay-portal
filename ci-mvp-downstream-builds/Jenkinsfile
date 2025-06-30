@@ -198,13 +198,17 @@ spec:
                             --branch ${env.GIT_BRANCH} \
                       https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
                       ${LOCAL_DIR_CHECKOUT}/liferay-portal
+                
+                   cd ${LOCAL_DIR_CHECKOUT}/liferay-portal
                 """
 
-                      //  ${LOCAL_DIR_CHECKOUT}/liferay-portal
-                   // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
 
-                   COMMIT_MESSAGE = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                  echo "📦 GIT_COMMIT: ${COMMIT_MESSAGE}"
+                         //  ${LOCAL_DIR_CHECKOUT}/liferay-portal
+                   env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+
+                  //  COMMIT_MESSAGE = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                  // echo "📦 GIT_COMMIT: ${COMMIT_MESSAGE}"
+
               }
   
             }
