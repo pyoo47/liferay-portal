@@ -241,7 +241,7 @@ spec:
       steps {
         container('aws-liferay-runner') {
           // bash 'echo Running AWS Liferay Runner...'
-          ls -l
+          echo 'Running AWS Liferay Runner...'
         }
       }
     }
