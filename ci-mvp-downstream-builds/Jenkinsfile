@@ -186,13 +186,13 @@ spec:
     EFS_LIFERAY_ARTIFACT_BUNDLES    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
     EFS_LIFERAY_ARTIFACT_TEST       = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
 
-    DO_LIFERAY_PORTAL_CHECKOUT     = 'do_liferay-portal-Checkout'
-    DO_LIFERAY_PORTAL_EFS          = 'do_liferay-portal-EFS'
-    CHOICE_LIFERAY_PORTAL          = "${DO_LIFERAY_PORTAL_CHECKOUT}"
+    DO_LIFERAY_PORTAL_CHECKOUT      = 'do_liferay-portal-Checkout'
+    DO_LIFERAY_PORTAL_EFS           = 'do_liferay-portal-EFS'
+    CHOICE_LIFERAY_PORTAL           = "${DO_LIFERAY_PORTAL_CHECKOUT}"
 
-    DO_LIFERAY_JENKINS_EE_CHECKOUT = 'do_liferay-jenkins-ee-Checkout'
-    DO_LIFERAY_JENKINS_EE_EFS      = 'do_liferay-jenkins-ee-EFS'
-    CHOICE_LIFERAY_JENKINS_EE      = "${DO_LIFERAY_JENKINS_EE_CHECKOUT}"
+    DO_LIFERAY_JENKINS_EE_CHECKOUT  = 'do_liferay-jenkins-ee-Checkout'
+    DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
+    CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_CHECKOUT}"
     
   }
 
@@ -233,7 +233,7 @@ spec:
 
     stage('Checkout liferay-portal') {
       when {
-        expression { return env.CHOICE == DO_LIFERAY_PORTAL_CHECKOUT }
+        expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_CHECKOUT }
       }
       steps {
         container('aws-caylent-runner') {
@@ -279,7 +279,7 @@ spec:
   
     stage('Checkout liferay-jenkins-ee') {
       when {
-        expression { return env.CHOICE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
+        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
       }
       steps {
         container('aws-caylent-runner') {
@@ -303,7 +303,7 @@ spec:
 
     stage('EFS liferay-portal') {
       when {
-        expression { return env.CHOICE == DO_LIFERAY_PORTAL_EFS }
+        expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_EFS }
       }
       steps {
         container('aws-caylent-runner') {
@@ -319,7 +319,7 @@ spec:
 
     stage('EFS liferay-jenkins-ee') {
       when {
-        expression { return env.CHOICE == DO_LIFERAY_JENKINS_EE_EFS }
+        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
       }
       steps {
         container('aws-caylent-runner') {
