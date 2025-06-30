@@ -3,7 +3,7 @@
   * - Worker Node Working Ok
   *
   * - This versio does the checkout of the liferay-portal repo in 47 seconds
-  *
+  * - This is the fisrt version buidling the bundle with the new aws-caylent-runner image
   *
   * Status: ✅ Minimal pod scheduled successfully
   */
@@ -120,7 +120,7 @@ spec:
 
     DO_LIFERAY_PORTAL_CHECKOUT      = 'do_liferay-portal-Checkout'
     DO_LIFERAY_PORTAL_EFS           = 'do_liferay-portal-EFS'
-    CHOICE_LIFERAY_PORTAL           = "FALSE ${DO_LIFERAY_PORTAL_CHECKOUT}"
+    CHOICE_LIFERAY_PORTAL           = "${DO_LIFERAY_PORTAL_CHECKOUT}"
 
     DO_LIFERAY_JENKINS_EE_CHECKOUT  = 'do_liferay-jenkins-ee-Checkout'
     DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
@@ -236,19 +236,6 @@ spec:
               //     """
               // }
               
-
-              // git clone --depth 1 --no-tags --quiet -b master git@github.com:liferay/liferay-jenkins-ee.git
-
-              sh """
-                echo '📥 Doing EFS liferay-jenkins-ee ... '
-
-                git clone --depth 1 --no-tags --quiet \
-                          --branch master \
-                          git@github.com/liferay/liferay-jenkins-ee.git \
-                          ${LOCAL_DIR_CHECKOUT} 
-              """
-
-
               sh """
                 echo '📂 EFS workspace and local contents:'
                 ls -al ${LOCAL_DIR_CHECKOUT}
@@ -353,13 +340,13 @@ spec:
   }
 
 
-  post {
-    always {
-      input message: 'Finish the pipeline?', ok: 'Yes, proceed'
-      echo "🔚 Pipeline completed. Cleaning up workspace..."
+  // post {
+  //   always {
+  //     input message: 'Finish the pipeline?', ok: 'Yes, proceed'
+  //     echo "🔚 Pipeline completed. Cleaning up workspace..."
     
-    }
-  }
+  //   }
+  // }
 
 
 }
