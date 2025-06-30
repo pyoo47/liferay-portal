@@ -66,33 +66,49 @@
 import com.liferay.TestBuild
 
 pipeline {
+
+
+
   agent {
     kubernetes {
       label 'liferay-agent-test'
-      defaultContainer 'build'
       yaml """
 apiVersion: v1
 kind: Pod
 metadata:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::300374333822:role/jenkins-irsa-role
-
 spec:
   serviceAccountName: jenkins-agent
-
+  securityContext:
+    fsGroup: 1000
+  labels:
+    jenkins: agent
 
   containers:
-
-
     - name: jnlp
       image: jenkins/inbound-agent:latest
-      resources:
-        requests:
-          memory: "512Mi"
-          cpu: "500m"
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
 
-
-
+          
+    - name: aws-liferay-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
+  
+  volumes:
+    - name: efs-workspace
+      persistentVolumeClaim:
+        claimName: jenkins-efs-pvc
+    - name: workspace-volume
+      emptyDir: {}
 
   nodeSelector:
     jenkins-role: agent
@@ -101,10 +117,10 @@ spec:
       operator: "Equal"
       value: "agent"
       effect: "NoSchedule"
+
 """
     }
   }
-
 
   options {
     skipDefaultCheckout()
@@ -204,9 +220,9 @@ spec:
       }
       steps {
 
-        container('aws-caylent-runner') {
+        container('aws-liferay-runner') {
 
-          dir("${LOCAL_DIR_CHECKOUT}") {
+          
             script {
         
               echo "📂 Checkout :: LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
@@ -232,7 +248,8 @@ spec:
                   echo '📥 Manual clone in container context...'
                   git clone --depth=1 \
                             --branch ${env.GIT_BRANCH} \
-                      https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git 
+                      https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                      ${LOCAL_DIR_CHECKOUT}/liferay-portal
                 """
 
                       //  ${LOCAL_DIR_CHECKOUT}/liferay-portal
@@ -240,7 +257,7 @@ spec:
               }
   
             }
-          }
+          
 
           }
         }
