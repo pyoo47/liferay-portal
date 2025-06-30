@@ -223,6 +223,47 @@ spec:
 
 
 
+    stage('Checkout liferay-portal') {
+      steps {
+        container('aws-caylent-runner') {
+          script {
+       
+            echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+            echo "📦 TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
+
+            // Clean the target folder
+            sh """
+              echo '🧹 Version 4...'
+              echo '🧹 Cleaning checkout folder...'
+              rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+            """
+
+           // input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
+
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'github-pat-pei',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_PASSWORD'
+              )
+            ]) {
+              sh """
+                echo '📥 Manual clone in container context...'
+                git clone --depth=1 \
+                          --branch ${env.GIT_BRANCH} \
+                     https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                     ${LOCAL_DIR_CHECKOUT}/liferay-portal
+              """
+
+              // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+            }
+ 
+          }
+        }
+        
+      }
+    }
+
   
 
 
