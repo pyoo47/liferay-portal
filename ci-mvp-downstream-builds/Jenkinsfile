@@ -361,9 +361,7 @@ spec:
 
                   echo '📦 Creating tarball (excluding .git)...'
 
-                  cd ${TARBALL_GIT_REPO_PL}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
-                  cd ${TARBALL_GIT_REPO_EE}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
-
+                  
                   tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
                   tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
 
