@@ -124,7 +124,7 @@ spec:
 
     DO_LIFERAY_JENKINS_EE_CHECKOUT  = 'do_liferay-jenkins-ee-Checkout'
     DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
-    CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_EFS}"
+    CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_CHECKOUT}"
 
   }
 
@@ -215,7 +215,7 @@ spec:
 
     stage('EFS liferay-jenkins-ee') {
       when {
-        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
+        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
       }
       steps {
         container('aws-caylent-runner') {
@@ -227,50 +227,20 @@ spec:
               echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
               echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
 
-              // sshagent(['GitHub-ssh-pei']) {
-              //     sh """
-              //       git clone --depth=1 \
-              //                 --branch master \
-              //                 git@github.com:liferay/liferay-jenkins-ee.git \
-              //                 ${LOCAL_DIR_CHECKOUT} 
-              //     """
-              // }
-              
-
-              // git clone --depth 1 --no-tags --quiet -b master git@github.com:liferay/liferay-jenkins-ee.git
-
               sh """
                 echo '📥 Doing EFS liferay-jenkins-ee ... '
 
                 git clone --depth 1 --no-tags --quiet \
                           --branch master \
                           git@github.com:liferay/liferay-jenkins-ee.git \
-                          ${LOCAL_DIR_CHECKOUT} 
+                          ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee 
 
-                         ls -al ${LOCAL_DIR_CHECKOUT}  
+                ls -al ${LOCAL_DIR_CHECKOUT}
+                ls -al ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee
               """
 
             input message: 'Does it work git clone ee ? ', ok: 'Yes, proceed'
 
-
-              sh """
-                echo '📂 EFS workspace and local contents:'
-                ls -al ${LOCAL_DIR_CHECKOUT}
-                ls -al ${EFS_LIFERAY_ARTIFACT_REPOS}
-
-                echo '📂 EFS workspace copy liferay-jenkins-ee to local'
-                cp ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME_EE} ${LOCAL_DIR_CHECKOUT}
-                
-                echo '📦 Extracting tarball (with pigz)...'
-                # tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE} -C ${LOCAL_DIR_CHECKOUT}
-                tar          -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE} -C ${LOCAL_DIR_CHECKOUT}
-                
-                echo '📂 Remove tar.gz ...'
-                rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}
-
-                echo '📂 New Extracted contents:  '
-                ls -al ${LOCAL_DIR_CHECKOUT}
-              """ 
           }
         }
         
