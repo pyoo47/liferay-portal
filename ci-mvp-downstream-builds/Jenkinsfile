@@ -278,12 +278,14 @@ spec:
                   pwd     
 
 
-                  echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.${HOSTNAME}.properties
+                  cd /opt/dev/projects/github/liferay-portal
 
-                  echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.${HOSTNAME}.properties
-                  echo "mirrors.hostname=" >> build.${HOSTNAME}.properties
 
-                  echo "java.jdk.default.runtime.version=jdk21" > test.${HOSTNAME}.properties
+                  echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.\$HOSTNAME.properties
+                  echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.\$HOSTNAME.properties
+                  echo "mirrors.hostname=" >> build.\$HOSTNAME.properties
+                  echo "java.jdk.default.runtime.version=jdk21" > test.\$HOSTNAME.properties
+
 
                   ant setup-profile-dxp
 
