@@ -246,7 +246,11 @@ spec:
                           --branch master \
                           git@github.com:liferay/liferay-jenkins-ee.git \
                           ${LOCAL_DIR_CHECKOUT} 
+
+                         ls -al ${LOCAL_DIR_CHECKOUT}  
               """
+
+            input message: 'Does it work git clone ee ? ', ok: 'Yes, proceed'
 
 
               sh """
@@ -353,13 +357,13 @@ spec:
   }
 
 
-  post {
-    always {
-      input message: 'Finish the pipeline?', ok: 'Yes, proceed'
-      echo "🔚 Pipeline completed. Cleaning up workspace..."
+  // post {
+  //   always {
+  //     input message: 'Finish the pipeline?', ok: 'Yes, proceed'
+  //     echo "🔚 Pipeline completed. Cleaning up workspace..."
     
-    }
-  }
+  //   }
+  // }
 
 
 }
