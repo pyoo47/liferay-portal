@@ -235,14 +235,14 @@ spec:
 
         container('aws-caylent-runner') {
           sh """
-            echo "📤 Readinf from S3..."
-            aws s3 ls ${env.AWS_S3_URL_TESTS}/${TEST_DUMMY_NAME} || echo "❌ AWS s3 ls failed"
+            echo "📤 Reading from S3... "
+            aws s3 ls ${env.AWS_S3_URL_TESTS}/ || echo "❌ AWS s3 ls failed"
           """
         }
         container('aws-liferay-runner') {
           sh """
-            echo "📤 Readinf from S3..."
-            aws s3 ls ${env.AWS_S3_URL_TESTS}/${TEST_DUMMY_NAME} || echo "❌ AWS s3 ls failed"
+            echo "📤 Reading from S3... "
+            aws s3 ls ${env.AWS_S3_URL_TESTS}/ || echo "❌ AWS s3 ls failed"
           """
         }
 
