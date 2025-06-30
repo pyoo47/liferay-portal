@@ -245,7 +245,8 @@ spec:
                 cp ${EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME_EE} ${LOCAL_DIR_CHECKOUT}
                 
                 echo '📦 Extracting tarball (with pigz)...'
-                tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE} -C ${LOCAL_DIR_CHECKOUT}
+                # tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE} -C ${LOCAL_DIR_CHECKOUT}
+                tar          -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE} -C ${LOCAL_DIR_CHECKOUT}
                 
                 echo '📂 Remove tar.gz ...'
                 rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}
