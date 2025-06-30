@@ -87,7 +87,7 @@ spec:
     stage('Sanity Check') {
       steps {
         container('build') {
-          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.1 '
+          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.1  (b)'
         }
       }
     }
