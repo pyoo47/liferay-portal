@@ -237,7 +237,10 @@ spec:
       }
       steps {
         container('aws-caylent-runner') {
-          dir("${LOCAL_DIR_CHECKOUT}") {
+
+          
+
+
             script {
                 sh """
                   echo '📥 Doing Checkout liferay-jenkins-ee ... v2 '
@@ -251,7 +254,9 @@ spec:
                 // // git clone --depth 1 --no-tags --quiet -b master git@github.com:liferay/liferay-jenkins-ee.git
             }
           }
-        }
+
+
+        
       }
     }
 
