@@ -4,7 +4,7 @@
   *
   * - This versio does the checkout of the liferay-portal repo in 47 seconds
   *
-  *
+  * Con este Runner anduvo aunuqe sin pigz .. 
   * Status: ✅ Minimal pod scheduled successfully
   */
 @Library('Liferay-Global-Shared-Libs') _
@@ -41,7 +41,7 @@ spec:
 
 
     - name: aws-caylent-runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:2.0.2-keys
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:2.0.1-keys
       command: ["cat"]
       tty: true
       volumeMounts:
