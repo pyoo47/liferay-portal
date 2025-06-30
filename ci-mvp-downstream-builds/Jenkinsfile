@@ -91,13 +91,47 @@ spec:
     }
   }
 
+
+  options {
+    skipDefaultCheckout()
+  }
+
+
   stages {
     
     stage('Sanity Check') {
       steps {
         container('build') {
-          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.1 <'
+          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.1 '
         }
+      }
+    }
+
+
+    stage('Print Environment') {
+      steps {
+        script {
+
+
+          echo """
+          Environment Variables:
+          Branch      : ${env.BRANCH_NAME}
+          Job Name    : ${env.JOB_NAME}
+          Build Number: ${env.CUSTOM_BUILD_NUMBER}
+          Workspace   : ${env.WORKSPACE}
+          Git Commit  : ${env.GIT_COMMIT}
+          Node Name   : ${env.NODE_NAME}
+          """
+
+          echo "Running on Node: ${env.NODE_NAME} - ${env.JOB_NAME}" > info.txt
+          echo "Testing Shared Libs"
+
+          log.info    'Validation Shared Libs Integration'
+          log.warning 'Liferay-Global-Shared-Libs is working fine'
+          
+          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+        }
+
       }
     }
 
