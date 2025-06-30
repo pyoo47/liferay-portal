@@ -1,0 +1,57 @@
+pipeline {
+  agent {
+    kubernetes {
+      label 'liferay-agent'
+      defaultContainer 'build'
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+    - name: jnlp
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "1"
+        limits:
+          memory: "4Gi"
+          cpu: "2"
+    - name: build
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      command: ['cat']
+      tty: true
+      resources:
+        requests:
+          memory: "8Gi"
+          cpu: "8"
+        limits:
+          memory: "16Gi"
+          cpu: "8"
+      env:
+        - name: ANT_OPTS
+          value: "-Xmx8192m"
+        - name: JAVA_OPTS
+          value: "-Xmx8192m"
+  nodeSelector:
+    jenkins-role: agent
+  tolerations:
+    - key: "jenkins-role"
+      operator: "Equal"
+      value: "agent"
+      effect: "NoSchedule"
+"""
+    }
+  }
+
+  stages {
+    stage('Build') {
+      steps {
+        container('build') {
+          sh 'echo "🔧 Starting build..."'
+          sh 'java -version'
+        }
+      }
+    }
+  }
+}

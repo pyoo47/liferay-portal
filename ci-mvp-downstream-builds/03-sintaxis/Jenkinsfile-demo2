@@ -1,0 +1,122 @@
+/**
+  * This demos shows how Jenkinsfile support running each stage in a different container
+  * using the `kubernetes` agent. 
+  * It also demonstrates how to use the `withCredentials`
+  *
+  */
+@Library('Liferay-Global-Shared-Libs') _
+
+import com.liferay.TestBuild
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins-efs-agent
+  labels:
+    jenkins: agent
+spec:
+  serviceAccountName: jenkins-agent
+  securityContext:
+    fsGroup: 1000
+  containers:
+    - name: jnlp
+      image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "256Mi"
+        limits:
+          cpu: "200m"
+          memory: "512Mi"
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+          
+    - name: aws-caylent-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      command: ["cat"]
+      tty: true
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
+          
+    - name: aws-liferay-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
+      command: ["cat"]
+      tty: true
+      resources:
+        requests:
+          cpu: "1000m"
+          memory: "2Gi"
+          ephemeral-storage: "20Gi"
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+          ephemeral-storage: "70Gi"
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
+          readOnly: true
+
+  volumes:
+    - name: efs-workspace
+      persistentVolumeClaim:
+        claimName: jenkins-efs-pvc
+    - name: workspace-volume
+      emptyDir: {}
+"""
+    }
+  }
+
+  stages {
+    stage('Checkout liferay-portal') {
+      steps {
+        container("aws-caylent-runner") {
+          script {
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'github-pat-pei',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_PASSWORD'
+              )
+            ]) {
+              sh """
+                echo '📥 Manual clone in container context...'
+                git clone --depth=1 \
+                          --branch ${env.GIT_BRANCH} \
+                          https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
+                          ${LOCAL_DIR_CHECKOUT}/liferay-portal
+              """
+            }
+          }
+        }
+      }
+    }
+
+    stage('Build the Bundle') {
+      steps {
+        container('aws-liferay-runner') {
+          script {
+            // Build the bundle steps
+          }
+        }
+      }
+    }
+  }
+}
+

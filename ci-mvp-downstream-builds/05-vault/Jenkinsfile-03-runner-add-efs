@@ -1,0 +1,213 @@
+/**
+  * Jenkinsfile for Liferay MVP Downstream Builds
+  * Version: 1.0.1
+  * This Jenkinsfile defines a minimal pod configuration for testing purposes.
+  * Also:
+  * - Include 'AWS Caylent Runner' on a m5.4xlarge ready to build the bundle
+  *  
+  $ Result:
+  * - I was able to build the bundle doing ssh (kubectl exe) on the AWS Caylent Runner container
+  * -               - Duration: 30 mins. on a m5.4xlarge with: 
+  *                                      Request ( 8 vCPU and  8Gi memory)
+  *                                      Limit.  (16 vCPU and 16Gi memory)
+  *                                      Used.   ( - vCPU and. 9Gi memory)
+  *
+  * - I was also able to run the following tests, on the same pod:
+  *   - Run Unit Tests (0 min - 59 sec)
+  *   - Run Func Tests (6 min - 30 sec)
+  *   - Run bbdd Tests (3 min - 43 sec)
+  *
+  *
+  * - EFS
+  *   - I was able to mount the EFS volume and the local workspace with the aws-liferay-container definition
+  *
+  *
+  * - Methodology:
+  *   - Starting the build with a Git Commit Push
+  *   - Jenkins agent pod is scheduled and assigned an m5.4xlarge instance
+  *   - The pod has 3 containers:
+  *     - jnlp: Jenkins inbound agent
+  *     - build: Alpine container for basic operations
+  *     - aws-caylent-runner: Custom container with AWS Caylent Runner
+  *   - Pause the pipeline to allow manual inspection
+  *     - Kubectl exec into the aws-caylent-runner container
+  *     - Run the build commands manually
+  *       - Build the bundle using the AWS Caylent Runner
+  *       - Run the unit tests
+  *       - Run the functional tests
+  *       - Run the database tests
+  *   - Successfully built the bundle and ran all tests
+  *   - Monitoring
+  *       - I'm usig tools K9s, Lens and kubectl to monitor the pod
+  *       - Also, AWS Console to monitor the EKS cluster and the pod's resource usage
+  *       -       AND EC2 instance metrics in the AWS Console EC2 Dashboard
+  *
+  * - NEXT Steps:
+  *   - Artifacts:
+  *     - About Artifacts uploaded to S3, I wasn't able yet because lack of permissions on IRSA configuration
+  *       to upload the following:
+  *       - Bundle: s3://liferayci-file-propagator-mvp/
+  *   - Automation
+  *     - Next steps is increase automation by integrating the build commands into the Jenkins pipeline
+  *   - Security
+  *     - Remove the ssh key from the AWS Caylent Runner container
+  *   - Orchestration
+  *     - Invoking Downstream Builds from the main pipeline
+  *   - Shared Libraries
+  *     - Testing Shared Libraries integration
+  *
+  * Status: ✅ Minimal pod scheduled successfully
+  */
+pipeline {
+  agent {
+    kubernetes {
+      label 'liferay-agent-test'
+      defaultContainer 'build'
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::300374333822:role/jenkins-irsa-role
+
+spec:
+  serviceAccountName: jenkins-agent
+
+
+  volumes:
+    - name: efs-workspace
+      persistentVolumeClaim:
+        claimName: jenkins-efs-pvc
+    - name: workspace-volume
+      emptyDir: {}
+
+
+  containers:
+
+    - name: jnlp
+      image: jenkins/inbound-agent:latest
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "500m"
+
+
+    - name: build
+      image: alpine
+      command: ['cat']
+      tty: true
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "1"
+
+
+    - name: aws-caylent-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
+      command: ["cat"]
+      tty: true
+      resources:
+        requests:
+          cpu: "8"
+          memory: "8Gi"
+        limits:
+          cpu: "16"
+          memory: "16Gi"
+
+
+    - name: aws-liferay-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:1.0.3
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
+
+
+
+  nodeSelector:
+    jenkins-role: agent
+  tolerations:
+    - key: "jenkins-role"
+      operator: "Equal"
+      value: "agent"
+      effect: "NoSchedule"
+"""
+    }
+  }
+
+
+  options {
+    skipDefaultCheckout()
+  }
+
+
+  stages {
+    
+    stage('Sanity Check') {
+      steps {
+        container('build') {
+          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.1 '
+        }
+      }
+    }
+
+
+    stage('Print Environment') {
+      steps {
+        script {
+
+          echo """
+          Environment Variables:
+          Branch      : ${env.BRANCH_NAME}
+          Job Name    : ${env.JOB_NAME}
+          Build Number: ${env.CUSTOM_BUILD_NUMBER}
+          Workspace   : ${env.WORKSPACE}
+          Git Commit  : ${env.GIT_COMMIT}
+          Node Name   : ${env.NODE_NAME}
+          """
+
+          echo "Running on Node: ${env.NODE_NAME} - ${env.JOB_NAME}" > info.txt
+          echo "Testing Shared Libs"
+          
+          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+        }
+
+      }
+    }
+
+    stage('Run AWS Caylent Runner') {
+      steps {
+        container('aws-caylent-runner') {
+          sh 'echo Running AWS Caylent Runner...'
+          // Add commands to run the AWS Caylent Runner here
+        }
+      }
+    }
+
+    stage('Run AWS Liferay Runner') {
+      steps {
+        container('aws-liferay-runner') {
+          sh 'echo Running AWS Liferay Runner...'
+          // Add commands to run the AWS Liferay Runner here
+        }
+      }
+    }
+
+
+  }
+
+
+  post {
+    always {
+      input message: 'Finish the pipeline?', ok: 'Yes, proceed'
+      echo "🔚 Pipeline completed. Cleaning up workspace..."
+    
+    }
+  }
+
+
+}
+
