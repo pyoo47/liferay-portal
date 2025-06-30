@@ -1,0 +1,234 @@
+pipeline {
+
+  
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins-efs-agent
+  securityContext:
+    fsGroup: 1000
+  labels:
+    jenkins: agent
+spec:
+  serviceAccountName: jenkins-agent
+  containers:
+    - name: jnlp
+      image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+    - name: runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - mountPath: /home/jenkins/agent
+          name: efs-workspace
+        - mountPath: /home/jenkins/local
+          name: workspace-volume
+  volumes:
+    - name: efs-workspace
+      persistentVolumeClaim:
+        claimName: jenkins-efs-pvc
+    - name: workspace-volume
+      emptyDir: {}
+"""
+    }
+  }
+
+
+  environment {
+    BUILD_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
+    BUILD_TEST_BRANCH   = 'master-ci-6005-downstream-builds'
+
+    AWS_ACCOUNT_ID='300374333822'
+    AWS_REGION='us-east-2'
+
+    // DOWNSTREAM_BUILD_ID = "${env.BUILD_ID}"
+    DOWNSTREAM_BUILD_ID='downstream-build-1'
+
+    AWS_S3_BUCKET='liferayci-file-propagator-mvp'
+    AWS_S3_PATH='build'
+
+    AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/artifacts"
+    AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.BUILD_NUMBER}/tests"
+
+    BUILD_BUNDLE_NAME='liferay-portal-bundle-tomcat.tar.gz'
+    BUILD_SOURCE_NAME='liferay-portal-source.tar.gz'
+
+    BUILD_BUNDLE_DUMMY_NAME="dummy-${BUILD_BUNDLE_NAME}"
+    BUILD_SOURCE_DUMMY_NAME="dummy-${BUILD_SOURCE_NAME}"
+
+    TEST_DUMMY_NAME="test-${DOWNSTREAM_BUILD_ID}-dummy.xml"
+
+    // s3://liferayci-file-propagator-mvp/build/35/artifacts
+    // s3://liferayci-file-propagator-mvp/build/35/tests
+
+    // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
+    // liferay-portal-source.tar.gz         (~1.2gb) 
+
+
+    LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
+
+    DEFAULT_BUILD_NUMBER = 1
+    TARBALL_GIT_NAME     = "liferay-portal-repo-${DEFAULT_BUILD_NUMBER}.tar.gz"
+    TARBALL_GIT_REPO     = "/home/jenkins/local/${TARBALL_GIT_NAME}"
+
+    DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${DEFAULT_BUILD_NUMBER}"
+  }
+
+
+
+
+  parameters {
+    string(name: 'PARENT_BUILD_NUMBER')
+    string(name: 'PARENT_GIT_COMMIT')
+    string(name: 'TARBALL_GIT_NAME',             defaultValue: "${env.TARBALL_GIT_NAME}")
+    string(name: 'TARBALL_GIT_REPO',             defaultValue: "${env.TARBALL_GIT_REPO}")
+    string(name: 'EFS_MOUNT_PATH',               defaultValue: "/home/jenkins/agent")
+    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER',  defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}")
+    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS',   defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/repo-github")
+    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/bundles")
+    string(name: 'EFS_LIFERAY_ARTIFACT_TEST',    defaultValue: "${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}/tests")
+  }
+
+  options {
+    skipDefaultCheckout()
+  }
+
+
+  stages {
+
+    stage('Prepare') {
+      steps {
+        script {
+          echo "🚀 Starting ${DOWNSTREAM_BUILD_ID}"
+          // Print some common Jenkins env vars
+          echo "Branch: ${env.BRANCH_NAME}"
+          echo "Job Name: ${env.JOB_NAME}"
+          echo "Build Number: ${env.BUILD_NUMBER}"
+          echo "Workspace: ${env.WORKSPACE}"
+          echo "Git Commit: ${env.GIT_COMMIT}"
+
+          echo "AWS s3 ARTIFACTS URL: ${env.AWS_S3_URL_ARTIFACTS}"
+          echo "AWS s3 TEST URL: ${env.AWS_S3_URL_TESTS}"
+
+          echo "PARAMETERS: "
+          echo "  PARENT_BUILD_NUMBER: ${params.PARENT_BUILD_NUMBER}"
+          echo "  PARENT_GIT_COMMIT: ${params.PARENT_GIT_COMMIT}"
+          echo "  TARBALL_GIT_NAME: ${params.TARBALL_GIT_NAME}"
+          echo "  TARBALL_GIT_REPO: ${params.TARBALL_GIT_REPO}"
+          echo "  EFS_MOUNT_PATH: ${params.EFS_MOUNT_PATH}"
+          echo "  EFS_LIFERAY_ARTIFACT_FOLDER: ${params.EFS_LIFERAY_ARTIFACT_FOLDER}"
+          echo "  EFS_LIFERAY_ARTIFACT_REPOS: ${params.EFS_LIFERAY_ARTIFACT_REPOS}"
+          echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}"
+          echo "  EFS_LIFERAY_ARTIFACT_TEST: ${params.EFS_LIFERAY_ARTIFACT_TEST}"         
+        }
+      }
+    }
+
+    stage('Branch Guard') {
+      when {
+        expression {
+          // Skip this job if it's NOT on the expected branch
+          if (env.BRANCH_NAME != {env.BUILD_TEST_BRANCH}) {
+            echo "Skipped: This job only runs on 'master-ci-6005-downstream-builds'. Current: ${env.BRANCH_NAME}"
+            return false
+          }
+          return true
+        }
+      }
+      steps {
+        echo "Correct branch detected: ${env.BRANCH_NAME}"
+      }
+    }
+
+    stage('Source Code Receive') {
+      steps {
+        container('runner') {
+          sh """
+            echo '📂 EFS workspace contents: (v1)'
+            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
+            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
+
+            # Clean the Local directory 
+            echo '🧹 Version 4.1..'
+            echo '🧹 Cleaning checkout folder...'
+            rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+
+            cp ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+
+            ls -al ${LOCAL_DIR_CHECKOUT}
+            echo '📦 Extracting tarball (with pigz)...'
+            # tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+            tar         -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+
+            echo '📂 Extracted contents:  '
+            ls -al ${LOCAL_DIR_CHECKOUT}
+            echo '📂 Checking out source code (emulated) done...'
+            rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME}
+            echo '📂 Source code ready in ${LOCAL_DIR_CHECKOUT}'
+            
+          """
+
+        }
+      }
+    }
+
+    stage('Reading bundle from EFS') {
+      steps {
+        container('runner') {
+          sh """
+            ls -al
+            df -h
+            echo "🔍 Checking EFS mount at /home/jenkins/agent"
+            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
+
+            ls -al /home/jenkins/agent
+
+            echo "📄 Reading Bundle file from EFS..."
+            cat /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME} || echo "❌ Bundle file not found"
+
+            echo "📄 Reading Source file from EFS..."
+            cat /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME} || echo "❌ Source file not found"
+
+            echo "📄 Writing test file to EFS..."
+            date > /home/jenkins/agent/${TEST_DUMMY_NAME}
+          """
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        echo "🔨 Simulating build in ${DOWNSTREAM_BUILD_ID}"
+        sh 'sleep 5'
+      }
+    }
+
+
+    stage('Upload to S3 - Test') {
+
+      steps {
+        container('runner') {
+          sh """
+            echo "📤 Uploading tests to S3..."
+            aws s3 cp /home/jenkins/agent/${TEST_DUMMY_NAME} \
+                  ${env.AWS_S3_URL_TESTS}/${TEST_DUMMY_NAME} || echo "❌ Upload failed"
+          """
+        }
+      }
+    }
+
+
+    stage('Complete') {
+      steps {
+        echo "✅ ${DOWNSTREAM_BUILD_ID} completed successfully!"
+      }
+    }
+  }
+  
+}
