@@ -231,17 +231,13 @@ spec:
           log.warning('Liferay-Global-Shared-Libs is working fine')
 
           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+       
+       
         }
 
-        container('aws-caylent-runner') {
-          sh """
-            echo "📤 Reading from S3... "
-            aws s3 ls ${env.AWS_S3_URL_TESTS}/ || echo "❌ AWS s3 ls failed"
-          """
-        }
         container('aws-liferay-runner') {
           sh """
-            echo "📤 Reading from S3... "
+            echo "📤 AWS CLI Validation ... "
             aws s3 ls ${env.AWS_S3_URL_TESTS}/ || echo "❌ AWS s3 ls failed"
           """
         }
