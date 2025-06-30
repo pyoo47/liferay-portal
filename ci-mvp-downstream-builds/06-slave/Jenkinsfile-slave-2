@@ -3,7 +3,7 @@
   * - Worker Node Working Ok
   *
   * - This versio does the checkout of the liferay-portal repo in 47 seconds
-  *
+  * - This versio does the checkout of the liferay-portal-ee from EFS in 3 seconds
   *
   * Status: ✅ Minimal pod scheduled successfully
   */
@@ -255,34 +255,16 @@ spec:
               """ 
           }
         }
+
+
+
+
+
+
         
       }
     }
   
-
-
-
-    stage('Build the Bundle - Step 0') {
-
-      steps {
-        container('aws-liferay-runner') {
-
-          dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
-            script {
-                sh """
-                  echo '📥 Doing EFS liferay-jenkins-ee ... '
-                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
-                  ls -a
-                  pwd     
-
-                """ 
-            }
-          }
-        }
-      }
-    }
-  
-
 
 
 
