@@ -40,23 +40,6 @@ spec:
 
 
 
-    - name: aws-caylent-runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
-      command: ["cat"]
-      tty: true
-      volumeMounts:
-        - mountPath: /home/jenkins/agent
-          name: efs-workspace
-        # resources:
-        #   requests:
-        #     cpu: "8"
-        #     memory: "8Gi"
-        #   limits:
-        #     cpu: "16"
-        #     memory: "16Gi"
-
-
-
     - name: aws-liferay-runner
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
       command: ["cat"]
@@ -141,7 +124,7 @@ spec:
 
     DO_LIFERAY_JENKINS_EE_CHECKOUT  = 'do_liferay-jenkins-ee-Checkout'
     DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
-    CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_CHECKOUT}"
+    CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_EFS}"
 
   }
 
@@ -229,36 +212,22 @@ spec:
     }
 
 
-  
 
-    stage('Checkout liferay-jenkins-ee') {
+    stage('EFS liferay-jenkins-ee') {
       when {
-        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
+        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
       }
       steps {
-        container('aws-caylent-runner') {
-
-          
-
-
-            script {
-                sh """
-                  echo '📥 Doing Checkout liferay-jenkins-ee ... v2 '
-                  git clone --depth 1 --no-tags --quiet \
-                          -b master \
-                            git@github.com:liferay/liferay-jenkins-ee.git
-                """
-
- 
-                //             ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee
-                // // git clone --depth 1 --no-tags --quiet -b master git@github.com:liferay/liferay-jenkins-ee.git
-            }
+        container('aws-liferay-runner') {
+          script {
+              sh """
+                echo '📥 Doing EFS liferay-jenkins-ee ... '
+              """
           }
-
-
-        
+        }
       }
     }
+  
 
 
 
