@@ -220,9 +220,6 @@ spec:
           Node Name   : ${env.NODE_NAME}
           """
 
-          echo "Running on Node: ${env.NODE_NAME} - ${env.JOB_NAME}" > info.txt
-          echo "Testing Shared Libs"
-
 
 
           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
@@ -251,13 +248,13 @@ spec:
   }
 
 
-  post {
-    always {
-      input message: 'Finish the pipeline?', ok: 'Yes, proceed'
-      echo "🔚 Pipeline completed. Cleaning up workspace..."
+  // post {
+  //   always {
+  //     input message: 'Finish the pipeline?', ok: 'Yes, proceed'
+  //     echo "🔚 Pipeline completed. Cleaning up workspace..."
     
-    }
-  }
+  //   }
+  // }
 
 
 }
