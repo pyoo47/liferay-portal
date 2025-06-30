@@ -231,7 +231,10 @@ spec:
           log.warning('Liferay-Global-Shared-Libs is working fine')
 
           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+       
+       
         }
+
 
       }
     }
@@ -259,7 +262,7 @@ spec:
         script {
                         
             echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Using (Docker image 2.1) ... Version 3.0 "
+            echo "🔄 Using (Docker image 2.1) ...  "
             
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
