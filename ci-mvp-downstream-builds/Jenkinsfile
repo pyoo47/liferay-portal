@@ -123,7 +123,7 @@ spec:
 
 
     - name: aws-liferay-runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:1.0.3
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
       command: ["cat"]
       tty: true
       volumeMounts:
