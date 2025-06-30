@@ -108,25 +108,41 @@ spec:
 
 
 
-    - name: aws-liferay-runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
+    - name: aws-caylent-runner
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
       command: ["cat"]
       tty: true
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
-        - mountPath: /home/jenkins/local
-          name: workspace-volume
       resources:
         requests:
           cpu: "8"
           memory: "8Gi"
-          ephemeral-storage: "20Gi"
         limits:
           cpu: "16"
           memory: "16Gi"
-          ephemeral-storage: "70Gi"
 
+
+
+    # - name: aws-liferay-runner
+    #   image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
+    #   command: ["cat"]
+    #   tty: true
+    #   volumeMounts:
+    #     - mountPath: /home/jenkins/agent
+    #       name: efs-workspace
+    #     - mountPath: /home/jenkins/local
+    #       name: workspace-volume
+    #   resources:
+    #     requests:
+    #       cpu: "8"
+    #       memory: "8Gi"
+    #       ephemeral-storage: "20Gi"
+    #     limits:
+    #       ephemeral-storage: "70Gi"
+    #       cpu: "16"
+    #       memory: "16Gi"
 
   nodeSelector:
     jenkins-role: agent
@@ -240,7 +256,7 @@ spec:
       }
       steps {
 
-        container('aws-liferay-runner') {
+        container('aws-caylent-runner') {
 
           dir("${LOCAL_DIR_CHECKOUT}") {
             script {
@@ -290,7 +306,7 @@ spec:
     //     expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
     //   }
     //   steps {
-    //     container('aws-liferay-runner') {
+    //     container('aws-caylent-runner') {
     //       dir("${LOCAL_DIR_CHECKOUT}") {
     //         script {
     //             sh """
@@ -310,31 +326,31 @@ spec:
 
 
 
-    stage('Build the Bundle') {
-      when {
-        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
-      }
-      steps {
-        container('aws-liferay-runner') {
-          dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
-            script {
-              sh """
-                echo '📦 Building the Bundle... (v2)'
-                echo '📂 Current Directory:'
-                pwd
-                ls -la
+    // stage('Build the Bundle') {
+    //   when {
+    //     expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
+    //   }
+    //   steps {
+    //     container('aws-caylent-runner') {
+    //       dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+    //         script {
+    //           sh """
+    //             echo '📦 Building the Bundle... (v2)'
+    //             echo '📂 Current Directory:'
+    //             pwd
+    //             ls -la
 
-                echo '🔨 Running Build Script...'
+    //             echo '🔨 Running Build Script...'
                 
 
-              """
-            }
-          }
+    //           """
+    //         }
+    //       }
           
 
-        }
-      }
-    }
+    //     }
+    //   }
+    // }
 
 
     // stage('EFS liferay-portal') {
@@ -342,7 +358,7 @@ spec:
     //     expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_EFS }
     //   }
     //   steps {
-    //     container('aws-liferay-runner') {
+    //     container('aws-caylent-runner') {
     //       script {
     //           sh """
     //             echo '📥 Doing EFS liferay-portal ... '
@@ -358,7 +374,7 @@ spec:
     //     expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
     //   }
     //   steps {
-    //     container('aws-liferay-runner') {
+    //     container('aws-caylent-runner') {
     //       script {
     //           sh """
     //             echo '📥 Doing EFS liferay-jenkins-ee ... '
