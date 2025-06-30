@@ -115,34 +115,15 @@ spec:
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
-      resources:
-        requests:
-          cpu: "8"
-          memory: "8Gi"
-        limits:
-          cpu: "16"
-          memory: "16Gi"
+          resources:
+            requests:
+              cpu: "8"
+              memory: "8Gi"
+            limits:
+              cpu: "16"
+              memory: "16Gi"
 
 
-
-    # - name: aws-liferay-runner
-    #   image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
-    #   command: ["cat"]
-    #   tty: true
-    #   volumeMounts:
-    #     - mountPath: /home/jenkins/agent
-    #       name: efs-workspace
-    #     - mountPath: /home/jenkins/local
-    #       name: workspace-volume
-    #   resources:
-    #     requests:
-    #       cpu: "8"
-    #       memory: "8Gi"
-    #       ephemeral-storage: "20Gi"
-    #     limits:
-    #       ephemeral-storage: "70Gi"
-    #       cpu: "16"
-    #       memory: "16Gi"
 
   nodeSelector:
     jenkins-role: agent
@@ -226,7 +207,7 @@ spec:
 
 
           echo """
-          Environment Variables: v2
+          Environment Variables:
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
@@ -301,56 +282,56 @@ spec:
 
 
   
-    // stage('Checkout liferay-jenkins-ee') {
-    //   when {
-    //     expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
-    //   }
-    //   steps {
-    //     container('aws-caylent-runner') {
-    //       dir("${LOCAL_DIR_CHECKOUT}") {
-    //         script {
-    //             sh """
-    //               echo '📥 Doing Checkout liferay-jenkins-ee ... '
-    //               git clone --depth 1 --no-tags --quiet \
-    //                       -b master \
-    //                         git@github.com:liferay/liferay-jenkins-ee.git \
-    //                         ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee
-    //             """
+    stage('Checkout liferay-jenkins-ee') {
+      when {
+        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
+      }
+      steps {
+        container('aws-caylent-runner') {
+          dir("${LOCAL_DIR_CHECKOUT}") {
+            script {
+                sh """
+                  echo '📥 Doing Checkout liferay-jenkins-ee ... '
+                  git clone --depth 1 --no-tags --quiet \
+                          -b master \
+                            git@github.com:liferay/liferay-jenkins-ee.git \
+                            ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee
+                """
 
-    //             // git clone --depth 1 --no-tags --quiet -b master git@github.com:liferay/liferay-jenkins-ee.git
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+                // git clone --depth 1 --no-tags --quiet -b master git@github.com:liferay/liferay-jenkins-ee.git
+            }
+          }
+        }
+      }
+    }
 
 
 
-    // stage('Build the Bundle') {
-    //   when {
-    //     expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
-    //   }
-    //   steps {
-    //     container('aws-caylent-runner') {
-    //       dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
-    //         script {
-    //           sh """
-    //             echo '📦 Building the Bundle... (v2)'
-    //             echo '📂 Current Directory:'
-    //             pwd
-    //             ls -la
+    stage('Build the Bundle') {
+      when {
+        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
+      }
+      steps {
+        container('aws-caylent-runner') {
+          dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+            script {
+              sh """
+                echo '📦 Building the Bundle... (v2)'
+                echo '📂 Current Directory:'
+                pwd
+                ls -la
 
-    //             echo '🔨 Running Build Script...'
+                echo '🔨 Running Build Script...'
                 
 
-    //           """
-    //         }
-    //       }
+              """
+            }
+          }
           
 
-    //     }
-    //   }
-    // }
+        }
+      }
+    }
 
 
     // stage('EFS liferay-portal') {
