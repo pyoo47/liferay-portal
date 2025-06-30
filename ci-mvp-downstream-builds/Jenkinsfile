@@ -87,6 +87,7 @@ spec:
     AWS_S3_BUCKET='liferayci-file-propagator-mvp'
     AWS_S3_PATH='build'
 
+    COMMIT_MESSAGE = "[test: test-01-unit]"
 
     CUSTOM_BUILD_NUMBER = "${env.BUILD_NUMBER}"
     // CUSTOM_BUILD_NUMBER = "1"
@@ -177,7 +178,7 @@ spec:
 
               // Clean the target folder
               sh """
-                echo '🧹 Version 4...'
+                echo '🧹 Version 5...'
                 echo '🧹 Cleaning checkout folder...'
                 rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
               """
@@ -201,6 +202,9 @@ spec:
 
                       //  ${LOCAL_DIR_CHECKOUT}/liferay-portal
                    // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+
+                   COMMIT_MESSAGE = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                  echo "📦 GIT_COMMIT: ${COMMIT_MESSAGE}"
               }
   
             }
