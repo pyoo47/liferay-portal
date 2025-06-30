@@ -81,14 +81,6 @@ spec:
   serviceAccountName: jenkins-agent
 
 
-  volumes:
-    - name: efs-workspace
-      persistentVolumeClaim:
-        claimName: jenkins-efs-pvc
-    - name: workspace-volume
-      emptyDir: {}
-
-
   containers:
 
 
@@ -99,42 +91,6 @@ spec:
           memory: "512Mi"
           cpu: "500m"
 
-
-    - name: build
-      image: alpine
-      command: ['cat']
-      tty: true
-      resources:
-        requests:
-          memory: "1Gi"
-          cpu: "1"
-
-
-    - name: aws-caylent-runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
-      command: ["cat"]
-      tty: true
-      volumeMounts:
-        - mountPath: /home/jenkins/agent
-          name: efs-workspace
-        # resources:
-        #   requests:
-        #     cpu: "8"
-        #     memory: "8Gi"
-        #   limits:
-        #     cpu: "16"
-        #     memory: "16Gi"
-
-
-    - name: aws-liferay-runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
-      command: ["cat"]
-      tty: true
-      volumeMounts:
-        - mountPath: /home/jenkins/agent
-          name: efs-workspace
-        # - mountPath: /home/jenkins/local
-        #   name: workspace-volume
 
 
 
@@ -204,13 +160,6 @@ spec:
 
   stages {
     
-    stage('Sanity Check') {
-      steps {
-        container('build') {
-          sh 'echo ✅ Minimal pod scheduled successfully! v1.0.1  - v3  '
-        }
-      }
-    }
 
 
     stage('Print Environment') {
@@ -239,21 +188,6 @@ spec:
       }
     }
 
-    stage('Run AWS Caylent Runner') {
-      steps {
-        container('aws-caylent-runner') {
-          echo 'Running AWS Liferay Runner...'
-        }
-      }
-    }
-
-    stage('Run AWS Liferay Runner') {
-      steps {
-        container('aws-liferay-runner') {
-          echo 'Running AWS Liferay Runner...'
-        }
-      }
-    }
 
 
 
@@ -268,7 +202,9 @@ spec:
             // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: test-01-unit]"
-            def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
+            // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
+            def commitMessage = "[test: test-01-unit]"
+
             
 
             try {
