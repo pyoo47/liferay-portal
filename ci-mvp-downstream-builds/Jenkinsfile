@@ -235,7 +235,7 @@ spec:
        
         }
 
-        container('aws-liferay-runner') {
+        container('aws-caylent-runner') {
           sh """
             echo "📤 AWS CLI Validation ... "
             aws s3 ls ${env.AWS_S3_URL_TESTS}/ || echo "❌ AWS s3 ls failed"
