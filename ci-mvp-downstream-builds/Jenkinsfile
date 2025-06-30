@@ -200,7 +200,7 @@ spec:
                 """
 
                       //  ${LOCAL_DIR_CHECKOUT}/liferay-portal
-                env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                   // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
               }
   
             }
