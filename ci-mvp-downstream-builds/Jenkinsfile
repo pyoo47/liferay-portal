@@ -120,7 +120,7 @@ spec:
 
     DO_LIFERAY_PORTAL_CHECKOUT      = 'do_liferay-portal-Checkout'
     DO_LIFERAY_PORTAL_EFS           = 'do_liferay-portal-EFS'
-    CHOICE_LIFERAY_PORTAL           = "FALSE ${DO_LIFERAY_PORTAL_CHECKOUT}"
+    CHOICE_LIFERAY_PORTAL           = "${DO_LIFERAY_PORTAL_CHECKOUT}"
 
     DO_LIFERAY_JENKINS_EE_CHECKOUT  = 'do_liferay-jenkins-ee-Checkout'
     DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
