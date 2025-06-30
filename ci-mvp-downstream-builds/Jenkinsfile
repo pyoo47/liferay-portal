@@ -220,12 +220,8 @@ spec:
           Node Name   : ${env.NODE_NAME}
           """
           
-          if (log) {
-            log.info('Validation Shared Libs Integration')
-            log.warning('Liferay-Global-Shared-Libs is working fine')
-          } else {
-            echo "WARNING: Shared Libs not available, skipping log validation."
-          }
+          log.info('Validation Shared Libs Integration')
+          log.warning('Liferay-Global-Shared-Libs is working fine')
 
           echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
         }
