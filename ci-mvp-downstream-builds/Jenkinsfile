@@ -256,7 +256,7 @@ spec:
         script {
                         
             echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Using (Docker image 2.1) ... Version 2.5 "
+            echo "🔄 Using (Docker image 2.1) ... Version 3.0 "
             
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
@@ -289,8 +289,8 @@ spec:
                       parameters: [
                         string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
                         string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
-                        string(name: 'TARBALL_GIT_NAME', value: TARBALL_GIT_NAME),
-                        string(name: 'TARBALL_GIT_REPO', value: TARBALL_GIT_REPO),
+                        string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
+                        string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
                         string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
                         string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
                         string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
