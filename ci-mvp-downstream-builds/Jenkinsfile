@@ -267,17 +267,32 @@ spec:
       steps {
         container('aws-liferay-runner') {
 
-          dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+          // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+
+
             script {
                 sh """
-                  echo '📥 Doing EFS liferay-jenkins-ee ... '
+                  echo '📥 Build the Bundle - Step 0 ... '
                   echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
                   ls -a
                   pwd     
 
+
+                  echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.${HOSTNAME}.properties
+
+                  echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.${HOSTNAME}.properties
+                  echo "mirrors.hostname=" >> build.${HOSTNAME}.properties
+
+                  echo "java.jdk.default.runtime.version=jdk21" > test.${HOSTNAME}.properties
+
+                  ant setup-profile-dxp
+
                 """ 
             }
-          }
+
+         // }
+
+
         }
       }
     }
