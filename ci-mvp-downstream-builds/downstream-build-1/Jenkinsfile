@@ -214,37 +214,14 @@ spec:
 
             # Copy bundle at local
     
-            cp ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER}/
-            echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}"${MY_NEW_TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+            cp ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER}/${MY_NEW_TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+            echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER}"${MY_NEW_TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
 
             ls -al ${LOCAL_DIR_CHECKOUT}
             echo '📦 Extracting tarball (with pigz)...'
             tar         -xzf ${LOCAL_DIR_CHECKOUT}/${MY_NEW_TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
 
             #----------------
-
-            echo '📂 EFS workspace contents: (v1)'
-            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
-            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
-
-
-
-            cp ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER}/
-            echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}"${MY_NEW_TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
-
-
-            echo '🧹 env.LOCAL_DIR_CHECKOUT.               :    ${env.LOCAL_DIR_CHECKOUT} '
-            echo '🧹 MY_NEW_TARBALL_GIT_NAME.              :    ${MY_NEW_TARBALL_GIT_NAME} '
-            echo '🧹 MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER. 
-            echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}" :    ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER} 
-            echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}"'
-
-
-            ls -al ${LOCAL_DIR_CHECKOUT}
-            echo '📦 Extracting tarball (with pigz)...'
-            tar         -xzf ${LOCAL_DIR_CHECKOUT}/${MY_NEW_TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
-
-
             echo '📂 Extracted contents:  '
             ls -al ${LOCAL_DIR_CHECKOUT}
             echo '📂 Checking out source code (emulated) done...'
