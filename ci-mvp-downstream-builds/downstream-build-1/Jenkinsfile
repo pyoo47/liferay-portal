@@ -274,7 +274,7 @@ spec:
 
               script {
                   sh """
-                    echo '📥 Build the Bundle - Step 1 ... '
+                    echo '📥 Build the Bundle - Step  1 ... '
                     echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
                     ls -a
                     pwd     
