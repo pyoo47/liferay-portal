@@ -256,8 +256,6 @@ spec:
                     echo "java.jdk.default.runtime.version=jdk21" > test.\$HOSTNAME.properties
 
                     ant setup-profile-dxp
-                    
-                    ant -f build-test.xml rebuild-database prepare-portal-ext-properties
 
                   """ 
               }
