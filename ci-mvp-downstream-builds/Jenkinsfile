@@ -150,7 +150,7 @@ spec:
           log.info('Validation Shared Libs Integration')
           log.warning('Liferay-Global-Shared-Libs is working fine')
 
-          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+          echo "kubectl exec -it ${env.NODE_NAME}  -c aws-caylent-runner  -n liferay-jenkins -- bash"
        
        
         }
@@ -282,6 +282,8 @@ spec:
         
       }
     }
+  
+
   
 
 
@@ -441,10 +443,11 @@ spec:
 
                   cd /opt/dev/projects/github/liferay-portal
                   
+                  echo '📦 Creating tarball (excluding .git)...'
                   echo "📦 Creating tarball to EFS (excluding .git) path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
 
-                  cd ${TARBALL_GIT_REPO_PL}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
-                  cd ${TARBALL_GIT_REPO_EE}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
+                  cd ${LOCAL_DIR_CHECKOUT}/liferay-portal;     git rev-parse HEAD > commit.txt; rm -rf .git; git init
+                  cd ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee; git rev-parse HEAD > commit.txt; rm -rf .git; git init
 
                   tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
                   tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
@@ -453,6 +456,7 @@ spec:
                   mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
                   cp ${TARBALL_GIT_REPO_PL} ${EFS_LIFERAY_ARTIFACT_REPOS}
                   cp ${TARBALL_GIT_REPO_EE} ${EFS_LIFERAY_ARTIFACT_REPOS}
+                  ls -la ${EFS_LIFERAY_ARTIFACT_REPOS}
                   echo "📦 Tarballs copied to EFS successfully."
 
 
@@ -460,6 +464,7 @@ spec:
                   mkdir -p ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   cp ${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   cp ${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  ls -la ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   echo "📦 Tarballs copied to EFS successfully."
                 
                 """ 
