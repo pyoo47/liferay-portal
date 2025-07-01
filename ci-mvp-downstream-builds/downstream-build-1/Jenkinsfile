@@ -135,6 +135,10 @@ spec:
           env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
           env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
 
+          echo "  env.TARBALL_GIT_NAME: ${env.TARBALL_GIT_NAME}"
+          echo "  env.DEFAULT_LIFERAY_ARTIFACT_FOLDER: ${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}"
+          echo "      TARBALL_GIT_NAME: ${TARBALL_GIT_NAME}"
+
         }
       }
     }
@@ -181,6 +185,10 @@ spec:
           script {            
             env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
             env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
+        
+            echo "  env.TARBALL_GIT_NAME: ${env.TARBALL_GIT_NAME}"
+            echo "  env.DEFAULT_LIFERAY_ARTIFACT_FOLDER: ${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}"
+
           }
 
 
@@ -210,6 +218,11 @@ spec:
 
 
             cp ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}/${env.TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+
+
+            echo '🧹 env.LOCAL_DIR_CHECKOUT.               :    ${env.LOCAL_DIR_CHECKOUT} '
+            echo '🧹 env.TARBALL_GIT_NAME.                 :    ${env.TARBALL_GIT_NAME} '
+            echo '🧹 params.EFS_LIFERAY_ARTIFACT_BUNDLES.  :    ${params.EFS_LIFERAY_ARTIFACT_BUNDLES} '
 
 
             ls -al ${LOCAL_DIR_CHECKOUT}
