@@ -149,7 +149,7 @@ spec:
 
 
           echo """
-          Environment Variables (v4):
+          Environment Variables (v5):
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
