@@ -20,6 +20,8 @@ spec:
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
+
+
     - name: runner
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
       command: ["cat"]
@@ -29,6 +31,8 @@ spec:
           name: efs-workspace
         - mountPath: /home/jenkins/local
           name: workspace-volume
+
+
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
@@ -174,8 +178,10 @@ spec:
 
           """
 
-          env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
-          env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
+          script {            
+            env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
+            env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
+          }
 
 
           sh """
@@ -225,38 +231,33 @@ spec:
 
   
     stage('Test1 - Step 0 (ant setup-profile-dxp)') {
-
       steps {
-        container('runner') {
+        retry(3) {
+          container('runner') {
 
-          // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+              script {
+                  sh """
+                    echo '📥 Build the Bundle - Step 0 ... '
+                    echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
+                    ls -a
+                    pwd     
 
-            script {
-                sh """
-                  echo '📥 Build the Bundle - Step 0 ... '
-                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
-                  ls -a
-                  pwd     
+                    cd /opt/dev/projects/github/liferay-portal
 
-                  cd /opt/dev/projects/github/liferay-portal
+                    echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.\$HOSTNAME.properties
 
+                    echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.\$HOSTNAME.properties
+                    echo "mirrors.hostname=" >> build.\$HOSTNAME.properties
+                    echo "java.jdk.default.runtime.version=jdk21" > test.\$HOSTNAME.properties
 
-                  echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.\$HOSTNAME.properties
+                    ant setup-profile-dxp
+                    
+                    ant -f build-test.xml rebuild-database prepare-portal-ext-properties
 
-                  echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.\$HOSTNAME.properties
-                  echo "mirrors.hostname=" >> build.\$HOSTNAME.properties
-                  echo "java.jdk.default.runtime.version=jdk21" > test.\$HOSTNAME.properties
+                  """ 
+              }
 
-                  ant setup-profile-dxp
-                  
-                  ant -f build-test.xml rebuild-database prepare-portal-ext-properties
-
-                """ 
-            }
-
-         // }
-
-
+          }
         }
       }
     }
@@ -264,32 +265,25 @@ spec:
 
 
     stage('Test1 (ant -f build-test-batch.xml dist-jdk7)') {
-
       steps {
-        container('runner') {
+        retry(3) {
+          container('runner') {
 
-          // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+              script {
+                  sh """
+                    echo '📥 Build the Bundle - Step 1 ... '
+                    echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
+                    ls -a
+                    pwd     
 
+                    cd /opt/dev/projects/github/liferay-portal
 
-            script {
-                sh """
-                  echo '📥 Build the Bundle - Step 1 ... '
-                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
-                  ls -a
-                  pwd     
+                    ant -f build-test-batch.xml modules-unit -Dtest.batch.name=modules-unit -Daxis.variable=0 -DTEST_CLASS_GROUP_0=com/liferay/jenkins/results/parser/DummyUnitTest.class
 
-                  cd /opt/dev/projects/github/liferay-portal
+                  """ 
+              }
 
-
-                  ant -f build-test-batch.xml modules-unit -Dtest.batch.name=modules-unit -Daxis.variable=0 -DTEST_CLASS_GROUP_0=com/liferay/jenkins/results/parser/DummyUnitTest.class
-
-
-                """ 
-            }
-
-         // }
-
-
+          }
         }
       }
     }

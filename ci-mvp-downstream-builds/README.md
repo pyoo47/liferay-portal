@@ -67,3 +67,8 @@ liferay-portal/
     DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
     EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
     FILE_TARBALL_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+
+
+
+     kubectl exec -it                      liferay-agent-test-6vljz-sbjk7 -c runner -n liferay-jenkins -- bash
+exec kubectl exec -i -t -n liferay-jenkins liferay-agent-test-6vljz-sbjk7 -c aws-caylent-runner -- sh -c "clear; (bash || ash || sh)"
