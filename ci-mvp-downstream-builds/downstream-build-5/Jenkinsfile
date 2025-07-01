@@ -71,7 +71,7 @@ spec:
     // liferay-portal-source.tar.gz         (~1.2gb) 
 
 
-    LOCAL_DIR_CHECKOUT  = "/home/jenkins/local/checkout"
+    LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
 
     DEFAULT_BUILD_NUMBER = 1
     TARBALL_GIT_NAME     = "liferay-portal-repo-${DEFAULT_BUILD_NUMBER}.tar.gz"
@@ -125,15 +125,11 @@ spec:
           echo "  EFS_LIFERAY_ARTIFACT_FOLDER: ${params.EFS_LIFERAY_ARTIFACT_FOLDER}"
           echo "  EFS_LIFERAY_ARTIFACT_REPOS: ${params.EFS_LIFERAY_ARTIFACT_REPOS}"
           echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}"
-          echo "  EFS_LIFERAY_ARTIFACT_TEST: ${params.EFS_LIFERAY_ARTIFACT_TEST}"        
-
+          echo "  EFS_LIFERAY_ARTIFACT_TEST: ${params.EFS_LIFERAY_ARTIFACT_TEST}" 
 
 
           env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
-          env.TARBALL_GIT_REPO     = "/home/jenkins/local/${env.TARBALL_GIT_NAME}"
-
           env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
-
 
         }
       }
@@ -158,78 +154,76 @@ spec:
     stage('Source Code Receive') {
       steps {
         container('runner') {
-          sh """
-            echo '📂 EFS workspace contents: (v1)'
-            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
-            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
 
+
+          sh """
+            # PARAMETERS: 
+            #   PARENT_BUILD_NUMBER: 277
+            #   PARENT_GIT_COMMIT: 
+            # env.TARBALL_GIT_NAME     = "liferay-portal-repo- $ { params.PARENT_BUILD_NUMBER. } .tar.gz"
+            #   TARBALL_GIT_NAME:         liferay-portal-repo-1.tar.gz
+            #   TARBALL_GIT_REPO: /opt/dev/projects/github/liferay-portal-repo-1.tar.gz
+            #   EFS_MOUNT_PATH: /home/jenkins/agent
+            #   EFS_LIFERAY_ARTIFACT_FOLDER:   /home/jenkins/agent/liferay-artifacts/build-277
+            #   EFS_LIFERAY_ARTIFACT_REPOS:    /home/jenkins/agent/liferay-artifacts/build-277/repo-github
+            #   EFS_LIFERAY_ARTIFACT_BUNDLES:  /home/jenkins/agent/liferay-artifacts/build-277/bundles
+            #   EFS_LIFERAY_ARTIFACT_TEST:     /home/jenkins/agent/liferay-artifacts/build-277/tests
+
+            # LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
+            # /home/jenkins/agent/liferay-artifacts/build-277/bundles/"liferay-portal-repo- $ { params.PARENT_BUILD_NUMBER. } .tar.gz"
+
+          """
+
+          env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
+          env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
+
+
+          sh """
+  
+            #----------------
             # Clean the Local directory 
             echo '🧹 Version 4.1..'
             echo '🧹 Cleaning checkout folder...'
             rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
 
-            cp ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+
+            # Copy bundle at local
+    
+            cp ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}/${env.TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
 
             ls -al ${LOCAL_DIR_CHECKOUT}
             echo '📦 Extracting tarball (with pigz)...'
-            # tar         -xzf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
-            tar -I pigz -xf ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+            tar         -xzf ${LOCAL_DIR_CHECKOUT}/${env.TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+
+            #----------------
+
+            echo '📂 EFS workspace contents: (v1)'
+            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
+            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
+
+
+
+            cp ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}/${env.TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+
+
+            ls -al ${LOCAL_DIR_CHECKOUT}
+            echo '📦 Extracting tarball (with pigz)...'
+            tar         -xzf ${LOCAL_DIR_CHECKOUT}/${env.TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+
 
             echo '📂 Extracted contents:  '
             ls -al ${LOCAL_DIR_CHECKOUT}
             echo '📂 Checking out source code (emulated) done...'
-            rm -f ${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME}
+            rm -f ${LOCAL_DIR_CHECKOUT}/${env.TARBALL_GIT_NAME}
             echo '📂 Source code ready in ${LOCAL_DIR_CHECKOUT}'
             
           """
+
         }
       }
     }
 
-    stage('Reading bundle from EFS') {
-      steps {
-        container('runner') {
-          sh """
-            ls -al
-            df -h
-            echo "🔍 Checking EFS mount at /home/jenkins/agent"
-            mount | grep /home/jenkins/agent || echo "❌ EFS NOT mounted"
-
-            ls -al /home/jenkins/agent
-
-            echo "📄 Reading Bundle file from EFS..."
-            cat /home/jenkins/agent/${BUILD_BUNDLE_DUMMY_NAME} || echo "❌ Bundle file not found"
-
-            echo "📄 Reading Source file from EFS..."
-            cat /home/jenkins/agent/${BUILD_SOURCE_DUMMY_NAME} || echo "❌ Source file not found"
-
-            echo "📄 Writing test file to EFS..."
-            date > /home/jenkins/agent/${TEST_DUMMY_NAME}
-          """
-        }
-      }
-    }
-
-    stage('Build') {
-      steps {
-        echo "🔨 Simulating build in ${DOWNSTREAM_BUILD_ID}"
-        sh 'sleep 5'
-      }
-    }
-
-
-    stage('Upload to S3 - Test') {
-
-      steps {
-        container('runner') {
-          sh """
-            echo "📤 Uploading tests to S3..."
-            aws s3 cp /home/jenkins/agent/${TEST_DUMMY_NAME} \
-                  ${env.AWS_S3_URL_TESTS}/${TEST_DUMMY_NAME} || echo "❌ Upload failed"
-          """
-        }
-      }
-    }
+  
 
 
     stage('Complete') {
