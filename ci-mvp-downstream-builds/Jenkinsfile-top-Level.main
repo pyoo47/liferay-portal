@@ -1,11 +1,6 @@
 /**
   * Jenkinsfile 
-  * - Worker Node Working Ok
-  *
-  * - This versio does the checkout of the liferay-portal repo in 47 seconds
-  *
-  *
-  * Status: ✅ Minimal pod scheduled successfully
+  * - (Main Version with clean stages)
   */
 @Library('Liferay-Global-Shared-Libs') _
 
@@ -126,6 +121,10 @@ spec:
     DO_LIFERAY_JENKINS_EE_CHECKOUT  = 'do_liferay-jenkins-ee-Checkout'
     DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
     CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_CHECKOUT}"
+
+    DO_BUILD_BUNDLE_EFS             = 'do_build-bundle-EFS'
+    DO_BUILD_BUNDLE_LOCAL           = 'do_build-bundle-Local'
+    CHOICE_BUILD_BUNDLE             = "${DO_BUILD_BUNDLE_EFS}"
 
   }
 
