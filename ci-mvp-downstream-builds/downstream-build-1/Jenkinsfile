@@ -307,8 +307,12 @@ spec:
     stage('Complete') {
       steps {
         echo "✅ ${DOWNSTREAM_BUILD_ID} completed successfully!"
+        input message: 'Finish the pipeline?', ok: 'Yes, proceed'
       }
     }
+
+
+
   }
   
 }

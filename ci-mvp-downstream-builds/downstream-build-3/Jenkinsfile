@@ -160,7 +160,7 @@ spec:
             # PARAMETERS: 
             #   PARENT_BUILD_NUMBER: 277
             #   PARENT_GIT_COMMIT: 
-            # env.TARBALL_GIT_NAME     = "liferay-portal-repo- $ { params.PARENT_BUILD_NUMBER. } .tar.gz"
+            # env.TARBALL_GIT_NAME     = "liferay-portal-repo-   {  params.PARENT_BUILD_NUMBER. } .tar.gz"
             #   TARBALL_GIT_NAME:         liferay-portal-repo-1.tar.gz
             #   TARBALL_GIT_REPO: /opt/dev/projects/github/liferay-portal-repo-1.tar.gz
             #   EFS_MOUNT_PATH: /home/jenkins/agent
@@ -170,7 +170,7 @@ spec:
             #   EFS_LIFERAY_ARTIFACT_TEST:     /home/jenkins/agent/liferay-artifacts/build-277/tests
 
             # LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
-            # /home/jenkins/agent/liferay-artifacts/build-277/bundles/"liferay-portal-repo- $ { params.PARENT_BUILD_NUMBER. } .tar.gz"
+            # /home/jenkins/agent/liferay-artifacts/build-277/bundles/"liferay-portal-repo-  { params.PARENT_BUILD_NUMBER. } .tar.gz"
 
           """
 
