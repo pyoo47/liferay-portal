@@ -220,6 +220,36 @@ spec:
     }
 
 
+    stage('Checkout liferay-portal [TEST] ') {
+      when {
+        expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_EFS }
+      }
+      steps {
+
+        container('aws-caylent-runner') {
+
+            script {
+        
+              echo "📂 Checkout :: LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+              echo "📦 Checkout :: TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
+
+              // Clean the target folder
+              sh """
+                echo '🧹 Version 5...'
+                echo '🧹 Cleaning checkout folder...'
+                rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+              """
+
+            // input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
+
+  
+            }
+          
+
+          }
+        }
+
+    }
 
     stage('EFS liferay-jenkins-ee') {
       when {
@@ -254,6 +284,34 @@ spec:
       }
     }
   
+
+
+      stage('EFS liferay-jenkins-ee [TEST]') {
+      when {
+        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
+      }
+      steps {
+        container('aws-caylent-runner') {
+          script {
+              sh """
+                echo '📥 Doing EFS liferay-jenkins-ee ... '
+              """
+        
+              echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+              echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
+
+              sh """
+                echo '📥 Doing EFS TEST ... '
+
+            
+              """
+
+
+          }
+        }
+        
+      }
+    }
 
     stage('Build the Bundle - Step 0 (ant setup-profile-dxp)') {
 
@@ -324,7 +382,7 @@ spec:
 
 
 
-    stage('Build the Bundle - Step 2 (Copy to EFS tarball git-repo)') {
+    stage('Build the Bundle - Step 2 (Copy to EFS)') {
       steps {
         container('aws-caylent-runner') {
             script {
@@ -344,34 +402,28 @@ spec:
                   echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
 
                   cd /opt/dev/projects/github/liferay-portal
-                  
-                  echo "📦 Creating tarball to EFS (excluding .git) path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
-
-                  cd ${TARBALL_GIT_REPO_PL}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
-                  cd ${TARBALL_GIT_REPO_EE}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
-
-                  tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
-                  tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
-
+                     
                   echo "📦 Copying tarball to EFS mount path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
                   mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
                   cp ${TARBALL_GIT_REPO_PL} ${EFS_LIFERAY_ARTIFACT_REPOS}
                   cp ${TARBALL_GIT_REPO_EE} ${EFS_LIFERAY_ARTIFACT_REPOS}
-                  echo "📦 Tarballs copied to EFS successfully."
+
+                  ls -a ${EFS_LIFERAY_ARTIFACT_REPOS} 
 
 
-                  echo "📦 Copying bundle created and the source to: ${EFS_LIFERAY_ARTIFACT_BUNDLES}"
-                  mkdir -p ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  echo "📦 Tarballs copied to EFS successfully."
-                
+                  echo '📦 Creating tarball (excluding .git)...'
+
+                  
+                  tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
+                  tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
+
                 """ 
 
             }
         }
       }
     }
+
 
 
 
