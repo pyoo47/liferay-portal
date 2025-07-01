@@ -1,11 +1,6 @@
 /**
   * Jenkinsfile 
-  * - Worker Node Working Ok
-  *
-  * - This versio does the checkout of the liferay-portal repo in 47 seconds
-  *
-  *
-  * Status: ✅ Minimal pod scheduled successfully
+  * - (Test Version with dual stages)
   */
 @Library('Liferay-Global-Shared-Libs') _
 
@@ -149,13 +144,13 @@ spec:
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
           Workspace   : ${env.WORKSPACE}
-          Node Name   : ${env.NODE_NAME}
+          Node Name   : ${env.NODE_NAME}   (Node Name in Jenkins - Pod Name in Kubernetes)       
           """
           
           log.info('Validation Shared Libs Integration')
           log.warning('Liferay-Global-Shared-Libs is working fine')
 
-          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+          // echo "kubectl exec -it ${env.NODE_NAME}  -c aws-caylent-runner  -n liferay-jenkins -- bash"
        
        
         }
@@ -224,6 +219,36 @@ spec:
     }
 
 
+    // stage('Checkout liferay-portal [TEST] ') {
+    //   when {
+    //     expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_EFS }
+    //   }
+    //   steps {
+
+    //     container('aws-caylent-runner') {
+
+    //         script {
+        
+    //           echo "📂 Checkout :: LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+    //           echo "📦 Checkout :: TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
+
+    //           // Clean the target folder
+    //           sh """
+    //             echo '🧹 Version 5...'
+    //             echo '🧹 Cleaning checkout folder...'
+    //             rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+    //           """
+
+    //         // input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
+
+  
+    //         }
+          
+
+    //       }
+    //     }
+
+    // }
 
     stage('EFS liferay-jenkins-ee') {
       when {
@@ -258,6 +283,36 @@ spec:
       }
     }
   
+
+  
+
+
+    // stage('EFS liferay-jenkins-ee [TEST]') {
+    //   when {
+    //     expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
+    //   }
+    //   steps {
+    //     container('aws-caylent-runner') {
+    //       script {
+    //           sh """
+    //             echo '📥 Doing EFS liferay-jenkins-ee ... '
+    //           """
+        
+    //           echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+    //           echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
+
+    //           sh """
+    //             echo '📥 Doing EFS TEST ... '
+
+            
+    //           """
+
+
+    //       }
+    //     }
+        
+    //   }
+    // }
 
     stage('Build the Bundle - Step 0 (ant setup-profile-dxp)') {
 
@@ -297,7 +352,9 @@ spec:
 
 
     stage('Build the Bundle - Step 1 (ant -f build-test-batch.xml dist-jdk7)') {
-
+      when {
+        expression { return env.CHOICE_BUILD_BUNDLE == DO_BUILD_BUNDLE_LOCAL }
+      }
       steps {
         container('aws-caylent-runner') {
 
@@ -328,7 +385,44 @@ spec:
 
 
 
-    stage('Build the Bundle - Step 2 (Copy to EFS tarball git-repo)') {
+
+    stage('Build the Bundle - Step 1 (ant -f build-test-batch.xml dist-jdk7) [TEST] ') {
+      when {
+        expression { return env.CHOICE_BUILD_BUNDLE == DO_BUILD_BUNDLE_EFS }
+      }
+      steps {
+        container('aws-caylent-runner') {
+
+          // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+
+
+            script {
+                sh """
+                  echo '📥 Build the Bundle - Step 1 ... '
+                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
+                  ls -a
+                  pwd     
+
+                  cd /opt/dev/projects/github/liferay-portal
+
+                  # Copy the bundles and source on local for testing and troubleshooting
+                  echo '📂 Copy bundles on local: '
+                  cp  ${EFS_LIFERAY_ARTIFACT_BUNDLES}/${BUILD_BUNDLE_NAME}  ${LOCAL_DIR_CHECKOUT}/liferay-portal
+                  cp  ${EFS_LIFERAY_ARTIFACT_BUNDLES}/${BUILD_SOURCE_NAME}  ${LOCAL_DIR_CHECKOUT}/liferay-portal
+
+                """ 
+            }
+
+         // }
+
+
+        }
+      }
+    }
+  
+
+
+    stage('Build the Bundle - Step 2 (Copy to EFS)') {
       steps {
         container('aws-caylent-runner') {
             script {
@@ -349,10 +443,11 @@ spec:
 
                   cd /opt/dev/projects/github/liferay-portal
                   
+                  echo '📦 Creating tarball (excluding .git)...'
                   echo "📦 Creating tarball to EFS (excluding .git) path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
 
-                  cd ${TARBALL_GIT_REPO_PL}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
-                  cd ${TARBALL_GIT_REPO_EE}; git rev-parse HEAD > commit.txt; rm -rf .git; git init
+                  cd ${LOCAL_DIR_CHECKOUT}/liferay-portal;     git rev-parse HEAD > commit.txt; rm -rf .git; git init
+                  cd ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee; git rev-parse HEAD > commit.txt; rm -rf .git; git init
 
                   tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
                   tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
@@ -361,6 +456,7 @@ spec:
                   mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
                   cp ${TARBALL_GIT_REPO_PL} ${EFS_LIFERAY_ARTIFACT_REPOS}
                   cp ${TARBALL_GIT_REPO_EE} ${EFS_LIFERAY_ARTIFACT_REPOS}
+                  ls -la ${EFS_LIFERAY_ARTIFACT_REPOS}
                   echo "📦 Tarballs copied to EFS successfully."
 
 
@@ -368,6 +464,7 @@ spec:
                   mkdir -p ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   cp ${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   cp ${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  ls -la ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   echo "📦 Tarballs copied to EFS successfully."
                 
                 """ 
@@ -376,6 +473,7 @@ spec:
         }
       }
     }
+
 
 
 
@@ -462,7 +560,7 @@ spec:
   post {
     always {
       input message: 'Finish the pipeline?', ok: 'Yes, proceed'
-      echo "🔚 Pipeline completed. Cleaning up workspace... s"
+      echo "🔚 Pipeline completed. Cleaning up workspace..."
     
     }
   }
