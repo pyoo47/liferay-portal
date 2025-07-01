@@ -23,7 +23,7 @@ spec:
 
 
     - name: runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:2.0.2-keys
       command: ["cat"]
       tty: true
       volumeMounts:
@@ -135,7 +135,7 @@ spec:
           env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
           env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
 
-
+          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
 
           echo "  env.TARBALL_GIT_NAME: ${env.TARBALL_GIT_NAME}"
           echo "  env.DEFAULT_LIFERAY_ARTIFACT_FOLDER: ${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}"
