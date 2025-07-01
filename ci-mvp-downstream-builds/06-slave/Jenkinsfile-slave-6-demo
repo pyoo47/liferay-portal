@@ -334,7 +334,7 @@ spec:
 
                   cd /opt/dev/projects/github/liferay-portal
 
-                  ls -a *tar.gz
+                  ls -a tar.gz
                   pwd                       
                 """ 
 
@@ -381,7 +381,6 @@ spec:
             // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: test-01-unit]"
-            // def commitMessage = "[test: test-02-func]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
             def commitMessage = "[test: test-01-unit]"
 
