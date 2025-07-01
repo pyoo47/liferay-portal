@@ -462,7 +462,7 @@ spec:
   post {
     always {
       input message: 'Finish the pipeline?', ok: 'Yes, proceed'
-      echo "🔚 Pipeline completed. Cleaning up workspace..."
+      echo "🔚 Pipeline completed. Cleaning up workspace... s"
     
     }
   }
