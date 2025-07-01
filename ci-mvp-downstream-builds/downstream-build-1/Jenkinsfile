@@ -125,7 +125,14 @@ spec:
           echo "  EFS_LIFERAY_ARTIFACT_FOLDER: ${params.EFS_LIFERAY_ARTIFACT_FOLDER}"
           echo "  EFS_LIFERAY_ARTIFACT_REPOS: ${params.EFS_LIFERAY_ARTIFACT_REPOS}"
           echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}"
-          echo "  EFS_LIFERAY_ARTIFACT_TEST: ${params.EFS_LIFERAY_ARTIFACT_TEST}"         
+          echo "  EFS_LIFERAY_ARTIFACT_TEST: ${params.EFS_LIFERAY_ARTIFACT_TEST}" 
+
+
+          env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
+          env.TARBALL_GIT_REPO     = "/home/jenkins/local/${env.TARBALL_GIT_NAME}"
+
+          env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
+
         }
       }
     }

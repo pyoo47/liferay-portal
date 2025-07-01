@@ -57,13 +57,18 @@ spec:
     - name: workspace-volume
       emptyDir: {}
 
-  nodeSelector:
-    jenkins-role: agent
-  tolerations:
-    - key: "jenkins-role"
-      operator: "Equal"
-      value: "agent"
-      effect: "NoSchedule"
+  
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: jenkins-role
+                operator: In
+                values:
+                  - agent  # Ensure this is the same as the taint in the NodePool for the agent (agent-small future)
+
 
 """
     }
