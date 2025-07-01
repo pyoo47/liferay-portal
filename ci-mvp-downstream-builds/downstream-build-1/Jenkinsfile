@@ -195,7 +195,7 @@ spec:
             echo " 222 MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
             
             MY_NEW_TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
-            MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
+            MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${params.PARENT_BUILD_NUMBER}"
 
             echo "  MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
             echo "  MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER: ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER}"
