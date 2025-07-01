@@ -127,6 +127,10 @@ spec:
     DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
     CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_CHECKOUT}"
 
+    DO_BUILD_BUNDLE_EFS             = 'do_build-bundle-EFS'
+    DO_BUILD_BUNDLE_LOCAL           = 'do_build-bundle-Local'
+    CHOICE_BUILD_BUNDLE             = "${DO_BUILD_BUNDLE_EFS}"
+
   }
 
 
@@ -286,7 +290,7 @@ spec:
   
 
 
-      stage('EFS liferay-jenkins-ee [TEST]') {
+    stage('EFS liferay-jenkins-ee [TEST]') {
       when {
         expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
       }
@@ -351,7 +355,9 @@ spec:
 
 
     stage('Build the Bundle - Step 1 (ant -f build-test-batch.xml dist-jdk7)') {
-
+      when {
+        expression { return env.CHOICE_BUILD_BUNDLE == DO_BUILD_BUNDLE_LOCAL }
+      }
       steps {
         container('aws-caylent-runner') {
 
@@ -380,6 +386,43 @@ spec:
     }
   
 
+
+
+
+    stage('Build the Bundle - Step 1 (ant -f build-test-batch.xml dist-jdk7) [TEST] ') {
+      when {
+        expression { return env.CHOICE_BUILD_BUNDLE == DO_BUILD_BUNDLE_EFS }
+      }
+      steps {
+        container('aws-caylent-runner') {
+
+          // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+
+
+            script {
+                sh """
+                  echo '📥 Build the Bundle - Step 1 ... '
+                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
+                  ls -a
+                  pwd     
+
+                  cd /opt/dev/projects/github/liferay-portal
+
+                  # Copy the bundles and source on local for testing and troubleshooting
+                  echo '📂 Copy bundles on local: '
+                  cp  ${EFS_LIFERAY_ARTIFACT_BUNDLES}/${BUILD_BUNDLE_NAME}  ${LOCAL_DIR_CHECKOUT}/liferay-portal
+                  cp  ${EFS_LIFERAY_ARTIFACT_BUNDLES}/${BUILD_SOURCE_NAME}  ${LOCAL_DIR_CHECKOUT}/liferay-portal
+
+                """ 
+            }
+
+         // }
+
+
+        }
+      }
+    }
+  
 
 
     stage('Build the Bundle - Step 2 (Copy to EFS)') {
