@@ -368,8 +368,8 @@ spec:
 
                   echo "📦 Copying bundle created and the source to: ${EFS_LIFERAY_ARTIFACT_BUNDLES}"
                   mkdir -p ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   ls -la ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   echo "📦 Tarballs copied to EFS successfully."
                 
