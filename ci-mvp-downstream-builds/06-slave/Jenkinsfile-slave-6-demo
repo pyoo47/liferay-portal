@@ -57,18 +57,13 @@ spec:
     - name: workspace-volume
       emptyDir: {}
 
-  
-
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: jenkins-role
-                operator: In
-                values:
-                  - agent  # Ensure this is the same as the taint in the NodePool for the agent (agent-small future)
-
+  nodeSelector:
+    jenkins-role: agent
+  tolerations:
+    - key: "jenkins-role"
+      operator: "Equal"
+      value: "agent"
+      effect: "NoSchedule"
 
 """
     }
@@ -132,10 +127,6 @@ spec:
     DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
     CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_CHECKOUT}"
 
-    DO_BUILD_BUNDLE_EFS             = 'do_build-bundle-EFS'
-    DO_BUILD_BUNDLE_LOCAL           = 'do_build-bundle-Local'
-    CHOICE_BUILD_BUNDLE             = "${DO_BUILD_BUNDLE_EFS}"
-
   }
 
 
@@ -149,7 +140,7 @@ spec:
 
 
           echo """
-          Environment Variables (v3):
+          Environment Variables (v2):
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
@@ -333,7 +324,7 @@ spec:
 
 
 
-    stage('Build the Bundle - Step 2 (Copy to EFS tarball git-repo)') {
+    stage('Build the Bundle - Step 2 (Copy to EFS)') {
       steps {
         container('aws-caylent-runner') {
             script {
@@ -343,7 +334,7 @@ spec:
 
                   cd /opt/dev/projects/github/liferay-portal
 
-                  ls -a *tar.gz
+                  ls -a tar.gz
                   pwd                       
                 """ 
 
@@ -353,37 +344,28 @@ spec:
                   echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
 
                   cd /opt/dev/projects/github/liferay-portal
-                  
-                  echo '📦 Creating tarball (excluding .git)...'
-                  echo "📦 Creating tarball to EFS (excluding .git) path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
-
-                  cd ${LOCAL_DIR_CHECKOUT}/liferay-portal;     git rev-parse HEAD > commit.txt; rm -rf .git; git init
-                  cd ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee; git rev-parse HEAD > commit.txt; rm -rf .git; git init
-
-                  tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
-                  tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
-
+                     
                   echo "📦 Copying tarball to EFS mount path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
                   mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
                   cp ${TARBALL_GIT_REPO_PL} ${EFS_LIFERAY_ARTIFACT_REPOS}
                   cp ${TARBALL_GIT_REPO_EE} ${EFS_LIFERAY_ARTIFACT_REPOS}
-                  ls -la ${EFS_LIFERAY_ARTIFACT_REPOS}
-                  echo "📦 Tarballs copied to EFS successfully."
+
+                  ls -a ${EFS_LIFERAY_ARTIFACT_REPOS} 
 
 
-                  echo "📦 Copying bundle created and the source to: ${EFS_LIFERAY_ARTIFACT_BUNDLES}"
-                  mkdir -p ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  ls -la ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  echo "📦 Tarballs copied to EFS successfully."
-                
+                  echo '📦 Creating tarball (excluding .git)...'
+
+                  
+                  tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
+                  tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
+
                 """ 
 
             }
         }
       }
     }
+
 
 
 
@@ -399,7 +381,6 @@ spec:
             // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: test-01-unit]"
-            // def commitMessage = "[test: test-02-func]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
             def commitMessage = "[test: test-01-unit]"
 

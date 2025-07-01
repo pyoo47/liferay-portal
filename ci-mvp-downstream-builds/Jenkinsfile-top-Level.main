@@ -57,18 +57,13 @@ spec:
     - name: workspace-volume
       emptyDir: {}
 
-  
-
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: jenkins-role
-                operator: In
-                values:
-                  - agent  # Ensure this is the same as the taint in the NodePool for the agent (agent-small future)
-
+  nodeSelector:
+    jenkins-role: agent
+  tolerations:
+    - key: "jenkins-role"
+      operator: "Equal"
+      value: "agent"
+      effect: "NoSchedule"
 
 """
     }
@@ -149,7 +144,7 @@ spec:
 
 
           echo """
-          Environment Variables (v3):
+          Environment Variables (v2):
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
@@ -373,8 +368,8 @@ spec:
 
                   echo "📦 Copying bundle created and the source to: ${EFS_LIFERAY_ARTIFACT_BUNDLES}"
                   mkdir -p ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  cp ${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  cp ${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   ls -la ${EFS_LIFERAY_ARTIFACT_BUNDLES}
                   echo "📦 Tarballs copied to EFS successfully."
                 
