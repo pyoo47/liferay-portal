@@ -144,7 +144,7 @@ spec:
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
           Workspace   : ${env.WORKSPACE}
-          Node Name   : ${env.NODE_NAME}
+          Node Name   : ${env.NODE_NAME}   (Node Name in Jenkins - Pod Name in Kubernetes)
           """
           
           log.info('Validation Shared Libs Integration')

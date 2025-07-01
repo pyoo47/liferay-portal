@@ -144,7 +144,7 @@ spec:
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
           Workspace   : ${env.WORKSPACE}
-          Node Name   : ${env.NODE_NAME}
+          Node Name   : ${env.NODE_NAME}   (Node Name in Jenkins - Pod Name in Kubernetes)       
           """
           
           log.info('Validation Shared Libs Integration')
@@ -219,36 +219,36 @@ spec:
     }
 
 
-    stage('Checkout liferay-portal [TEST] ') {
-      when {
-        expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_EFS }
-      }
-      steps {
+    // stage('Checkout liferay-portal [TEST] ') {
+    //   when {
+    //     expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_EFS }
+    //   }
+    //   steps {
 
-        container('aws-caylent-runner') {
+    //     container('aws-caylent-runner') {
 
-            script {
+    //         script {
         
-              echo "📂 Checkout :: LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-              echo "📦 Checkout :: TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
+    //           echo "📂 Checkout :: LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+    //           echo "📦 Checkout :: TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
 
-              // Clean the target folder
-              sh """
-                echo '🧹 Version 5...'
-                echo '🧹 Cleaning checkout folder...'
-                rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
-              """
+    //           // Clean the target folder
+    //           sh """
+    //             echo '🧹 Version 5...'
+    //             echo '🧹 Cleaning checkout folder...'
+    //             rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
+    //           """
 
-            // input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
+    //         // input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
 
   
-            }
+    //         }
           
 
-          }
-        }
+    //       }
+    //     }
 
-    }
+    // }
 
     stage('EFS liferay-jenkins-ee') {
       when {
@@ -285,32 +285,32 @@ spec:
   
 
 
-    stage('EFS liferay-jenkins-ee [TEST]') {
-      when {
-        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
-      }
-      steps {
-        container('aws-caylent-runner') {
-          script {
-              sh """
-                echo '📥 Doing EFS liferay-jenkins-ee ... '
-              """
+    // stage('EFS liferay-jenkins-ee [TEST]') {
+    //   when {
+    //     expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_EFS }
+    //   }
+    //   steps {
+    //     container('aws-caylent-runner') {
+    //       script {
+    //           sh """
+    //             echo '📥 Doing EFS liferay-jenkins-ee ... '
+    //           """
         
-              echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
-              echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
+    //           echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
+    //           echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
 
-              sh """
-                echo '📥 Doing EFS TEST ... '
+    //           sh """
+    //             echo '📥 Doing EFS TEST ... '
 
             
-              """
+    //           """
 
 
-          }
-        }
+    //       }
+    //     }
         
-      }
-    }
+    //   }
+    // }
 
     stage('Build the Bundle - Step 0 (ant setup-profile-dxp)') {
 
