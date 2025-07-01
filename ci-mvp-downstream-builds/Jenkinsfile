@@ -300,32 +300,30 @@ spec:
 
 
 
+    // Only re-runs the enclosed block if it fails.
+    // It stops as soon as the block succeeds once.
+    // retry(3) {
+    //   sh './deploy.sh'
+    // }
 
     stage('Build the Bundle - Step 1 (ant -f build-test-batch.xml dist-jdk7)') {
-
       steps {
-        container('aws-caylent-runner') {
-
-          // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
-
-
+        retry(3) {
+          container('aws-caylent-runner') {
             script {
-                sh """
-                  echo '📥 Build the Bundle - Step 1 ... '
-                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
-                  ls -a
-                  pwd     
+              sh """
+                echo '📥 Build the Bundle - Step 1 ... '
+                echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
+                ls -a
+                pwd     
 
-                  cd /opt/dev/projects/github/liferay-portal
+                cd /opt/dev/projects/github/liferay-portal
 
-                  ant -f build-test-batch.xml dist-jdk7 -Daxis.variable=tomcat
+                ant -f build-test-batch.xml dist-jdk7 -Daxis.variable=tomcat
 
-                """ 
+              """ 
             }
-
-         // }
-
-
+          }
         }
       }
     }

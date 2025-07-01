@@ -15,11 +15,15 @@ metadata:
 spec:
   serviceAccountName: jenkins-agent
   containers:
+
+  
     - name: jnlp
       image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
+
+
     - name: runner
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
       command: ["cat"]
@@ -29,6 +33,8 @@ spec:
           name: efs-workspace
         - mountPath: /home/jenkins/local
           name: workspace-volume
+
+
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
@@ -173,10 +179,11 @@ spec:
             # /home/jenkins/agent/liferay-artifacts/build-277/bundles/"liferay-portal-repo- $ { params.PARENT_BUILD_NUMBER. } .tar.gz"
 
           """
-
-          env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
-          env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
-
+          
+          script {            
+            env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
+            env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
+          }
 
           sh """
   
