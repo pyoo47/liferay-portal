@@ -17,7 +17,7 @@ pipeline {
 
   agent {
     kubernetes {
-      label 'liferay-agent-test'
+      // label 'liferay-agent-test'
       yaml """
 apiVersion: v1
 kind: Pod
