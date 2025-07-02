@@ -72,3 +72,29 @@ liferay-portal/
 
      kubectl exec -it                      liferay-agent-test-6vljz-sbjk7 -c runner -n liferay-jenkins -- bash
 exec kubectl exec -i -t -n liferay-jenkins liferay-agent-test-6vljz-sbjk7 -c aws-caylent-runner -- sh -c "clear; (bash || ash || sh)"
+
+
+
+---
+
+
+    - name: mysql
+      image: mysql:8.4.4
+      command: 
+        - "mysqld"
+        - "--character-set-server=utf8mb4" # Use utf8mb4 instead of utf8
+        - "--connect_timeout=120"
+        - "--max_allowed_packet=104857600"
+        - "--wait_timeout=1200"
+        - "--tls-version=TLSv1.2"
+      env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "yes"
+      volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+      securityContext:
+        privileged: false # Drop privileged mode; not needed
+      tty: true
+      ports:
+        - containerPort: 3306
