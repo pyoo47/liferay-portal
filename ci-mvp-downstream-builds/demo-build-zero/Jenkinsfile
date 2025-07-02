@@ -166,7 +166,6 @@ spec:
 
             def parallelJobs = [:]
 
-
             int count = env.DOWNSTREAM_BUILD_COUNT.toInteger()
 
             // for (int i = 0; i < count; i++) {

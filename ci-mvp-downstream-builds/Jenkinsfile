@@ -349,14 +349,17 @@ spec:
             }
 
 
+            def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
+            
+            echo "✅ Selected: ${selectedTests*.label.join(', ')}"
 
             def parallelJobs = [:]
 
-            for (int i = 0; i < DOWNSTREAM_BUILD_COUNT; i++) {
+            int count = env.DOWNSTREAM_BUILD_COUNT.toInteger()
+                
+            for (int i = 0; i < count; i++) {
 
-                def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
-
-                echo "✅ Selected: ${selectedTests*.label.join(', ')}"
+                echo "🔄 Iteration ${i + 1} of ${count} "
 
                 selectedTests.each { test ->
                     def jobPath = TestBuild.getFullJobPath(test)
@@ -385,8 +388,6 @@ spec:
             }
             
             parallel parallelJobs   // ← Jenkins waits for all to finish here
-
-
 
 
         }
