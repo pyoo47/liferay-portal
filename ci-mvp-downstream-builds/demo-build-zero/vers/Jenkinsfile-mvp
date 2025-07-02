@@ -1,65 +1,5 @@
 /**
-  * Jenkinsfile for Liferay MVP Downstream Builds
-  * Version: 1.0.1
-  * This Jenkinsfile defines a minimal pod configuration for testing purposes.
-  * Also:
-  * - Include 'AWS Caylent Runner' on a m5.4xlarge ready to build the bundle
-  *  
-  $ Result:
-  * - I was able to build the bundle doing ssh (kubectl exe) on the AWS Caylent Runner container
-  * -               - Duration: 30 mins. on a m5.4xlarge with: 
-  *                                      Request ( 8 vCPU and  8Gi memory)
-  *                                      Limit.  (16 vCPU and 16Gi memory)
-  *                                      Used.   ( - vCPU and. 9Gi memory)
-  *
-  * - I was also able to run the following tests, on the same pod:
-  *   - Run Unit Tests (0 min - 59 sec)
-  *   - Run Func Tests (6 min - 30 sec)
-  *   - Run bbdd Tests (3 min - 43 sec)
-  *
-  *
-  * - EFS
-  *   - Worked ok - Mount the EFS volume and the local workspace with the aws-liferay-container definition
-  * - Shared Libraries
-  *   - Worked ok - Testing Shared Libraries integration
-  * - Orchestration
-  *   - Worked ok - Invoking Downstream Builds from the main pipeline
-  *
-  *
-  * - Methodology:
-  *   - Starting the build with a Git Commit Push
-  *   - Jenkins agent pod is scheduled and assigned an m5.4xlarge instance
-  *   - The pod has 3 containers:
-  *     - jnlp: Jenkins inbound agent
-  *     - build: Alpine container for basic operations
-  *     - aws-caylent-runner: Custom container with AWS Caylent Runner
-  *   - Pause the pipeline to allow manual inspection
-  *     - Kubectl exec into the aws-caylent-runner container
-  *     - Run the build commands manually
-  *       - Build the bundle using the AWS Caylent Runner
-  *       - Run the unit tests
-  *       - Run the functional tests
-  *       - Run the database tests
-  *   - Successfully built the bundle and ran all tests
-  *   - Monitoring
-  *       - I'm usig tools K9s, Lens and kubectl to monitor the pod
-  *       - Also, AWS Console to monitor the EKS cluster and the pod's resource usage
-  *       -       AND EC2 instance metrics in the AWS Console EC2 Dashboard
-  *
-  *
-  *
-  * - NEXT Steps:
-  *   - Artifacts:
-  *     - About Artifacts uploaded to S3, I wasn't able yet because lack of permissions on IRSA configuration
-  *       to upload the following:
-  *       - Bundle: s3://liferayci-file-propagator-mvp/
-  *   - Automation
-  *     - Next steps is increase automation by integrating the build commands into the Jenkins pipeline
-  *   - Security
-  *     - Remove the ssh key from the AWS Caylent Runner container
-  *
-  *
-  * Status: ✅ Minimal pod scheduled successfully
+  * Jenkinsfile for the Downstream Build Zero Pipeline
   */
 @Library('Liferay-Global-Shared-Libs') _
 
@@ -162,7 +102,7 @@ spec:
     
 
 
-    stage('Print Environment') {
+    stage('Environment Information') {
       steps {
         script {
 
@@ -203,7 +143,7 @@ spec:
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: test-01-unit]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
-            def commitMessage = "[test: test-01-unit]"
+            def commitMessage = "[test: test-05-unit]"
 
             
 
@@ -228,6 +168,12 @@ spec:
                 echo "👉 Running: ${test.label}"
                 echo "🔧 Job Path: ${jobPath}"
                 echo "📁 Directory: ${dirPath}"
+
+                jobPath = "MVP-Downstream-Builds/MVP-Downstream-Build-5/master-ci-6005-downstream-builds"
+                dirPath = "ci-mvp-downstream-builds/downstream-build-5"
+
+                echo "🔧 Job Path (override): ${jobPath}"
+                echo "📁 Directory (override): ${dirPath}"
 
                 build job: jobPath, 
                       parameters: [
