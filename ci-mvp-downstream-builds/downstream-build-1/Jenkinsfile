@@ -243,12 +243,11 @@ spec:
               script {
 
                   NODE_NAME = "${env.NODE_NAME}"
-
                   NODE_HOSTNAME = sh(script: 'hostname', returnStdout: true).trim()
 
                   echo "NODE_NAME: ${NODE_NAME}"
                   echo "NODE_HOSTNAME: ${NODE_HOSTNAME}"
-                  
+
 
                   sh """
                     echo '📥 Build the Bundle - Step 0 ... '
