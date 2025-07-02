@@ -170,9 +170,9 @@ spec:
                 def dirPath = "ci-mvp-downstream-builds/downstream-build-5"
 
                 //  parallelJobs[jobLabel] = {
-                i++
+                i = i + 1
 
-                arallelJobs["${jobLabel}-${i}"] = {
+                arallelJobs["${jobLabel}"] = {
 
                     echo "👉 Running: ${jobLabel}"
                     echo "🔧 Job Path: ${jobPath}"
