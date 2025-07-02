@@ -46,6 +46,19 @@ spec:
         claimName: jenkins-efs-pvc
     - name: workspace-volume
       emptyDir: {}
+
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: jenkins-role
+                operator: In
+                values:
+                  - agent-small  # Ensure this is the same as the taint in the NodePool for the agent (agent-small future)
+
+
 """
     }
   }
