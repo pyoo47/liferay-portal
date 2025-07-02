@@ -146,7 +146,7 @@ spec:
         script {
 
           echo """
-          Environment Info:
+          Environment Info:   
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
@@ -154,7 +154,7 @@ spec:
           Node Name   : ${env.NODE_NAME}   (Node Name in Jenkins - Pod Name EKS)
           """
           
-          log.info('Validation Shared Libs Integration -v2')
+          log.info('Validation Shared Libs Integration')
           log.warning('Liferay-Global-Shared-Libs is working fine')
       
         }
