@@ -271,7 +271,7 @@ spec:
 
                   echo "java.jdk.default.runtime.version=jdk21" > test.${NODE_HOSTNAME}.properties
                   echo "database.type=mysql" >> test.${NODE_HOSTNAME}.properties
-                  echo "database.mysql.host=mysql" >> test.${NODE_HOSTNAME}.properties
+                  echo "database.mysql.host=localhost" >> test.${NODE_HOSTNAME}.properties
                   echo "database.mysql.username=root" >> test.${NODE_HOSTNAME}.properties
                   echo "database.mysql.password=" >> test.${NODE_HOSTNAME}.properties
 
