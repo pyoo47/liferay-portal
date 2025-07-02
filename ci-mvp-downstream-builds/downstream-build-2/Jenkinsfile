@@ -33,6 +33,25 @@ spec:
           name: workspace-volume
 
 
+    - name: mysql
+      image: mysql:8.4.4
+      command:
+        - "mysqld"
+        - "--character-set-server=utf8"
+        - "--connect_timeout=120"
+        - "--max_allowed_packet=104857600"
+        - "--wait_timeout=1200"
+        - "--tls-version=TLSv1.2"
+      env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "yes"
+      securityContext:
+        privileged: true
+      tty: true
+      ports:
+        - containerPort: 3306
+
+
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
@@ -271,7 +290,7 @@ spec:
 
                   echo "java.jdk.default.runtime.version=jdk21" > test.${NODE_HOSTNAME}.properties
                   echo "database.type=mysql" >> test.${NODE_HOSTNAME}.properties
-                  echo "database.mysql.host=localhost" >> test.${NODE_HOSTNAME}.properties
+                  echo "database.mysql.host=mysql" >> test.${NODE_HOSTNAME}.properties
                   echo "database.mysql.username=root" >> test.${NODE_HOSTNAME}.properties
                   echo "database.mysql.password=" >> test.${NODE_HOSTNAME}.properties
 
