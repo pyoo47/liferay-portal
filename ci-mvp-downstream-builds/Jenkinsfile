@@ -91,7 +91,7 @@ spec:
   environment {
 
 
-    DOWNSTREAM_BUILD_COUNT = 5
+    DOWNSTREAM_BUILD_COUNT = 100
 
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
     GIT_BRANCH   = 'master-ci-6005-postgresql'
@@ -410,7 +410,7 @@ spec:
 
     stage('EFS CleanUp') {
       steps {
-        container('runner') {
+        container('aws-caylent-runner') {
           script {
               sh """
                 echo '📥 EFS Clean Up ... '
