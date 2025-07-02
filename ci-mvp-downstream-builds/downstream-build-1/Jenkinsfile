@@ -70,6 +70,9 @@ spec:
     // liferay-portal-source.tar.gz         (~1.2gb) 
 
 
+    DOWNSTREAM_BUILD_NUMBER = "${env.BUILD_NUMBER}"
+
+
     LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
 
     DEFAULT_BUILD_NUMBER = 1
@@ -270,7 +273,7 @@ spec:
     
                     aws s3 cp --no-progress \
                         /opt/dev/projects/github/liferay-portal/test-results/TESTS-TestSuites.xml \
-                        s3://liferayci-file-propagator-mvp/builds/${params.PARENT_BUILD_NUMBER}/modules-unit/TESTS-TestSuites.xml
+                        s3://liferayci-file-propagator-mvp/builds/test/${params.PARENT_BUILD_NUMBER}/${DOWNSTREAM_BUILD_NUMBER}/TESTS-TestSuites.xml
 
                   """ 
               }

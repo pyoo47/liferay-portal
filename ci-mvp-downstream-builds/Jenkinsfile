@@ -330,13 +330,13 @@ spec:
             
             // def commitMessage = "[Count: 1000] - (to be implemente)"
             // def commitMessage = "[test: NONE ]"
-            def commitMessage = "[test: ALL ]"
+            // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: test-01-unit]"
             // def commitMessage = "[test: test-02-func]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
-            // def commitMessage = "[test: test-01-unit]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
+            def commitMessage = "[test: test-01-unit]"
 
             
 
@@ -362,24 +362,24 @@ spec:
                     def jobPath = TestBuild.getFullJobPath(test)
                     def dirPath = TestBuild.getFullDirPath(test)
 
-                    echo "👉 Running: ${test.label}"
-                    echo "🔧 Job Path: ${jobPath}"
-                    echo "📁 Directory: ${dirPath}"
-                    
-                    jobPath = TestBuild.getFullJobPath(test)
-                    dirPath = TestBuild.getFullDirPath(test)
 
-                    build job: jobPath, 
-                          parameters: [
-                            string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
-                            string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
-                            string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
-                            string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
-                            string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
-                            string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
-                            string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
-                            string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
-                          ]
+                    parallelJobs["${jobLabel}-${i}"] = {
+                            echo "👉 Running: ${test.label}"
+                            echo "🔧 Job Path: ${jobPath}"
+                            echo "📁 Directory: ${dirPath}"
+
+                            build job: jobPath, 
+                                  parameters: [
+                                    string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
+                                    string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
+                                    string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
+                                    string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
+                                    string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
+                                    string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
+                                    string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
+                                    string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
+                                  ]
+                    }
                 }
                 
                 parallel parallelJobs   // ← Jenkins waits for all to finish here
