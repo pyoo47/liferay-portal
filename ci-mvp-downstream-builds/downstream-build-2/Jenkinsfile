@@ -45,11 +45,15 @@ spec:
       env:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
           value: "yes"
+      volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
       securityContext:
         privileged: true
       tty: true
       ports:
         - containerPort: 3306
+
 
 
   volumes:
@@ -58,6 +62,9 @@ spec:
         claimName: jenkins-efs-pvc
     - name: workspace-volume
       emptyDir: {}
+    - name: mysql-data
+      emptyDir: {}
+
 """
     }
   }
