@@ -91,7 +91,7 @@ spec:
   environment {
 
 
-    DOWNSTREAM_BUILD_COUNT = 5
+    DOWNSTREAM_BUILD_COUNT = 100
 
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
     GIT_BRANCH   = 'master-ci-6005-postgresql'
@@ -373,6 +373,7 @@ spec:
                     def jobPath = TestBuild.getFullJobPath(test)
                     def dirPath = TestBuild.getFullDirPath(test)
 
+                    def parallelJobsId = "${jobLabel}-${i}"
 
                     parallelJobs["${jobLabel}-${i}"] = {
                             echo "👉 Running: ${test.label}"
@@ -388,9 +389,12 @@ spec:
                                     string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
                                     string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
                                     string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
-                                    string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
+                                    string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST),
+                                    string(name: 'PARALLEL_ID', value: parallelJobsId)
                                   ]
                     }
+
+
                 }
                 
             }
