@@ -139,15 +139,15 @@ spec:
         script {
                         
             echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Using (Docker image 2.1) ... v2 "
+            echo "🔄 Using (Docker image 2.1) ... v4 "
             
             // def commitMessage = "[test: NONE ]"
             // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
-            // def commitMessage = "[test: test-01-unit]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
-            def commitMessage = "[test: test-04-unit, test-05-unit, test-04-unit, test-05-unit]"
+            // def commitMessage = "[test: test-04-unit, test-05-unit, test-04-unit, test-05-unit]"
             // def commitMessage = "[test: test-05-unit]"
+            def commitMessage = "[test: test-05-unit]"
 
             
 
@@ -160,20 +160,34 @@ spec:
             }
 
 
+            def selectedTests = TestBuild.fromCommitMessage(commitMessage)
+
             echo "✅ Selected: ${selectedTests*.label.join(', ')}"
 
             def parallelJobs = [:]
 
-            for (int i = 0; i < DOWNSTREAM_BUILD_COUNT; i++) {
+            int count = env.DOWNSTREAM_BUILD_COUNT.toInteger()
 
-                def selectedTests = TestBuild.fromCommitMessage(commitMessage)
+            // for (int i = 0; i < count; i++) {
                 
-                echo "🔄 New Iteration ${i + 1} of 5"
+            //     // echo "🔄 NEW Iteration ${i + 1} of ${DOWNSTREAM_BUILD_COUNT} "
+            //     echo "🔄 Hello  ${i + 1} of ${count} "
+            // }
+
+            for (int i = 0; i < count; i++) {
+                
+                echo "🔄 Iteration ${i + 1} of ${count} "
 
                 selectedTests.each { test ->
+
                     def jobLabel = test.label
+
                     def jobPath = "MVP-Downstream-Builds/MVP-Downstream-Build-5/master-ci-6005-downstream-builds"
                     def dirPath = "ci-mvp-downstream-builds/downstream-build-5"
+
+                    echo "👉 Running: ${jobLabel}"
+                    echo "🔧 Job Path: ${jobPath}"
+                    echo "📁 Directory: ${dirPath}"
 
                     parallelJobs["${jobLabel}-${i}"] = {
                         echo "👉 Running: ${jobLabel}"
@@ -192,9 +206,8 @@ spec:
                                 string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
                               ]
                     }
+
                 }
-
-
 
             }
 
