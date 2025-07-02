@@ -169,6 +169,12 @@ spec:
                 echo "🔧 Job Path: ${jobPath}"
                 echo "📁 Directory: ${dirPath}"
 
+                jobPath = "MVP-Downstream-Builds/MVP-Downstream-Build-5/master-ci-6005-downstream-builds"
+                dirPath = "ci-mvp-downstream-builds/downstream-build-5"
+
+                echo "🔧 Job Path (override): ${jobPath}"
+                echo "📁 Directory (override): ${dirPath}"
+
                 // build job: jobPath, 
                 //       parameters: [
                 //         string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
