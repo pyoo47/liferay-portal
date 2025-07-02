@@ -23,7 +23,7 @@ spec:
 
 
     - name: runner
-      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
+      image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:2.0.2-keys
       command: ["cat"]
       tty: true
       volumeMounts:
@@ -135,6 +135,17 @@ spec:
           env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
           env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
 
+          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+
+          echo "  env.TARBALL_GIT_NAME: ${env.TARBALL_GIT_NAME}"
+          echo "  env.DEFAULT_LIFERAY_ARTIFACT_FOLDER: ${env.DEFAULT_LIFERAY_ARTIFACT_FOLDER}"
+          echo "      TARBALL_GIT_NAME: ${TARBALL_GIT_NAME}"
+          
+          MY_NEW_TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
+          
+          echo " MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
+
+
         }
       }
     }
@@ -164,7 +175,7 @@ spec:
             # PARAMETERS: 
             #   PARENT_BUILD_NUMBER: 277
             #   PARENT_GIT_COMMIT: 
-            # env.TARBALL_GIT_NAME     = "liferay-portal-repo- $ { params.PARENT_BUILD_NUMBER. } .tar.gz"
+            # env.TARBALL_GIT_NAME     = "liferay-portal-repo-   {  params.PARENT_BUILD_NUMBER. } .tar.gz"
             #   TARBALL_GIT_NAME:         liferay-portal-repo-1.tar.gz
             #   TARBALL_GIT_REPO: /opt/dev/projects/github/liferay-portal-repo-1.tar.gz
             #   EFS_MOUNT_PATH: /home/jenkins/agent
@@ -174,13 +185,21 @@ spec:
             #   EFS_LIFERAY_ARTIFACT_TEST:     /home/jenkins/agent/liferay-artifacts/build-277/tests
 
             # LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
-            # /home/jenkins/agent/liferay-artifacts/build-277/bundles/"liferay-portal-repo- $ { params.PARENT_BUILD_NUMBER. } .tar.gz"
+            # /home/jenkins/agent/liferay-artifacts/build-277/bundles/"liferay-portal-repo-  { params.PARENT_BUILD_NUMBER. } .tar.gz"
 
           """
 
           script {            
-            env.TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
-            env.DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${env.DEFAULT_BUILD_NUMBER}"
+
+            echo " 1111 MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
+            echo " 222 MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
+            
+            MY_NEW_TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
+            MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${params.PARENT_BUILD_NUMBER}"
+
+            echo "  MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
+            echo "  MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER: ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER}"
+
           }
 
 
@@ -195,32 +214,18 @@ spec:
 
             # Copy bundle at local
     
-            cp ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}/${env.TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+            cp ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER}/repo-github/${MY_NEW_TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
+            echo "  EFS_LIFERAY_ARTIFACT_BUNDLES: ${MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER}/repo-github/"${MY_NEW_TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
 
             ls -al ${LOCAL_DIR_CHECKOUT}
             echo '📦 Extracting tarball (with pigz)...'
-            tar         -xzf ${LOCAL_DIR_CHECKOUT}/${env.TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
+            tar         -xzf ${LOCAL_DIR_CHECKOUT}/${MY_NEW_TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
 
             #----------------
-
-            echo '📂 EFS workspace contents: (v1)'
-            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}
-            ls -al ${params.EFS_LIFERAY_ARTIFACT_REPOS}/${TARBALL_GIT_NAME}
-
-
-
-            cp ${params.EFS_LIFERAY_ARTIFACT_BUNDLES}/${env.TARBALL_GIT_NAME} ${LOCAL_DIR_CHECKOUT}
-
-
-            ls -al ${LOCAL_DIR_CHECKOUT}
-            echo '📦 Extracting tarball (with pigz)...'
-            tar         -xzf ${LOCAL_DIR_CHECKOUT}/${env.TARBALL_GIT_NAME} -C ${LOCAL_DIR_CHECKOUT}
-
-
             echo '📂 Extracted contents:  '
             ls -al ${LOCAL_DIR_CHECKOUT}
             echo '📂 Checking out source code (emulated) done...'
-            rm -f ${LOCAL_DIR_CHECKOUT}/${env.TARBALL_GIT_NAME}
+            rm -f ${LOCAL_DIR_CHECKOUT}/${MY_NEW_TARBALL_GIT_NAME}
             echo '📂 Source code ready in ${LOCAL_DIR_CHECKOUT}'
             
           """
@@ -251,8 +256,6 @@ spec:
                     echo "java.jdk.default.runtime.version=jdk21" > test.\$HOSTNAME.properties
 
                     ant setup-profile-dxp
-                    
-                    ant -f build-test.xml rebuild-database prepare-portal-ext-properties
 
                   """ 
               }
@@ -307,8 +310,12 @@ spec:
     stage('Complete') {
       steps {
         echo "✅ ${DOWNSTREAM_BUILD_ID} completed successfully!"
+        input message: 'Finish the pipeline?', ok: 'Yes, proceed'
       }
     }
+
+
+
   }
   
 }
