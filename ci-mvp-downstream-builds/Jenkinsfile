@@ -365,6 +365,9 @@ spec:
                     echo "👉 Running: ${test.label}"
                     echo "🔧 Job Path: ${jobPath}"
                     echo "📁 Directory: ${dirPath}"
+                    
+                    jobPath = TestBuild.getFullJobPath(test)
+                    dirPath = TestBuild.getFullDirPath(test)
 
                     build job: jobPath, 
                           parameters: [
