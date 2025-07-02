@@ -166,10 +166,10 @@ spec:
 
             def parallelJobs = [:]
 
-            for (int i = 0; i < env.DOWNSTREAM_BUILD_COUNT; i++) {
+            for (int i = 0; i < 3; i++) {
                 
-                echo "🔄 NEW Iteration ${i + 1} of ${DOWNSTREAM_BUILD_COUNT} "
-                
+                // echo "🔄 NEW Iteration ${i + 1} of ${DOWNSTREAM_BUILD_COUNT} "
+                echo "🔄 Hello  "
             }
 
             // for (int i = 0; i < env.DOWNSTREAM_BUILD_COUNT; i++) {
