@@ -149,7 +149,7 @@ spec:
 
 
           echo """
-          Environment Variables (v5):
+          Environment Variables (v4):
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
@@ -394,12 +394,12 @@ spec:
             echo "🔄 Using (Docker image 2.1) ...  "
             
             // def commitMessage = "[test: NONE ]"
-            // def commitMessage = "[test: ALL ]"
+            def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: test-01-unit]"
             // def commitMessage = "[test: test-02-func]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
-            def commitMessage = "[test: test-01-unit]"
+            // def commitMessage = "[test: test-01-unit]"
 
             
 
