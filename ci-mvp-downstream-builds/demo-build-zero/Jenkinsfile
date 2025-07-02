@@ -156,8 +156,8 @@ spec:
               echo "🔍 Reason: ${e.getMessage()}"
             }
 
-            for (int j = 0; j < 5; j++) {
-                echo "🔄 Iteration ${j + 1} of 5"
+            // for (int j = 0; j < 5; j++) {
+            //    echo "🔄 Iteration ${j + 1} of 5"
               
                 def selectedTests = TestBuild.fromCommitMessage(commitMessage)
 
@@ -190,7 +190,7 @@ spec:
                               ]
                     }
                 }
-            }
+            // }
 
 
             parallel parallelJobs
