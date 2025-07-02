@@ -26,6 +26,13 @@ spec:
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:2.0.2-keys
       command: ["cat"]
       tty: true
+      resources:
+        requests:
+          cpu: "4"
+          memory: "8Gi"
+        limits:
+          cpu: "4"
+          memory: "8Gi"
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace

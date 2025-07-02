@@ -44,6 +44,13 @@ spec:
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:2.0.2-keys
       command: ["cat"]
       tty: true
+      resources:
+        requests:
+          cpu: "12"
+          memory: "16Gi"
+        limits:
+          cpu: "12"
+          memory: "16Gi"
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
@@ -362,6 +369,7 @@ spec:
                 echo "🔄 Iteration ${i + 1} of ${count} "
 
                 selectedTests.each { test ->
+                    def jobLabel = "${test.label}-${i}"
                     def jobPath = TestBuild.getFullJobPath(test)
                     def dirPath = TestBuild.getFullDirPath(test)
 

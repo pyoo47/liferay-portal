@@ -23,6 +23,8 @@ spec:
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
+
+
     - name: aws-caylent-runner
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-caylent-runner:1.0.1
       command: ["cat"]
@@ -44,6 +46,9 @@ spec:
           ephemeral-storage: "20Gi"
         limits:
           ephemeral-storage: "70Gi"
+
+
+          
     - name: aws-liferay-runner
       image: 300374333822.dkr.ecr.us-east-2.amazonaws.com/aws-liferay-runner:2.0.1
       command: ["cat"]
