@@ -241,6 +241,15 @@ spec:
           container('runner') {
 
               script {
+
+                  NODE_NAME = "${env.NODE_NAME}"
+
+                  NODE_HOSTNAME = sh(script: 'hostname', returnStdout: true).trim()
+
+                  echo "NODE_NAME: ${NODE_NAME}"
+                  echo "NODE_HOSTNAME: ${NODE_HOSTNAME}"
+                  
+
                   sh """
                     echo '📥 Build the Bundle - Step 0 ... '
                     echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
@@ -249,11 +258,11 @@ spec:
 
                     cd /opt/dev/projects/github/liferay-portal
 
-                    echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.\$HOSTNAME.properties
+                    echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.${NODE_HOSTNAME}.properties
 
-                    echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.\$HOSTNAME.properties
-                    echo "mirrors.hostname=" >> build.\$HOSTNAME.properties
-                    echo "java.jdk.default.runtime.version=jdk21" > test.\$HOSTNAME.properties
+                    echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.${NODE_HOSTNAME}.properties
+                    echo "mirrors.hostname=" >> build.${NODE_HOSTNAME}.properties
+                    echo "java.jdk.default.runtime.version=jdk21" > test.${NODE_HOSTNAME}.properties
 
                     ant setup-profile-dxp
 
