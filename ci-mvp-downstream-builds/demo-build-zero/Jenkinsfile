@@ -195,7 +195,7 @@ spec:
                     //             string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
                     //             string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
                     //           ]
-                    }
+                    // }
                 }
 
             }
