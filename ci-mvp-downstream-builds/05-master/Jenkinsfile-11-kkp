@@ -84,7 +84,7 @@ spec:
   environment {
 
 
-    DOWNSTREAM_BUILD_COUNT = 5
+    DOWNSTREAM_BUILD_COUNT = 1
 
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
     GIT_BRANCH   = 'master-ci-6005-postgresql'
@@ -97,8 +97,8 @@ spec:
 
     COMMIT_MESSAGE = "[test: test-01-unit]"
 
-    CUSTOM_BUILD_NUMBER = "${env.BUILD_NUMBER}"
-
+    // CUSTOM_BUILD_NUMBER = "${env.BUILD_NUMBER}"
+ CUSTOM_BUILD_NUMBER = 285
 
     AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.CUSTOM_BUILD_NUMBER}/artifacts"
     AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.CUSTOM_BUILD_NUMBER}/tests"
@@ -263,7 +263,8 @@ spec:
 
                 cd /opt/dev/projects/github/liferay-portal
 
-                ant -f build-test-batch.xml dist-jdk7 -Daxis.variable=tomcat
+                 echo '📥 Build the Bundle ant -f build-test-batch.xml dist-jdk7 -Daxis.variable=tomcat  '
+                # ant -f build-test-batch.xml dist-jdk7 -Daxis.variable=tomcat
 
               """ 
             }
@@ -290,26 +291,26 @@ spec:
                   echo '📦 Creating tarball (excluding .git)...'
                   echo "📦 Creating tarball to EFS (excluding .git) path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
 
-                  cd ${LOCAL_DIR_CHECKOUT}/liferay-portal;     git rev-parse HEAD > commit.txt; rm -rf .git; git init
-                  cd ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee; git rev-parse HEAD > commit.txt; rm -rf .git; git init
+                  // cd ${LOCAL_DIR_CHECKOUT}/liferay-portal;     git rev-parse HEAD > commit.txt; rm -rf .git; git init
+                  // cd ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee; git rev-parse HEAD > commit.txt; rm -rf .git; git init
 
-                  tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
-                  tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
+                  // tar -I pigz -cf ${TARBALL_GIT_REPO_PL} -C ${LOCAL_DIR_CHECKOUT} liferay-portal
+                  // tar -I pigz -cf ${TARBALL_GIT_REPO_EE} -C ${LOCAL_DIR_CHECKOUT} liferay-jenkins-ee
 
-                  echo "📦 Copying tarball to EFS mount path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
-                  mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
-                  cp ${TARBALL_GIT_REPO_PL} ${EFS_LIFERAY_ARTIFACT_REPOS}
-                  cp ${TARBALL_GIT_REPO_EE} ${EFS_LIFERAY_ARTIFACT_REPOS}
-                  ls -la ${EFS_LIFERAY_ARTIFACT_REPOS}
-                  echo "📦 Tarballs copied to EFS successfully."
+                  // echo "📦 Copying tarball to EFS mount path: ${EFS_LIFERAY_ARTIFACT_REPOS}"
+                  // mkdir -p ${EFS_LIFERAY_ARTIFACT_REPOS}
+                  // cp ${TARBALL_GIT_REPO_PL} ${EFS_LIFERAY_ARTIFACT_REPOS}
+                  // cp ${TARBALL_GIT_REPO_EE} ${EFS_LIFERAY_ARTIFACT_REPOS}
+                  // ls -la ${EFS_LIFERAY_ARTIFACT_REPOS}
+                  // echo "📦 Tarballs copied to EFS successfully."
 
 
-                  echo "📦 Copying bundle created and the source to: ${EFS_LIFERAY_ARTIFACT_BUNDLES}"
-                  mkdir -p ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  ls -la ${EFS_LIFERAY_ARTIFACT_BUNDLES}
-                  echo "📦 Tarballs copied to EFS successfully."
+                  // echo "📦 Copying bundle created and the source to: ${EFS_LIFERAY_ARTIFACT_BUNDLES}"
+                  // mkdir -p ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  // cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_BUNDLE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  // cp ${LOCAL_DIR_CHECKOUT}/liferay-portal/${BUILD_SOURCE_NAME} ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  // ls -la ${EFS_LIFERAY_ARTIFACT_BUNDLES}
+                  // echo "📦 Tarballs copied to EFS successfully."
                 
                 """ 
 
@@ -335,8 +336,6 @@ spec:
             // def commitMessage = "[test: test-01-unit]"
             // def commitMessage = "[test: test-02-func]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
-            // def commitMessage = "[test: test-01-unit]"
-            // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
 
             
 
@@ -354,35 +353,38 @@ spec:
 
             for (int i = 0; i < DOWNSTREAM_BUILD_COUNT; i++) {
 
-                def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
+                def selectedTests = TestBuild.fromCommitMessage(commitMessage)
 
                 echo "✅ Selected: ${selectedTests*.label.join(', ')}"
 
                 selectedTests.each { test ->
+                    def jobLabel = "${test.label}-${i}"
                     def jobPath = TestBuild.getFullJobPath(test)
                     def dirPath = TestBuild.getFullDirPath(test)
 
-                    echo "👉 Running: ${test.label}"
-                    echo "🔧 Job Path: ${jobPath}"
-                    echo "📁 Directory: ${dirPath}"
+                    // Store a closure in the map for parallel execution
+                    parallelJobs[jobLabel] = {
+                        echo "👉 Running: ${test.label}"
+                        echo "🔧 Job Path: ${jobPath}"
+                        echo "📁 Directory: ${dirPath}"
 
-                    build job: jobPath, 
-                          parameters: [
-                            string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
-                            string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
-                            string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
-                            string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
-                            string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
-                            string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
-                            string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
-                            string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
-                          ]
+                        build job: jobPath,
+                              parameters: [
+                                string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
+                                string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
+                                string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
+                                string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
+                              ]
+                    }
                 }
-                
-                parallel parallelJobs   // ← Jenkins waits for all to finish here
             }
-            
 
+            // Run all collected jobs in parallel
+            parallel parallelJobs
 
 
 
