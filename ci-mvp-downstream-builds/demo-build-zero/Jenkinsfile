@@ -168,10 +168,15 @@ spec:
 
             for (int i = 0; i < DOWNSTREAM_BUILD_COUNT; i++) {
                 
-                echo "🔄 New  Iteration ${i + 1} of 5"
+                echo "🔄 Iteration ${i + 1} of ${DOWNSTREAM_BUILD_COUNT} "
 
-                selectedTests.each { test ->
-                    def jobLabel = test.label
+                // selectedTests.each { test ->
+
+                    def jobLabel = "unitTest" // test.label
+
+                  // def jobPath = TestBuild.getFullJobPath(test)
+                  // def dirPath = TestBuild.getFullDirPath(test)
+
                     def jobPath = "MVP-Downstream-Builds/MVP-Downstream-Build-5/master-ci-6005-downstream-builds"
                     def dirPath = "ci-mvp-downstream-builds/downstream-build-5"
 
@@ -179,25 +184,25 @@ spec:
                     echo "🔧 Job Path: ${jobPath}"
                     echo "📁 Directory: ${dirPath}"
 
-                    // parallelJobs["${jobLabel}-${i}"] = {
-                    //     echo "👉 Running: ${jobLabel}"
-                    //     echo "🔧 Job Path: ${jobPath}"
-                    //     echo "📁 Directory: ${dirPath}"
+                    parallelJobs["${jobLabel}-${i}"] = {
+                        echo "👉 Running: ${jobLabel}"
+                        echo "🔧 Job Path: ${jobPath}"
+                        echo "📁 Directory: ${dirPath}"
 
-                    //     build job: jobPath,
-                    //           parameters: [
-                    //             string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
-                    //             string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
-                    //             string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
-                    //             string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
-                    //             string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
-                    //             string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
-                    //             string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
-                    //             string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
-                    //           ]
-                    // }
+                        build job: jobPath,
+                              parameters: [
+                                string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
+                                string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
+                                string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
+                                string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
+                              ]
+                    }
 
-                }
+                //}
 
             }
 
