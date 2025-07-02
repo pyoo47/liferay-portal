@@ -156,15 +156,17 @@ spec:
               echo "🔍 Reason: ${e.getMessage()}"
             }
 
+            def selectedTests = TestBuild.fromCommitMessage(commitMessage)
+
+            echo "✅ Selected: ${selectedTests*.label.join(', ')}"
+
+            def parallelJobs = [:]
+
+            
             for (int j = 0; j < 5; j++) {
                 echo "🔄 New Iteration ${j + 1} of 5"
 
 
-                def selectedTests = TestBuild.fromCommitMessage(commitMessage)
-
-                echo "✅ Selected: ${selectedTests*.label.join(', ')}"
-
-                def parallelJobs = [:]
 
                 selectedTests.each { test ->
                     def jobLabel = test.label
