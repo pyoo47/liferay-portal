@@ -156,6 +156,8 @@ spec:
               echo "🔍 Reason: ${e.getMessage()}"
             }
 
+            int i = 0
+
             def selectedTests = TestBuild.fromCommitMessage(commitMessage)
 
             echo "✅ Selected: ${selectedTests*.label.join(', ')}"
@@ -166,6 +168,10 @@ spec:
                 def jobLabel = test.label
                 def jobPath = "MVP-Downstream-Builds/MVP-Downstream-Build-5/master-ci-6005-downstream-builds"
                 def dirPath = "ci-mvp-downstream-builds/downstream-build-5"
+
+                i++
+                
+                arallelJobs["${jobLabel}-${i}"] = {
 
                 parallelJobs[jobLabel] = {
                     echo "👉 Running: ${jobLabel}"
