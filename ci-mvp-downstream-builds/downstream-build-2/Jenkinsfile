@@ -269,7 +269,7 @@ spec:
 
                   ant setup-profile-dxp
                   
-                  # ant -f build-test.xml rebuild-database prepare-portal-ext-properties
+                  ant -f build-test.xml rebuild-database prepare-portal-ext-properties
 
 
                 """ 
