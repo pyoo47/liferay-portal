@@ -83,6 +83,9 @@ spec:
 
   environment {
 
+
+    DOWNSTREAM_BUILD_COUNT = 5
+
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
     GIT_BRANCH   = 'master-ci-6005-postgresql'
 
@@ -95,7 +98,7 @@ spec:
     COMMIT_MESSAGE = "[test: test-01-unit]"
 
     CUSTOM_BUILD_NUMBER = "${env.BUILD_NUMBER}"
-    // CUSTOM_BUILD_NUMBER = "1"
+
 
     AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.CUSTOM_BUILD_NUMBER}/artifacts"
     AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.CUSTOM_BUILD_NUMBER}/tests"
@@ -124,17 +127,6 @@ spec:
     EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
     EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
 
-    DO_LIFERAY_PORTAL_CHECKOUT      = 'do_liferay-portal-Checkout'
-    DO_LIFERAY_PORTAL_EFS           = 'do_liferay-portal-EFS'
-    CHOICE_LIFERAY_PORTAL           = "${DO_LIFERAY_PORTAL_CHECKOUT}"
-
-    DO_LIFERAY_JENKINS_EE_CHECKOUT  = 'do_liferay-jenkins-ee-Checkout'
-    DO_LIFERAY_JENKINS_EE_EFS       = 'do_liferay-jenkins-ee-EFS'
-    CHOICE_LIFERAY_JENKINS_EE       = "${DO_LIFERAY_JENKINS_EE_CHECKOUT}"
-
-    DO_BUILD_BUNDLE_EFS             = 'do_build-bundle-EFS'
-    DO_BUILD_BUNDLE_LOCAL           = 'do_build-bundle-Local'
-    CHOICE_BUILD_BUNDLE             = "${DO_BUILD_BUNDLE_EFS}"
 
   }
 
@@ -142,57 +134,40 @@ spec:
   stages {
     
 
-
-    stage('Print Environment') {
+    stage('Environment Info') {
       steps {
         script {
 
-
           echo """
-          Environment Variables (v4):
+          Environment Info:
           Branch      : ${env.BRANCH_NAME}
           Job Name    : ${env.JOB_NAME}
           Build Number: ${env.CUSTOM_BUILD_NUMBER}
           Workspace   : ${env.WORKSPACE}
-          Node Name   : ${env.NODE_NAME}
+          Node Name   : ${env.NODE_NAME}   (Node Name in Jenkins - Pod Name EKS)
           """
           
           log.info('Validation Shared Libs Integration -v2')
           log.warning('Liferay-Global-Shared-Libs is working fine')
-
-          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
-       
-       
+      
         }
-
-
       }
     }
 
 
 
-    stage('Checkout liferay-portal') {
-      when {
-        expression { return env.CHOICE_LIFERAY_PORTAL == DO_LIFERAY_PORTAL_CHECKOUT }
-      }
+    stage('liferay-portal Checkout') {
       steps {
-
         container('aws-caylent-runner') {
-
-          
             script {
         
               echo "📂 Checkout :: LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
               echo "📦 Checkout :: TARBALL_GIT_REPO_PL: ${TARBALL_GIT_REPO_PL}"
 
-              // Clean the target folder
               sh """
-                echo '🧹 Version 5...'
                 echo '🧹 Cleaning checkout folder...'
                 rm -rf ${LOCAL_DIR_CHECKOUT} && mkdir -p ${LOCAL_DIR_CHECKOUT}
               """
-
-            // input message: 'Proceed with Checkout? (v1)', ok: 'Yes, proceed'
 
               withCredentials([
                 usernamePassword(
@@ -207,22 +182,13 @@ spec:
                             --branch ${env.GIT_BRANCH} \
                       https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/pablo-inchausti-caylent/liferay-portal.git \
                       ${LOCAL_DIR_CHECKOUT}/liferay-portal
-                
-                   
+
                 """
-
-
-                         //  ${LOCAL_DIR_CHECKOUT}/liferay-portal
-                  // env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-
-                  //  COMMIT_MESSAGE = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                  // echo "📦 GIT_COMMIT: ${COMMIT_MESSAGE}"
 
               }
   
             }
-          
-
+        
           }
         }
 
@@ -230,22 +196,16 @@ spec:
 
 
 
-    stage('EFS liferay-jenkins-ee') {
-      when {
-        expression { return env.CHOICE_LIFERAY_JENKINS_EE == DO_LIFERAY_JENKINS_EE_CHECKOUT }
-      }
+    stage('liferay-jenkins-ee Checkout ') {
       steps {
         container('aws-caylent-runner') {
           script {
-              sh """
-                echo '📥 Doing EFS liferay-jenkins-ee ... '
-              """
         
               echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}"
               echo "📦 TARBALL_GIT_REPO_EE: ${TARBALL_GIT_REPO_EE}"
 
               sh """
-                echo '📥 Doing EFS liferay-jenkins-ee ... '
+                echo '📥 liferay-jenkins-ee Checkout '
 
                 git clone --depth 1 --no-tags --quiet \
                           --branch master \
@@ -256,7 +216,6 @@ spec:
                 ls -al ${LOCAL_DIR_CHECKOUT}/liferay-jenkins-ee
               """
 
-
           }
         }
         
@@ -264,55 +223,40 @@ spec:
     }
   
 
-    stage('Build the Bundle - Step 0 (ant setup-profile-dxp)') {
+    stage('Build the Bundle Setup') {
 
       steps {
         container('aws-caylent-runner') {
+          script {
+              sh """
+                echo '📥 Build the Bundle Setup '
+                echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
+                ls -a
+                pwd     
 
-          // dir("${LOCAL_DIR_CHECKOUT}/liferay-portal") {
+                cd /opt/dev/projects/github/liferay-portal
 
-            script {
-                sh """
-                  echo '📥 Build the Bundle - Step 0 ... '
-                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
-                  ls -a
-                  pwd     
+                echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.\$HOSTNAME.properties
+                echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.\$HOSTNAME.properties
+                echo "mirrors.hostname=" >> build.\$HOSTNAME.properties
+                echo "java.jdk.default.runtime.version=jdk21" > test.\$HOSTNAME.properties
 
-                  cd /opt/dev/projects/github/liferay-portal
+                ant setup-profile-dxp
 
-                  echo "app.server.parent.dir=/opt/dev/projects/github/liferay-portal/bundles" > app.server.\$HOSTNAME.properties
-                  echo "liferay.home=/opt/dev/projects/github/liferay-portal/bundles" > build.\$HOSTNAME.properties
-                  echo "mirrors.hostname=" >> build.\$HOSTNAME.properties
-                  echo "java.jdk.default.runtime.version=jdk21" > test.\$HOSTNAME.properties
-
-                  ant setup-profile-dxp
-
-                """ 
-            }
-
-         // }
-
-
+              """ 
+          }
         }
       }
     }
   
 
-
-
-    // Only re-runs the enclosed block if it fails.
-    // It stops as soon as the block succeeds once.
-    // retry(3) {
-    //   sh './deploy.sh'
-    // }
-
-    stage('Build the Bundle - Step 1 (ant -f build-test-batch.xml dist-jdk7)') {
+    stage('Build the Bundle') {
       steps {
         retry(3) {
           container('aws-caylent-runner') {
             script {
               sh """
-                echo '📥 Build the Bundle - Step 1 ... '
+                echo '📥 Build the Bundle '
                 echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
                 ls -a
                 pwd     
@@ -331,23 +275,14 @@ spec:
 
 
 
-    stage('Build the Bundle - Step 2 (Copy to EFS tarball git-repo)') {
+    stage('Copy Bundle to EFS') {
+
       steps {
         container('aws-caylent-runner') {
             script {
-                sh """
-                  echo '📥 Build the Bundle - Step 1 ... '
-                  echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
-
-                  cd /opt/dev/projects/github/liferay-portal
-
-                  ls -a *tar.gz
-                  pwd                       
-                """ 
-
 
                 sh """
-                  echo '📥 Build the Bundle - Step 1 ... '
+                  echo '📥 Copy the Bundle to EFS ... '
                   echo "📂 LOCAL_DIR_CHECKOUT: ${LOCAL_DIR_CHECKOUT}  "   
 
                   cd /opt/dev/projects/github/liferay-portal
@@ -390,9 +325,10 @@ spec:
       steps {
         script {
                         
-            echo "🔄 Starting dynamic downstream builds based on commit message..."
-            echo "🔄 Using (Docker image 2.1) ...  "
+            echo "🔄 Dynamic downstream builds"
             
+            
+            // def commitMessage = "[Count: 1000] - (to be implemente)"
             // def commitMessage = "[test: NONE ]"
             def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
@@ -400,6 +336,7 @@ spec:
             // def commitMessage = "[test: test-02-func]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
             // def commitMessage = "[test: test-01-unit]"
+            // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
 
             
 
@@ -411,34 +348,43 @@ spec:
               echo "🔍 Reason: ${e.getMessage()}"
             }
 
-            def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
 
-            echo "✅ Selected: ${selectedTests*.label.join(', ')}"
 
             def parallelJobs = [:]
 
-            selectedTests.each { test ->
-                def jobPath = TestBuild.getFullJobPath(test)
-                def dirPath = TestBuild.getFullDirPath(test)
+            for (int i = 0; i < DOWNSTREAM_BUILD_COUNT; i++) {
 
-                echo "👉 Running: ${test.label}"
-                echo "🔧 Job Path: ${jobPath}"
-                echo "📁 Directory: ${dirPath}"
+                def selectedTests = TestBuild.fromCommitMessage(commitMessage) 
 
-                build job: jobPath, 
-                      parameters: [
-                        string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
-                        string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
-                        string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
-                        string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
-                        string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
-                        string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
-                        string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
-                        string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
-                      ]
+                echo "✅ Selected: ${selectedTests*.label.join(', ')}"
+
+                selectedTests.each { test ->
+                    def jobPath = TestBuild.getFullJobPath(test)
+                    def dirPath = TestBuild.getFullDirPath(test)
+
+                    echo "👉 Running: ${test.label}"
+                    echo "🔧 Job Path: ${jobPath}"
+                    echo "📁 Directory: ${dirPath}"
+
+                    build job: jobPath, 
+                          parameters: [
+                            string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
+                            string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
+                            string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
+                            string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
+                            string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
+                            string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
+                            string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
+                            string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
+                          ]
+                }
+                
+                parallel parallelJobs   // ← Jenkins waits for all to finish here
             }
+            
 
-            parallel parallelJobs   // ← Jenkins waits for all to finish here
+
+
 
         }
       }
@@ -446,32 +392,36 @@ spec:
 
 
 
+    stage('EFS CleanUp') {
+      steps {
+        container('runner') {
+          script {
+              sh """
+                echo '📥 EFS Clean Up ... '
+                echo "📂 EFS_LIFERAY_ARTIFACT_FOLDER: ${EFS_LIFERAY_ARTIFACT_FOLDER}"
+                
+                ls -al ${EFS_LIFERAY_ARTIFACT_FOLDER}
+                rm -rf ${EFS_LIFERAY_ARTIFACT_FOLDER}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  }
-
-
-  post {
-    always {
-      input message: 'Finish the pipeline?', ok: 'Yes, proceed'
-      echo "🔚 Pipeline completed. Cleaning up workspace..."
-    
+              """ 
+          }
+        }
+      }
     }
+
+
+
+
   }
+
+
+  // post {
+  //   always {
+  //     input message: 'Finish the pipeline?', ok: 'Yes, proceed'
+  //     echo "🔚 Pipeline completed. Cleaning up workspace..."
+    
+  //   }
+  // }
 
 
 }
