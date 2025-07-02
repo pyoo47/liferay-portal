@@ -1,0 +1,226 @@
+/**
+  * Jenkinsfile for the Downstream Build Zero Pipeline
+  */
+@Library('Liferay-Global-Shared-Libs') _
+
+import com.liferay.TestBuild
+
+pipeline {
+  agent {
+    kubernetes {
+      label 'liferay-agent-test'
+      defaultContainer 'build'
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::300374333822:role/jenkins-irsa-role
+
+spec:
+  serviceAccountName: jenkins-agent
+
+
+  containers:
+
+
+    - name: jnlp
+      image: jenkins/inbound-agent:latest
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "500m"
+
+
+
+
+  nodeSelector:
+    jenkins-role: agent
+  tolerations:
+    - key: "jenkins-role"
+      operator: "Equal"
+      value: "agent"
+      effect: "NoSchedule"
+"""
+    }
+  }
+
+
+  options {
+    skipDefaultCheckout()
+  }
+
+
+
+
+  environment {
+
+
+    DOWNSTREAM_BUILD_COUNT = 5
+
+    GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
+    GIT_BRANCH   = 'master-ci-6005-postgresql'
+
+    AWS_ACCOUNT_ID='300374333822'
+    AWS_REGION='us-east-2'
+
+    AWS_S3_BUCKET='liferayci-file-propagator-mvp'
+    AWS_S3_PATH='build'
+
+
+    // CUSTOM_BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    CUSTOM_BUILD_NUMBER = "1"
+
+    AWS_S3_URL_ARTIFACTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.CUSTOM_BUILD_NUMBER}/artifacts"
+    AWS_S3_URL_TESTS="s3://${AWS_S3_BUCKET}/${AWS_S3_PATH}/${env.CUSTOM_BUILD_NUMBER}/tests"
+
+    BUILD_BUNDLE_NAME='liferay-portal-bundle-tomcat.tar.gz'
+    BUILD_SOURCE_NAME='liferay-portal-source.tar.gz'
+
+
+
+    // s3://liferayci-file-propagator-mvp/build/35/artifacts
+    // s3://liferayci-file-propagator-mvp/build/35/tests
+
+    // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
+    // liferay-portal-source.tar.gz         (~1.2gb)
+
+    LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
+    TARBALL_GIT_NAME_PL = "liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+    TARBALL_GIT_REPO_PL = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}"
+
+    TARBALL_GIT_NAME_EE = "liferay-jenkins-ee-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+    TARBALL_GIT_REPO_EE = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE}"
+
+    EFS_MOUNT_PATH                = "/home/jenkins/agent"
+    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.CUSTOM_BUILD_NUMBER}"
+    EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
+    EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
+    EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
+
+  }
+
+
+  stages {
+    
+
+
+    stage('Environment Information') {
+      steps {
+        script {
+
+
+          echo """
+          Environment Variables:
+          Branch      : ${env.BRANCH_NAME}
+          Job Name    : ${env.JOB_NAME}
+          Build Number: ${env.CUSTOM_BUILD_NUMBER}
+          Workspace   : ${env.WORKSPACE}
+          Node Name   : ${env.NODE_NAME}
+          """
+          
+          log.info('Validation Shared Libs Integration')
+          log.warning('Liferay-Global-Shared-Libs is working fine')
+
+          echo "kubectl exec -it ${env.NODE_NAME} -c runner -n liferay-jenkins -- bash"
+       
+       
+        }
+
+
+      }
+    }
+
+
+
+
+    stage('Dynamic Downstream Builds') {
+      steps {
+        script {
+                        
+            echo "🔄 Starting dynamic downstream builds based on commit message..."
+            echo "🔄 Using (Docker image 2.1) ... v2 "
+            
+            // def commitMessage = "[test: NONE ]"
+            // def commitMessage = "[test: ALL ]"
+            // def commitMessage = "[test: test-01-unit, test-03-db]"
+            // def commitMessage = "[test: test-01-unit]"
+            // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
+            def commitMessage = "[test: test-04-unit, test-05-unit, test-04-unit, test-05-unit]"
+            // def commitMessage = "[test: test-05-unit]"
+
+            
+
+            try {
+              commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+              echo "📩 Commit message found: ${commitMessage}"
+            } catch (e) {
+              echo "⚠️ Could not retrieve commit message. Using default: ${commitMessage}"
+              echo "🔍 Reason: ${e.getMessage()}"
+            }
+
+            def selectedTests = TestBuild.fromCommitMessage(commitMessage)
+
+            echo "✅ Selected: ${selectedTests*.label.join(', ')}"
+
+            def parallelJobs = [:]
+
+            for (int i = 0; i < DOWNSTREAM_BUILD_COUNT; i++) {
+
+                echo "🔄 New Iteration ${i + 1} of 5"
+
+                selectedTests.each { test ->
+                    def jobLabel = test.label
+                    def jobPath = "MVP-Downstream-Builds/MVP-Downstream-Build-5/master-ci-6005-downstream-builds"
+                    def dirPath = "ci-mvp-downstream-builds/downstream-build-5"
+
+                    parallelJobs["${jobLabel}-${i}"] = {
+                    //  parallelJobs[jobLabel] = {
+
+                        echo "👉 Running: ${jobLabel}"
+                        echo "🔧 Job Path: ${jobPath}"
+                        echo "📁 Directory: ${dirPath}"
+
+                        build job: jobPath,
+                              parameters: [
+                                string(name: 'PARENT_BUILD_NUMBER', value: env.CUSTOM_BUILD_NUMBER),
+                                string(name: 'PARENT_GIT_COMMIT', value: env.GIT_COMMIT),
+                                string(name: 'TARBALL_GIT_NAME_PL', value: TARBALL_GIT_NAME_PL),
+                                string(name: 'TARBALL_GIT_REPO_PL', value: TARBALL_GIT_REPO_PL),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_FOLDER', value: env.EFS_LIFERAY_ARTIFACT_FOLDER),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_REPOS', value: env.EFS_LIFERAY_ARTIFACT_REPOS),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_BUNDLES', value: env.EFS_LIFERAY_ARTIFACT_BUNDLES),
+                                string(name: 'EFS_LIFERAY_ARTIFACT_TEST', value: env.EFS_LIFERAY_ARTIFACT_TEST)
+                              ]
+                    }
+                }
+
+
+
+            }
+
+
+            parallel parallelJobs
+
+        }
+      }
+    }
+
+  
+
+
+
+
+  }
+
+
+  // post {
+  //   always {
+  //     input message: 'Finish the pipeline?', ok: 'Yes, proceed'
+  //     echo "🔚 Pipeline completed. Cleaning up workspace..."
+    
+  //   }
+  // }
+
+
+}
