@@ -36,11 +36,9 @@ liferay-portal/
     │   ├── Jenkinsfile
     │   └── down-build-4.sh
     ├── downstream-build-5/
-    │   ├── Jenkinsfile
-    │   └── down-build-5.sh
-    └── top-level-build/
         ├── Jenkinsfile
-        └── top-level-build.sh
+        └── down-build-5.sh
+
     --- Jenkinsfile      (possible dispatch jenkins file)
 
 # Branchs
@@ -48,53 +46,23 @@ liferay-portal/
     - master-ci-6005-postgresql         -  for top level build
     - master-ci-6005-downstream-builds  -  for top downstream-builds
 
-# Last Pod Build
-
-
-    POD=$(kubectl get pods -n liferay-jenkins \
-    --selector=jenkins=agent \
-    --sort-by=.metadata.creationTimestamp \
-    -o jsonpath='{.items[-1:].metadata.name}')
-    echo $POD
-    kubectl exec -it "$POD" -n liferay-jenkins -- /bin/bash
-
-    # Top 20 files in size
-    alias duse='du -sh .[!.]* * | sort -hr | head -n 20 '
-    alias ll='ls -alh '
-
 # Commnads inside the pod
 
-    DIR_LOCAL_CHECKOUT  = "/home/jenkins/local/checkout"
-    EFS_WORKSPACE_DIR   = "/home/jenkins/agent/workspace/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-    FILE_TARBALL_NAME   = "liferay-portalrepo-${env.BUILD_NUMBER}.tar.gz"
+    LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
+
+    EFS_MOUNT_PATH                = "/home/jenkins/agent"
+    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.CUSTOM_BUILD_NUMBER}"
+    EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
+    EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
+    EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
+
+    BUILD_BUNDLE_NAME   = 'liferay-portal-bundle-tomcat.tar.gz'
+    BUILD_SOURCE_NAME   = 'liferay-portal-source.tar.gz'
+
+    TARBALL_GIT_NAME_PL = "liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+    TARBALL_GIT_NAME_EE = "liferay-jenkins-ee-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+
+    TARBALL_GIT_REPO_PL = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}"
+    TARBALL_GIT_REPO_EE = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE}"
 
 
-
-     kubectl exec -it                      liferay-agent-test-6vljz-sbjk7 -c runner -n liferay-jenkins -- bash
-exec kubectl exec -i -t -n liferay-jenkins liferay-agent-test-6vljz-sbjk7 -c aws-caylent-runner -- sh -c "clear; (bash || ash || sh)"
-
-
-
----
-
-
-    - name: mysql
-      image: mysql:8.4.4
-      command: 
-        - "mysqld"
-        - "--character-set-server=utf8mb4" # Use utf8mb4 instead of utf8
-        - "--connect_timeout=120"
-        - "--max_allowed_packet=104857600"
-        - "--wait_timeout=1200"
-        - "--tls-version=TLSv1.2"
-      env:
-        - name: MYSQL_ALLOW_EMPTY_PASSWORD
-          value: "yes"
-      volumeMounts:
-        - name: mysql-data
-          mountPath: /var/lib/mysql
-      securityContext:
-        privileged: false # Drop privileged mode; not needed
-      tty: true
-      ports:
-        - containerPort: 3306
