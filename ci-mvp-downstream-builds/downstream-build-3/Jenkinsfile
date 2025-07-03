@@ -33,6 +33,16 @@ spec:
           name: workspace-volume
 
 
+    - name: postgresql
+      image: postgres:16.3-bullseye
+      env:
+        - name: POSTGRES_USER
+          value: "root"
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: "trust"
+      tty: true
+
+
   volumes:
     - name: efs-workspace
       persistentVolumeClaim:
