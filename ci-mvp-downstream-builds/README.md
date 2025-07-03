@@ -47,28 +47,32 @@ liferay-portal/
 
 ## Branches
 
-
 - `master-ci-6005-postgresql` – Top-level build
 - `master-ci-6005-downstream-builds` – Downstream builds
 
-# Commnads inside the pod
 
-    LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
+## Inside the Jenkins Pod
 
-    EFS_MOUNT_PATH                = "/home/jenkins/agent"
-    EFS_LIFERAY_ARTIFACT_FOLDER   = "${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.CUSTOM_BUILD_NUMBER}"
-    EFS_LIFERAY_ARTIFACT_REPOS    = "${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
-    EFS_LIFERAY_ARTIFACT_BUNDLES  = "${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
-    EFS_LIFERAY_ARTIFACT_TEST     = "${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
+These are key environment variables used during the build:
 
-    BUILD_BUNDLE_NAME   = 'liferay-portal-bundle-tomcat.tar.gz'
-    BUILD_SOURCE_NAME   = 'liferay-portal-source.tar.gz'
+```bash
+LOCAL_DIR_CHECKOUT="/opt/dev/projects/github"
 
-    TARBALL_GIT_NAME_PL = "liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
-    TARBALL_GIT_NAME_EE = "liferay-jenkins-ee-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+EFS_MOUNT_PATH="/home/jenkins/agent"
+EFS_LIFERAY_ARTIFACT_FOLDER="${EFS_MOUNT_PATH}/liferay-artifacts/build-${env.CUSTOM_BUILD_NUMBER}"
+EFS_LIFERAY_ARTIFACT_REPOS="${EFS_LIFERAY_ARTIFACT_FOLDER}/repo-github"
+EFS_LIFERAY_ARTIFACT_BUNDLES="${EFS_LIFERAY_ARTIFACT_FOLDER}/bundles"
+EFS_LIFERAY_ARTIFACT_TEST="${EFS_LIFERAY_ARTIFACT_FOLDER}/tests"
 
-    TARBALL_GIT_REPO_PL = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}"
-    TARBALL_GIT_REPO_EE = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE}"
+BUILD_BUNDLE_NAME="liferay-portal-bundle-tomcat.tar.gz"
+BUILD_SOURCE_NAME="liferay-portal-source.tar.gz"
+
+TARBALL_GIT_NAME_PL="liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+TARBALL_GIT_NAME_EE="liferay-jenkins-ee-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
+
+TARBALL_GIT_REPO_PL="${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}"
+TARBALL_GIT_REPO_EE="${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE}"
+```
 
 
 ## AWS Sandbox Tagging - Summary
