@@ -19,8 +19,8 @@
   - **S3**: Stores test results
   - **Custom Shared Libraries** for Jenkins pipelines
     
-# Folder structure
 
+## Folder Structure
 
 ```text
 liferay-portal/
@@ -45,10 +45,11 @@ liferay-portal/
         └── down-build-5.sh
 ```
 
-# Branchs
+## Branches
 
-    - master-ci-6005-postgresql         -  for top level build
-    - master-ci-6005-downstream-builds  -  for top downstream-builds
+
+- `master-ci-6005-postgresql` – Top-level build
+- `master-ci-6005-downstream-builds` – Downstream builds
 
 # Commnads inside the pod
 
