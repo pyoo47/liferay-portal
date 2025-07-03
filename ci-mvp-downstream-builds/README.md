@@ -2,11 +2,16 @@
 
 # Work environment:
 
+    Branch:
     master-ci-6005-postgresql
+    
+    Folder:
     ci-mvp-downstream-builds/Jenkinsfile
 
-    Fork:
+    Repo:
     https://github.com/pablo-inchausti-caylent/liferay-portal
+            Fork from:
+            https://github.com/michaelhashimoto/liferay-portal
 
 # Features
 
