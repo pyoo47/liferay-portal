@@ -25,7 +25,7 @@ PoC-20-Shared-Libs/Global-Shared-Libs
    name: Liferay-Global-Shared-Libs
    repo: https://github.com/caylent/Liferay-eks-mvp.git
    branch: main
-   credential: PAT PEI
+   credential: Personal Access Token (Pablo Inchusti)
    Library Path: PoC-20-Shared-Libs/Global-Shared-Libs/
 
 

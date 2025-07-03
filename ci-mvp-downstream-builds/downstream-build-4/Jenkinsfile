@@ -51,7 +51,6 @@ spec:
     AWS_ACCOUNT_ID='300374333822'
     AWS_REGION='us-east-2'
 
-    // DOWNSTREAM_BUILD_ID = "${env.BUILD_ID}"
     DOWNSTREAM_BUILD_ID='downstream-build-4'
 
     AWS_S3_BUCKET='liferayci-file-propagator-mvp'
@@ -62,18 +61,6 @@ spec:
 
     BUILD_BUNDLE_NAME='liferay-portal-bundle-tomcat.tar.gz'
     BUILD_SOURCE_NAME='liferay-portal-source.tar.gz'
-
-    BUILD_BUNDLE_DUMMY_NAME="dummy-${BUILD_BUNDLE_NAME}"
-    BUILD_SOURCE_DUMMY_NAME="dummy-${BUILD_SOURCE_NAME}"
-
-    TEST_DUMMY_NAME="test-${DOWNSTREAM_BUILD_ID}-dummy.xml"
-
-    // s3://liferayci-file-propagator-mvp/build/35/artifacts
-    // s3://liferayci-file-propagator-mvp/build/35/tests
-
-    // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)
-    // liferay-portal-source.tar.gz         (~1.2gb) 
-
 
     LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
 
@@ -106,7 +93,7 @@ spec:
 
   stages {
 
-    stage('Prepare') {
+    stage('Environment Setup') {
       steps {
         script {
           echo "🚀 Starting ${DOWNSTREAM_BUILD_ID}"
@@ -150,49 +137,14 @@ spec:
       }
     }
 
-    stage('Branch Guard') {
-      when {
-        expression {
-          // Skip this job if it's NOT on the expected branch
-          if (env.BRANCH_NAME != {env.BUILD_TEST_BRANCH}) {
-            echo "Skipped: This job only runs on 'master-ci-6005-downstream-builds'. Current: ${env.BRANCH_NAME}"
-            return false
-          }
-          return true
-        }
-      }
-      steps {
-        echo "Correct branch detected: ${env.BRANCH_NAME}"
-      }
-    }
-
-    stage('Source Code Receive') {
+    stage('Source Code Copy') {
       steps {
         container('runner') {
 
-
-          sh """
-            # PARAMETERS: 
-            #   PARENT_BUILD_NUMBER: 277
-            #   PARENT_GIT_COMMIT: 
-            # env.TARBALL_GIT_NAME     = "liferay-portal-repo-   {  params.PARENT_BUILD_NUMBER. } .tar.gz"
-            #   TARBALL_GIT_NAME:         liferay-portal-repo-1.tar.gz
-            #   TARBALL_GIT_REPO: /opt/dev/projects/github/liferay-portal-repo-1.tar.gz
-            #   EFS_MOUNT_PATH: /home/jenkins/agent
-            #   EFS_LIFERAY_ARTIFACT_FOLDER:   /home/jenkins/agent/liferay-artifacts/build-277
-            #   EFS_LIFERAY_ARTIFACT_REPOS:    /home/jenkins/agent/liferay-artifacts/build-277/repo-github
-            #   EFS_LIFERAY_ARTIFACT_BUNDLES:  /home/jenkins/agent/liferay-artifacts/build-277/bundles
-            #   EFS_LIFERAY_ARTIFACT_TEST:     /home/jenkins/agent/liferay-artifacts/build-277/tests
-
-            # LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
-            # /home/jenkins/agent/liferay-artifacts/build-277/bundles/"liferay-portal-repo-  { params.PARENT_BUILD_NUMBER. } .tar.gz"
-
-          """
-
           script {            
 
-            echo " 1111 MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
-            echo " 222 MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
+            echo " MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
+            echo " MY_NEW_TARBALL_GIT_NAME: ${MY_NEW_TARBALL_GIT_NAME}"
             
             MY_NEW_TARBALL_GIT_NAME     = "liferay-portal-repo-${params.PARENT_BUILD_NUMBER}.tar.gz"
             MY_NEW_DEFAULT_LIFERAY_ARTIFACT_FOLDER = "/home/jenkins/agent/liferay-artifacts/build-${params.PARENT_BUILD_NUMBER}"
@@ -235,8 +187,6 @@ spec:
     }
 
   
-
-
     stage('Complete') {
       steps {
         echo "✅ ${DOWNSTREAM_BUILD_ID} completed successfully!"
