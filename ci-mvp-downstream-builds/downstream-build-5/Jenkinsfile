@@ -51,7 +51,6 @@ spec:
     AWS_ACCOUNT_ID='300374333822'
     AWS_REGION='us-east-2'
 
-    // DOWNSTREAM_BUILD_ID = "${env.BUILD_ID}"
     DOWNSTREAM_BUILD_ID='downstream-build-5'
 
     AWS_S3_BUCKET='liferayci-file-propagator-mvp'

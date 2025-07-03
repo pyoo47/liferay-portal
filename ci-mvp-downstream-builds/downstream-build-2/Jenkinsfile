@@ -88,6 +88,8 @@ spec:
     BUILD_BUNDLE_NAME='liferay-portal-bundle-tomcat.tar.gz'
     BUILD_SOURCE_NAME='liferay-portal-source.tar.gz'
 
+    DOWNSTREAM_BUILD_NUMBER = "${env.BUILD_NUMBER}"
+
     LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
 
     DEFAULT_BUILD_NUMBER = 1
@@ -278,16 +280,6 @@ spec:
 
                   ant -f build-test-batch.xml modules-integration-mysql84 -Dtest.batch.name=modules-integration-mysql84 -Daxis.variable=0 -DTEST_CLASS_GROUP_0=com/liferay/jenkins/results/parser/test/DummyIntegrationTest.class
 
-
-                  #
-                  # This portion of the script uploads the Test Results artifacts to S3 to be used to be report
-                  #
-
-                  # aws s3 cp --no-progress \
-                  # 	s3 cp /opt/dev/projects/github/liferay-portal/test-results/TESTS-TestSuites.xml \
-                  # 	s3://liferayci-file-propagator-mvp/builds/1/modules-integration-mysql84/TESTS-TestSuites.xml
-
-
                 """ 
             }
 
@@ -295,6 +287,24 @@ spec:
       }
     }
 
+
+
+    stage(' Upload To S3') {
+      steps {
+        container('runner') {
+          script {
+              sh """
+                echo '📥 Uploading test results to S3 ... '
+                
+                aws s3 cp --no-progress \
+                    /opt/dev/projects/github/liferay-portal/test-results/TESTS-TestSuites.xml \
+                    s3://liferayci-file-propagator-mvp/builds/test/${params.PARENT_BUILD_NUMBER}/${DOWNSTREAM_BUILD_NUMBER}/TESTS-TestSuites.xml
+
+              """ 
+          }
+        }
+      }
+    }
 
     stage('Complete') {
       steps {
