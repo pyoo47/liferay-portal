@@ -1,4 +1,4 @@
-# Caylent :: Liferay Upstream Builds
+# Caylent :: Liferay - Top Level and Downpstream Builds 
 
     Working on branch:
     master-ci-6005-postgresql
@@ -7,11 +7,13 @@
 
 # Liferay-eks-mvp
 
-- Upstream Builds 
+- Top Level and Downpstream Builds 
 
-    with real integration integration to
+    Jenkins on EKS an Karpenter for Autoscaling
+    
+    With integration to
 
-    - SCM lifetay-portal (this repo) - branch master-ci-6005-postgresql
+    - SCM - lifetay-portal - branch master-ci-6005-postgresql
     - EFS - Elasti File System
     - ECR - Elastic Container Registry docker runners
     - Downstream  Pipelines
@@ -24,7 +26,7 @@
 liferay-portal/
 └── ci-mvp-downstream-builds/
     │
-    ├── Jenkinsfile
+    ├── Jenkinsfile              (Top Level Build)
     │
     ├── downstream-build-1/
     │   ├── Jenkinsfile
