@@ -15,12 +15,8 @@ metadata:
 spec:
   serviceAccountName: jenkins-agent
   containers:
-  
     - name: jnlp
       image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-4
-      env:
-        - name: JAVA_OPTS
-          value: "-Djava.util.logging.FileHandler.maxLocks=1000"
       volumeMounts:
         - mountPath: /home/jenkins/agent
           name: efs-workspace
