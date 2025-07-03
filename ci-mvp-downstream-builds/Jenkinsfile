@@ -106,13 +106,6 @@ spec:
     BUILD_SOURCE_NAME='liferay-portal-source.tar.gz'
 
 
-
-    // s3://liferayci-file-propagator-mvp/build/35/artifacts        
-    //    s3://liferayci-file-propagator-mvp/build/35/tests    
-
-    // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)  
-    // liferay-portal-source.tar.gz         (~1.2gb)
-
     LOCAL_DIR_CHECKOUT  = "/opt/dev/projects/github"
     TARBALL_GIT_NAME_PL = "liferay-portal-repo-${env.CUSTOM_BUILD_NUMBER}.tar.gz"
     TARBALL_GIT_REPO_PL = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_PL}"
@@ -326,14 +319,9 @@ spec:
                         
             echo "🔄 Dynamic downstream builds. "
             
-            
-            // def commitMessage = "[Count: 1000] - (to be implemente)"
-            // def commitMessage = "[test: NONE ]"
-            // def commitMessage = "[test: ALL ]"
             // def commitMessage = "[test: test-01-unit, test-03-db]"
             // def commitMessage = "[test: test-01-unit]"
             // def commitMessage = "[test: test-02-func]"
-            // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
             // def commitMessage = "[test: test-01-unit, test-02-func, test-03-db, test-04-unit, test-05-unit]"
             def commitMessage = "[test: test-01-unit]"
 
