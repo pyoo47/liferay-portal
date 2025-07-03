@@ -1,18 +1,13 @@
 # Caylent :: Liferay - CI Pipeline 
 
-# Work environment:
 
-    Branch:
-    master-ci-6005-postgresql
-    
-    Folder:
-    ci-mvp-downstream-builds/Jenkinsfile
+## Work Environment
+- **Branch**: `master-ci-6005-postgresql`  
+- **Folder**: `ci-mvp-downstream-builds/Jenkinsfile`  
+- **Repository**: [pablo-inchausti-caylent/liferay-portal](https://github.com/pablo-inchausti-caylent/liferay-portal)  
+  _(Forked from [michaelhashimoto/liferay-portal](https://github.com/michaelhashimoto/liferay-portal))_
 
-    Repo:
-    https://github.com/pablo-inchausti-caylent/liferay-portal
-            Fork from:
-            https://github.com/michaelhashimoto/liferay-portal
-
+  
 # Features
 
 - Top Level and Downpstream Builds 
