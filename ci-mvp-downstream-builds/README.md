@@ -10,14 +10,15 @@
 - Top Level and Downpstream Builds 
 
     Jenkins on EKS an Karpenter for Autoscaling
-    
+
     With integration to
 
     - SCM - lifetay-portal - branch master-ci-6005-postgresql
     - EFS - Elasti File System
     - ECR - Elastic Container Registry docker runners
-    - Downstream  Pipelines
     - S3 copy
+    - Downstream Pipelines
+    - Custom Shared Libs
     
 # Folder structure
 
