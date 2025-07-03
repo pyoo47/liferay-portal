@@ -79,6 +79,7 @@ TARBALL_GIT_REPO_EE="${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE}"
 
     caylent:project: Liferay CI Process Modernization
     caylent:workload: EKS Liferay Mvp
-    map-migrated: migJJYVOZAD8H
+    
+    map-migrated: All resources were tagged with mig-ID Provided 
 
 
