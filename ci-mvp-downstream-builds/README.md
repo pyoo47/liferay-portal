@@ -16,7 +16,7 @@
     - SCM - lifetay-portal - branch master-ci-6005-postgresql
     - EFS - Elasti File System
     - ECR - Elastic Container Registry docker runners
-    - S3 copy
+    - S3  - Copy test results
     - Downstream Pipelines
     - Custom Shared Libs
     
