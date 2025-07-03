@@ -68,3 +68,11 @@ liferay-portal/
     TARBALL_GIT_REPO_EE = "${LOCAL_DIR_CHECKOUT}/${TARBALL_GIT_NAME_EE}"
 
 
+## AWS Sandbox Tagging - Summary
+
+    caylent:owner: pablo.inchausti@caylent.com
+    caylent:project: Liferay CI Process Modernization
+    caylent:workload: EKS Liferay Mvp
+    map-migrated: migJJYVOZAD8H
+
+
