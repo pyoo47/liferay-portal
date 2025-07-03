@@ -12,17 +12,18 @@
     with real integration integration to
 
     - SCM lifetay-portal (this repo) - branch master-ci-6005-postgresql
-
     - EFS - Elasti File System
     - ECR - Elastic Container Registry docker runners
     - Downstream  Pipelines
-    
     - S3 copy
     
 # Folder structure
 
 liferay-portal/
 └── ci-mvp-downstream-builds/
+    │
+    ├── Jenkinsfile
+    │
     ├── downstream-build-1/
     │   ├── Jenkinsfile
     │   └── down-build-1.sh
@@ -35,11 +36,10 @@ liferay-portal/
     ├── downstream-build-4/
     │   ├── Jenkinsfile
     │   └── down-build-4.sh
-    ├── downstream-build-5/
+    └── downstream-build-5/
         ├── Jenkinsfile
         └── down-build-5.sh
 
-    --- Jenkinsfile      (possible dispatch jenkins file)
 
 # Branchs
 
