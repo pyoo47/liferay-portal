@@ -91,7 +91,8 @@ spec:
   environment {
 
 
-    DOWNSTREAM_BUILD_COUNT = 500
+   
+    DOWNSTREAM_BUILD_COUNT = 1000
 
     GIT_REPO_URL = 'https://github.com/pablo-inchausti-caylent/liferay-portal.git'
     GIT_BRANCH   = 'master-ci-6005-postgresql'
