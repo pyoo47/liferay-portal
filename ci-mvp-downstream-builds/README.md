@@ -14,8 +14,8 @@
     With integration to
 
     - SCM - lifetay-portal - branch master-ci-6005-postgresql
-    - EFS - Elasti File System
-    - ECR - Elastic Container Registry docker runners
+    - EFS - Elasti File System - bundle and github-repo.tar.gz
+    - ECR - Elastic Container Registry - docker runners
     - S3  - Copy test results
     - Downstream Pipelines
     - Custom Shared Libs
