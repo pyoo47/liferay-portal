@@ -19,6 +19,8 @@
     
 # Folder structure
 
+
+```text
 liferay-portal/
 └── ci-mvp-downstream-builds/
     │
@@ -39,7 +41,7 @@ liferay-portal/
     └── downstream-build-5/
         ├── Jenkinsfile
         └── down-build-5.sh
-
+```
 
 # Branchs
 
