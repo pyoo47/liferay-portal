@@ -116,7 +116,7 @@ spec:
 
 
 
-    //  s3://liferayci-file-propagator-mvp/build/35/artifacts        
+    //    s3://liferayci-file-propagator-mvp/build/35/artifacts        
     //  s3://liferayci-file-propagator-mvp/build/35/tests    
 
     // liferay-portal-bundle-tomcat.tar.gz  (~1.7gb)  
