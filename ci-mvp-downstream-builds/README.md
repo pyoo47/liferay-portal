@@ -8,20 +8,16 @@
   _(Forked from [michaelhashimoto/liferay-portal](https://github.com/michaelhashimoto/liferay-portal))_
 
   
-# Features
+## Features
 
-- Top Level and Downpstream Builds 
-
-    Jenkins on EKS an Karpenter for Autoscaling
-
-    With integration to
-
-    - SCM - lifetay-portal - branch master-ci-6005-postgresql
-    - EFS - Elasti File System - bundle and github-repo.tar.gz
-    - ECR - Elastic Container Registry - docker runners
-    - S3  - Copy test results
-    - Downstream Pipelines
-    - Custom Shared Libs
+- Top-Level and Downstream Builds using Jenkins on EKS
+- Karpenter-enabled dynamic autoscaling
+- Integrated with:
+  - **SCM**: `liferay-portal` branch `master-ci-6005-postgresql`
+  - **EFS**: Elastic File System for artifacts and repo bundles (`*.tar.gz`)
+  - **ECR**: Elastic Container Registry for Docker-based runners
+  - **S3**: Stores test results
+  - **Custom Shared Libraries** for Jenkins pipelines
     
 # Folder structure
 
