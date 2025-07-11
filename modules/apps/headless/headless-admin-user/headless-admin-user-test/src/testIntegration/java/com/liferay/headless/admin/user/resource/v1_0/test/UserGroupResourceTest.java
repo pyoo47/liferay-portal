@@ -321,8 +321,13 @@ public class UserGroupResourceTest extends BaseUserGroupResourceTestCase {
 
 		long totalCount = page.getTotalCount();
 
+		Thread.sleep(1000);
+
 		UserGroup userGroup1 = testGetUserGroupsPage_addUserGroup(
 			randomUserGroup());
+
+		Thread.sleep(1000);
+
 		UserGroup userGroup2 = testGetUserGroupsPage_addUserGroup(
 			randomUserGroup());
 
@@ -345,6 +350,8 @@ public class UserGroupResourceTest extends BaseUserGroupResourceTestCase {
 
 		userGroup1.setDescription(
 			StringUtil.toLowerCase(RandomTestUtil.randomString()));
+
+		Thread.sleep(1000);
 
 		userGroup1 = userGroupResource.patchUserGroup(
 			userGroup1.getId(), userGroup1);
