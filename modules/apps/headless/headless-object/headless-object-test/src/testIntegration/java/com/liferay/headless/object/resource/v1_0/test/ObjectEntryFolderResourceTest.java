@@ -145,20 +145,30 @@ public class ObjectEntryFolderResourceTest
 
 		// Change parent object entry folder to default object entry folder
 
+		Thread.sleep(1000);
+
 		ObjectEntryFolder postParentObjectEntryFolder =
 			testPatchObjectEntryFolder_addObjectEntryFolder();
+
+		Thread.sleep(1000);
 
 		ObjectEntryFolder postObjectEntryFolder1 =
 			testPatchObjectEntryFolder_addObjectEntryFolder();
 
+		Thread.sleep(1000);
+
 		postObjectEntryFolder1.setParentObjectEntryFolderId(
 			postParentObjectEntryFolder.getId());
+
+		Thread.sleep(1000);
 
 		objectEntryFolderResource.patchObjectEntryFolder(
 			postObjectEntryFolder1.getId(), postObjectEntryFolder1);
 
 		postObjectEntryFolder1.setParentObjectEntryFolderId(
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT);
+
+		Thread.sleep(1000);
 
 		ObjectEntryFolder patchObjectEntryFolder1 =
 			objectEntryFolderResource.patchObjectEntryFolder(
@@ -171,11 +181,15 @@ public class ObjectEntryFolderResourceTest
 
 		// Change parent object entry folder to existing object entry folder
 
+		Thread.sleep(1000);
+
 		ObjectEntryFolder postObjectEntryFolder2 =
 			testPatchObjectEntryFolder_addObjectEntryFolder();
 
 		postObjectEntryFolder2.setParentObjectEntryFolderId(
 			postParentObjectEntryFolder.getId());
+
+		Thread.sleep(1000);
 
 		ObjectEntryFolder patchObjectEntryFolder2 =
 			objectEntryFolderResource.patchObjectEntryFolder(
@@ -187,16 +201,22 @@ public class ObjectEntryFolderResourceTest
 
 		// Preserve existing parent object entry folder ID
 
+		Thread.sleep(1000);
+
 		ObjectEntryFolder postObjectEntryFolder3 =
 			testPatchObjectEntryFolder_addObjectEntryFolder();
 
 		postObjectEntryFolder3.setParentObjectEntryFolderId(
 			postParentObjectEntryFolder.getId());
 
+		Thread.sleep(1000);
+
 		objectEntryFolderResource.patchObjectEntryFolder(
 			postObjectEntryFolder3.getId(), postObjectEntryFolder3);
 
 		postObjectEntryFolder3.setParentObjectEntryFolderId((Long)null);
+
+		Thread.sleep(1000);
 
 		ObjectEntryFolder patchObjectEntryFolder3 =
 			objectEntryFolderResource.patchObjectEntryFolder(
