@@ -4241,6 +4241,8 @@ public abstract class BaseUserAccountResourceTestCase {
 	public void testGetUserAccountsPageWithFilterDateTimeEquals()
 		throws Exception {
 
+		Thread.sleep(1000);
+
 		List<EntityField> entityFields = getEntityFields(
 			EntityField.Type.DATE_TIME);
 
@@ -4249,6 +4251,8 @@ public abstract class BaseUserAccountResourceTestCase {
 		}
 
 		UserAccount userAccount1 = randomUserAccount();
+
+		Thread.sleep(1000);
 
 		userAccount1 = testGetUserAccountsPage_addUserAccount(userAccount1);
 
