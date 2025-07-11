@@ -884,6 +884,8 @@ public abstract class BaseListTypeDefinitionResourceTestCase {
 	public void testGetListTypeDefinitionsPageWithFilterDateTimeEquals()
 		throws Exception {
 
+		Thread.sleep(1000);
+
 		List<EntityField> entityFields = getEntityFields(
 			EntityField.Type.DATE_TIME);
 
@@ -893,11 +895,15 @@ public abstract class BaseListTypeDefinitionResourceTestCase {
 
 		ListTypeDefinition listTypeDefinition1 = randomListTypeDefinition();
 
+		Thread.sleep(1000);
+
 		listTypeDefinition1 =
 			testGetListTypeDefinitionsPage_addListTypeDefinition(
 				listTypeDefinition1);
 
 		for (EntityField entityField : entityFields) {
+			Thread.sleep(1000);
+
 			Page<ListTypeDefinition> page =
 				listTypeDefinitionResource.getListTypeDefinitionsPage(
 					null, null,

@@ -247,6 +247,8 @@ public abstract class BaseUserNotificationResourceTestCase {
 	public void testGetMyUserNotificationsPageWithFilterDateTimeEquals()
 		throws Exception {
 
+		Thread.sleep(1000);
+
 		List<EntityField> entityFields = getEntityFields(
 			EntityField.Type.DATE_TIME);
 
@@ -256,10 +258,14 @@ public abstract class BaseUserNotificationResourceTestCase {
 
 		UserNotification userNotification1 = randomUserNotification();
 
+		Thread.sleep(1000);
+
 		userNotification1 = testGetMyUserNotificationsPage_addUserNotification(
 			userNotification1);
 
 		for (EntityField entityField : entityFields) {
+			Thread.sleep(1000);
+
 			Page<UserNotification> page =
 				userNotificationResource.getMyUserNotificationsPage(
 					null,
