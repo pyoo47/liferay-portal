@@ -415,8 +415,13 @@ public class AccountGroupResourceTest extends BaseAccountGroupResourceTestCase {
 
 		long totalCount = page.getTotalCount();
 
+		Thread.sleep(1000);
+
 		AccountGroup accountGroup1 = testGetAccountGroupsPage_addAccountGroup(
 			randomAccountGroup());
+
+		Thread.sleep(1000);
+
 		AccountGroup accountGroup2 = testGetAccountGroupsPage_addAccountGroup(
 			randomAccountGroup());
 
@@ -439,6 +444,8 @@ public class AccountGroupResourceTest extends BaseAccountGroupResourceTestCase {
 
 		accountGroup1.setDescription(
 			StringUtil.toLowerCase(RandomTestUtil.randomString()));
+
+		Thread.sleep(1000);
 
 		accountGroup1 = accountGroupResource.patchAccountGroup(
 			accountGroup1.getId(), accountGroup1);
