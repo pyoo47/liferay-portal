@@ -14,11 +14,19 @@ import com.liferay.jenkins.results.parser.failure.message.generator.RebaseFailur
 import com.liferay.jenkins.results.parser.failure.message.generator.RelevantRuleValidationFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.SourceFormatFailureMessageGenerator;
 
+import java.io.File;
+
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dom4j.Document;
 import org.dom4j.Element;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author Cesar Polanco
@@ -28,17 +36,12 @@ public class SourceFormatBuild
 	implements PortalBranchInformationBuild, PullRequestBuild, WorkspaceBuild {
 
 	public boolean bypassCITestRelevant() {
-		Workspace workspace = getWorkspace();
+		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
+			_getPortalWorkspaceGitRepository();
 
-		WorkspaceGitRepository workspaceGitRepository =
-			workspace.getPrimaryWorkspaceGitRepository();
-
-		if (!(workspaceGitRepository instanceof PortalWorkspaceGitRepository)) {
+		if (portalWorkspaceGitRepository == null) {
 			return false;
 		}
-
-		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
-			(PortalWorkspaceGitRepository)workspaceGitRepository;
 
 		return portalWorkspaceGitRepository.bypassCITestRelevant();
 	}
@@ -154,7 +157,7 @@ public class SourceFormatBuild
 		Dom4JUtil.addToElement(
 			detailsElement, String.valueOf(successCount), " out of ",
 			String.valueOf(getDownstreamBuildCountByResult(null) + 1),
-			"jobs PASSED");
+			" jobs PASSED");
 
 		if (Objects.equals(result, "SUCCESS")) {
 			Dom4JUtil.addToElement(
@@ -173,7 +176,8 @@ public class SourceFormatBuild
 		}
 
 		return Dom4JUtil.getNewElement(
-			"html", null, getResultElement(), detailsElement);
+			"html", null, getResultElement(), _getSourceFormatVersionElement(),
+			detailsElement);
 	}
 
 	@Override
@@ -251,6 +255,189 @@ public class SourceFormatBuild
 			Dom4JUtil.getNewAnchorElement(senderBranchURL, senderBranchName),
 			Dom4JUtil.getNewElement("br"), "Branch GIT ID: ",
 			Dom4JUtil.getNewAnchorElement(senderCommitURL, senderSHA));
+	}
+
+	private PortalWorkspaceGitRepository _getPortalWorkspaceGitRepository() {
+		Workspace workspace = getWorkspace();
+
+		WorkspaceGitRepository workspaceGitRepository =
+			workspace.getPrimaryWorkspaceGitRepository();
+
+		if (!(workspaceGitRepository instanceof PortalWorkspaceGitRepository)) {
+			return null;
+		}
+
+		return (PortalWorkspaceGitRepository)workspaceGitRepository;
+	}
+
+	private String _getSourceFormatVersion() {
+		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
+			_getPortalWorkspaceGitRepository();
+
+		if (portalWorkspaceGitRepository == null) {
+			return null;
+		}
+
+		File ivyXMLFile = new File(
+			portalWorkspaceGitRepository.getDirectory(),
+			"tools/sdk/dependencies/com.liferay.source.formatter/ivy.xml");
+
+		if (!ivyXMLFile.exists()) {
+			return null;
+		}
+
+		try {
+			Document document = Dom4JUtil.parse(
+				JenkinsResultsParserUtil.read(ivyXMLFile));
+
+			Element rootElement = document.getRootElement();
+
+			Element dependenciesElement = rootElement.element("dependencies");
+
+			for (Element dependencyElement :
+					dependenciesElement.elements("dependency")) {
+
+				if (!Objects.equals(
+						dependencyElement.attributeValue("name"),
+						"com.liferay.source.formatter")) {
+
+					continue;
+				}
+
+				return dependencyElement.attributeValue("rev");
+			}
+
+			return null;
+		}
+		catch (Exception exception) {
+			return null;
+		}
+	}
+
+	private Element _getSourceFormatVersionElement() {
+		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
+			_getPortalWorkspaceGitRepository();
+
+		if (portalWorkspaceGitRepository == null) {
+			return Dom4JUtil.getNewElement("span");
+		}
+
+		if (_isSourceFormatBuilt()) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Run com.liferay.source.formatter built from ");
+			sb.append(portalWorkspaceGitRepository.getSenderBranchSHA());
+			sb.append(".");
+
+			return Dom4JUtil.getNewElement("p", null, sb.toString());
+		}
+
+		String sourceFormatVersion = _getSourceFormatVersion();
+
+		if (sourceFormatVersion == null) {
+			return Dom4JUtil.getNewElement("span");
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Run com.liferay.source.formatter at version ");
+		sb.append(sourceFormatVersion);
+		sb.append(".<br />");
+
+		if (Objects.equals(
+				portalWorkspaceGitRepository.getUpstreamBranchName(),
+				"master") &&
+			!_isSourceFormatReleased()) {
+
+			sb.append("<em>The latest version has not been released yet.</em>");
+		}
+
+		return Dom4JUtil.getNewElement("p", null, sb.toString());
+	}
+
+	private boolean _isSourceFormatBuilt() {
+		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
+			_getPortalWorkspaceGitRepository();
+
+		if (portalWorkspaceGitRepository == null) {
+			return false;
+		}
+
+		GitWorkingDirectory gitWorkingDirectory =
+			portalWorkspaceGitRepository.getGitWorkingDirectory();
+
+		for (File modifiedFile : gitWorkingDirectory.getModifiedFilesList()) {
+			String modifiedFilePath = JenkinsResultsParserUtil.getCanonicalPath(
+				modifiedFile);
+
+			if (modifiedFilePath.contains("modules/util/source-formatter") ||
+				modifiedFilePath.contains("source-formatter.properties")) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean _isSourceFormatReleased() {
+		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
+			_getPortalWorkspaceGitRepository();
+
+		if (portalWorkspaceGitRepository == null) {
+			return false;
+		}
+
+		try {
+			JSONArray sourceFormatterJSONArray =
+				JenkinsResultsParserUtil.toJSONArray(
+					JenkinsResultsParserUtil.combine(
+						"https://api.github.com/repos/brianchandotcom/",
+						"liferay-portal/commits?path=modules/util/",
+						"source-formatter&per_page=1"));
+
+			if (sourceFormatterJSONArray.isEmpty()) {
+				return false;
+			}
+
+			JSONObject sourceFormatJSONObject =
+				sourceFormatterJSONArray.getJSONObject(0);
+
+			String commitURL = sourceFormatJSONObject.optString("url");
+
+			if (commitURL == null) {
+				return false;
+			}
+
+			JSONObject commitJSONObject = JenkinsResultsParserUtil.toJSONObject(
+				commitURL);
+
+			JSONArray filesJSONArray = commitJSONObject.optJSONArray("files");
+
+			if ((filesJSONArray == null) || filesJSONArray.isEmpty()) {
+				return false;
+			}
+
+			Set<String> filenames = new HashSet<>();
+
+			for (int i = 0; i < filesJSONArray.length(); i++) {
+				JSONObject fileJSONObject = filesJSONArray.getJSONObject(i);
+
+				filenames.add(fileJSONObject.getString("filename"));
+			}
+
+			if (!filenames.contains(
+					"modules/sdk/gradle-plugins-source-formatter/bnd.bnd") ||
+				!filenames.contains("modules/util/source-formatter/bnd.bnd")) {
+
+				return false;
+			}
+
+			return true;
+		}
+		catch (Exception exception) {
+			return false;
+		}
 	}
 
 	private static final String _NAME_TEST_SUITE = "sf";
