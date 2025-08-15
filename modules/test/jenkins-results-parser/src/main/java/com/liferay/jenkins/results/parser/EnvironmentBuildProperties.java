@@ -25,6 +25,19 @@ import java.util.regex.Pattern;
  */
 public class EnvironmentBuildProperties extends Properties {
 
+	public static Environment getCurrentEnvironment() {
+		String masterNetworkName = System.getenv("MASTER_NETWORK_NAME");
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(masterNetworkName) &&
+			(masterNetworkName.equals("aws-network") ||
+			 masterNetworkName.equals("gcp-network"))) {
+
+			return Environment.AWS;
+		}
+
+		return Environment.DB;
+	}
+
 	public static String toURLString(File file) throws IOException {
 		URI uri = file.toURI();
 
@@ -90,7 +103,7 @@ public class EnvironmentBuildProperties extends Properties {
 	}
 
 	public EnvironmentBuildProperties(String urlString) throws IOException {
-		this(Environment.DB, urlString, false);
+		this(getCurrentEnvironment(), urlString, false);
 	}
 
 	public Environment getEnvironment() {
