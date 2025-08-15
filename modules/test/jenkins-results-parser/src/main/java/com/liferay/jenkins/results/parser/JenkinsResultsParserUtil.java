@@ -1455,7 +1455,26 @@ public class JenkinsResultsParserUtil {
 				_buildPropertiesURLs = URLS_BUILD_PROPERTIES_DEFAULT;
 			}
 
+			EnvironmentBuildProperties.Environment environment =
+				EnvironmentBuildProperties.Environment.DB;
+
+			String masterNetworkName = System.getenv("MASTER_NETWORK_NAME");
+
+			if (!isNullOrEmpty(masterNetworkName) &&
+				(masterNetworkName.equals("aws-network") ||
+				 masterNetworkName.equals("gcp-network"))) {
+
+				environment = EnvironmentBuildProperties.Environment.AWS;
+			}
+
 			for (String url : _buildPropertiesURLs) {
+				if (url.contains("liferay-jenkins-ee")) {
+					properties.putAll(
+						new EnvironmentBuildProperties(environment, url));
+
+					continue;
+				}
+
 				if (url.startsWith("file://")) {
 					properties.putAll(
 						getProperties(new File(url.replace("file://", ""))));
