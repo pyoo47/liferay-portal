@@ -18,6 +18,15 @@ import java.util.regex.Pattern;
 public class EnvironmentBuildPropertiesUtil {
 
 	public static void generateEnvironmentBuildProperties(
+			File rootDirectory, boolean deleteBasePropertiesFile)
+		throws IOException {
+
+		generateEnvironmentBuildProperties(
+			EnvironmentBuildProperties.getCurrentEnvironment(), rootDirectory,
+			deleteBasePropertiesFile);
+	}
+
+	public static void generateEnvironmentBuildProperties(
 			EnvironmentBuildProperties.Environment environment,
 			File rootDirectory, boolean deleteBasePropertiesFile)
 		throws IOException {

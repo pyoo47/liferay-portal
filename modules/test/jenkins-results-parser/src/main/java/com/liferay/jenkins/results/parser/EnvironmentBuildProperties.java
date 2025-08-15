@@ -102,6 +102,10 @@ public class EnvironmentBuildProperties extends Properties {
 		}
 	}
 
+	public EnvironmentBuildProperties(File file) throws IOException {
+		this(getCurrentEnvironment(), toURLString(file), false);
+	}
+
 	public EnvironmentBuildProperties(String urlString) throws IOException {
 		this(getCurrentEnvironment(), urlString, false);
 	}
