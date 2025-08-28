@@ -58,20 +58,26 @@ public class GenerateTestrayCSVUtil {
 
 		List<TestrayCaseResult> testrayCaseResults = new ArrayList<>();
 
+		List<String> testrayCaseResultNames = new ArrayList<>();
+
 		for (TestrayCaseResult testrayCaseResult :
 				testrayBuild.getTestrayCaseResults()) {
+
+			String testrayCaseResultName = testrayCaseResult.getName();
 
 			if (((testrayCaseResult.getStatus() !=
 					TestrayCaseResult.Status.FAILED) &&
 				 (testrayCaseResult.getStatus() !=
 					 TestrayCaseResult.Status.UNTESTED)) ||
 				Objects.equals(
-					testrayCaseResult.getName(), "Top Level Build")) {
+					testrayCaseResult.getName(), "Top Level Build") ||
+				testrayCaseResultNames.contains(testrayCaseResultName)) {
 
 				continue;
 			}
 
 			testrayCaseResults.add(testrayCaseResult);
+			testrayCaseResultNames.add(testrayCaseResultName);
 		}
 
 		if (testrayCaseResults.isEmpty()) {
