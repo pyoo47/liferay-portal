@@ -95,6 +95,8 @@ public class AssetCategoryPortletDataHandlerTest
 
 		_assetCategoryLocalService.deleteCategory(assetCategory);
 
+		_assetVocabularyLocalService.deleteVocabulary(assetVocabulary);
+
 		ExportImportConfiguration exportImportConfiguration =
 			_exportImportConfigurationLocalService.
 				addDraftExportImportConfiguration(
