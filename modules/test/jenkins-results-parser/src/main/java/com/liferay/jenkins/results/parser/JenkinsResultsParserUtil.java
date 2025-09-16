@@ -129,6 +129,8 @@ public class JenkinsResultsParserUtil {
 		"liferay-jenkins-ee", "liferay-jenkins-results-parser-samples-ee",
 		"liferay-portal"
 	};
+	
+	public static final int A = 1;
 
 	public static final int PAGES_GITHUB_API_PAGES_SIZE_MAX = 10;
 
