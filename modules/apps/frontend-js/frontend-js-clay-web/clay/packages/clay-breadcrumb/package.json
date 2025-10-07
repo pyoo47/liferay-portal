@@ -30,14 +30,14 @@
 		"react"
 	],
 	"dependencies": {
-		"@clayui/button": "^3.144.1",
-		"@clayui/icon": "^3.144.1",
-		"@clayui/link": "^3.144.1",
+		"@clayui/button": "*",
+		"@clayui/icon": "*",
+		"@clayui/link": "*",
 		"classnames": "^2.2.6",
 		"warning": "^4.0.3"
 	},
 	"peerDependencies": {
-		"@clayui/css": "3.x",
+		"@clayui/css": "*",
 		"react": "^16.0.0 || ^17.0.0 || ^18.0.0",
 		"react-dom": "^16.0.0 || ^17.0.0 || ^18.0.0"
 	},

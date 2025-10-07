@@ -31,14 +31,14 @@
 		"react"
 	],
 	"dependencies": {
-		"@clayui/form": "^3.148.0",
-		"@clayui/icon": "^3.144.1",
-		"@clayui/label": "^3.144.1",
-		"@clayui/link": "^3.144.1",
+		"@clayui/form": "*",
+		"@clayui/icon": "*",
+		"@clayui/label": "*",
+		"@clayui/link": "*",
 		"classnames": "^2.2.6"
 	},
 	"peerDependencies": {
-		"@clayui/css": "3.x",
+		"@clayui/css": "*",
 		"react": "^16.0.0 || ^17.0.0 || ^18.0.0",
 		"react-dom": "^16.0.0 || ^17.0.0 || ^18.0.0"
 	},

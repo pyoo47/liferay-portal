@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"@ckeditor/ckeditor5-react": "9.3.1",
-		"@clayui/loading-indicator": "3.144.1",
+		"@clayui/loading-indicator": "*",
 		"@liferay/cookies-banner-web": "*",
 		"@liferay/frontend-data-set-web": "*",
 		"@liferay/frontend-js-item-selector-web": "*",
