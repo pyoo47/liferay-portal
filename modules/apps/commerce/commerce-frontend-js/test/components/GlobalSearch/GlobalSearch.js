@@ -158,7 +158,9 @@ describe('Global Search', () => {
 
 					expect(carts.length).toBe(4);
 
-					expect(firstCart.text).toContain(orderTemplate.id);
+					expect(firstCart.text).toContain(
+						orderTemplate.id.toString()
+					);
 
 					expect(firstCart.href).toContain(
 						`/cart-page/${orderTemplate.id}`

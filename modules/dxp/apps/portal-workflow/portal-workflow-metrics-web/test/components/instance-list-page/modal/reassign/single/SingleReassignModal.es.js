@@ -92,7 +92,7 @@ describe('The SingleReassignModal component should', () => {
 		getByText = renderResult.getByText;
 
 		await act(async () => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 	});
 
@@ -115,7 +115,7 @@ describe('The SingleReassignModal component should', () => {
 		fireEvent.click(retryBtn);
 
 		await act(async () => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 	});
 
@@ -144,7 +144,7 @@ describe('The SingleReassignModal component should', () => {
 		fireEvent.click(reassignBtn);
 
 		await act(async () => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 	});
 
@@ -158,7 +158,7 @@ describe('The SingleReassignModal component should', () => {
 		fireEvent.click(reassignBtn);
 
 		await act(async () => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 	});
 

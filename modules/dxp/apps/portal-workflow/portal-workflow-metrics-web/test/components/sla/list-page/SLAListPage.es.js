@@ -43,7 +43,7 @@ describe('The SLAListPage component should', () => {
 			getByTitle = renderResult.getByTitle;
 
 			await act(async () => {
-				jest.runAllTimers();
+				jest.advanceTimersByTime(100);
 			});
 		});
 
@@ -119,7 +119,7 @@ describe('The SLAListPage component should', () => {
 			getByText = renderResult.getByText;
 
 			await act(async () => {
-				jest.runAllTimers();
+				jest.advanceTimersByTime(100);
 			});
 		});
 
@@ -169,7 +169,7 @@ describe('The SLAListPage component should', () => {
 			fireEvent.click(dropDownItems[1]);
 
 			await act(async () => {
-				jest.runAllTimers();
+				jest.advanceTimersByTime(100);
 			});
 		});
 
@@ -187,7 +187,7 @@ describe('The SLAListPage component should', () => {
 			fireEvent.click(deleteButton);
 
 			await act(async () => {
-				jest.runAllTimers();
+				jest.advanceTimersByTime(100);
 			});
 		});
 
@@ -209,7 +209,7 @@ describe('The SLAListPage component should', () => {
 			fireEvent.click(deleteButton);
 
 			await act(async () => {
-				jest.runAllTimers();
+				jest.advanceTimersByTime(100);
 			});
 		});
 
@@ -329,7 +329,7 @@ describe('The SLAListPage component should', () => {
 			getByText = renderResult.getByText;
 
 			await act(async () => {
-				jest.runAllTimers();
+				jest.advanceTimersByTime(100);
 			});
 		});
 

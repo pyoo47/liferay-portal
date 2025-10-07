@@ -163,7 +163,7 @@ describe('RulesSidebar', () => {
 		});
 
 		act(() => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 
 		const modalTitle = document.querySelector('.modal-title');
@@ -192,13 +192,13 @@ describe('RulesSidebar', () => {
 		fireEvent.click(openOptionsButton);
 
 		act(() => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 
 		fireEvent.click(screen.getByText('edit'));
 
 		act(() => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 
 		const modalTitle = document.querySelector('.modal-title');
@@ -227,7 +227,7 @@ describe('RulesSidebar', () => {
 		fireEvent.click(openOptionsButton);
 
 		act(() => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 
 		fireEvent.click(screen.getByText('delete'));

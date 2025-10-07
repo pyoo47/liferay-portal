@@ -13,6 +13,11 @@ import {FIELDS, FIELDS_TYPES, OPERATORS_BY_TYPE} from '../__mock__/fields.es';
 
 global.fetch.enableFetchMocks();
 
+jest.mock('frontend-js-web', () => ({
+	...jest.requireActual('frontend-js-web'),
+	loadModule: () => {},
+}));
+
 const DEFAULT_RULE = {
 	actions: [
 		{

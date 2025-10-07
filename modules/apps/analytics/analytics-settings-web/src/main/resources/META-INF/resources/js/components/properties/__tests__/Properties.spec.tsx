@@ -167,7 +167,7 @@ describe('Properties', () => {
 		await act(async () => {
 			await fireEvent.click(addProperyButton);
 
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 
 		expect(document.body).toHaveClass('modal-open');

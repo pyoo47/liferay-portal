@@ -73,7 +73,7 @@ describe('PageContentSelectors', () => {
 		userEvent.click(previewBySelector);
 
 		act(() => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 
 		expect(document.getElementById('segments')).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe('PageContentSelectors', () => {
 		userEvent.click(previewBySelector);
 
 		act(() => {
-			jest.runAllTimers();
+			jest.advanceTimersByTime(100);
 		});
 
 		fireEvent.click(document.getElementById('experiences'));

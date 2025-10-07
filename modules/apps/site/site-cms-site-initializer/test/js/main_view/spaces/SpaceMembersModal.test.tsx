@@ -4,7 +4,7 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {render, screen, waitFor} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import React from 'react';
 
 import AdminUserService from '../../../../src/main/resources/META-INF/resources/js/common/services/AdminUserService';
@@ -100,8 +100,10 @@ describe('SpaceMembersModal', () => {
 			expect(getSpaceUsersSpy).toHaveBeenCalledTimes(1);
 		});
 
-		expect(screen.getByText('all-members')).toBeInTheDocument();
-		expect(screen.getByLabelText('who-has-access')).toBeInTheDocument();
+		await waitFor(() => {
+			expect(screen.getByText('all-members')).toBeInTheDocument();
+			expect(screen.getByLabelText('who-has-access')).toBeInTheDocument();
+		});
 	});
 
 	it('displays the members list correctly from the service', async () => {

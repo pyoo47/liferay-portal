@@ -64,7 +64,7 @@ const renderComponent = ({rules = []} = {}) => {
 	);
 
 	act(() => {
-		jest.runAllTimers();
+		jest.advanceTimersByTime(100);
 	});
 };
 
