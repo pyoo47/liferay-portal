@@ -36,7 +36,7 @@ async function writePackageJsons(projectDescription, projectExports) {
 	// package.json for those.
 
 	const uniquePackageNames = projectExports
-		.map(splitProjectExport)
+		.map((projectExport) => splitProjectExport(projectExport.moduleName))
 		.reduce((uniquePackageNames, {name, scope}) => {
 			const packageName = `${scope ? `${scope}/` : ''}${name}`;
 
@@ -77,12 +77,14 @@ async function writeExportBridge(
 	projectExport,
 	projectWebContextPath
 ) {
-	const {modulePath, name, scope} = splitProjectExport(projectExport);
+	const {moduleName} = projectExport;
+
+	const {modulePath, name, scope} = splitProjectExport(moduleName);
 	const {version} = projectScopeRequire(
 		`${scope ? `${scope}/` : ''}${name}/package.json`
 	);
 	const namespacedPackageName = getNamespacedPackageName(
-		projectExport,
+		moduleName,
 		projectDescription.name
 	);
 	const namespacedPackageId = `${namespacedPackageName}@${version}`;
@@ -90,10 +92,10 @@ async function writeExportBridge(
 	// Compose bridge code
 
 	const importPath =
-		getPathToRoot(projectExport, modulePath) +
+		getPathToRoot(moduleName, modulePath) +
 		projectWebContextPath +
 		'/__liferay__/exports/' +
-		`${getFlatName(projectExport)}.js`;
+		`${getFlatName(moduleName)}.js`;
 
 	const hashedImportPath = hashPathForVariable(importPath);
 
@@ -126,7 +128,7 @@ Liferay.Loader.define(
 	await fs.writeFile(filePath, code, 'utf-8');
 }
 
-function getPathToRoot(projectExport, modulePath) {
+function getPathToRoot(moduleName, modulePath) {
 
 	//
 	// Compute the relative position of the bridge related to the real ES
@@ -143,7 +145,7 @@ function getPathToRoot(projectExport, modulePath) {
 
 	let pathToRoot = '../..';
 
-	if (projectExport.startsWith('@')) {
+	if (moduleName.startsWith('@')) {
 		pathToRoot += '/..';
 	}
 

@@ -6,12 +6,14 @@
 import getFlatName from '../../util/getFlatName.mjs';
 import getExportBridgePath from './getExportBridgePath.mjs';
 
-export default function getEntryPoint(moduleName) {
+export default function getEntryPoint(projectExport) {
 	let entryPoint;
+
+	const {moduleName, path} = projectExport;
 
 	if (moduleName.endsWith('.css')) {
 		entryPoint = {
-			in: moduleName,
+			in: path,
 			out: `css/${getFlatName(moduleName).replace(/\.css$/, '')}`,
 		};
 	}

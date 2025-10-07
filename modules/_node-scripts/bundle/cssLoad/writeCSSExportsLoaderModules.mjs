@@ -19,8 +19,8 @@ export default async function writeCSSExportsLoaderModules(
 
 	await Promise.all(
 		projectExports
-			.filter((moduleName) => moduleName.endsWith('.css'))
-			.map((moduleName) =>
+			.filter(({moduleName}) => moduleName.endsWith('.css'))
+			.map(({moduleName}) =>
 				writeCSSExportLoaderModule(projectWebContextPath, moduleName)
 			)
 	);

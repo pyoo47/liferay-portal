@@ -18,9 +18,14 @@ import getExportBridgePath from './getExportBridgePath.mjs';
  */
 export default async function writeExportBridge(
 	overridenPackageSymbols,
-	moduleName
+	moduleName,
+	filePath
 ) {
-	const symbols = getExportedSymbols(overridenPackageSymbols, moduleName);
+	const symbols = getExportedSymbols(
+		overridenPackageSymbols,
+		moduleName,
+		filePath
+	);
 
 	const exportBridgePath = getExportBridgePath(moduleName);
 

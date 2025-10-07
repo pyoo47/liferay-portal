@@ -12,6 +12,10 @@ import projectScopeRequire from '../util/projectScopeRequire.mjs';
  * [
  *   '@liferay/js-api',
  *   '@liferay/js-api/data-set',
+ *   {
+ *    moduleName: 'foo',
+ *    path: './src/main/resources/META-INF/resources/foo.js'
+ *   }
  * ]
  */
 export default function getProjectExports() {
@@ -21,5 +25,14 @@ export default function getProjectExports() {
 		return [];
 	}
 
-	return exports;
+	return exports.map((module) => {
+		if (typeof module === 'string') {
+			return {
+				moduleName: module,
+				path: module,
+			};
+		}
+
+		return module;
+	});
 }

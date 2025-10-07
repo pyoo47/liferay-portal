@@ -1,0 +1,47 @@
+import com.liferay.gradle.plugins.node.task.YarnInstallTask
+
+task clayYarnInstall(type: YarnInstallTask)
+task clayYarnTest(type: Exec)
+task clayYarnBuild(type: Exec)
+
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
+	compileOnly group: "jakarta.servlet", name: "jakarta.servlet-api", version: "6.0.0"
+	compileOnly group: "org.osgi", name: "org.osgi.service.cm", version: "1.6.0"
+	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.4.0"
+	compileOnly project(":apps:frontend-js:frontend-js-importmaps-extender-api")
+	compileOnly project(":apps:frontend-js:frontend-js-loader-modules-extender-api")
+	compileOnly project(":apps:portal-url-builder:portal-url-builder-api")
+	compileOnly project(":core:petra:petra-function")
+	compileOnly project(":core:petra:petra-string")
+}
+
+clayYarnInstall {
+	doLast {
+		delete ".yarnrc"
+	}
+
+	workingDir = "clay"
+}
+
+clayYarnTest {
+	args = [clayYarnInstall.scriptFile, "test"]
+	dependsOn clayYarnBuild
+	executable = new File(clayYarnInstall.nodeDir, "bin/node")
+	workingDir = "clay"
+}
+
+clayYarnBuild {
+	args = [clayYarnInstall.scriptFile, "build"]
+	dependsOn clayYarnInstall
+	executable = new File(clayYarnInstall.nodeDir, "bin/node")
+	workingDir = "clay"
+}
+
+packageRunTest {
+	dependsOn clayYarnTest
+}
+
+packageRunBuild {
+	dependsOn clayYarnBuild
+}

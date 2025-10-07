@@ -21,13 +21,13 @@ export default async function bundleCSSExports(projectExports) {
 
 	await Promise.all(
 		projectExports
-			.filter((moduleName) => moduleName.endsWith('.css'))
-			.map((moduleName) => bundle(moduleName))
+			.filter(({moduleName}) => moduleName.endsWith('.css'))
+			.map((projectExport) => bundle(projectExport))
 	);
 }
 
-async function bundle(moduleName) {
-	const entryPoint = getEntryPoint(moduleName);
+async function bundle(projectExport) {
+	const entryPoint = getEntryPoint(projectExport);
 
 	const esbuildConfig = {
 		entryPoints: [entryPoint],
@@ -69,5 +69,5 @@ async function bundle(moduleName) {
 		);
 	}
 
-	return runEsbuild(esbuildConfig, getFlatName(moduleName));
+	return runEsbuild(esbuildConfig, getFlatName(projectExport.moduleName));
 }

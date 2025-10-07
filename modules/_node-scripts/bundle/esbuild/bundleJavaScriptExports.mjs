@@ -32,14 +32,14 @@ export default async function bundleJavaScriptExports(
 
 	await Promise.all(
 		projectExports
-			.filter((moduleName) => !moduleName.endsWith('.css'))
-			.map((moduleName) =>
+			.filter(({moduleName}) => !moduleName.endsWith('.css'))
+			.map((projectExport) =>
 				bundle(
 					globalImports,
 					overridenPackageSymbols,
 					projectAlias,
 					projectWebContextPath,
-					moduleName
+					projectExport
 				)
 			)
 	);
@@ -50,9 +50,9 @@ async function bundle(
 	overridenPackageSymbols,
 	projectAlias,
 	projectWebContextPath,
-	moduleName
+	projectExport
 ) {
-	const entryPoint = getEntryPoint(moduleName);
+	const entryPoint = getEntryPoint(projectExport);
 
 	const esbuildConfig = {
 		alias: projectAlias,
@@ -61,7 +61,7 @@ async function bundle(
 		format: 'esm',
 		outdir: BUILD_MAIN_EXPORTS_PATH,
 		plugins: [
-			getExactAliasPlugin(globalImports, 'exports', [moduleName]),
+			getExactAliasPlugin(globalImports, 'exports', [projectExport.moduleName]),
 			getExternalsPlugin(),
 			getImportBridgesPlugin(globalImports, overridenPackageSymbols),
 		],
@@ -99,9 +99,9 @@ async function bundle(
 		);
 	}
 
-	await writeExportBridge(overridenPackageSymbols, moduleName);
+	await writeExportBridge(overridenPackageSymbols, projectExport.moduleName);
 
-	const flatModuleName = getFlatName(moduleName);
+	const flatModuleName = getFlatName(projectExport.moduleName);
 
 	await runEsbuild(esbuildConfig, flatModuleName);
 

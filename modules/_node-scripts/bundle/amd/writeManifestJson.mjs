@@ -50,14 +50,14 @@ export default async function writeManifestJson(
 
 	const groupedProjectExports = projectExports.reduce(
 		(groupedProjectExports, projectExport) => {
-			const {name, scope} = splitProjectExport(projectExport);
+			const {name, scope} = splitProjectExport(projectExport.moduleName);
 			const packageName = `${scope ? `${scope}/` : ''}${name}`;
 
 			if (!groupedProjectExports[packageName]) {
 				groupedProjectExports[packageName] = [];
 			}
 
-			groupedProjectExports[packageName].push(projectExport);
+			groupedProjectExports[packageName].push(projectExport.moduleName);
 
 			return groupedProjectExports;
 		},

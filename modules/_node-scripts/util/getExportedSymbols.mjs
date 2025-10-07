@@ -7,7 +7,8 @@ import projectScopeRequire from './projectScopeRequire.mjs';
 
 export default function getExportedSymbols(
 	overridenPackageSymbols,
-	moduleName
+	moduleName,
+	filePath
 ) {
 	let symbols;
 
@@ -28,7 +29,7 @@ export default function getExportedSymbols(
 			}
 		}
 		else {
-			symbols = loadSymbols(moduleName);
+			symbols = loadSymbols(moduleName, filePath);
 		}
 	}
 	catch (error) {
@@ -40,8 +41,8 @@ export default function getExportedSymbols(
 	return symbols;
 }
 
-function loadSymbols(moduleName) {
-	const module = projectScopeRequire(moduleName);
+function loadSymbols(moduleName, filePath) {
+	const module = projectScopeRequire(filePath ? filePath : moduleName);
 
 	const symbols = Object.keys(module).reduce((symbols, key) => {
 		symbols[key] = true;
