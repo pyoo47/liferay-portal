@@ -1,0 +1,18 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"allowJs": false,
+		"declaration": true,
+		"emitDeclarationOnly": true,
+		"noEmit": false,
+		"removeComments": false,
+		"skipLibCheck": true,
+		"paths": {}
+	},
+	"exclude": [
+		"node_modules",
+		"packages/**/lib",
+		"packages/generator-clay-component",
+		"**/__tests__/**"
+	]
+}

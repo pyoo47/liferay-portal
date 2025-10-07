@@ -1,0 +1,19 @@
+{
+	"version": "3.149.2",
+	"npmClient": "yarn",
+	"command": {
+		"publish": {
+			"ignoreChanges": [
+				"**/stories/*",
+				"**/__tests__/**",
+				"**/*.md",
+				"**/*.mdx",
+				"**/docs/*",
+				"**/packages/demos/**",
+				"**/packages/generator-clay-component/**",
+				"**/packages/browserslist-config-clay/**"
+			],
+			"message": "chore(release): publish %s packages"
+		}
+	}
+}
