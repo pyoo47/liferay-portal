@@ -5,8 +5,10 @@
 
 /* eslint-env jest */
 
+import '@testing-library/jest-dom/extend-expect';
+
 afterEach(() => {
-	global.fetch.mockRestore();
+	global.fetch?.mockRestore?.();
 });
 
 beforeEach(() => {

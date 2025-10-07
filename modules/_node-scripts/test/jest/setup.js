@@ -33,7 +33,7 @@ if (!global.createRange) {
 	});
 }
 
-global.fetch = require('jest-fetch-mock');
+require('jest-fetch-mock').enableMocks();
 
 global.themeDisplay = global.Liferay.ThemeDisplay;
 

@@ -44,7 +44,7 @@ function getJestConfig({rootDir = '<rootDir>'}) {
 		resolver: path.join(__dirname, 'resolver.js'),
 		setupFiles: [path.join(__dirname, 'setup.js')],
 		setupFilesAfterEnv: [path.join(__dirname, 'setupAfterEnv.js')],
-		testEnvironment,
+		testEnvironment: 'jsdom',
 		testEnvironmentOptions: {
 			url: 'http://localhost',
 		},
@@ -59,7 +59,16 @@ function getJestConfig({rootDir = '<rootDir>'}) {
 
 			/* eslint-disable sort-keys */
 			'\\.scss$': path.join(__dirname, 'transformSass.js'),
-			'.+': path.join(__dirname, 'transformBabel.js'),
+			'.+': [
+				'babel-jest',
+				{
+					presets: [
+						'@babel/preset-env',
+						'@babel/preset-react',
+						'@babel/preset-typescript',
+					],
+				},
+			],
 
 			/* eslint-enable sort-keys */
 		},
