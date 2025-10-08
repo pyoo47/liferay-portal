@@ -108,11 +108,7 @@ $cadmin-purple-d4: #70c !default;
 $cadmin-purple-d3: #8600e6 !default;
 $cadmin-purple-d2: #9500ff !default;
 $cadmin-purple-d1: #9f1aff !default;
-$cadmin-purple: if(
-	$cadmin-enable-lexicon-flat-colors,
-	#a3f,
-	#6f42c1
-) !default;
+$cadmin-purple: if($cadmin-enable-lexicon-flat-colors, #a3f, #6f42c1) !default;
 $cadmin-purple-l1: #bf66ff !default;
 $cadmin-purple-l2: #ca80ff !default;
 $cadmin-purple-l3: #d499ff !default;
@@ -160,11 +156,7 @@ $cadmin-yellow-d4: #997000 !default;
 $cadmin-yellow-d3: #b38900 !default;
 $cadmin-yellow-d2: #cc9600 !default;
 $cadmin-yellow-d1: #e6a800 !default;
-$cadmin-yellow: if(
-	$cadmin-enable-lexicon-flat-colors,
-	#fb0,
-	#ffc107
-) !default;
+$cadmin-yellow: if($cadmin-enable-lexicon-flat-colors, #fb0, #ffc107) !default;
 $cadmin-yellow-l1: #ffc933 !default;
 $cadmin-yellow-l2: #ffd666 !default;
 $cadmin-yellow-l3: #ffe499 !default;

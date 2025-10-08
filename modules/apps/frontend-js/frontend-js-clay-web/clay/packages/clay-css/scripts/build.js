@@ -43,7 +43,8 @@ function copyRecursiveSync(sourcePath, destinationPath) {
 				path.join(destinationPath, childItemName)
 			);
 		});
-	} else {
+	}
+	else {
 		fs.copyFileSync(sourcePath, destinationPath);
 	}
 }
@@ -56,11 +57,13 @@ function ensureDirectory(directoryPath) {
 					fs.mkdir(directoryPath, {recursive: true}, (error) => {
 						if (error) {
 							reject(error);
-						} else {
+						}
+						else {
 							resolve(directoryPath);
 						}
 					});
-				} else {
+				}
+				else {
 					reject(error);
 				}
 			}
@@ -122,7 +125,8 @@ async function buildIconsSvg(filesPath) {
 		fileWritable.end('</svg>', (error) => {
 			if (error) {
 				reject(error);
-			} else {
+			}
+			else {
 				resolve();
 			}
 		})
@@ -211,7 +215,8 @@ async function buildScssIcons(filesPath) {
 				(error) => {
 					if (error) {
 						reject(error);
-					} else {
+					}
+					else {
 						resolve();
 					}
 				}
@@ -226,7 +231,8 @@ async function buildScssIcons(filesPath) {
 		fileWritable.end(`	${sourceIconsScss.slice(endTag)}`, (error) => {
 			if (error) {
 				reject(error);
-			} else {
+			}
+			else {
 				resolve();
 			}
 		})
@@ -310,10 +316,12 @@ async function build() {
 
 build()
 	.then(() => {
+
 		// eslint-disable-next-line no-console
 		console.log('Build successful');
 	})
 	.catch((error) => {
+
 		// eslint-disable-next-line no-console
 		console.log('Build error:\n', error);
 		process.exit(1);
