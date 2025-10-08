@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
@@ -16,6 +16,7 @@ import ClayCard from './Card';
 import type {ButtonWithIconProps} from '@clayui/button';
 
 interface IProps extends React.BaseHTMLAttributes<HTMLDivElement> {
+
 	/**
 	 * List of actions in the dropdown menu
 	 */
@@ -156,6 +157,7 @@ export const ClayCardWithUser = ({
 				{userImageSrc && (
 					<ClaySticker.Image alt={userImageAlt} src={userImageSrc} />
 				)}
+
 				{!userImageSrc && (
 					<ClayIcon spritemap={spritemap} symbol={userSymbol} />
 				)}

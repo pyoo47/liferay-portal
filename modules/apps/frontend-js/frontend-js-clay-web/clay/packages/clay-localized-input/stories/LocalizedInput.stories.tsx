@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2020 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayForm from '@clayui/form';
@@ -92,8 +92,10 @@ export const Default = () => {
 					selectedLocale={selectedLocaleError}
 					translations={translationsError}
 				/>
+
 				<ClayForm.FeedbackGroup>
 					<ClayForm.Text>Clay Form Text</ClayForm.Text>
+
 					<ClayForm.FeedbackItem id="input-group-error">
 						<ClayForm.FeedbackIndicator symbol="exclamation-full" />
 						This is a description of the error!

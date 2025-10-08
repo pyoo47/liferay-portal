@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React, {useCallback, useEffect, useLayoutEffect} from 'react';
@@ -48,7 +48,7 @@ const ALIGN_MAP = {
 	TopRight: ['br', 'tr'],
 } as const;
 
-export type AlignPoints = typeof ALIGN_MAP[keyof typeof ALIGN_MAP];
+export type AlignPoints = (typeof ALIGN_MAP)[keyof typeof ALIGN_MAP];
 
 /**
  * For backwards compatability, we are creating a util here so that `metal-position`

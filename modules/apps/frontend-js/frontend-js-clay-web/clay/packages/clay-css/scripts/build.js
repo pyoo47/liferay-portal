@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2021 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 'use strict';
@@ -81,6 +81,7 @@ async function buildIconsSvg(filesPath) {
 	const fileWritable = fs.createWriteStream(ICONS_OUTPUT_FILEPATH);
 
 	// Writes the file header in the stream.
+
 	fileWritable.write(
 		'<?xml version="1.0" encoding="UTF-8"?>' +
 			'<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' +
@@ -116,6 +117,7 @@ async function buildIconsSvg(filesPath) {
 
 	// Close the writable stream by adding the chunk at the end and wait for
 	// the stream to terminate with error or success.
+
 	await new Promise((resolve, reject) =>
 		fileWritable.end('</svg>', (error) => {
 			if (error) {
@@ -144,6 +146,7 @@ async function buildScssIcons(filesPath) {
 	const endTag = sourceIconsScss.indexOf(');');
 
 	// Writes the source file header to the stream.
+
 	fileWritable.write(`${sourceIconsScss.slice(0, startTag)}$lx-icons: (\n\n`);
 
 	filesPath.sort();
@@ -218,6 +221,7 @@ async function buildScssIcons(filesPath) {
 
 	// Close the writable stream by adding the final chunk of the source file
 	// and wait for the stream to finish.
+
 	await new Promise((resolve, reject) =>
 		fileWritable.end(`	${sourceIconsScss.slice(endTag)}`, (error) => {
 			if (error) {
@@ -237,7 +241,7 @@ async function build() {
 			return console.error(error);
 		}
 
-		var result = data.replace(
+		const result = data.replace(
 			/\*\s+Clay\s(.+)\n/g,
 			`* Clay ${
 				JSON.parse(fs.readFileSync(path.join('.', 'package.json')))
@@ -262,10 +266,11 @@ async function build() {
 		path.resolve('./src/images/icons'),
 		path.join(OUTPUT_DIRECTORY, 'images/icons')
 	);
-	copyRecursiveSync(
-		path.join('..', '..', 'LICENSES'),
-		path.resolve('./LICENSES')
-	);
+
+	// copyRecursiveSync(
+	// 	path.join('..', '..', 'LICENSES'),
+	// 	path.resolve('./LICENSES')
+	// );
 
 	const filesPath = await fs.promises.readdir(ICONS_DIRECTORY);
 

@@ -1,0 +1,9 @@
+/packages/clayui.com/.cache
+/packages/clayui.com/public
+/packages/clayui.com/react-docgen
+/packages/clayui.com/static
+/packages/clay-css/**/*.md
+/packages/clay-css/src/js/**/*.js
+/packages/clay-css/src/scss/bootstrap/**/*.scss
+yarn.lock
+.next

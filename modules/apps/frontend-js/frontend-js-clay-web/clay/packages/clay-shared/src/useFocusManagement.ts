@@ -1,11 +1,12 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React from 'react';
 
 // https://github.com/facebook/react/blob/master/packages/shared/ReactWorkTags.js#L39
+
 const HostComponent = 5;
 
 let minimalTabIndex = 0;
@@ -29,10 +30,13 @@ export function isFocusable({
 	tagName?: string;
 	type?: string;
 }) {
+
 	// Normalize casing
+
 	tagName = tagName?.toLowerCase();
 
 	// Hack to check if element is visible
+
 	if (!offsetParent) {
 		return false;
 	}
@@ -92,6 +96,7 @@ export const FOCUSABLE_ELEMENTS = [
 
 // A switcher that helps define which fiber to use to navigate, the
 // component's current fiber or the fiber in progress.
+
 let hasSibling = false;
 
 function collectDocumentFocusTargets() {
@@ -113,10 +118,12 @@ function collectDocumentFocusTargets() {
 }
 
 // https://github.com/facebook/react/pull/15849#diff-39a673d38713257d5fe7d90aac2acb5aR107
+
 const isFiberFocusable = (fiber: any): boolean => {
 	const {memoizedProps, stateNode, type} = fiber;
 
 	// The element may be having an update in progress.
+
 	if (memoizedProps === null) {
 		return false;
 	}
@@ -209,14 +216,18 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 		// When browsing the alternate/in progress fiber if don't find sibling
 		// elements that might correspond to a React.Portal try searching for
 		// focus targets using the current fiber.
+
 		if (!hasSibling) {
 			fiberFocusTargets = getFocusTargetsInScope(scope);
-		} else {
+		}
+		else {
+
 			// Just resets the value for the next focus iteration.
+
 			hasSibling = false;
 		}
 
-		if (fiberFocusTargets.length === 0) {
+		if (!fiberFocusTargets.length) {
 			return null;
 		}
 
@@ -243,6 +254,7 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 		const prevFocusInDoc = docFocusTargets[docPosition - 1];
 
 		// Ignore when the active element is not in the scope.
+
 		if (
 			reactFiberPosition < 0 &&
 			!prevFocusInDocRef.current &&
@@ -258,6 +270,7 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 
 		// If the focus is moving within the focus trap, let the browser handle
 		// navigation and focus order.
+
 		if (
 			startFocusTrap &&
 			endFocusTrap &&
@@ -269,6 +282,7 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 
 		// Checks if the focus has reached the end of the scope and should
 		// go back to the beginning.
+
 		if (endFocusTrap && endFocusTrap === nextFocusInDoc) {
 			nextFocusInFiber = docFocusTargets.find(
 				(_, index, array) => array[index - 1] === startFocusTrap
@@ -277,6 +291,7 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 
 		// Checks if the focus has arrived at the beginning of the scope and is
 		// returning moves the focus to the end of the scope.
+
 		if (startFocusTrap && startFocusTrap === prevFocusInDoc) {
 			prevFocusInFiber = docFocusTargets.find(
 				(_, index, array) => array[index + 1] === endFocusTrap
@@ -284,6 +299,7 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 		}
 
 		// Only moves to the next element if it is in scope.
+
 		if (
 			persistOnScope &&
 			(!nextFocusInFiber || (backwards && !prevFocusInFiber))
@@ -295,11 +311,13 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 		// a portal to render the node in a different part of the DOM. When
 		// this happens, we want to track where the next node is in case we
 		// reach the end of the list of focus targets.
+
 		if (nextFocusInFiber !== nextFocusInDoc) {
 			nextFocusInDocRef.current = nextFocusInDoc!;
 		}
 
 		// Same as above, except we track the previous node for tabbing backwards.
+
 		if (prevFocusInFiber !== prevFocusInDoc) {
 			prevFocusInDocRef.current = prevFocusInDoc!;
 		}
@@ -322,6 +340,7 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 		// If there is no `nextActive`, that means we are either at the beginning or end of the
 		// list of focus targets in the React Tree. So we go back to the flow of the
 		// document instead of the flow of the React Tree.
+
 		if (!nextActive) {
 			nextActive = backwards
 				? prevFocusInDocRef.current
@@ -347,6 +366,7 @@ export function useFocusManagement(scope: React.RefObject<null | HTMLElement>) {
 
 	return {
 		focusFirst: () => {
+
 			// eslint-disable-next-line react-compiler/react-compiler
 			minimalTabIndex = -1;
 			const next = moveFocusInScope(getFiber(scope), false, true);

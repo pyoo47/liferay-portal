@@ -16,6 +16,22 @@
     types/**/*.d.ts
 
 ##
+## ClayUI
+##
+
+    #
+    # Clay CSS and Clay docs site ignores
+    #
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clayui.com/.cache
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clayui.com/public
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clayui.com/react-docgen
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clayui.com/static
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clay-css/**/*.md
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clay-css/src/js/**/*.js
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clay-css/src/scss/bootstrap/**/*.scss
+
+
+##
 ## Playwright Tests
 ##
 

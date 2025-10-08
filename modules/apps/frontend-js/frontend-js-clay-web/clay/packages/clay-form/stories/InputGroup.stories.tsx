@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React from 'react';
@@ -19,6 +19,7 @@ export const GroupSeparated = () => (
 				<ClayInput.GroupItem shrink>
 					<ClayInput.GroupText>@</ClayInput.GroupText>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem>
 					<ClayInput
 						aria-label="Username"
@@ -28,6 +29,7 @@ export const GroupSeparated = () => (
 				</ClayInput.GroupItem>
 			</ClayInput.Group>
 		</ClayForm.Group>
+
 		<ClayForm.Group>
 			<ClayInput.Group>
 				<ClayInput.GroupItem>
@@ -37,9 +39,11 @@ export const GroupSeparated = () => (
 						type="text"
 					/>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem shrink>
 					<ClayInput.GroupText>@</ClayInput.GroupText>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem>
 					<ClayInput
 						aria-label="Email Host"
@@ -47,6 +51,7 @@ export const GroupSeparated = () => (
 						type="text"
 					/>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem shrink>
 					<ClayInput.GroupText>.com</ClayInput.GroupText>
 				</ClayInput.GroupItem>
@@ -62,6 +67,7 @@ export const GroupConnected = () => (
 				<ClayInput.GroupItem prepend shrink>
 					<ClayInput.GroupText>@</ClayInput.GroupText>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem append>
 					<ClayInput
 						aria-label="Username"
@@ -71,6 +77,7 @@ export const GroupConnected = () => (
 				</ClayInput.GroupItem>
 			</ClayInput.Group>
 		</ClayForm.Group>
+
 		<ClayForm.Group>
 			<ClayInput.Group>
 				<ClayInput.GroupItem prepend>
@@ -80,9 +87,11 @@ export const GroupConnected = () => (
 						type="text"
 					/>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem prepend shrink>
 					<ClayInput.GroupText>@</ClayInput.GroupText>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem prepend>
 					<ClayInput
 						aria-label="Email Host"
@@ -90,6 +99,7 @@ export const GroupConnected = () => (
 						type="text"
 					/>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem append shrink>
 					<ClayInput.GroupText>.com</ClayInput.GroupText>
 				</ClayInput.GroupItem>
@@ -105,6 +115,7 @@ export const GroupMixed = () => (
 				<ClayInput.GroupItem shrink>
 					<ClayInput.GroupText>@</ClayInput.GroupText>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem prepend>
 					<ClayInput
 						aria-label="Username"
@@ -112,6 +123,7 @@ export const GroupMixed = () => (
 						type="text"
 					/>
 				</ClayInput.GroupItem>
+
 				<ClayInput.GroupItem append shrink>
 					<button className="btn btn-secondary" type="submit">
 						Submit

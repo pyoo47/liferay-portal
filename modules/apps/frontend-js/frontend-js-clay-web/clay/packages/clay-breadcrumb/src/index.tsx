@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
@@ -14,6 +14,7 @@ type TItem = React.ComponentProps<typeof Item>;
 type TItems = Array<TItem>;
 
 interface IProps extends React.HTMLAttributes<HTMLOListElement> {
+
 	/**
 	 * Defines the aria label of component elements.
 	 */
@@ -59,8 +60,10 @@ const Breadcrumb = ({
 		close: 'Partially nest breadcrumbs',
 		open: 'See full nested',
 	},
+
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	ellipsisBuffer = 1,
+
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	ellipsisProps = {},
 	className,
@@ -92,6 +95,7 @@ const Breadcrumb = ({
 					title={collapsed ? ariaLabels.close : ariaLabels.open}
 				/>
 			)}
+
 			<ol {...otherProps} className={classNames('breadcrumb', className)}>
 				{items.length > 3 && !collapsed ? (
 					<Items

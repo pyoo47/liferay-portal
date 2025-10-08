@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React, {useState} from 'react';
@@ -15,7 +15,7 @@ export default {
 export const Default = (args: any) => (
 	<ClayBreadcrumb
 		ellipsisBuffer={args.ellipsisBuffer}
-		ellipsisProps={{'aria-label': 'More', title: 'More'}}
+		ellipsisProps={{'aria-label': 'More', 'title': 'More'}}
 		items={[
 			{
 				href: '#1',
@@ -76,7 +76,7 @@ export const Buttons = (args: any) => {
 	return (
 		<ClayBreadcrumb
 			ellipsisBuffer={args.ellipsisBuffer}
-			ellipsisProps={{'aria-label': 'More', title: 'More'}}
+			ellipsisProps={{'aria-label': 'More', 'title': 'More'}}
 			items={[
 				{
 					label: 'Home',
@@ -166,7 +166,7 @@ export const ActiveState = () => {
 	return (
 		<ClayBreadcrumb
 			ellipsisBuffer={1}
-			ellipsisProps={{'aria-label': 'More', title: 'More'}}
+			ellipsisProps={{'aria-label': 'More', 'title': 'More'}}
 			items={items}
 		/>
 	);

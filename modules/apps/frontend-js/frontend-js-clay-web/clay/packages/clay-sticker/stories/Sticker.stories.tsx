@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayButton from '@clayui/button';
@@ -54,14 +54,23 @@ export const Default = () => (
 
 		<div className="mt-3">
 			<ClaySticker displayType="outline-0">S</ClaySticker>
+
 			<ClaySticker displayType="outline-1">M</ClaySticker>
+
 			<ClaySticker displayType="outline-2">C</ClaySticker>
+
 			<ClaySticker displayType="outline-3">M</ClaySticker>
+
 			<ClaySticker displayType="outline-4">S</ClaySticker>
+
 			<ClaySticker displayType="outline-5">S</ClaySticker>
+
 			<ClaySticker displayType="outline-6">E</ClaySticker>
+
 			<ClaySticker displayType="outline-7">Q</ClaySticker>
+
 			<ClaySticker displayType="outline-8">D</ClaySticker>
+
 			<ClaySticker displayType="outline-9">P</ClaySticker>
 		</div>
 	</div>
@@ -72,6 +81,7 @@ export const Shape = () => (
 		<ClaySticker>
 			<ClayIcon symbol="user" />
 		</ClaySticker>
+
 		<ClaySticker displayType="danger" shape="circle">
 			<ClayIcon symbol="user" />
 		</ClaySticker>
@@ -108,15 +118,19 @@ export const Size = () => (
 			<ClaySticker className="mr-1" displayType="outline-0" size="xs">
 				S
 			</ClaySticker>
+
 			<ClaySticker className="mr-1" displayType="outline-1" size="sm">
 				M
 			</ClaySticker>
+
 			<ClaySticker className="mr-1" displayType="outline-2">
 				C
 			</ClaySticker>
+
 			<ClaySticker className="mr-1" displayType="outline-3" size="lg">
 				M
 			</ClaySticker>
+
 			<ClaySticker className="mr-1" displayType="outline-4" size="xl">
 				S
 			</ClaySticker>
@@ -187,6 +201,7 @@ export const Positions = (args: any) => (
 					className="aspect-ratio-item aspect-ratio-item-fluid"
 					src="https://via.placeholder.com/200"
 				/>
+
 				<ClaySticker position={args.position} size="sm">
 					A
 				</ClaySticker>
@@ -218,6 +233,7 @@ export const Overlay = () => (
 		<ClaySticker.Overlay>
 			<ClaySticker.Image alt="" src="https://via.placeholder.com/200" />
 		</ClaySticker.Overlay>
+
 		<ClaySticker.Overlay>BC</ClaySticker.Overlay>
 	</ClaySticker>
 );

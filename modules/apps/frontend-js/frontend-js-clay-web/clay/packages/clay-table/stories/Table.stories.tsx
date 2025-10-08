@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayButton from '@clayui/button';
@@ -78,27 +78,35 @@ function Dropdown() {
 export const Default = () => (
 	<ClayTable>
 		<caption>Table caption</caption>
+
 		<ClayTable.Head>
 			<ClayTable.Row>
 				<ClayTable.Cell expanded headingCell headingTitle>
 					Teams
 				</ClayTable.Cell>
+
 				<ClayTable.Cell headingCell headingTitle>
 					Region
 				</ClayTable.Cell>
+
 				<ClayTable.Cell headingCell headingTitle>
 					Country
 				</ClayTable.Cell>
+
 				<ClayTable.Cell headingCell headingTitle>
 					Description
 				</ClayTable.Cell>
 			</ClayTable.Row>
 		</ClayTable.Head>
+
 		<ClayTable.Body>
 			<ClayTable.Row>
 				<ClayTable.Cell headingTitle>White and Red</ClayTable.Cell>
+
 				<ClayTable.Cell>South America</ClayTable.Cell>
+
 				<ClayTable.Cell>Brazil</ClayTable.Cell>
+
 				<ClayTable.Cell truncate>
 					Homero aeterno conclusionemque est in, scribentur
 					mediocritatem mea ut. Ad voluptua vituperata constituam pro.
@@ -108,10 +116,14 @@ export const Default = () => (
 					legimus oporteat cu eum.
 				</ClayTable.Cell>
 			</ClayTable.Row>
+
 			<ClayTable.Row>
 				<ClayTable.Cell headingTitle>White and Purple</ClayTable.Cell>
+
 				<ClayTable.Cell>Europe</ClayTable.Cell>
+
 				<ClayTable.Cell>Spain</ClayTable.Cell>
+
 				<ClayTable.Cell truncate>
 					Homero aeterno conclusionemque est in, scribentur
 					mediocritatem mea ut. Ad voluptua vituperata constituam pro.
@@ -135,6 +147,7 @@ export const WithHover = (args: any) => {
 			<div className="autofit-col">
 				<img alt="thumbnail" className="table-img" src={thumbnail} />
 			</div>
+
 			<div className="autofit-col autofit-col-expand">
 				<div className="table-title">
 					<span className="text-truncate-inline">
@@ -192,12 +205,15 @@ export const WithHover = (args: any) => {
 				tableVerticalAlignment={args.tableVerticalAlignment}
 			>
 				<caption>Table caption</caption>
+
 				<ClayTable.Head>
 					<ClayTable.Row>
 						<ClayTable.Cell headingCell>
 							<ClayButton displayType="unstyled">Name</ClayButton>
+
 							<ClayIcon symbol="order-arrow-up" />
 						</ClayTable.Cell>
+
 						{HeadCellTitles.map((title, index) => (
 							<ClayTable.Cell headingCell key={index}>
 								{title}
@@ -205,6 +221,7 @@ export const WithHover = (args: any) => {
 						))}
 					</ClayTable.Row>
 				</ClayTable.Head>
+
 				<ClayTable.Body>
 					<ClayTable.Row divider>
 						<ClayTable.Cell colSpan={8}>Folders</ClayTable.Cell>
@@ -214,6 +231,7 @@ export const WithHover = (args: any) => {
 						<ClayTable.Cell expanded headingTitle>
 							Photos
 						</ClayTable.Cell>
+
 						{rowCellItems.map((child, index) => (
 							<ClayTable.Cell key={index}>{child}</ClayTable.Cell>
 						))}
@@ -223,6 +241,7 @@ export const WithHover = (args: any) => {
 						<ClayTable.Cell expanded headingTitle>
 							Videos
 						</ClayTable.Cell>
+
 						{rowCellItems.map((child, index) => (
 							<ClayTable.Cell key={index}>{child}</ClayTable.Cell>
 						))}
@@ -236,24 +255,31 @@ export const WithHover = (args: any) => {
 						<ClayTable.Cell expanded headingTitle>
 							Hamburger
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<ImageCell />
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>U.S.A</ClayTable.Cell>
+
 						<ClayTable.Cell align="right">10 min.</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<ClayLabel displayType="success">
 								No Spicy
 							</ClayLabel>
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<ClayButton displayType="secondary">
 								Download
 							</ClayButton>
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<ClayProgressBar value={2} />
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<Dropdown />
 						</ClayTable.Cell>
@@ -263,22 +289,29 @@ export const WithHover = (args: any) => {
 						<ClayTable.Cell expanded headingTitle>
 							Ramen
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<ImageCell />
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>China</ClayTable.Cell>
+
 						<ClayTable.Cell align="right">90 min.</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<ClayLabel displayType="warning">Spicy</ClayLabel>
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<ClayButton displayType="secondary">
 								Download
 							</ClayButton>
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<ClayProgressBar value={8} />
 						</ClayTable.Cell>
+
 						<ClayTable.Cell>
 							<Dropdown />
 						</ClayTable.Cell>
@@ -292,6 +325,7 @@ export const WithHover = (args: any) => {
 						<ClayTable.Cell expanded headingTitle>
 							Ferrán Adriá
 						</ClayTable.Cell>
+
 						{rowCellItems.map((child, index) => (
 							<ClayTable.Cell key={index}>{child}</ClayTable.Cell>
 						))}
@@ -352,9 +386,11 @@ export const WithTableList = (args: any) => {
 				tableVerticalAlignment={args.tableVerticalAlignment}
 			>
 				<caption>Table caption</caption>
+
 				<ClayTable.Head>
 					<ClayTable.Row>
 						<ClayTable.Cell />
+
 						{HeadCellTitles.map((title, index) => (
 							<ClayTable.Cell
 								headingCell
@@ -371,16 +407,19 @@ export const WithTableList = (args: any) => {
 					<ClayTable.Row divider>
 						<ClayTable.Cell colSpan={9}>Group 1</ClayTable.Cell>
 					</ClayTable.Row>
+
 					<ClayTable.Row>
 						{rowCellTitles.map((title, index) => (
 							<ClayTable.Cell key={index}>{title}</ClayTable.Cell>
 						))}
 					</ClayTable.Row>
+
 					<ClayTable.Row>
 						{rowCellTitles.map((title, index) => (
 							<ClayTable.Cell key={index}>{title}</ClayTable.Cell>
 						))}
 					</ClayTable.Row>
+
 					<ClayTable.Row>
 						{rowCellTitles.map((title, index) => (
 							<ClayTable.Cell key={index}>{title}</ClayTable.Cell>
@@ -422,18 +461,23 @@ export const WithTableListStriped = (args: any) => (
 			tableVerticalAlignment={args.tableVerticalAlignment}
 		>
 			<caption>Table caption</caption>
+
 			<ClayTable.Head>
 				<ClayTable.Row>
 					<ClayTable.Cell headingCell />
+
 					<ClayTable.Cell expanded headingCell headingTitle>
 						<span className="text-truncate">Description</span>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingCell>
 						<span className="text-truncate">Format</span>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingCell>
 						<span className="text-truncate">Label</span>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingCell />
 				</ClayTable.Row>
 			</ClayTable.Head>
@@ -443,52 +487,66 @@ export const WithTableListStriped = (args: any) => (
 					<ClayTable.Cell>
 						<ClayCheckboxWithState aria-label="Select first row" />
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingTitle truncate>
 						Wings eu, pumpkin spice robusta, kopi-luwak mocha
 						caffeine froth grounds.
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="1">JPG</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="1">JPG</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<Dropdown />
 					</ClayTable.Cell>
 				</ClayTable.Row>
+
 				<ClayTable.Row>
 					<ClayTable.Cell>
 						<ClayCheckboxWithState aria-label="Select second row" />
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingTitle truncate>
 						Wings eu, pumpkin spice robusta, kopi-luwak mocha
 						caffeine froth grounds.
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="2">GIF</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="2">GIF</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<Dropdown />
 					</ClayTable.Cell>
 				</ClayTable.Row>
+
 				<ClayTable.Row>
 					<ClayTable.Cell>
 						<ClayCheckboxWithState aria-label="Select third row" />
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingTitle truncate>
 						Wings eu, pumpkin spice robusta, kopi-luwak mocha
 						caffeine froth grounds.
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="3">TIFF</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="3">TIFF</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<Dropdown />
 					</ClayTable.Cell>
@@ -528,18 +586,23 @@ export const WithNonWrappedCells = (args: any) => (
 			tableVerticalAlignment={args.tableVerticalAlignment}
 		>
 			<caption>Table caption</caption>
+
 			<ClayTable.Head>
 				<ClayTable.Row>
 					<ClayTable.Cell headingCell />
+
 					<ClayTable.Cell expanded headingCell headingTitle>
 						<span className="text-truncate">Description</span>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingCell>
 						<span className="text-truncate">Format</span>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingCell>
 						<span className="text-truncate">Label</span>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingCell />
 				</ClayTable.Row>
 			</ClayTable.Head>
@@ -549,52 +612,66 @@ export const WithNonWrappedCells = (args: any) => (
 					<ClayTable.Cell>
 						<ClayCheckboxWithState aria-label="Select first row" />
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingTitle noWrap>
 						Wings eu, pumpkin spice robusta, kopi-luwak mocha
 						caffeine froth grounds.
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="1">JPG</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="1">JPG</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<Dropdown />
 					</ClayTable.Cell>
 				</ClayTable.Row>
+
 				<ClayTable.Row>
 					<ClayTable.Cell>
 						<ClayCheckboxWithState aria-label="Select second row" />
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingTitle noWrap>
 						Wings eu, pumpkin spice robusta, kopi-luwak mocha
 						caffeine froth grounds.
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="2">GIF</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="2">GIF</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<Dropdown />
 					</ClayTable.Cell>
 				</ClayTable.Row>
+
 				<ClayTable.Row>
 					<ClayTable.Cell>
 						<ClayCheckboxWithState aria-label="Select third row" />
 					</ClayTable.Cell>
+
 					<ClayTable.Cell headingTitle noWrap>
 						Wings eu, pumpkin spice robusta, kopi-luwak mocha
 						caffeine froth grounds.
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="3">TIFF</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<a href="3">TIFF</a>
 					</ClayTable.Cell>
+
 					<ClayTable.Cell>
 						<Dropdown />
 					</ClayTable.Cell>

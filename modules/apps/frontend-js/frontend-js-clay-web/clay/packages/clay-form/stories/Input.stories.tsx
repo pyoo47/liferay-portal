@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React from 'react';
@@ -22,6 +22,7 @@ export const Default = (args: any) => (
 	<div className="sheet">
 		<ClayForm.Group>
 			<label htmlFor="basicInputText">Name</label>
+
 			<ClayInput
 				disabled={args.disabled}
 				id="basicInputText"
@@ -48,9 +49,11 @@ export const InputFeedback = () => (
 					Name
 					<ClayForm.HelpText>(More Help Text)</ClayForm.HelpText>
 				</label>
+
 				<ClayForm.FeedbackGroup>
 					<ClayForm.HelpText>Help Text</ClayForm.HelpText>
 				</ClayForm.FeedbackGroup>
+
 				<ClayInput
 					aria-describedby="input-group-error"
 					aria-invalid="true"
@@ -74,6 +77,7 @@ export const Textarea = (args: any) => (
 	<div className="sheet">
 		<ClayForm.Group>
 			<label htmlFor="basicInputText">Name</label>
+
 			<ClayInput
 				component="textarea"
 				disabled={args.disabled}

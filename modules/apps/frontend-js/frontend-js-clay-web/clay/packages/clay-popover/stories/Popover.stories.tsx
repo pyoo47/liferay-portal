@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
@@ -121,6 +121,7 @@ export const RecalculatePosition = () => {
 			{open && (
 				<ClayModal observer={observer} size="lg" status="info">
 					<ClayModal.Header>Title</ClayModal.Header>
+
 					<ClayModal.Body scrollable>
 						<ClayPopover
 							header="Popover"
@@ -142,22 +143,27 @@ export const RecalculatePosition = () => {
 						caffeine. White roast seasonal, mocha trifecta, dripper caffeine
 						spoon acerbic to go macchiato strong.`}
 						</ClayPopover>
+
 						<br />
+
 						<img
 							alt="cat"
 							src="https://cataas.com/cat/says/it will have"
 						/>
+
 						<img
 							alt="cat"
 							src="https://cataas.com/cat/says/a scroll"
 						/>
 					</ClayModal.Body>
+
 					<ClayModal.Footer
 						first={
 							<ClayButton.Group spaced>
 								<ClayButton displayType="secondary">
 									Secondary
 								</ClayButton>
+
 								<ClayButton displayType="secondary">
 									Secondary
 								</ClayButton>

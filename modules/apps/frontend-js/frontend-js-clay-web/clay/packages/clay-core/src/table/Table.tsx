@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2023 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {sub, useControlledState, useId} from '@clayui/shared';
@@ -18,6 +18,7 @@ import {useTreeNavigation} from './useTreeNavigation';
 import type {AnnouncerAPI} from '../live-announcer';
 
 interface IProps extends React.HTMLAttributes<HTMLTableElement> {
+
 	/**
 	 * Defines the columns that are always visible and will be ignored by the
 	 * visible columns functionality.
@@ -239,7 +240,7 @@ export const Table = React.forwardRef(
 		});
 
 		const ref = useForwardRef(outRef);
-		const announcerAPI = useRef<AnnouncerAPI>(null);
+		const announcerAPIRef = useRef<AnnouncerAPI>(null);
 
 		const {navigationProps} = useTreeNavigation({
 			disabled: !nestedKey,
@@ -267,7 +268,7 @@ export const Table = React.forwardRef(
 				}}
 				tableVerticalAlignment="middle"
 			>
-				<LiveAnnouncer ref={announcerAPI} />
+				<LiveAnnouncer ref={announcerAPIRef} />
 
 				<FocusWithinProvider
 					containerRef={ref}
@@ -287,7 +288,7 @@ export const Table = React.forwardRef(
 							onLoadMore,
 							onSortChange: useCallback(
 								(sort, textValue) => {
-									announcerAPI.current!.announce(
+									announcerAPIRef.current!.announce(
 										sub(messages!.sorting, [
 											textValue,
 											sort!.direction,
@@ -308,7 +309,8 @@ export const Table = React.forwardRef(
 										column.forEach((value, index) => {
 											if (columns.has(value)) {
 												columns.delete(value);
-											} else {
+											}
+											else {
 												columns.set(value, index);
 											}
 										});
@@ -322,7 +324,8 @@ export const Table = React.forwardRef(
 
 									if (columns.has(column)) {
 										columns.delete(column);
-									} else {
+									}
+									else {
 										columns.set(column, index);
 									}
 

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import Icon from '@clayui/icon';
@@ -129,11 +129,13 @@ const ClayColorPickerCustom = ({
 									// the custom, clicking on an empty slot will replace that
 									// slot with the new color if don't have an active slot
 									// being edited.
+
 									if (hex === DEFAULT_SPLOTCH_COLOR) {
 										onEditorActiveChange(true);
 
 										// Replaces the slot color with the color entered in the
 										// input if it does not have an active slot being edited.
+
 										if (
 											previousColorRef.current !==
 												tinycolor(
@@ -151,13 +153,15 @@ const ClayColorPickerCustom = ({
 												color,
 												color.getOriginalInput() as string
 											);
-										} else {
+										}
+										else {
 											const newColor = tinycolor(hex);
 
 											onColorsChange(hex, index);
 											onChange(newColor, hex);
 										}
-									} else {
+									}
+									else {
 										const newColor = hex!.includes('var(')
 											? getCSSVariableColor(hex!)
 											: tinycolor(hex);

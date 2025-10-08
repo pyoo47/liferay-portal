@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {Text, TextHighlight} from '@clayui/core';
@@ -45,6 +45,7 @@ export const Default = (args: any) => (
 					>
 						Numbers (one-five)
 					</label>
+
 					<ClayAutocomplete
 						aria-labelledby="clay-autocomplete-label-1"
 						id="clay-autocomplete-1"
@@ -87,6 +88,7 @@ export const Dynamic = () => (
 					>
 						States
 					</label>
+
 					<ClayAutocomplete
 						aria-labelledby="clay-autocomplete-label-1"
 						defaultItems={[
@@ -176,6 +178,7 @@ export const CustomItem = () => {
 						>
 							Numbers (one-five)
 						</label>
+
 						<ClayAutocomplete
 							aria-labelledby="clay-autocomplete-label-2"
 							defaultItems={[
@@ -209,6 +212,7 @@ export const CustomItem = () => {
 												</TextHighlight>
 											</Text>
 										</Layout.ContentCol>
+
 										<Layout.ContentCol>
 											<Text size={2}>Description</Text>
 										</Layout.ContentCol>
@@ -253,6 +257,7 @@ export const AsyncFilter = () => {
 						>
 							Name
 						</label>
+
 						<ClayAutocomplete
 							aria-labelledby="clay-autocomplete-label-1"
 							filterKey="name"
@@ -332,6 +337,7 @@ export const NestedData = () => {
 						>
 							Name
 						</label>
+
 						<ClayAutocomplete
 							aria-labelledby="clay-autocomplete-label-1"
 							filterKey={(item: RickandMortyNested) =>
@@ -386,6 +392,7 @@ export const Keyboard = () => {
 				<div className="sheet">
 					<div className="form-group">
 						<label>Numbers (one-five)</label>
+
 						<FocusScope>
 							<ClayAutocomplete>
 								<ClayAutocomplete.Input
@@ -443,6 +450,7 @@ export const AsyncData = () => {
 				<div className="sheet">
 					<div className="form-group">
 						<label>Name</label>
+
 						<ClayAutocomplete>
 							<ClayAutocomplete.Input
 								aria-label="Enter a name:"
@@ -494,6 +502,7 @@ export const AsyncData = () => {
 									/>
 								</DropDown.ItemList>
 							</ClayAutocomplete.DropDown>
+
 							{loading && <ClayAutocomplete.LoadingIndicator />}
 						</ClayAutocomplete>
 					</div>
@@ -518,6 +527,7 @@ export const CreationActionWithStaticRendering = () => {
 						>
 							Tags
 						</label>
+
 						<ClayAutocomplete
 							aria-labelledby="clay-autocomplete-label-1"
 							id="clay-autocomplete-1"
@@ -559,6 +569,7 @@ export const CreationActionWithDynamicRendering = () => {
 						>
 							Tags
 						</label>
+
 						<ClayAutocomplete
 							aria-labelledby="clay-autocomplete-label-1"
 							defaultItems={['Small', 'Medium', 'Large']}

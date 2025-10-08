@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {useId} from '@clayui/shared';
@@ -50,7 +50,7 @@ function getItemId(value: Record<string, any> | string | number, key: string) {
 export function useCollection<
 	T extends Record<string, any> | string | number,
 	P = unknown,
-	K = unknown
+	K = unknown,
 >({
 	children,
 	connectNested = true,
@@ -127,7 +127,7 @@ export function useCollection<
 							? React.cloneElement(
 									child as React.ReactElement,
 									props
-							  )
+								)
 							: child}
 					</ItemContainer>
 				);
@@ -144,6 +144,7 @@ export function useCollection<
 
 							// We only pass the textValue to the component when the collection
 							// indicates that it will be used for accessibility issues.
+
 							...(!suppressTextValueWarning
 								? {
 										textValue: getTextValue(
@@ -151,9 +152,9 @@ export function useCollection<
 											child,
 											true
 										),
-								  }
+									}
 								: {}),
-					  }
+						}
 					: {}),
 				...(props ? props : {}),
 			});
@@ -170,6 +171,7 @@ export function useCollection<
 			// structure.
 			// TODO: Mount a structure with the children's information and cache it
 			// to use when rendering the component.
+
 			const callNestedChild = (child: ChildElement) => {
 				if (
 					child.type.displayName &&
@@ -235,13 +237,15 @@ export function useCollection<
 					);
 
 					// TODO: We need support for items with just number and string types.
+
 					if (typeof item === 'object') {
 						item['_key'] = key;
 					}
 
 					registerItem(key, child, index);
 				}
-			} else {
+			}
+			else {
 				React.Children.forEach(children, (child, index) => {
 					if (!React.isValidElement(child)) {
 						return;
@@ -274,21 +278,21 @@ export function useCollection<
 								? excludeProps(
 										item as Record<any, any>,
 										exclude
-								  )
+									)
 								: item;
 						const child = Array.isArray(publicApi)
 							? (children(
 									publicItem,
 									...publicApi
-							  ) as ChildElement)
+								) as ChildElement)
 							: (children(
 									publicItem,
 									virtual.index
-							  ) as ChildElement);
+								) as ChildElement);
 
 						const props = {
 							'data-index': virtual.index,
-							ref: (node: HTMLElement) => {
+							'ref': (node: HTMLElement) => {
 								virtualizer.measureElement(node);
 
 								const ref = (child as ChildElement).ref;
@@ -297,7 +301,7 @@ export function useCollection<
 									ref(node);
 								}
 							},
-							style: {
+							'style': {
 								left: 0,
 								position: 'absolute',
 								top: 0,
@@ -338,7 +342,7 @@ export function useCollection<
 					if (
 						visibleKeys &&
 						((Array.isArray(visibleKeys) &&
-							visibleKeys.length > 0 &&
+							!!visibleKeys.length &&
 							!visibleKeys.includes(index)) ||
 							(visibleKeys instanceof Set &&
 								visibleKeys.size > 0 &&
@@ -361,7 +365,7 @@ export function useCollection<
 				if (
 					visibleKeys &&
 					((Array.isArray(visibleKeys) &&
-						visibleKeys.length > 0 &&
+						!!visibleKeys.length &&
 						!visibleKeys.includes(index)) ||
 						(visibleKeys instanceof Set &&
 							visibleKeys.size > 0 &&
@@ -426,6 +430,7 @@ export function useCollection<
 	// consume the data later and only recompute when the data changes or
 	// the children this avoids recalculating again on any rendering,
 	// for example on a virtualized list.
+
 	useMemo(() => {
 		if (!parentLayout) {
 			cleanUp();
@@ -434,6 +439,7 @@ export function useCollection<
 		// Walks through the elements to compute the layout of the collection
 		// before rendering the element. The data can be consumed later even
 		// if the element is not rendered.
+
 		createItemsLayout({children, items});
 	}, [children, createItemsLayout, items]);
 
@@ -442,10 +448,11 @@ export function useCollection<
 	//
 	// - Data: We get the data of the item to consume later
 	// - Rendering: We render each element in memory
+
 	const rendered = useMemo(() => {
 		const list = performCollectionRender({children, items});
 
-		if (list.length === 0 && notFound) {
+		if (!list.length && notFound) {
 			return notFound;
 		}
 
@@ -455,6 +462,7 @@ export function useCollection<
 	// Effect only called when the component is unmounted removing the layout
 	// items that are rendered by the collection instance, effect only when
 	// there are nested collections.
+
 	useEffect(
 		() => () => {
 			if (forceUpdate) {
@@ -470,6 +478,7 @@ export function useCollection<
 	// adding the items of the collection instance to the layout root.
 	// NOTE: This update avoids the side effect of set the state in a `useMemo`
 	// at render time then only being called when the collection is ready.
+
 	useEffect(() => {
 		if (forceUpdate) {
 			forceUpdate(null);

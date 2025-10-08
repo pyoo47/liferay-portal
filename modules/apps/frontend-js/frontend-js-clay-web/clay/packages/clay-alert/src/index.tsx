@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import Icon from '@clayui/icon';
@@ -12,31 +12,31 @@ import {ClayAlertFooter} from './Footer';
 import {ClayToastContainer} from './ToastContainer';
 
 const useAutoClose = (autoClose?: boolean | number, onClose = () => {}) => {
-	const startedTime = React.useRef<number>(0);
-	const timer = React.useRef<number | undefined>(undefined);
-	const timeToClose = React.useRef(autoClose === true ? 10000 : autoClose);
+	const startedTimeRef = React.useRef<number>(0);
+	const timerRef = React.useRef<number | undefined>(undefined);
+	const timeToCloseRef = React.useRef(autoClose === true ? 10000 : autoClose);
 
 	let pauseTimer = () => {};
 	let startTimer = () => {};
 
 	if (autoClose) {
 		pauseTimer = () => {
-			if (timer.current) {
-				timeToClose.current =
-					(timeToClose.current as number) -
-					(Date.now() - startedTime.current);
+			if (timerRef.current) {
+				timeToCloseRef.current =
+					(timeToCloseRef.current as number) -
+					(Date.now() - startedTimeRef.current);
 
-				clearTimeout(timer.current);
+				clearTimeout(timerRef.current);
 
-				timer.current = undefined;
+				timerRef.current = undefined;
 			}
 		};
 
 		startTimer = () => {
-			startedTime.current = Date.now();
-			timer.current = window.setTimeout(
+			startedTimeRef.current = Date.now();
+			timerRef.current = window.setTimeout(
 				onClose,
-				timeToClose.current as number
+				timeToCloseRef.current as number
 			);
 		};
 	}
@@ -64,6 +64,7 @@ export type DisplayType =
 
 export interface IClayAlertProps
 	extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role'> {
+
 	/**
 	 * A React Component to render the alert actions.
 	 */

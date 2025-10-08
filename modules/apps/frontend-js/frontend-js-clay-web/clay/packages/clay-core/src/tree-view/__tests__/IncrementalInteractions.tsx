@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import Button from '@clayui/button';
@@ -15,6 +15,7 @@ import {Icon, Provider, TreeView} from '../..';
 const spritemap = 'icons.svg';
 
 // Just to avoid TypeScript error with required props
+
 const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 OptionalCheckbox.displayName = 'ClayCheckbox';
@@ -28,6 +29,7 @@ describe('TreeView incremental interactions', () => {
 				<TreeView>
 					<TreeView.Item key="Root">
 						<TreeView.ItemStack>Root</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item key="Item">Item</TreeView.Item>
 						</TreeView.Group>
@@ -58,6 +60,7 @@ describe('TreeView incremental interactions', () => {
 				<TreeView>
 					<TreeView.Item key="Root">
 						<TreeView.ItemStack>Root</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item key="Item">Item</TreeView.Item>
 						</TreeView.Group>
@@ -118,6 +121,7 @@ describe('TreeView incremental interactions', () => {
 									event.preventDefault();
 
 									// @ts-ignore
+
 									if (event.detail === 2) {
 										expand.toggle(item.id);
 									}
@@ -125,6 +129,7 @@ describe('TreeView incremental interactions', () => {
 							>
 								{item.name}
 							</TreeView.ItemStack>
+
 							<TreeView.Group items={item.children}>
 								\
 								{(item) => (
@@ -177,12 +182,15 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.Item>
 									<TreeView.ItemStack>
 										<OptionalCheckbox />
+
 										{item.name}
 									</TreeView.ItemStack>
+
 									<TreeView.Group items={item.children}>
 										{(item) => (
 											<TreeView.Item>
 												<OptionalCheckbox />
+
 												{item.name}
 											</TreeView.Item>
 										)}
@@ -229,6 +237,7 @@ describe('TreeView incremental interactions', () => {
 									<OptionalCheckbox />
 									Root
 								</TreeView.ItemStack>
+
 								<TreeView.Group>
 									<TreeView.Item key="Item">
 										<OptionalCheckbox />
@@ -267,6 +276,7 @@ describe('TreeView incremental interactions', () => {
 									<OptionalCheckbox />
 									Root
 								</TreeView.ItemStack>
+
 								<TreeView.Group>
 									<TreeView.Item key="Item">
 										<OptionalCheckbox />
@@ -307,12 +317,15 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.Item>
 									<TreeView.ItemStack>
 										<OptionalCheckbox />
+
 										{item.name}
 									</TreeView.ItemStack>
+
 									<TreeView.Group items={item.children}>
 										{(item) => (
 											<TreeView.Item>
 												<OptionalCheckbox />
+
 												{item.name}
 											</TreeView.Item>
 										)}
@@ -352,6 +365,7 @@ describe('TreeView incremental interactions', () => {
 									<OptionalCheckbox />
 									Root
 								</TreeView.ItemStack>
+
 								<TreeView.Group>
 									<TreeView.Item key="Item">
 										<OptionalCheckbox />
@@ -393,6 +407,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -437,6 +452,7 @@ describe('TreeView incremental interactions', () => {
 							<TreeView.Item>
 								<TreeView.ItemStack>
 									{item.name}
+
 									<Button
 										data-testid="root"
 										onClick={() =>
@@ -446,10 +462,12 @@ describe('TreeView incremental interactions', () => {
 										Select
 									</Button>
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
 											{item.name}
+
 											<Button
 												data-testid="item"
 												onClick={() =>
@@ -507,6 +525,7 @@ describe('TreeView incremental interactions', () => {
 									}
 								>
 									{item.name}
+
 									<Button
 										data-testid="root"
 										onClick={(event) => {
@@ -518,6 +537,7 @@ describe('TreeView incremental interactions', () => {
 										Select
 									</Button>
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item
@@ -528,6 +548,7 @@ describe('TreeView incremental interactions', () => {
 											}
 										>
 											{item.name}
+
 											<Button
 												data-testid="item"
 												onClick={(event) => {
@@ -582,6 +603,7 @@ describe('TreeView incremental interactions', () => {
 									}
 								>
 									{item.name}
+
 									<Button
 										data-testid="root"
 										onClick={(event) => {
@@ -593,6 +615,7 @@ describe('TreeView incremental interactions', () => {
 										Select
 									</Button>
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item
@@ -603,6 +626,7 @@ describe('TreeView incremental interactions', () => {
 											}
 										>
 											{item.name}
+
 											<Button
 												data-testid="item"
 												onClick={(event) => {
@@ -649,6 +673,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -689,6 +714,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -728,6 +754,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -782,6 +809,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -819,6 +847,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -871,6 +900,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -929,6 +959,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -979,6 +1010,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -1029,10 +1061,12 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
 											<OptionalCheckbox />
+
 											{item.name}
 										</TreeView.Item>
 									)}
@@ -1115,6 +1149,7 @@ describe('TreeView incremental interactions', () => {
 								<TreeView.ItemStack>
 									{item.name}
 								</TreeView.ItemStack>
+
 								<TreeView.Group items={item.children}>
 									{(item) => (
 										<TreeView.Item>
@@ -1185,6 +1220,7 @@ describe('TreeView incremental interactions', () => {
 					>
 						Item 1
 					</TreeView.Item>
+
 					<TreeView.Item>Item 2</TreeView.Item>
 				</TreeView>
 			</Provider>
@@ -1233,6 +1269,7 @@ describe('TreeView incremental interactions', () => {
 					>
 						Item 1
 					</TreeView.Item>
+
 					<TreeView.Item>Item 2</TreeView.Item>
 				</TreeView>
 			</Provider>

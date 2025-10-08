@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import classNames from 'classnames';
@@ -9,6 +9,7 @@ import React, {useContext} from 'react';
 import {NavigationBarContext} from './context';
 
 export interface IProps extends React.HTMLAttributes<HTMLLIElement> {
+
 	/**
 	 * Determines the active state of an dropdown list item.
 	 */
@@ -34,9 +35,13 @@ export const Item = ({
 				children,
 				(child: React.ReactElement<IProps>, index) => {
 					if (
+
 						// @ts-ignore
+
 						child?.type.displayName === 'ClayLink' ||
+
 						// @ts-ignore
+
 						child?.type.displayName === 'ClayButton'
 					) {
 						return React.cloneElement(child, {
@@ -44,17 +49,19 @@ export const Item = ({
 							'aria-current': active
 								? ariaCurrent ?? undefined
 								: undefined,
-							children: <span>{child.props.children}</span>,
-							className: classNames(
+							'children': <span>{child.props.children}</span>,
+							'className': classNames(
 								'nav-link',
 								child.props.className?.replace('nav-link', ''),
 								{
 									active,
 								}
 							),
+
 							// @ts-ignore
-							displayType: null,
-							key: index,
+
+							'displayType': null,
+							'key': index,
 						});
 					}
 

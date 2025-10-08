@@ -1,12 +1,18 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+import classNames from 'classnames';
 import {promises as fs} from 'fs';
+
 import {
-	SandpackProvider,
-	SandpackLayout,
 	SandpackCodeEditor,
+	SandpackLayout,
 	SandpackPreview,
+	SandpackProvider,
 	theme,
 } from './Sandpack';
-import classNames from 'classnames';
 import styles from './sandpack.module.css';
 
 type Props = {
@@ -14,7 +20,7 @@ type Props = {
 	children: any;
 };
 
-export async function Sandpack({language, children}: Props) {
+export async function Sandpack({children, language}: Props) {
 	const file = await fs.readFile(
 		process.cwd() + '/node_modules/@clayui/css/lib/images/icons/icons.svg',
 		'utf-8'
@@ -23,11 +29,9 @@ export async function Sandpack({language, children}: Props) {
 	return (
 		<SandpackProvider
 			className={classNames('mb-4', styles.code_editor_open)}
-			theme={theme as any}
-			template={language === 'jsx' ? 'react' : undefined}
 			customSetup={{
 				dependencies: {
-					react: '^16.12.0',
+					'react': '^16.12.0',
 					'react-dom': '^16.12.0',
 					'@clayui/core': 'latest',
 					'@clayui/icon': 'latest',
@@ -93,10 +97,13 @@ ReactDOM.render(
 			options={{
 				experimental_enableServiceWorker: true,
 			}}
+			template={language === 'jsx' ? 'react' : undefined}
+			theme={theme as any}
 		>
 			<div className={styles.code_preview}>
 				<SandpackPreview />
 			</div>
+
 			<SandpackLayout>
 				<SandpackCodeEditor showLineNumbers showTabs={false} />
 			</SandpackLayout>

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import Button from '@clayui/button';
@@ -39,6 +39,7 @@ const ClayDatePickerDateNavigation = ({
 	spritemap,
 	years,
 }: Props) => {
+
 	/**
 	 * Handles the change of the month from the available
 	 * years in the range
@@ -82,6 +83,7 @@ const ClayDatePickerDateNavigation = ({
 						value={currentMonth.getMonth()}
 					/>
 				</div>
+
 				<div className="date-picker-nav-item input-date-picker-year">
 					<Picker
 						UNSAFE_behavior="secondary"
@@ -132,6 +134,7 @@ const ClayDatePickerDateNavigation = ({
 					>
 						<Icon spritemap={spritemap} symbol="angle-left" />
 					</Button>
+
 					<Button
 						aria-label={ariaLabels.buttonDot}
 						className="nav-btn nav-btn-monospaced"
@@ -142,6 +145,7 @@ const ClayDatePickerDateNavigation = ({
 					>
 						<Icon spritemap={spritemap} symbol="simple-circle" />
 					</Button>
+
 					<Button
 						aria-label={ariaLabels.buttonNextMonth}
 						className="nav-btn nav-btn-monospaced"

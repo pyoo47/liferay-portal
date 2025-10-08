@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {Nav, VerticalNav} from '@clayui/core';
@@ -10,6 +10,7 @@ import warning from 'warning';
 export type DisplayType = null | 'primary';
 
 interface IItem extends React.ComponentProps<typeof Nav.Item> {
+
 	/**
 	 * Flag to indicate if item is active.
 	 */
@@ -32,6 +33,7 @@ interface IItem extends React.ComponentProps<typeof Nav.Item> {
 }
 
 interface IItemWithItems extends IItem {
+
 	/**
 	 * Flag to indicate if nested items are expanded and shown.
 	 */
@@ -44,6 +46,7 @@ interface IItemWithItems extends IItem {
 }
 
 interface IProps extends React.ComponentProps<typeof VerticalNav> {
+
 	/**
 	 * Flag to define if the item represents the current page. Disable this
 	 * attribute only if there are multiple navigations on the page.

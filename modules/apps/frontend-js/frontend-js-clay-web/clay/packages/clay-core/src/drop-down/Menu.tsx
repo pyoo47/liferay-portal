@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2023 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {
@@ -34,7 +34,7 @@ const List = React.forwardRef<
 });
 
 type Props<T> = {
-	alwaysClose?: boolean;
+	'alwaysClose'?: boolean;
 
 	/**
 	 * The `aria-label` attribute defines a string value that labels an interactive
@@ -51,12 +51,12 @@ type Props<T> = {
 	/**
 	 * Flag to indicate if menu is showing or not (controlled).
 	 */
-	active?: boolean;
+	'active'?: boolean;
 
 	/**
 	 * Custom container component.
 	 */
-	as?:
+	'as'?:
 		| 'div'
 		| React.ForwardRefExoticComponent<any>
 		| ((props: React.HTMLAttributes<HTMLDivElement>) => JSX.Element);
@@ -64,38 +64,38 @@ type Props<T> = {
 	/**
 	 * CSS clases to menu element.
 	 */
-	className?: string;
+	'className'?: string;
 
 	/**
 	 * The initial value of the active state (uncontrolled).
 	 */
-	defaultActive?: boolean;
+	'defaultActive'?: boolean;
 
 	/**
 	 * Flag to indicate that the component is disabled.
 	 */
-	disabled?: boolean;
+	'disabled'?: boolean;
 
 	/**
 	 * Callback for when the active state changes (controlled).
 	 */
-	onActiveChange?: InternalDispatch<boolean>;
+	'onActiveChange'?: InternalDispatch<boolean>;
 
 	/**
 	 * Defines the ARIA role of the menu.
 	 */
-	role?: 'menu' | 'listbox';
+	'role'?: 'menu' | 'listbox';
 
 	/**
 	 * Trigger menu.
 	 */
-	trigger: React.ReactElement & {
+	'trigger': React.ReactElement & {
 		ref?: (node: HTMLButtonElement | null) => void;
 	};
 
-	style?: React.CSSProperties;
+	'style'?: React.CSSProperties;
 
-	UNSAFE_focusableElements?: Array<string>;
+	'UNSAFE_focusableElements'?: Array<string>;
 } & Omit<Partial<ICollectionProps<T, unknown>>, 'virtualize'>;
 
 function MenuInner<T extends Record<string, unknown> | string | number>(
@@ -123,6 +123,7 @@ function MenuInner<T extends Record<string, unknown> | string | number>(
 	const triggerRef = useRef<HTMLButtonElement | null>(null);
 
 	// Pre-initializes events for the Focus Menu.
+
 	useInteractionFocus();
 
 	useImperativeHandle(ref, () => menuRef.current, []);
@@ -216,19 +217,21 @@ function MenuInner<T extends Record<string, unknown> | string | number>(
 				'aria-controls': active ? ariaControlsId : undefined,
 				'aria-expanded': active,
 				'aria-haspopup': 'true',
-				className: classNames(
+				'className': classNames(
 					'dropdown-toggle',
 					trigger.props.className
 				),
 				disabled,
-				onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+				'onClick': (event: React.MouseEvent<HTMLButtonElement>) => {
 					if (trigger.props.onClick) {
 						trigger.props.onClick(event);
 					}
 
 					setActive(!active);
 				},
-				onKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => {
+				'onKeyDown': (
+					event: React.KeyboardEvent<HTMLButtonElement>
+				) => {
 					if (trigger.props.onKeyDown) {
 						trigger.props.onKeyDown(event);
 					}
@@ -254,9 +257,11 @@ function MenuInner<T extends Record<string, unknown> | string | number>(
 							break;
 					}
 				},
-				ref: (node: HTMLButtonElement) => {
+				'ref': (node: HTMLButtonElement) => {
 					triggerRef.current = node;
+
 					// Call the original ref, if any.
+
 					const {ref} = trigger;
 					if (typeof ref === 'function') {
 						ref(node);

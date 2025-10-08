@@ -10,6 +10,19 @@
     apps/microblogs
 
 ##
+## ClayUI
+##
+
+    #
+    # Clay CSS and Clay docs site ignores
+    #
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clayui.com/.cache
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clayui.com/public
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clayui.com/react-docgen
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clayui.com/static
+    /apps/frontend-js/frontend-js-clay-web/clay/packages/clay-css/src/js/**/*
+
+##
 ## Generated Files
 ##
 

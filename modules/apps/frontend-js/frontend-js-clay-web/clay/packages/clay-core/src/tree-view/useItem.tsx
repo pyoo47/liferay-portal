@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2021 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React, {useContext, useEffect, useMemo, useRef} from 'react';
@@ -79,11 +79,12 @@ export function ItemContextProvider({children, value}: Props) {
 
 	const hoverTimeoutIdRef = useRef<number | null>();
 
-	const isValidDrop = useRef<boolean>(true);
+	const isValidDropRef = useRef<boolean>(true);
 
 	// Holds a reference to the index value and only updates when its positions
 	// change. This causes a ripple effect that we only want to update
 	// when necessary.
+
 	const indexes = useMemo(
 		() => [...(parentIndexes ?? []), value.index],
 		[parentIndexes, value.index]
@@ -143,9 +144,11 @@ export function ItemContextProvider({children, value}: Props) {
 	});
 
 	useEffect(() => {
+
 		// Resets the flag when the drag and drop is finished or cancelled.
+
 		if (mode === null) {
-			isValidDrop.current = true;
+			isValidDropRef.current = true;
 		}
 	}, [mode]);
 
@@ -170,7 +173,7 @@ export function ItemContextProvider({children, value}: Props) {
 				monitor.didDrop() ||
 				!monitor.canDrop() ||
 				dragItem.item.key === item.key ||
-				!isValidDrop.current
+				!isValidDropRef.current
 			) {
 				return;
 			}
@@ -229,7 +232,8 @@ export function ItemContextProvider({children, value}: Props) {
 				dropItemRect.height * DISTANCE + dropItemRect.top
 			) {
 				currentPosition = TARGET_POSITION.TOP;
-			} else if (
+			}
+			else if (
 				clientOffsetY >
 					dropItemRect.bottom - dropItemRect.height * DISTANCE &&
 				!expandedKeys.has(item.key)
@@ -254,7 +258,7 @@ export function ItemContextProvider({children, value}: Props) {
 				!expandedKeys.has(item.key) &&
 				child &&
 				Array.isArray(child) &&
-				child.length > 0
+				!!child.length
 			) {
 				hoverTimeoutIdRef.current = setTimeout(() => {
 					hoverTimeoutIdRef.current = null;
@@ -281,13 +285,13 @@ export function ItemContextProvider({children, value}: Props) {
 				);
 
 				if (!isHovered) {
-					isValidDrop.current = false;
+					isValidDropRef.current = false;
 
 					return;
 				}
 			}
 
-			isValidDrop.current = true;
+			isValidDropRef.current = true;
 			if (currentPosition !== position) {
 				onPositionChange(currentKey, currentPosition);
 			}

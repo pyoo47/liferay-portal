@@ -61,7 +61,9 @@ async function bundle(
 		format: 'esm',
 		outdir: BUILD_MAIN_EXPORTS_PATH,
 		plugins: [
-			getExactAliasPlugin(globalImports, 'exports', [projectExport.moduleName]),
+			getExactAliasPlugin(globalImports, 'exports', [
+				projectExport.moduleName,
+			]),
 			getExternalsPlugin(),
 			getImportBridgesPlugin(globalImports, overridenPackageSymbols),
 		],

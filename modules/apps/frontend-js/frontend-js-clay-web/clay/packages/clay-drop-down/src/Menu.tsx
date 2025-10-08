@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {IPortalBaseProps, Overlay, useOverlayPosition} from '@clayui/shared';
@@ -25,6 +25,7 @@ export const Align = {
 } as const;
 
 export interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+
 	/**
 	 * Flag to indicate if menu is showing or not.
 	 */
@@ -220,7 +221,7 @@ const Menu = React.forwardRef<HTMLDivElement, IProps>(
 							'dropdown-menu-indicator-start': hasLeftSymbols,
 							[`dropdown-menu-height-${height}`]: height,
 							[`dropdown-menu-width-${width}`]: width,
-							show: active,
+							'show': active,
 						})}
 						ref={menuRef}
 						role={role}

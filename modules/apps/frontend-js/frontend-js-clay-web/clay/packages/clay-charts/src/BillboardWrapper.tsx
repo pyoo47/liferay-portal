@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {ChartOptions, bb} from 'billboard.js';
@@ -31,9 +31,11 @@ const BillboardWrapper = ({
 					data,
 					onafterinit() {
 						if (onafterinit) {
+
 							// Called async so that `forwardRef.current`
 							// will be set to the chart before calling
 							// `onafterinit`
+
 							setTimeout(() => onafterinit(), 0);
 						}
 					},
@@ -52,7 +54,9 @@ const BillboardWrapper = ({
 			if (forwardRef.current) {
 				try {
 					forwardRef.current.destroy();
-				} catch (error) {
+				}
+				catch (error) {
+
 					// eslint-disable-next-line no-console
 					console.error('Internal billboard.js error', error);
 				}

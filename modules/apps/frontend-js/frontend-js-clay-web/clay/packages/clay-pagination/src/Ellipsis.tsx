@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import Button from '@clayui/button';
@@ -12,13 +12,13 @@ const {Item, Menu} = __EXPERIMENTAL_MENU;
 
 type Props = {
 	'aria-label'?: string;
-	alignmentPosition?: number | AlignPoints;
-	disabled?: boolean;
-	disabledPages?: Array<number>;
-	hrefConstructor?: (page?: number) => string;
-	items?: Array<number>;
-	onPageChange?: (page?: number) => void;
-	title?: string;
+	'alignmentPosition'?: number | AlignPoints;
+	'disabled'?: boolean;
+	'disabledPages'?: Array<number>;
+	'hrefConstructor'?: (page?: number) => string;
+	'items'?: Array<number>;
+	'onPageChange'?: (page?: number) => void;
+	'title'?: string;
 };
 
 export const Ellipsis = ({
@@ -35,7 +35,7 @@ export const Ellipsis = ({
 			? sub(otherProps['aria-label'], [
 					String(items[0]),
 					String(items[items.length - 1]),
-			  ])
+				])
 			: undefined;
 
 	const title =
@@ -43,7 +43,7 @@ export const Ellipsis = ({
 			? sub(otherProps['title'], [
 					String(items[0]),
 					String(items[items.length - 1]),
-			  ])
+				])
 			: undefined;
 
 	return (

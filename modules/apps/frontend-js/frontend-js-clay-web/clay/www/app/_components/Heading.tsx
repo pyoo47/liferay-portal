@@ -1,9 +1,15 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
 'use client';
 
-import classNames from 'classnames';
-import NavigationBar from '@clayui/navigation-bar';
 import ClayLink, {ClayLinkContext} from '@clayui/link';
+import NavigationBar from '@clayui/navigation-bar';
+import classNames from 'classnames';
 import Link from 'next/link';
+
 import styles from './heading.module.css';
 
 type Props = {
@@ -45,7 +51,7 @@ export default function Heading({
 						href: `/docs/${slugBase.join('/')}/markup`,
 						label: 'HTML/CSS',
 					},
-			  ]
+				]
 			: []),
 		...(design
 			? [
@@ -54,7 +60,7 @@ export default function Heading({
 						href: `/docs/${slugBase.join('/')}/design`,
 						label: 'Design',
 					},
-			  ]
+				]
 			: []),
 	];
 
@@ -62,6 +68,7 @@ export default function Heading({
 		<div className={styles.heading_container}>
 			<div className={styles.heading_title}>
 				<h1 className="text-10">{title}</h1>
+
 				{lexicon && (
 					<a
 						className="badge badge-primary badge-translucent"
@@ -72,6 +79,7 @@ export default function Heading({
 						View in Lexicon
 					</a>
 				)}
+
 				{packageStatus && (
 					<span
 						className={classNames('badge badge-translucent', {
@@ -84,6 +92,7 @@ export default function Heading({
 					</span>
 				)}
 			</div>
+
 			{description && (
 				<p className="text-6 text-secondary">{description}</p>
 			)}
@@ -93,10 +102,13 @@ export default function Heading({
 					<tbody>
 						<tr>
 							<th>install</th>
+
 							<td>yarn add {npmPackage}</td>
 						</tr>
+
 						<tr>
 							<th>version</th>
+
 							<td>
 								<img
 									alt="NPM Version"
@@ -104,8 +116,10 @@ export default function Heading({
 								/>
 							</td>
 						</tr>
+
 						<tr>
 							<th>use</th>
+
 							<td>{use}</td>
 						</tr>
 					</tbody>
@@ -115,13 +129,13 @@ export default function Heading({
 			{(markup || design) && (
 				<ClayLinkContext.Provider value={Link as any}>
 					<NavigationBar
-						triggerLabel="Navigation"
 						className={styles.nav}
+						triggerLabel="Navigation"
 					>
 						{items.map((item) => (
 							<NavigationBar.Item
-								key={item.label}
 								active={item.active}
+								key={item.label}
 							>
 								<ClayLink href={item.href}>
 									{item.label}

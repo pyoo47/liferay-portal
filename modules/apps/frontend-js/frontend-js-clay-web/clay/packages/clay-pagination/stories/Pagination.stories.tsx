@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React from 'react';
@@ -14,7 +14,9 @@ export default {
 export const Default = () => (
 	<ClayPagination>
 		<ClayPagination.Item>1</ClayPagination.Item>
+
 		<ClayPagination.Ellipsis aria-label="More" title="More" />
+
 		<ClayPagination.Item aria-label="Go to the end">
 			End
 		</ClayPagination.Item>
@@ -27,7 +29,7 @@ export const WithLinks = (args: any) => (
 		ellipsisBuffer={args.ellipsisBuffer}
 		ellipsisProps={{
 			'aria-label': 'More {0} through {1}',
-			title: 'More {0} through {1}',
+			'title': 'More {0} through {1}',
 		}}
 		hrefConstructor={(page) => `#${page}`}
 		totalPages={args.totalPages}
@@ -60,7 +62,7 @@ export const DisabledPages = () => (
 		ellipsisBuffer={2}
 		ellipsisProps={{
 			'aria-label': 'Show page links {0} to {1}',
-			title: 'Show page links {0} to {1}',
+			'title': 'Show page links {0} to {1}',
 		}}
 		totalPages={5}
 	/>

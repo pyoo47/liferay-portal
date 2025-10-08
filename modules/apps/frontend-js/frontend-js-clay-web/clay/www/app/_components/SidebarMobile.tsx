@@ -1,3 +1,8 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
 'use client';
 
 import Icon from '@clayui/icon';
@@ -10,7 +15,7 @@ type Props = {
 	children: React.ReactNode;
 };
 
-export function SidebarMobile({logo, children}: Props) {
+export function SidebarMobile({children, logo}: Props) {
 	const [expand, setExpand] = useState(false);
 
 	return (
@@ -24,7 +29,7 @@ export function SidebarMobile({logo, children}: Props) {
 					onClick={() => setExpand(!expand)}
 					type="button"
 				>
-					<Icon symbol="bars" spritemap="/images/icons/icons.svg" />
+					<Icon spritemap="/images/icons/icons.svg" symbol="bars" />
 				</button>
 			</div>
 

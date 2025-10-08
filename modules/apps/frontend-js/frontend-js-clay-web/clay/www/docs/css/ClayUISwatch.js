@@ -1,3 +1,8 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
 'use client';
 
 /**
@@ -43,28 +48,35 @@ export default (props) => {
 				)}`}
 				ref={SwatchColorRef}
 			/>
+
 			<div className="clay-site-swatch-body">
 				<div className="clay-site-swatch-title">
 					{props.lexiconName}
 				</div>
+
 				<div className="autofit-row">
 					<div className="autofit-col clay-site-swatch-type">Var</div>
+
 					<div className="autofit-col autofit-col-expand clay-site-swatch-value">
 						<span className="clay-site-swatch-text clay-site-var">
 							{props.varName}
 						</span>
 					</div>
 				</div>
+
 				<div className="autofit-row">
 					<div className="autofit-col clay-site-swatch-type">Hex</div>
+
 					<div className="autofit-col autofit-col-expand clay-site-swatch-value">
 						<span className="clay-site-hex clay-site-swatch-text">
 							{hex}
 						</span>
 					</div>
 				</div>
+
 				<div className="autofit-row">
 					<div className="autofit-col clay-site-swatch-type">Rgb</div>
+
 					<div className="autofit-col autofit-col-expand clay-site-swatch-value">
 						<span className="clay-site-rgb clay-site-swatch-text">
 							{rgb}

@@ -1,11 +1,12 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React from 'react';
 
 interface IBufferList {
+
 	/**
 	 * Component to be used as a Ellipsis.
 	 */
@@ -71,7 +72,9 @@ export const getEllipsisItems = (
 		...leftBuffer,
 		...items.slice(
 			Math.max(activeIndex - ellipsisBuffer, 1),
+
 			// Add 1 to account for active index
+
 			Math.min(activeIndex + ellipsisBuffer + 1, lastIndex)
 		),
 		...rightBuffer,

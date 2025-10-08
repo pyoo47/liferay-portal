@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {__UNSTABLE_DataClient, useProvider} from '@clayui/provider';
@@ -44,6 +44,7 @@ type Variables = Record<string, any> | null;
 type LinkFunction = (variables: string) => Promise<any>;
 
 type FetchRetryDelay = {
+
 	/**
 	 * The number of milliseconds to wait before attempting the first retry.
 	 *
@@ -64,6 +65,7 @@ type FetchRetryDelay = {
 };
 
 type FetchRetry = {
+
 	/**
 	 * The maximum number of times to try a single request before giving up.
 	 */
@@ -81,6 +83,7 @@ type FetchCursor<T> = {
 };
 
 type Props = {
+
 	/**
 	 * A Promise returning function to fetch your data, this replaces the
 	 * use of `fetch` by default.
@@ -225,6 +228,7 @@ const useResource = ({
 	suspense = false,
 	variables = null,
 }: Props) => {
+
 	// We changed the cache policy when suspense is enabled so that the
 	// integration with suspense and the client works better, we need
 	// to store the data that was retrieved from the promise in progress
@@ -232,6 +236,7 @@ const useResource = ({
 	// When we throw the promise at render time, suspense invokes and resets
 	// the hook states and refs every time, when realizes the promise has been
 	// resolved starts the hooks lifecycle with useEffects and other states.
+
 	if (fetchPolicy === FetchPolicy.NoCache && suspense) {
 		fetchPolicy = FetchPolicy.CacheAndNetwork;
 	}
@@ -240,7 +245,7 @@ const useResource = ({
 
 	const retryDelayTimeoutIdRef = useRef<null | NodeJS.Timeout>(null);
 
-	const abortController = useRef<AbortController | null>(null);
+	const abortControllerRef = useRef<AbortController | null>(null);
 
 	const networkStatusRef = useRef<NetworkStatus>();
 
@@ -254,6 +259,7 @@ const useResource = ({
 
 	// A flag to identify if the first rendering happened to avoid
 	// two requests.
+
 	const firstRenderRef = useRef<boolean>(true);
 
 	const firstRequestRef = useRef<boolean>(false);
@@ -272,7 +278,7 @@ const useResource = ({
 
 	const {client: globalClient} = useProvider();
 
-	const client = useRef(
+	const clientRef = useRef(
 		globalClient ?? new __UNSTABLE_DataClient({storageMaxSize})
 	);
 
@@ -284,7 +290,7 @@ const useResource = ({
 	const [sort, setSort] = useState<Sorting | null>(null);
 
 	const [resource, setResource] = useState<any>(
-		client.current.read(identifier) ?? null
+		clientRef.current.read(identifier) ?? null
 	);
 
 	const debouncedVariablesChange = useDebounce(variables, fetchDelay);
@@ -331,13 +337,16 @@ const useResource = ({
 			);
 
 			retryDelayTimeoutIdRef.current = setTimeout(() => {
+
 				// eslint-disable-next-line @typescript-eslint/no-use-before-define
 				doFetch(retryAttempts + 1);
 			}, delay);
-		} else {
+		}
+		else {
 			if (suspense) {
-				client.current.update(identifier, error);
-			} else {
+				clientRef.current.update(identifier, error);
+			}
+			else {
 				dispatchNetworkStatus(NetworkStatus.Error);
 			}
 
@@ -356,19 +365,22 @@ const useResource = ({
 		cleanPoll();
 
 		pollingTimeoutIdRef.current = setTimeout(() => {
+
 			// eslint-disable-next-line @typescript-eslint/no-use-before-define
 			maybeFetch(NetworkStatus.Polling);
 		}, pollIntervalRef.current);
 	};
 
 	const fetchOnComplete = (result: any) => {
+
 		// Should clear retry interval if any of the
 		// attempts are successful.
+
 		cleanRetry();
 
 		let data = result;
 
-		const cursor = client.current.getCursor(identifier);
+		const cursor = clientRef.current.getCursor(identifier);
 
 		if (
 			networkStatusRef.current === NetworkStatus.Loading &&
@@ -378,7 +390,8 @@ const useResource = ({
 		) {
 			if (Array.isArray(result) && Array.isArray(resource)) {
 				data = [...resource, ...result];
-			} else if (
+			}
+			else if (
 				typeof result === 'object' &&
 				typeof resource === 'object'
 			) {
@@ -390,7 +403,7 @@ const useResource = ({
 		dispatchNetworkStatus(NetworkStatus.Unused);
 
 		if (shouldUseCache) {
-			client.current.update(identifier, data);
+			clientRef.current.update(identifier, data);
 		}
 
 		if (pollIntervalRef.current > 0) {
@@ -415,7 +428,7 @@ const useResource = ({
 	const getUrlFormat = (link: string, variables: Variables) => {
 		const uri = new URL(link);
 
-		if (client.current.getCursor(identifier) === null) {
+		if (clientRef.current.getCursor(identifier) === null) {
 			warning(
 				uri.searchParams.toString() === '',
 				'DataProvider: We recommend that instead of passing parameters over the link, use the variables API. \n More details: https://clayui.com/docs/components/data-provider.html'
@@ -443,9 +456,11 @@ const useResource = ({
 					fetchTimeout,
 					link(
 						populateSearchParams(
+
 							// This is just a hack to be able to instantiate the URL and make
 							// `populateSearchParams` reusable in `getUrlFormat` and make
 							// things easier.
+
 							new URL('http://clay.data.provider'),
 							variables
 						).searchParams.toString()
@@ -458,26 +473,26 @@ const useResource = ({
 
 				let nextCursor: any = undefined;
 
-				if (abortController.current) {
-					abortController.current.abort();
+				if (abortControllerRef.current) {
+					abortControllerRef.current.abort();
 				}
 
-				abortController.current = new AbortController();
+				abortControllerRef.current = new AbortController();
 
 				return timeout(
 					fetchTimeout,
 					fn(
 						getUrlFormat(
-							client.current.getCursor(identifier) ?? link,
+							clientRef.current.getCursor(identifier) ?? link,
 							variables
 						),
 						{
 							...fetchOptions,
-							signal: abortController.current.signal,
+							signal: abortControllerRef.current.signal,
 						},
 						doSort || sort || undefined
 					),
-					abortController.current
+					abortControllerRef.current
 				)
 					.then((res: any) => {
 						if (
@@ -486,7 +501,8 @@ const useResource = ({
 							!res.bodyUsed
 						) {
 							return res.json();
-						} else if (
+						}
+						else if (
 							!(res instanceof Response) &&
 							res.items &&
 							(res.cursor || res.cursor === null)
@@ -501,7 +517,7 @@ const useResource = ({
 					.then(fetchOnComplete)
 					.then((res) => {
 						if (nextCursor !== undefined) {
-							client.current.setCursor(identifier, nextCursor);
+							clientRef.current.setCursor(identifier, nextCursor);
 						}
 
 						return res;
@@ -514,7 +530,7 @@ const useResource = ({
 	};
 
 	const maybeFetch = (status: NetworkStatus) => {
-		const data = client.current.read(identifier);
+		const data = clientRef.current.read(identifier);
 
 		if (shouldUseCache && data) {
 			fetchOnComplete(data);
@@ -522,6 +538,7 @@ const useResource = ({
 			// When fetch policy is only cache-first and gets the data from
 			// the cache, it should not perform a request, only when it is
 			// cache-and-network.
+
 			if (fetchPolicy === FetchPolicy.CacheFirst) {
 				return false;
 			}
@@ -533,7 +550,7 @@ const useResource = ({
 	};
 
 	const loadMore = () => {
-		if (!client.current.getCursor(identifier)) {
+		if (!clientRef.current.getCursor(identifier)) {
 			return null;
 		}
 
@@ -544,8 +561,10 @@ const useResource = ({
 
 	const refetch = () => {
 		if (!shouldUseCache) {
+
 			// Resets the cursor
-			delete client.current.cursors[identifier];
+
+			delete clientRef.current.cursors[identifier];
 		}
 
 		dispatchNetworkStatus(NetworkStatus.Refetch);
@@ -568,8 +587,10 @@ const useResource = ({
 	useEffect(() => {
 		if (!firstRenderRef.current) {
 			if (!shouldUseCache) {
+
 				// Resets the cursor
-				delete client.current.cursors[identifier];
+
+				delete clientRef.current.cursors[identifier];
 			}
 
 			maybeFetch(NetworkStatus.Refetch);
@@ -580,8 +601,10 @@ const useResource = ({
 		firstRenderRef.current = false;
 
 		return () => {
+
 			// Set to zero to prevent any unfinished requests
 			// from continuing polling after umount has occurred.
+
 			pollIntervalRef.current = 0;
 
 			cleanPoll();
@@ -589,9 +612,10 @@ const useResource = ({
 		};
 	}, []);
 
-	let fetchingOrError = client.current.isFetching(identifier);
+	let fetchingOrError = clientRef.current.isFetching(identifier);
 
 	// Makes first request if not started at render time
+
 	if (!fetchingOrError && firstRenderRef.current) {
 		const result = maybeFetch(NetworkStatus.Loading);
 
@@ -599,12 +623,13 @@ const useResource = ({
 			firstRequestRef.current = true;
 			fetchingOrError = result;
 
-			client.current.update(identifier, result);
+			clientRef.current.update(identifier, result);
 		}
 	}
 
 	// Attach the promise to the instance if it is not the that started
 	// the request.
+
 	if (fetchingOrError && firstRequestRef.current === false && !suspense) {
 		firstRequestRef.current = true;
 
@@ -614,15 +639,18 @@ const useResource = ({
 	}
 
 	// Integration with React.Suspense
+
 	if (
 		suspense &&
 		resource === null &&
 		(fetchingOrError instanceof Promise || fetchingOrError instanceof Error)
 	) {
+
 		// Integration with React.Suspense, throwing a throw with the promise in
 		// progress at render time for Suspense to catch.
 		// Integration with ErrorBoundary, when a network error happens we throw
 		// an error at render time so that ErrorBoundary catches the error.
+
 		throw fetchingOrError;
 	}
 

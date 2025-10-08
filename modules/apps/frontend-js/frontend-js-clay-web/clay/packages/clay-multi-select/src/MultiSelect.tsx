@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ACT, {
@@ -27,6 +27,7 @@ import type {ICollectionProps} from '@clayui/core';
 import type {Item, LastChangeLiveRegion, Locators} from './types';
 
 interface IMenuRendererProps {
+
 	/**
 	 * Value of input
 	 * * @deprecated since v3.49.0 - use `value` instead.
@@ -51,6 +52,7 @@ export interface IProps<T extends Record<string, any> = Item>
 			'onChange' | 'children'
 		>,
 		Omit<Partial<ICollectionProps<T, unknown>>, 'virtualize' | 'items'> {
+
 	/**
 	 * Flag to indicate if menu is showing or not.
 	 */
@@ -180,10 +182,12 @@ export interface IProps<T extends Record<string, any> = Item>
 
 		// Defines the description of hotkeys for the component, use this
 		// to handle internationalization.
+
 		hotkeys: string;
 
 		// The off-screen live region informs screen reader users the result of
 		// removing or adding a label.
+
 		labelAdded: string;
 		labelRemoved: string;
 	};
@@ -246,7 +250,7 @@ type Component = <T extends Record<string, any> = Item>(
 ) => React.ReactElement | null;
 
 export const MultiSelect = React.forwardRef(function MultiSelectInner<
-	T extends Record<string, any> = Item
+	T extends Record<string, any> = Item,
 >(
 	{
 		active: externalActive,
@@ -343,6 +347,7 @@ export const MultiSelect = React.forwardRef(function MultiSelectInner<
 
 	// Throws the warning only when the component is mounted and avoids
 	// throwing it every time a rerender happens.
+
 	useEffect(() => {
 		if (MenuRenderer) {
 			console.warn(
@@ -362,7 +367,9 @@ export const MultiSelect = React.forwardRef(function MultiSelectInner<
 	}, []);
 
 	useEffect(() => {
+
 		// Backward compatibility with the `menuRenderer` API.
+
 		if (MenuRenderer && sourceItems) {
 			setActive(!!value && sourceItems.length !== 0);
 		}
@@ -492,7 +499,7 @@ export const MultiSelect = React.forwardRef(function MultiSelectInner<
 									setActive(
 										!!value && sourceItems.length !== 0
 									);
-							  }
+								}
 							: otherProps.onFocus
 					}
 					onFocusChange={setIsFocused}
@@ -508,7 +515,7 @@ export const MultiSelect = React.forwardRef(function MultiSelectInner<
 					{memoizedChildren}
 				</Autocomplete>
 
-				{sourceItems && MenuRenderer && sourceItems.length > 0 && (
+				{sourceItems && MenuRenderer && !!sourceItems.length && (
 					<ACT.DropDown
 						active={active}
 						alignElementRef={containerRef}
@@ -532,50 +539,54 @@ export const MultiSelect = React.forwardRef(function MultiSelectInner<
 					</ACT.DropDown>
 				)}
 
-				{!disabled && !disabledClearAll && (value || items.length > 0) && (
-					<ClayInput.GroupItem shrink>
-						<ClayButtonWithIcon
-							aria-label={clearAllTitle}
-							borderless
-							className="component-action"
-							displayType="secondary"
-							onClick={() => {
-								if (onClearAllButtonClick) {
-									onClearAllButtonClick();
-								} else {
-									setItems([]);
-									setValue('');
-								}
+				{!disabled &&
+					!disabledClearAll &&
+					(value || !!items.length) && (
+						<ClayInput.GroupItem shrink>
+							<ClayButtonWithIcon
+								aria-label={clearAllTitle}
+								borderless
+								className="component-action"
+								displayType="secondary"
+								onClick={() => {
+									if (onClearAllButtonClick) {
+										onClearAllButtonClick();
+									}
+									else {
+										setItems([]);
+										setValue('');
+									}
 
-								if (inputElementRef.current) {
-									inputElementRef.current.focus();
-								}
-							}}
-							outline
-							spritemap={spritemap}
-							symbol="times-circle"
-							title={clearAllTitle}
-						/>
-					</ClayInput.GroupItem>
-				)}
+									if (inputElementRef.current) {
+										inputElementRef.current.focus();
+									}
+								}}
+								outline
+								spritemap={spritemap}
+								symbol="times-circle"
+								title={clearAllTitle}
+							/>
+						</ClayInput.GroupItem>
+					)}
 
 				<div className="sr-only">
 					<span id={ariaDescriptionId}>
 						{hotkeysDescription ?? messages.hotkeys}
 					</span>
+
 					<span aria-live="polite" aria-relevant="text">
 						{lastChangesRef.current
 							? sub(
 									liveRegion
 										? liveRegion[
 												lastChangesRef.current.action
-										  ]
+											]
 										: lastChangesRef.current.action ===
-										  'added'
-										? messages.labelAdded
-										: messages.labelRemoved,
+											  'added'
+											? messages.labelAdded
+											: messages.labelRemoved,
 									[lastChangesRef.current.label]
-							  )
+								)
 							: null}
 					</span>
 				</div>

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {useProvider} from '@clayui/provider';
@@ -28,6 +28,7 @@ const createDivElement = (className?: string, id?: string) => {
 };
 
 export interface IBaseProps {
+
 	/**
 	 * Class to add to the root element
 	 */
@@ -89,7 +90,8 @@ export const ClayPortal = ({
 			if (portalRef.current) {
 				if (typeof portalRef.current.remove === 'function') {
 					portalRef.current.remove();
-				} else if (elToMountTo) {
+				}
+				else if (elToMountTo) {
 					elToMountTo.removeChild(portalRef.current);
 				}
 			}

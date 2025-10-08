@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import DropDown from '@clayui/drop-down';
@@ -29,20 +29,32 @@ export const Default = () => {
 				<label htmlFor={pickerId} id={labelId}>
 					Choose a fruit
 				</label>
+
 				<Picker aria-labelledby={labelId} id={pickerId}>
 					<Option key="apple">Apple</Option>
+
 					<Option disabled key="banana">
 						Banana
 					</Option>
+
 					<Option key="mangos">Mangos</Option>
+
 					<Option key="blueberry">Blueberry</Option>
+
 					<Option key="boysenberry">Boysenberry</Option>
+
 					<Option key="cherry">Cherry</Option>
+
 					<Option key="cranberry">Cranberry</Option>
+
 					<Option key="eggplant">Eggplant</Option>
+
 					<Option key="fig">Fig</Option>
+
 					<Option key="grape">Grape</Option>
+
 					<Option key="guava">Guava</Option>
+
 					<Option key="huckleberry">Huckleberry</Option>
 				</Picker>
 			</Form.Group>
@@ -60,6 +72,7 @@ export const Dynamic = () => {
 				<label htmlFor={pickerId} id={labelId}>
 					Choose a fruit
 				</label>
+
 				<Picker
 					aria-labelledby={labelId}
 					id={pickerId}
@@ -91,6 +104,7 @@ const Trigger = React.forwardRef<
 >(({children, ...otherProps}, ref) => (
 	<div ref={ref} {...otherProps} tabIndex={0}>
 		<Icon className="mr-2" symbol="user" />
+
 		{children}
 	</div>
 ));
@@ -107,6 +121,7 @@ export const CustomTrigger = () => {
 				<label htmlFor={pickerId} id={labelId}>
 					Choose a user
 				</label>
+
 				<Picker
 					aria-labelledby={labelId}
 					as={Trigger}
@@ -130,6 +145,7 @@ export const CustomOptions = () => {
 				<label htmlFor={pickerId} id={labelId}>
 					Choose a user
 				</label>
+
 				<Picker
 					aria-labelledby={labelId}
 					id={pickerId}
@@ -151,6 +167,7 @@ export const CustomOptions = () => {
 									>
 										{item}
 									</Text>
+
 									<Text
 										aria-hidden
 										color="secondary"
@@ -160,6 +177,7 @@ export const CustomOptions = () => {
 										Description
 									</Text>
 								</Layout.ContentCol>
+
 								<Layout.ContentCol>
 									<Label
 										aria-hidden
@@ -188,6 +206,7 @@ export const CustomGroup = () => {
 				<label htmlFor={pickerId} id={labelId}>
 					Select an option
 				</label>
+
 				<Picker
 					aria-labelledby={labelId}
 					id={pickerId}
@@ -235,6 +254,7 @@ export const Shrink = () => {
 			<label htmlFor={pickerId} id={labelId}>
 				Select an option
 			</label>
+
 			<Picker
 				aria-labelledby={labelId}
 				id={pickerId}
@@ -281,24 +301,36 @@ export const Width = () => {
 					<label htmlFor={pickerId} id={labelId}>
 						Choose a fruit
 					</label>
+
 					<Picker
 						aria-labelledby={labelId}
 						defaultActive
 						id={pickerId}
 					>
 						<Option key="apple">Apple</Option>
+
 						<Option disabled key="banana">
 							Banana
 						</Option>
+
 						<Option key="mangos">Mangos</Option>
+
 						<Option key="blueberry">Blueberry</Option>
+
 						<Option key="boysenberry">Boysenberry</Option>
+
 						<Option key="cherry">Cherry</Option>
+
 						<Option key="cranberry">Cranberry</Option>
+
 						<Option key="eggplant">Eggplant</Option>
+
 						<Option key="fig">Fig</Option>
+
 						<Option key="grape">Grape</Option>
+
 						<Option key="guava">Guava</Option>
+
 						<Option key="huckleberry">Huckleberry</Option>
 					</Picker>
 				</Form.Group>
@@ -309,6 +341,7 @@ export const Width = () => {
 					<label htmlFor={pickerId} id={labelId}>
 						Choose a fruit
 					</label>
+
 					<Picker
 						aria-labelledby={labelId}
 						defaultActive
@@ -316,18 +349,29 @@ export const Width = () => {
 						placeholder="Fruit"
 					>
 						<Option key="apple">Apple</Option>
+
 						<Option disabled key="banana">
 							Banana
 						</Option>
+
 						<Option key="mangos">Mangos</Option>
+
 						<Option key="blueberry">Blueberry</Option>
+
 						<Option key="boysenberry">Boysenberry</Option>
+
 						<Option key="cherry">Cherry</Option>
+
 						<Option key="cranberry">Cranberry</Option>
+
 						<Option key="eggplant">Eggplant</Option>
+
 						<Option key="fig">Fig</Option>
+
 						<Option key="grape">Grape</Option>
+
 						<Option key="guava">Guava</Option>
+
 						<Option key="huckleberry">Huckleberry</Option>
 					</Picker>
 				</Form.Group>
@@ -338,6 +382,7 @@ export const Width = () => {
 					<label htmlFor={pickerId} id={labelId}>
 						Year
 					</label>
+
 					<Picker
 						aria-labelledby={labelId}
 						defaultActive
@@ -346,9 +391,13 @@ export const Width = () => {
 						width={85}
 					>
 						<Option key="2020">2020</Option>
+
 						<Option key="2021">2021</Option>
+
 						<Option key="2022">2022</Option>
+
 						<Option key="2023">2023</Option>
+
 						<Option key="2024">2024</Option>
 					</Picker>
 				</Form.Group>
@@ -359,6 +408,7 @@ export const Width = () => {
 					<label htmlFor={pickerId} id={labelId}>
 						Long Option Year
 					</label>
+
 					<Picker
 						aria-labelledby={labelId}
 						defaultActive
@@ -368,9 +418,13 @@ export const Width = () => {
 						<Option key="2020">
 							2020 was really a looooooooong year
 						</Option>
+
 						<Option key="2021">2021</Option>
+
 						<Option key="2022">2022</Option>
+
 						<Option key="2023">2023</Option>
+
 						<Option key="2024">2024</Option>
 					</Picker>
 				</Form.Group>

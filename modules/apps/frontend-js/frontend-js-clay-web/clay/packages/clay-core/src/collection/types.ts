@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import type {Virtualizer} from '@tanstack/react-virtual';
@@ -18,11 +18,13 @@ export type ChildElement = IReactTypeElement & {
 	ref?: (node: HTMLElement | null) => void;
 };
 
-export type ChildrenFunction<T, P> = P extends Array<unknown>
-	? (item: T, ...args: P) => React.ReactElement
-	: (item: T, index?: number) => React.ReactElement;
+export type ChildrenFunction<T, P> =
+	P extends Array<unknown>
+		? (item: T, ...args: P) => React.ReactElement
+		: (item: T, index?: number) => React.ReactElement;
 
 export interface ICollectionProps<T, P> {
+
 	/**
 	 * Children content to render a dynamic or static content.
 	 */
@@ -53,6 +55,7 @@ export type CollectionState = {
 };
 
 export type Props<P, K> = {
+
 	/**
 	 * Flag to enable all nested collections to share the same data.
 	 */

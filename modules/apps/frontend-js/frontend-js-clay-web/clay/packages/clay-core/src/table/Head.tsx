@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2023 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import Button from '@clayui/button';
@@ -27,9 +27,11 @@ const Header = React.forwardRef<HTMLLIElement, HeaderProps>(
 				<div className="dropdown-subheader mb-0">
 					{name.toUpperCase()}
 				</div>
+
 				<div className="dropdown-section py-0 text-secondary">
 					{description}
 				</div>
+
 				<div className="dropdown-divider" />
 			</li>
 		);
@@ -40,6 +42,7 @@ const useIsomorphicEffect =
 	typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 interface IProps<T> extends React.TableHTMLAttributes<HTMLTableSectionElement> {
+
 	/**
 	 * Children content to render a dynamic or static content.
 	 */
@@ -167,6 +170,7 @@ export function Head<T extends Record<string, any>>(
 															.value
 													}
 												</Layout.ContentCol>
+
 												<Layout.ContentCol float="end">
 													<Toggle
 														containerProps={{

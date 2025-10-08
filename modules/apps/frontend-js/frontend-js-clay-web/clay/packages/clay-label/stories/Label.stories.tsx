@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayIcon from '@clayui/icon';
@@ -28,7 +28,7 @@ export const Default = (args: any) => {
 				args.closeable
 					? {
 							onClick: () => setVisible((val) => !val),
-					  }
+						}
 					: undefined
 			}
 			displayType={args.displayType}
@@ -63,6 +63,7 @@ export const ContentBefore = () => (
 		<ClayLabel.ItemBefore>
 			<ClayIcon symbol="check" />
 		</ClayLabel.ItemBefore>
+
 		<ClayLabel.ItemExpand>Label</ClayLabel.ItemExpand>
 	</ClayLabel>
 );

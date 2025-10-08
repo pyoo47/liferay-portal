@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {ClayCheckbox, ClayRadio} from '@clayui/form';
@@ -24,7 +24,7 @@ import DropDownGroup from './Group';
 
 export const findNested = <
 	T extends {items?: Array<T>; [key: string]: any},
-	K extends keyof T
+	K extends keyof T,
 >(
 	items: Array<T>,
 	key: K
@@ -38,6 +38,7 @@ export const findNested = <
 		// because it will be in another menu and the current menu does not need
 		// to know the information of what exists inside the contextual one, like
 		// knowing if there is an icon.
+
 		if (item.items && item['type'] !== 'contextual') {
 			return findNested(item.items, key);
 		}
@@ -172,7 +173,7 @@ const OFFSET_MAP = {
 function offsetFn(points: any) {
 	return OFFSET_MAP[points.join('') as keyof typeof OFFSET_MAP] as [
 		number,
-		number
+		number,
 	];
 }
 
@@ -210,6 +211,7 @@ const Contextual = ({
 	});
 
 	const setThrottleVisible = useCallback(
+
 		// eslint-disable-next-line react-compiler/react-compiler
 		throttle((value: boolean) => setVisible(value), 100),
 		[]
@@ -278,6 +280,7 @@ const Contextual = ({
 					ref={menuElementRef}
 				>
 					{visible && <MouseSafeArea parentRef={menuElementRef} />}
+
 					<ClayDropDownContext.Provider
 						value={{
 							back: () => {
@@ -371,7 +374,7 @@ const RadioGroup = ({
 	};
 
 	warning(
-		items && items.filter((item) => item.type !== 'radio').length === 0,
+		items && !items.filter((item) => item.type !== 'radio').length,
 		'ClayDropDownWithItems -> Items of type `radiogroup` should be used `radio` if you need to use others, it is recommended to use type `group`.'
 	);
 
@@ -403,6 +406,7 @@ export type Item = {
 	checked?: boolean;
 	disabled?: boolean;
 	href?: string;
+
 	/**
 	 * The unique id that references the next menu.
 	 */
@@ -437,14 +441,14 @@ export type Props = {
 	/**
 	 * The path to the SVG spritemap file containing the icons.
 	 */
-	spritemap?: string;
+	'spritemap'?: string;
 
 	/**
 	 * List of items to display in drop down menu
 	 */
-	items: Array<Item>;
+	'items': Array<Item>;
 
-	role?: string;
+	'role'?: string;
 };
 
 export const DropDownItems = ({

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayButton from '@clayui/button';
@@ -38,7 +38,7 @@ export const Default = () => (
 
 		<ClayPaginationWithBasicItems
 			activePage={1}
-			ellipsisProps={{'aria-label': 'More', title: 'More'}}
+			ellipsisProps={{'aria-label': 'More', 'title': 'More'}}
 			onPageChange={() => {}}
 			totalPages={10}
 		/>
@@ -73,7 +73,7 @@ export const WithItems = (args: any) => {
 			activeDelta={delta}
 			deltas={deltas}
 			ellipsisBuffer={args.ellipsisBuffer}
-			ellipsisProps={{'aria-label': 'More', title: 'More'}}
+			ellipsisProps={{'aria-label': 'More', 'title': 'More'}}
 			onDeltaChange={setDelta}
 			totalItems={args.totalItems}
 		/>
@@ -93,7 +93,7 @@ export const WithoutDropdown = () => {
 			activeDelta={delta}
 			defaultActive={3}
 			ellipsisBuffer={3}
-			ellipsisProps={{'aria-label': 'More', title: 'More'}}
+			ellipsisProps={{'aria-label': 'More', 'title': 'More'}}
 			onDeltaChange={setDelta}
 			showDeltasDropDown={false}
 			totalItems={21}

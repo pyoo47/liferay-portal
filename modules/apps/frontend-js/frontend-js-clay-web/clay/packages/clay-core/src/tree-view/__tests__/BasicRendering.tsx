@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {ClayDropDownWithItems as DropDownWithItems} from '@clayui/drop-down';
@@ -13,6 +13,7 @@ import {Button, Icon, Provider, Text, TreeView} from '../..';
 const spritemap = 'icons.svg';
 
 // Just to avoid TypeScript error with required props
+
 const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 OptionalCheckbox.displayName = 'ClayCheckbox';
@@ -26,6 +27,7 @@ describe('TreeView basic rendering', () => {
 				<TreeView>
 					<TreeView.Item>
 						<TreeView.ItemStack>Root</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item>Item</TreeView.Item>
 						</TreeView.Group>
@@ -51,6 +53,7 @@ describe('TreeView basic rendering', () => {
 					{(item) => (
 						<TreeView.Item key={item.name}>
 							<TreeView.ItemStack>{item.name}</TreeView.ItemStack>
+
 							<TreeView.Group items={item.children}>
 								{(item) => (
 									<TreeView.Item key={item.name}>
@@ -91,6 +94,7 @@ describe('TreeView basic rendering', () => {
 					{(item) => (
 						<TreeView.Item key={item.name}>
 							<TreeView.ItemStack>{item.name}</TreeView.ItemStack>
+
 							<TreeView.Group items={item.children}>
 								{(item) => (
 									<TreeView.Item key={item.name}>
@@ -113,6 +117,7 @@ describe('TreeView basic rendering', () => {
 				<TreeView displayType="light">
 					<TreeView.Item>
 						<TreeView.ItemStack>Root</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item>Item</TreeView.Item>
 						</TreeView.Group>
@@ -130,6 +135,7 @@ describe('TreeView basic rendering', () => {
 				<TreeView displayType="dark">
 					<TreeView.Item>
 						<TreeView.ItemStack>Root</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item>Item</TreeView.Item>
 						</TreeView.Group>
@@ -152,6 +158,7 @@ describe('TreeView basic rendering', () => {
 				>
 					<TreeView.Item>
 						<TreeView.ItemStack>Root</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item>Item</TreeView.Item>
 						</TreeView.Group>
@@ -208,6 +215,7 @@ describe('TreeView basic rendering', () => {
 				<TreeView>
 					<TreeView.Item>
 						<TreeView.ItemStack disabled>Root</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item disabled>Item</TreeView.Item>
 						</TreeView.Group>
@@ -233,6 +241,7 @@ describe('TreeView basic rendering', () => {
 						<TreeView.ItemStack disabled expanderDisabled={false}>
 							Root
 						</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item disabled>Item</TreeView.Item>
 						</TreeView.Group>
@@ -258,6 +267,7 @@ describe('TreeView basic rendering', () => {
 							<OptionalCheckbox />
 							Root
 						</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item>
 								<OptionalCheckbox />
@@ -279,13 +289,16 @@ describe('TreeView basic rendering', () => {
 					<TreeView.Item>
 						<TreeView.ItemStack>
 							<OptionalCheckbox />
+
 							<Text size={3} truncate>
 								Root
 							</Text>
 						</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item>
 								<OptionalCheckbox />
+
 								<Text size={3} truncate>
 									Text
 								</Text>
@@ -308,6 +321,7 @@ describe('TreeView basic rendering', () => {
 							<OptionalCheckbox />
 							Root
 						</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item key="Item">
 								<OptionalCheckbox />
@@ -343,12 +357,15 @@ describe('TreeView basic rendering', () => {
 						<TreeView.Item>
 							<TreeView.ItemStack>
 								<OptionalCheckbox />
+
 								{item.name}
 							</TreeView.ItemStack>
+
 							<TreeView.Group items={item.children}>
 								{(item) => (
 									<TreeView.Item>
 										<OptionalCheckbox />
+
 										{item.name}
 									</TreeView.Item>
 								)}
@@ -372,6 +389,7 @@ describe('TreeView basic rendering', () => {
 				<TreeView defaultExpandedKeys={new Set(['Root', 'Item'])}>
 					<TreeView.Item key="Root">
 						<TreeView.ItemStack>Root</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item key="Item">Item</TreeView.Item>
 						</TreeView.Group>
@@ -395,6 +413,7 @@ describe('TreeView basic rendering', () => {
 							<OptionalCheckbox />
 							Root
 						</TreeView.ItemStack>
+
 						<TreeView.Group>
 							<TreeView.Item active>
 								<OptionalCheckbox />

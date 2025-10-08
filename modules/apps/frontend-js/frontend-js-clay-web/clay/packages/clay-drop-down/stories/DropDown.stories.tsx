@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayButton from '@clayui/button';
@@ -141,6 +141,7 @@ export const DynamicWithSearch = () => {
 			triggerIcon="caret-bottom"
 		>
 			<ClayDropDown.Search placeholder="Type to filter" />
+
 			<ClayDropDown.ItemList items={['one', 'two', 'three', 'four']}>
 				{(item: string) => (
 					<ClayDropDown.Item key={item} onClick={() => {}}>
@@ -181,6 +182,7 @@ export const DynamicGroup = () => {
 			triggerIcon="caret-bottom"
 		>
 			<ClayDropDown.Search placeholder="Type to filter" />
+
 			<ClayDropDown.ItemList items={items}>
 				{(item: any) => (
 					<ClayDropDown.Group
@@ -298,6 +300,7 @@ export const Radio = () => (
 				<ClayDropDown.Section>
 					<ClayRadio checked label="Ascending" value="asc" />
 				</ClayDropDown.Section>
+
 				<ClayDropDown.Section>
 					<ClayRadio label="Descending" value="desc" />
 				</ClayDropDown.Section>
@@ -567,12 +570,14 @@ export const InModal = () => {
 			{visible && (
 				<ClayModal observer={observer} size="lg" status="info">
 					<ClayModal.Header>Title</ClayModal.Header>
+
 					<ClayModal.Body scrollable>
 						<ClayInput
 							onClick={() => setPanelVisibility(!panelVisibility)}
 							placeholder="meow"
 							ref={inputRef}
 						/>
+
 						<ClayDropDown.Menu
 							active={panelVisibility}
 							alignElementRef={inputRef}
@@ -583,21 +588,28 @@ export const InModal = () => {
 						>
 							<ClayDropDown.Item>my panel item</ClayDropDown.Item>
 						</ClayDropDown.Menu>
+
 						<img alt="cat" src="https://cataas.com/cat/says/it" />
+
 						<img alt="cat" src="https://cataas.com/cat/says/will" />
+
 						<img alt="cat" src="https://cataas.com/cat/says/have" />
+
 						<img alt="cat" src="https://cataas.com/cat/says/a" />
+
 						<img
 							alt="cat"
 							src="https://cataas.com/cat/says/scroll"
 						/>
 					</ClayModal.Body>
+
 					<ClayModal.Footer
 						first={
 							<ClayButton.Group spaced>
 								<ClayButton displayType="secondary">
 									Secondary
 								</ClayButton>
+
 								<ClayButton displayType="secondary">
 									Secondary
 								</ClayButton>

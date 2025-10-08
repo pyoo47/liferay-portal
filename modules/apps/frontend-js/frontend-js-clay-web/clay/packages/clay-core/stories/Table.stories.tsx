@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2023 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React, {useCallback, useState} from 'react';
@@ -76,6 +76,7 @@ export const Dynamic = () => {
 				{(row) => (
 					<Row>
 						<Cell>{row.name}</Cell>
+
 						<Cell>{row.type}</Cell>
 					</Row>
 				)}
@@ -123,6 +124,7 @@ export const Sections = () => {
 		<Table>
 			<Head items={columns}>
 				<Cell key="name">Name</Cell>
+
 				<Cell key="type">Type</Cell>
 			</Head>
 
@@ -130,27 +132,38 @@ export const Sections = () => {
 				<Row divider>
 					<Cell>Folders</Cell>
 				</Row>
+
 				<Row>
 					<Cell>Games</Cell>
+
 					<Cell>File folder</Cell>
 				</Row>
+
 				<Row>
 					<Cell>Program Files</Cell>
+
 					<Cell>File folder</Cell>
 				</Row>
+
 				<Row>
 					<Cell>Core</Cell>
+
 					<Cell>File folder</Cell>
 				</Row>
+
 				<Row divider>
 					<Cell>Folders</Cell>
 				</Row>
+
 				<Row>
 					<Cell>Games</Cell>
+
 					<Cell>File folder</Cell>
 				</Row>
+
 				<Row>
 					<Cell>Program Files</Cell>
+
 					<Cell>File folder</Cell>
 				</Row>
 			</Body>
@@ -197,9 +210,11 @@ export const Sorting = () => {
 				<Cell key="name" sortable>
 					Name
 				</Cell>
+
 				<Cell key="files" sortable>
 					Files
 				</Cell>
+
 				<Cell key="type" sortable>
 					Type
 				</Cell>
@@ -209,7 +224,9 @@ export const Sorting = () => {
 				{(row) => (
 					<Row>
 						<Cell>{row['name']}</Cell>
+
 						<Cell>{row['files']}</Cell>
+
 						<Cell>{row['type']}</Cell>
 					</Row>
 				)}
@@ -261,10 +278,12 @@ export const Treegrid = () => {
 					<Row>
 						<Cell key={`${row.id}:name`}>
 							{ICON_TYPES[row['type']]}
+
 							<Text size={3} weight="semi-bold">
 								{row['name']}
 							</Text>
 						</Cell>
+
 						<Cell key={`${row.id}:type`}>{row['type']}</Cell>
 					</Row>
 				)}
@@ -278,7 +297,9 @@ export const AsyncLoad = () => (
 		aria-label="File Explorer"
 		nestedKey="children"
 		onLoadMore={async (item: any) => {
+
 			// Delay to simulate loading of new data
+
 			await new Promise((resolve) => {
 				setTimeout(() => resolve(''), 1000);
 			});
@@ -315,6 +336,7 @@ export const AsyncLoad = () => (
 							{row['name']}
 						</Text>
 					</Cell>
+
 					<Cell key={`${row.id}:type`}>{row['type']}</Cell>
 				</Row>
 			)}

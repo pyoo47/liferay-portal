@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2023 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import Alert from '@clayui/alert';
@@ -31,19 +31,25 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			Links
 		</Heading>
+
 		<Link href="#link-styles">Default</Link>
+
 		<Link displayType="primary" href="#link-styles">
 			Primary
 		</Link>
+
 		<Link displayType="secondary" href="#link-styles">
 			Secondary
 		</Link>
+
 		<Link displayType="danger" href="#link-styles">
 			Danger
 		</Link>
+
 		<Link displayType="tertiary" href="#link-styles">
 			Tertiary
 		</Link>
+
 		<Link displayType="unstyled" href="#link-styles">
 			Unstyled
 		</Link>
@@ -51,12 +57,13 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			Pagination
 		</Heading>
+
 		<PaginationWithBasicItems
 			active={8}
 			ellipsisBuffer={2}
 			ellipsisProps={{
 				'aria-label': 'More {0} through {1}',
-				title: 'More {0} through {1}',
+				'title': 'More {0} through {1}',
 			}}
 			hrefConstructor={(page) => `#${page}`}
 			totalPages={25}
@@ -65,6 +72,7 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			Navigation Bar
 		</Heading>
+
 		<NavigationBar triggerLabel="Item 1">
 			<NavigationBar.Item active>
 				<Link href="#">Item 1</Link>
@@ -78,15 +86,18 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			Nav
 		</Heading>
+
 		<Nav>
 			<Nav.Item>
 				<Nav.Link active href="#">
 					Active
 				</Nav.Link>
 			</Nav.Item>
+
 			<Nav.Item>
 				<Nav.Link href="#">Normal</Nav.Link>
 			</Nav.Item>
+
 			<Nav.Item>
 				<Nav.Link disabled href="#">
 					Disabled
@@ -97,6 +108,7 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			VerticalNav
 		</Heading>
+
 		<VerticalNav
 			aria-label="vertical navbar"
 			items={[
@@ -151,6 +163,7 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			Label
 		</Heading>
+
 		<Label displayType="secondary" href="#foo">
 			Label
 		</Label>
@@ -158,6 +171,7 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			Card
 		</Heading>
+
 		<div className="row">
 			<div className="col-md-4">
 				<CardWithInfo
@@ -175,6 +189,7 @@ export const UnderlinedLinks = () => (
 					title="Very Large File"
 				/>
 			</div>
+
 			<div className="col-md-4">
 				<CardWithHorizontal href="#" title="Very Large Folder" />
 			</div>
@@ -183,6 +198,7 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			Breadcrumb
 		</Heading>
+
 		<Breadcrumb
 			items={[
 				{
@@ -236,8 +252,10 @@ export const UnderlinedLinks = () => (
 		<Heading fontSize={5} level={2}>
 			Alert
 		</Heading>
+
 		<Alert displayType="info" variant="feedback">
 			News on the{' '}
+
 			<a className="alert-link" href="#">
 				blog
 			</a>
@@ -250,19 +268,25 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Links
 		</Heading>
+
 		<Link href="#link-styles">Default</Link>
+
 		<Link displayType="primary" href="#link-styles">
 			Primary
 		</Link>
+
 		<Link displayType="secondary" href="#link-styles">
 			Secondary
 		</Link>
+
 		<Link displayType="danger" href="#link-styles">
 			Danger
 		</Link>
+
 		<Link displayType="tertiary" href="#link-styles">
 			Tertiary
 		</Link>
+
 		<Link displayType="unstyled" href="#link-styles">
 			Unstyled
 		</Link>
@@ -270,12 +294,13 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Pagination
 		</Heading>
+
 		<PaginationWithBasicItems
 			active={8}
 			ellipsisBuffer={2}
 			ellipsisProps={{
 				'aria-label': 'More {0} through {1}',
-				title: 'More {0} through {1}',
+				'title': 'More {0} through {1}',
 			}}
 			hrefConstructor={(page) => `#${page}`}
 			totalPages={25}
@@ -284,6 +309,7 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Navigation Bar
 		</Heading>
+
 		<NavigationBar triggerLabel="Item 1">
 			<NavigationBar.Item active>
 				<Link href="#">Item 1</Link>
@@ -297,15 +323,18 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Nav
 		</Heading>
+
 		<Nav>
 			<Nav.Item>
 				<Nav.Link active href="#">
 					Active
 				</Nav.Link>
 			</Nav.Item>
+
 			<Nav.Item>
 				<Nav.Link href="#">Normal</Nav.Link>
 			</Nav.Item>
+
 			<Nav.Item>
 				<Nav.Link disabled href="#">
 					Disabled
@@ -316,6 +345,7 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			VerticalNav
 		</Heading>
+
 		<VerticalNav
 			aria-label="vertical navbar"
 			items={[
@@ -370,6 +400,7 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Label
 		</Heading>
+
 		<Label displayType="secondary" href="#foo">
 			Label
 		</Label>
@@ -377,6 +408,7 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Card
 		</Heading>
+
 		<div className="row">
 			<div className="col-md-4">
 				<CardWithInfo
@@ -394,6 +426,7 @@ export const TextSpacing = () => (
 					title="Very Large File"
 				/>
 			</div>
+
 			<div className="col-md-4">
 				<CardWithHorizontal href="#" title="Very Large Folder" />
 			</div>
@@ -402,6 +435,7 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Breadcrumb
 		</Heading>
+
 		<Breadcrumb
 			items={[
 				{
@@ -455,8 +489,10 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Alert
 		</Heading>
+
 		<Alert displayType="info" variant="feedback">
 			News on the{' '}
+
 			<a className="alert-link" href="#">
 				blog
 			</a>
@@ -465,6 +501,7 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Autocomplete
 		</Heading>
+
 		<div className="row">
 			<div className="col-md-5">
 				<div className="form-group">
@@ -474,6 +511,7 @@ export const TextSpacing = () => (
 					>
 						Numbers (one-five)
 					</label>
+
 					<Autocomplete
 						aria-labelledby="clay-autocomplete-label-1"
 						id="clay-autocomplete-1"
@@ -492,6 +530,7 @@ export const TextSpacing = () => (
 		<Heading fontSize={5} level={2}>
 			Button
 		</Heading>
+
 		<Button>Button</Button>
 	</div>
 );
@@ -501,21 +540,27 @@ export const ExpandedText = () => (
 		<Heading fontSize={5} level={2}>
 			Tabs
 		</Heading>
+
 		<Tabs>
 			<Tabs.List>
 				<Tabs.Item>
 					ReallySuperInsanelyJustIncrediblyLongAndTotallyNotPossibleWordButWeAreReallyTryingToCoverAllOurBasesHereJustInCaseSomeoneIsNutsAsPerUsual
 				</Tabs.Item>
+
 				<Tabs.Item>
 					ReallySuperInsanelyJustIncrediblyLongAndTotallyNotPossibleWordButWeAreReallyTryingToCoverAllOurBasesHereJustInCaseSomeoneIsNutsAsPerUsual
 				</Tabs.Item>
+
 				<Tabs.Item>
 					ReallySuperInsanelyJustIncrediblyLongAndTotallyNotPossibleWordButWeAreReallyTryingToCoverAllOurBasesHereJustInCaseSomeoneIsNutsAsPerUsual
 				</Tabs.Item>
 			</Tabs.List>
+
 			<Tabs.Panels>
 				<Tabs.TabPanel>Tab Content 1</Tabs.TabPanel>
+
 				<Tabs.TabPanel>Tab Content 2</Tabs.TabPanel>
+
 				<Tabs.TabPanel>Tab Content 3</Tabs.TabPanel>
 			</Tabs.Panels>
 		</Tabs>
@@ -523,6 +568,7 @@ export const ExpandedText = () => (
 		<Heading fontSize={5} level={2}>
 			Card
 		</Heading>
+
 		<div className="row">
 			<div className="col-md-4">
 				<CardWithInfo
@@ -540,6 +586,7 @@ export const ExpandedText = () => (
 					title="ReallySuperInsanelyJustIncrediblyLongAndTotallyNotPossibleWordButWeAreReallyTryingToCoverAllOurBasesHereJustInCaseSomeoneIsNutsAsPerUsual"
 				/>
 			</div>
+
 			<div className="col-md-4">
 				<CardWithHorizontal
 					href="#"
@@ -551,17 +598,20 @@ export const ExpandedText = () => (
 		<Heading fontSize={5} level={2}>
 			Navigation Bar
 		</Heading>
+
 		<NavigationBar triggerLabel="Item 1">
 			<NavigationBar.Item active>
 				<Link href="#">
 					ReallySuperInsanelyJustIncrediblyLongAndTotallyNotPossibleWordButWeAreReallyTryingToCoverAllOurBasesHereJustInCaseSomeoneIsNutsAsPerUsual
 				</Link>
 			</NavigationBar.Item>
+
 			<NavigationBar.Item>
 				<Link href="#">
 					ReallySuperInsanelyJustIncrediblyLongAndTotallyNotPossibleWordButWeAreReallyTryingToCoverAllOurBasesHereJustInCaseSomeoneIsNutsAsPerUsual
 				</Link>
 			</NavigationBar.Item>
+
 			<NavigationBar.Item>
 				<Link href="#">
 					ReallySuperInsanelyJustIncrediblyLongAndTotallyNotPossibleWordButWeAreReallyTryingToCoverAllOurBasesHereJustInCaseSomeoneIsNutsAsPerUsual

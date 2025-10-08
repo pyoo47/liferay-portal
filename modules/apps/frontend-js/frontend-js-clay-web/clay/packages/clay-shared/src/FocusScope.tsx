@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React, {Children} from 'react';
@@ -19,6 +19,7 @@ type ChildrenFunction =
 	| ((focusManager: ReturnType<typeof useFocusManagement>) => Children);
 
 type Props = {
+
 	/**
 	 * Flag indicates whether the focus will also be controlled with the right
 	 * and left arrow keys.
@@ -74,7 +75,8 @@ export const FocusScope = ({
 					onFocus(next);
 				}
 			}
-		} else if (
+		}
+		else if (
 			(arrowKeysUpDown && key === Keys.Up) ||
 			(arrowKeysLeftRight && key === Keys.Left) ||
 			(key === Keys.Tab && shiftKey)
@@ -102,6 +104,7 @@ export const FocusScope = ({
 
 					// If the element already exists a `onKeyDown` event should
 					// invoke it as well.
+
 					if (child.props.onKeyDown) {
 						child.props.onKeyDown(event);
 					}
@@ -114,9 +117,11 @@ export const FocusScope = ({
 
 						if (ref) {
 							if (typeof ref === 'object') {
+
 								// eslint-disable-next-line react-compiler/react-compiler
 								ref.current = r;
-							} else if (typeof ref === 'function') {
+							}
+							else if (typeof ref === 'function') {
 								ref(r);
 							}
 						}

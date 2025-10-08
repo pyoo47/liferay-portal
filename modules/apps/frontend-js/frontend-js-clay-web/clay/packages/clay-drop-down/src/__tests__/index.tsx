@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayDropDown, {ClayDropDownWithItems} from '..';
@@ -356,7 +356,9 @@ describe('ClayDropDown', () => {
 			<ClayDropDown trigger={<button>Click Me</button>}>
 				<ClayDropDown.ItemList>
 					<ClayDropDown.Item>one</ClayDropDown.Item>
+
 					<ClayDropDown.Item>two</ClayDropDown.Item>
+
 					<ClayDropDown.Item>three</ClayDropDown.Item>
 				</ClayDropDown.ItemList>
 			</ClayDropDown>
@@ -377,6 +379,7 @@ describe('ClayDropDown', () => {
 		const {getAllByRole, getByRole} = render(
 			<ClayDropDown trigger={<button>Click Me</button>}>
 				<ClayDropDown.Search placeholder="Type to filter" />
+
 				<ClayDropDown.ItemList items={['one', 'two', 'three']}>
 					{(item: string) => (
 						<ClayDropDown.Item key={item}>{item}</ClayDropDown.Item>
@@ -474,6 +477,7 @@ describe('ClayDropDown', () => {
 		const {getAllByRole: cGetAllByRole, getByRole} = render(
 			<ClayDropDown trigger={<button>Click Me</button>}>
 				<ClayDropDown.Search placeholder="Type to filter" />
+
 				<ClayDropDown.ItemList
 					items={[
 						{

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import {
@@ -31,21 +31,21 @@ export const ALIGN_POSITIONS = [
 ] as const;
 
 const ALIGNMENTS_MAP = {
-	bottom: ['tc', 'bc'],
+	'bottom': ['tc', 'bc'],
 	'bottom-left': ['tl', 'bl'],
 	'bottom-right': ['tr', 'br'],
-	left: ['cr', 'cl'],
+	'left': ['cr', 'cl'],
 	'left-bottom': ['br', 'bl'],
 	'left-top': ['tr', 'tl'],
-	right: ['cl', 'cr'],
+	'right': ['cl', 'cr'],
 	'right-bottom': ['bl', 'br'],
 	'right-top': ['tl', 'tr'],
-	top: ['bc', 'tc'],
+	'top': ['bc', 'tc'],
 	'top-left': ['bl', 'tl'],
 	'top-right': ['br', 'tr'],
 } as const;
 
-type Point = typeof ALIGNMENTS_MAP[keyof typeof ALIGNMENTS_MAP];
+type Point = (typeof ALIGNMENTS_MAP)[keyof typeof ALIGNMENTS_MAP];
 
 const BOTTOM_OFFSET = [0, 4] as const;
 const LEFT_OFFSET = [-4, 0] as const;
@@ -68,10 +68,11 @@ const OFFSET_MAP = {
 };
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+
 	/**
 	 * Position in which the tooltip will be aligned to the element.
 	 */
-	alignPosition?: typeof ALIGN_POSITIONS[number];
+	alignPosition?: (typeof ALIGN_POSITIONS)[number];
 
 	/**
 	 * Flag to indicate if the popover should be closed when
@@ -145,7 +146,7 @@ export const Popover = React.forwardRef(function Popover(
 		onOffset = (points) =>
 			OFFSET_MAP[points.join('') as keyof typeof OFFSET_MAP] as [
 				number,
-				number
+				number,
 			],
 		onShowChange,
 		show,
@@ -293,7 +294,7 @@ export const Popover = React.forwardRef(function Popover(
 				{
 					[`popover-${displayType}`]: displayType,
 					'popover-width-lg': size === 'lg',
-					show: internalShow,
+					'show': internalShow,
 				}
 			)}
 			ref={ref as React.RefObject<HTMLDivElement>}
@@ -329,11 +330,14 @@ export const Popover = React.forwardRef(function Popover(
 					ref: (node: HTMLButtonElement) => {
 						if (node) {
 							triggerRef.current = node;
+
 							// Call the original ref, if any.
+
 							const {ref} = trigger;
 							if (typeof ref === 'function') {
 								ref(node);
-							} else if (ref) {
+							}
+							else if (ref) {
 								(
 									ref as React.MutableRefObject<HTMLButtonElement>
 								).current = node;

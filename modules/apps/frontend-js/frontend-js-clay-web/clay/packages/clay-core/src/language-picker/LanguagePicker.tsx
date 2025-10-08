@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2025 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import ClayIcon from '@clayui/icon';
@@ -38,6 +38,7 @@ type Translations = {
 };
 
 type Props = {
+
 	/**
 	 * Flag to indicate if the Picker is active or not (controlled).
 	 */
@@ -137,14 +138,16 @@ const getTranslationLabel = ({
 	if (localeId === defaultLocaleId) {
 		displayType = 'info';
 		label = messages.default;
-	} else if (translation) {
+	}
+	else if (translation) {
 		const {total, translated} = translation;
 
 		if (translated !== 0) {
 			if (total === translated) {
 				displayType = 'success';
 				label = messages.translated;
-			} else {
+			}
+			else {
 				displayType = 'secondary';
 				label = sub(messages.translating, [translated, total]);
 			}
@@ -297,6 +300,7 @@ export function LanguagePicker({
 									</span>
 								</ClayLayout.ContentSection>
 							</ClayLayout.ContentCol>
+
 							{hasTranslations ? (
 								<ClayLayout.ContentCol containerElement="span">
 									<ClayLayout.ContentSection>

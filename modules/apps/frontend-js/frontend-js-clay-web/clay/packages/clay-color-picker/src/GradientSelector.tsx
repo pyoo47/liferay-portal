@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
 import React from 'react';
@@ -10,6 +10,7 @@ import {usePointerPosition} from './hooks';
 import {colorToXY, xToSaturation, yToVisibility} from './util';
 
 type Props = {
+
 	/**
 	 * Color value that is currently selected.
 	 */
@@ -38,12 +39,12 @@ const ClayColorPickerGradientSelector = ({
 	hue = 0,
 }: Props) => {
 	const containerRef = React.useRef<HTMLDivElement>(null);
-	const selectorActive = React.useRef<boolean>(false);
+	const selectorActiveRef = React.useRef<boolean>(false);
 
 	const {onPointerMove, setXY, x, y} = usePointerPosition(containerRef);
 
 	const removeListeners = () => {
-		selectorActive.current = false;
+		selectorActiveRef.current = false;
 
 		window.removeEventListener('pointermove', onPointerMove);
 		window.removeEventListener('pointerup', removeListeners);
@@ -52,13 +53,13 @@ const ClayColorPickerGradientSelector = ({
 	useIsomorphicLayoutEffect(() => {
 		const {current} = containerRef;
 
-		if (current && selectorActive.current) {
+		if (current && selectorActiveRef.current) {
 			onChange(xToSaturation(x, current), yToVisibility(y, current));
 		}
 	}, [x, y]);
 
 	React.useEffect(() => {
-		if (containerRef.current && !selectorActive.current) {
+		if (containerRef.current && !selectorActiveRef.current) {
 			setXY(colorToXY(color, containerRef.current));
 		}
 	}, [color]);
@@ -71,7 +72,7 @@ const ClayColorPickerGradientSelector = ({
 			onPointerDown={(event) => {
 				event.preventDefault();
 
-				selectorActive.current = true;
+				selectorActiveRef.current = true;
 				onPointerMove(event);
 
 				(containerRef.current!.querySelector(
