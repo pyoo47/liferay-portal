@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {ClayInput} from '@clayui/form';
@@ -8,7 +8,6 @@ import ClaySlider from '@clayui/slider';
 import React from 'react';
 
 type Props = {
-
 	/**
 	 * Sets the color on ClaySlider form-control-range
 	 */
@@ -43,7 +42,6 @@ const ClayColorPickerAlpha = ({color, onChange, value = 0}: Props) => {
 				}}
 				value={value}
 			/>
-
 			<ClayInput.Group>
 				<ClayInput.GroupItem>
 					<ClayInput
@@ -62,7 +60,6 @@ const ClayColorPickerAlpha = ({color, onChange, value = 0}: Props) => {
 								: value
 						}
 					/>
-
 					<ClayInput.GroupInsetItem before tag="label">
 						A
 					</ClayInput.GroupInsetItem>

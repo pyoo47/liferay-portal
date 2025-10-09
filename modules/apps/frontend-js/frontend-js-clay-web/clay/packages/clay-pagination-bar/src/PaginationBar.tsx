@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import classNames from 'classnames';
@@ -10,7 +10,6 @@ import {DropDown} from './DropDown';
 import {Results} from './Results';
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
-
 	/**
 	 * The size of pagination element.
 	 */
@@ -19,7 +18,6 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
 
 interface IForwardRef<T, P = {}>
 	extends React.ForwardRefExoticComponent<P & React.RefAttributes<T>> {
-
 	/**
 	 * @deprecated since v3.84.0 - use `Picker` component instead.
 	 */

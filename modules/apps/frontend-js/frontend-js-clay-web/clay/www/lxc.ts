@@ -1,8 +1,3 @@
-/**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
- */
-
 import {parse} from 'node-html-parser';
 
 async function fetchLiferay(slug: string, siteId: string, host: string) {
@@ -29,11 +24,9 @@ async function fetchLiferay(slug: string, siteId: string, host: string) {
 		throw new Error('Error calling Liferay fetch.', {
 			cause: new Error(error),
 		});
-	}
-	else if (response.ok && responseContentType === 'application/json') {
+	} else if (response.ok && responseContentType === 'application/json') {
 		return response.json();
-	}
-	else {
+	} else {
 		const data = await response.text();
 
 		return data;
@@ -80,8 +73,7 @@ async function getResource(siteId: string, host: string) {
 
 							if (element.tagName === 'IMG') {
 								element.setAttribute('src', url);
-							}
-							else {
+							} else {
 								element.setAttribute('srcset', url);
 							}
 						}
@@ -99,8 +91,7 @@ async function getResource(siteId: string, host: string) {
 					};
 				})
 		);
-	}
-	catch (error) {
+	} catch (error) {
 		return [];
 	}
 }
@@ -134,7 +125,6 @@ export function createLXCResource() {
 				(item) => item !== 'design' && item !== 'markup'
 			);
 			const id = normalizedSlug[normalizedSlug.length - 1];
-
 			return resource.find((item) => item.slug === `/${id}`);
 		},
 	};

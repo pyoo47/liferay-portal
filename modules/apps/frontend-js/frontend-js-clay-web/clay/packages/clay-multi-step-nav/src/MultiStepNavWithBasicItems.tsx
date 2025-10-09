@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {ClayDropDownWithItems} from '@clayui/drop-down';
@@ -10,7 +10,6 @@ import React from 'react';
 import ClayMultiStepNav from './MultiStepNav';
 
 interface ISteps {
-
 	/**
 	 * Value that is displayed below the step icon.
 	 */
@@ -23,7 +22,6 @@ interface ISteps {
 }
 
 interface IProps extends React.ComponentProps<typeof ClayMultiStepNav> {
-
 	/**
 	 * Value for which step index is active (controlled).
 	 */
@@ -153,9 +151,7 @@ export const MultiStepNavWithBasicItems = ({
 						}
 					>
 						<ClayMultiStepNav.Title>{title}</ClayMultiStepNav.Title>
-
 						<ClayMultiStepNav.Divider />
-
 						<ClayMultiStepNav.Indicator
 							label={1 + i}
 							onClick={() => setActive(i)}
@@ -178,7 +174,6 @@ export const MultiStepNavWithBasicItems = ({
 								? steps[internalActive]!.title
 								: steps[showSteps.length]!.title}
 						</ClayMultiStepNav.Title>
-
 						<ClayMultiStepNav.Divider />
 
 						<ClayDropDownWithItems
@@ -192,9 +187,7 @@ export const MultiStepNavWithBasicItems = ({
 						<ClayMultiStepNav.Title>
 							{lastStep.title}
 						</ClayMultiStepNav.Title>
-
 						<ClayMultiStepNav.Divider />
-
 						<ClayMultiStepNav.Indicator
 							label={steps.length}
 							onClick={() => setActive(indexEnd)}

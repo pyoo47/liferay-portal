@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2023 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {cleanup, render} from '@testing-library/react';
@@ -73,13 +73,9 @@ describe('Table incremental interactions', () => {
 							let cmp = new Intl.Collator('en', {
 								numeric: true,
 							}).compare(
-
 								// @ts-ignore
-
 								a[sort.column],
-
 								// @ts-ignore
-
 								b[sort.column]
 							);
 
@@ -108,9 +104,7 @@ describe('Table incremental interactions', () => {
 					<Body defaultItems={items}>
 						{(row) => (
 							<Row items={columns}>
-
 								{/** @ts-ignore */}
-
 								{(column) => <Cell>{row[column.id]}</Cell>}
 							</Row>
 						)}
@@ -165,13 +159,9 @@ describe('Table incremental interactions', () => {
 
 				return items.sort((a, b) => {
 					let cmp = new Intl.Collator('en', {numeric: true}).compare(
-
 						// @ts-ignore
-
 						a[sort.column],
-
 						// @ts-ignore
-
 						b[sort.column]
 					);
 
@@ -196,9 +186,7 @@ describe('Table incremental interactions', () => {
 					<Body defaultItems={filteredItems}>
 						{(row) => (
 							<Row items={columns}>
-
 								{/** @ts-ignore */}
-
 								{(column) => <Cell>{row[column.id]}</Cell>}
 							</Row>
 						)}
@@ -253,13 +241,9 @@ describe('Table incremental interactions', () => {
 
 				return items.sort((a, b) => {
 					let cmp = new Intl.Collator('en', {numeric: true}).compare(
-
 						// @ts-ignore
-
 						a[sort.column],
-
 						// @ts-ignore
-
 						b[sort.column]
 					);
 
@@ -284,9 +268,7 @@ describe('Table incremental interactions', () => {
 					<Body defaultItems={filteredItems}>
 						{(row) => (
 							<Row items={columns}>
-
 								{/** @ts-ignore */}
-
 								{(column) => <Cell>{row[column.id]}</Cell>}
 							</Row>
 						)}
@@ -334,9 +316,7 @@ describe('Table incremental interactions', () => {
 							<Row items={columns}>
 								{(column) => (
 									<Cell key={`${row.id}:${column.id}`}>
-
 										{/** @ts-ignore */}
-
 										{row[column.id]}
 									</Cell>
 								)}
@@ -367,9 +347,7 @@ describe('Table incremental interactions', () => {
 							<Row items={columns}>
 								{(column) => (
 									<Cell key={`${row.id}:${column.id}`}>
-
 										{/** @ts-ignore */}
-
 										{row[column.id]}
 									</Cell>
 								)}
@@ -407,9 +385,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -446,9 +422,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -489,9 +463,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -538,9 +510,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -569,9 +539,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -624,9 +592,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -671,9 +637,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -720,9 +684,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -765,9 +727,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -810,9 +770,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}
@@ -859,9 +817,7 @@ describe('Table incremental interactions', () => {
 								<Row items={columns}>
 									{(column) => (
 										<Cell key={`${row.id}:${column.id}`}>
-
 											{/** @ts-ignore */}
-
 											{row[column.id]}
 										</Cell>
 									)}

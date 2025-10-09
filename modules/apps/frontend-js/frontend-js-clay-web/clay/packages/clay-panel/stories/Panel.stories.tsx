@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayLabel from '@clayui/label';
@@ -30,9 +30,7 @@ export const Default = (args: any) => (
 		size={args.size}
 	>
 		<ClayPanel.Header>Header!</ClayPanel.Header>
-
 		<ClayPanel.Body>Body!</ClayPanel.Body>
-
 		<ClayPanel.Footer>Footer!</ClayPanel.Footer>
 	</ClayPanel>
 );
@@ -55,9 +53,7 @@ export const Collapsable = (args: any) => {
 				size={args.size}
 			>
 				<ClayPanel.Header>Header!</ClayPanel.Header>
-
 				<ClayPanel.Body>Body!</ClayPanel.Body>
-
 				<ClayPanel.Footer>Footer!</ClayPanel.Footer>
 			</ClayPanel>
 
@@ -77,9 +73,7 @@ export const Collapsable = (args: any) => {
 				size={args.size}
 			>
 				<ClayPanel.Header>Header!</ClayPanel.Header>
-
 				<ClayPanel.Body>Body!</ClayPanel.Body>
-
 				<ClayPanel.Footer>Footer!</ClayPanel.Footer>
 			</ClayPanel>
 		</>
@@ -139,19 +133,12 @@ export const CollapsableWithTitle = (args: any) => (
 		displayTitle={
 			<ClayPanel.Title>
 				<h3>Rule Name</h3>
-
 				<span>{'If field '}</span>
-
 				<ClayLabel displayType="success">Country</ClayLabel>
-
 				<ClayLabel>Is Equal To</ClayLabel>
-
 				<span>{'value '}</span>
-
 				<ClayLabel displayType="info">Brazil</ClayLabel>
-
 				<span>{'enable '}</span>
-
 				<ClayLabel displayType="success">State</ClayLabel>
 			</ClayPanel.Title>
 		}
@@ -160,9 +147,7 @@ export const CollapsableWithTitle = (args: any) => (
 		size={args.size}
 	>
 		<ClayPanel.Header>Header!</ClayPanel.Header>
-
 		<ClayPanel.Body>Body!</ClayPanel.Body>
-
 		<ClayPanel.Footer>Footer!</ClayPanel.Footer>
 	</ClayPanel>
 );

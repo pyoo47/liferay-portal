@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import classNames from 'classnames';
@@ -9,7 +9,6 @@ import React, {useContext} from 'react';
 import {VerticalBarContext} from './context';
 
 type Props = {
-
 	/**
 	 * Item content.
 	 */
@@ -71,11 +70,11 @@ export const Item = React.forwardRef<HTMLLIElement, Props>(function Item(
 			{React.cloneElement(children, {
 				'aria-controls': `${id}-tabpanel-${keyValue}`,
 				'aria-selected': activePanel === keyValue,
-				'className': classNames('tbar-btn tbar-btn-monospaced', {
+				className: classNames('tbar-btn tbar-btn-monospaced', {
 					active: activePanel === keyValue,
 				}),
-				'id': `${id}-tab-${keyValue}`,
-				'onClick': (
+				id: `${id}-tab-${keyValue}`,
+				onClick: (
 					event: React.MouseEvent<HTMLButtonElement, MouseEvent>
 				) => {
 					if (children.props.onClick) {
@@ -90,20 +89,18 @@ export const Item = React.forwardRef<HTMLLIElement, Props>(function Item(
 						onActivePanel(null);
 
 						setPanelNext(null);
-					}
-					else if (keyValue && activePanel === null) {
+					} else if (keyValue && activePanel === null) {
 						onActivePanel(keyValue);
 
 						setPanelNext(null);
-					}
-					else if (keyValue !== activePanel) {
+					} else if (keyValue !== activePanel) {
 						onActivePanel(null);
 
 						setPanelNext(keyValue);
 					}
 				},
-				'role': 'tab',
-				'tabIndex':
+				role: 'tab',
+				tabIndex:
 					(activePanel !== null && activePanel !== keyValue) ||
 					(activePanel === null && index !== 0)
 						? -1

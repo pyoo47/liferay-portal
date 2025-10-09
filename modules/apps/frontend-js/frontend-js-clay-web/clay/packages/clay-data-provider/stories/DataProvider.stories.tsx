@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import React, {useContext, useState} from 'react';
@@ -28,21 +28,15 @@ export const PollingExample = (args: any) => (
 					<div className="autofit-col">
 						<h3>
 							{'Coinbase Trades '}
-
 							<small>
 								{props.networkStatus === 1 && 'Loading'}
-
 								{props.networkStatus === 2 && 'Refetch'}
-
 								{props.networkStatus === 3 && 'Polling'}
-
 								{props.networkStatus === 4 && 'Ready'}
-
 								{props.networkStatus === 5 && 'Error'}
 							</small>
 						</h3>
 					</div>
-
 					<div className="autofit-col">
 						<button
 							className="btn"
@@ -53,7 +47,6 @@ export const PollingExample = (args: any) => (
 						</button>
 					</div>
 				</div>
-
 				<div className="row">
 					<div className="col-md-5">
 						<p className="text-truncate-inline">
@@ -66,36 +59,29 @@ export const PollingExample = (args: any) => (
 						</p>
 					</div>
 				</div>
-
 				<ul className="list-group">
 					<li className="list-group-item list-group-item-flex">
 						<div className="autofit-col" />
-
 						<div className="autofit-col">
 							<p className="list-group-title">Trade Size</p>
 						</div>
-
 						<div className="autofit-col">
 							<p className="list-group-title">Price (USD)</p>
 						</div>
-
 						<div className="autofit-col">
 							<p className="list-group-title">Time (ISO)</p>
 						</div>
 					</li>
-
 					{props.networkStatus === 1 && (
 						<li className="disabled list-group-item list-group-item-flex">
 							Loading...
 						</li>
 					)}
-
 					{props.error && (
 						<li className="disabled list-group-item list-group-item-flex">
 							Error
 						</li>
 					)}
-
 					{props.data &&
 						!props.error &&
 						props.data.map((item: any) => (
@@ -104,11 +90,8 @@ export const PollingExample = (args: any) => (
 								key={item.trade_id}
 							>
 								<div className="autofit-col">{item.side}</div>
-
 								<div className="autofit-col">{item.size}</div>
-
 								<div className="autofit-col">{item.price}</div>
-
 								<div className="autofit-col">{item.time}</div>
 							</li>
 						))}
@@ -146,21 +129,15 @@ export const VariableChange = () => {
 								<div className="autofit-col">
 									<h3>
 										{'The Rick and Morty '}
-
 										<small>
 											{networkStatus === 1 && 'Loading'}
-
 											{networkStatus === 2 && 'Refetch'}
-
 											{networkStatus === 3 && 'Polling'}
-
 											{networkStatus === 4 && 'Ready'}
-
 											{networkStatus === 5 && 'Error'}
 										</small>
 									</h3>
 								</div>
-
 								<div className="autofit-col">
 									<button
 										className="btn"
@@ -176,7 +153,6 @@ export const VariableChange = () => {
 									<label htmlFor="searchCharacterInput">
 										Search Character
 									</label>
-
 									<input
 										className="form-control"
 										id="searchCharacterInput"
@@ -188,20 +164,17 @@ export const VariableChange = () => {
 										value={value}
 									/>
 								</div>
-
 								<ul className="list-group">
 									{networkStatus === 1 && (
 										<li className="disabled list-group-item list-group-item-flex">
 											Loading...
 										</li>
 									)}
-
 									{error && (
 										<li className="disabled list-group-item list-group-item-flex">
 											Result is not found
 										</li>
 									)}
-
 									{!error &&
 										data &&
 										data.results &&
@@ -214,7 +187,6 @@ export const VariableChange = () => {
 													<p className="list-group-title text-truncate">
 														Name
 													</p>
-
 													<p className="list-group-subtitle text-truncate">
 														{item.name}
 													</p>
@@ -243,13 +215,11 @@ export const PollingDisable = () => {
 	return (
 		<div className="pb-4 sheet">
 			<h3>{`Polling  ${poll ? 'enable' : 'disable'}`}</h3>
-
 			<div className="row">
 				<div className="col-md-5">
 					<p>Open your console to see the network tab.</p>
 				</div>
 			</div>
-
 			<div className="row">
 				<div className="col-md-5">
 					<button
@@ -279,7 +249,6 @@ export const CustomFetcher = () => {
 	return (
 		<div className="pb-4 sheet">
 			<h3>Custom Fetcher</h3>
-
 			<div className="row">
 				<div className="col-md-5">
 					<p>Open your console to see the network tab.</p>

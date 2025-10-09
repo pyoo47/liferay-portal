@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {ClayDropDownWithItems} from '@clayui/drop-down';
@@ -15,7 +15,6 @@ import React from 'react';
 import ClayList from './List';
 
 export interface IListItem {
-
 	/**
 	 * Description of item.
 	 */
@@ -79,7 +78,6 @@ interface IBooleanMap {
 }
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
-
 	/**
 	 * Property of item that makes it unique from other items.
 	 * Defaults to 'id'.
@@ -239,7 +237,7 @@ export const ListWithItems = ({
 																	],
 																}
 															);
-														}
+													  }
 													: undefined
 											}
 											selected={selectedItemsMap[key]}
@@ -264,7 +262,7 @@ export const ListWithItems = ({
 												...selectedItemsMap,
 												[key]: !selectedItemsMap[key],
 											});
-										}
+									  }
 									: undefined
 							}
 							selected={selectedItemsMap[key]}

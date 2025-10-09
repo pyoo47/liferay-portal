@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import React, {useState} from 'react';
@@ -43,7 +43,6 @@ export const Default = (args: any) => {
 				>
 					Tab 1
 				</ClayTabs.Item>
-
 				<ClayTabs.Item
 					disabled={args.disabledSecondTab}
 					innerProps={{
@@ -52,7 +51,6 @@ export const Default = (args: any) => {
 				>
 					Tab 2
 				</ClayTabs.Item>
-
 				<ClayTabs.Item
 					disabled={args.disabledThirdTab}
 					innerProps={{
@@ -61,7 +59,6 @@ export const Default = (args: any) => {
 				>
 					Tab 3
 				</ClayTabs.Item>
-
 				<ClayTabs.Item
 					disabled={args.disabledFourthTab}
 					innerProps={{
@@ -82,7 +79,6 @@ export const Default = (args: any) => {
 				plunger pot. Single shot variety pumpkin spice seasonal
 				skinny barista carajillo robust cream.`}
 				</ClayTabs.TabPane>
-
 				<ClayTabs.TabPane id="tabpanel2">
 					{`2. Single origin, extra id beans, eu to go, skinny
 				americano ut aftertaste sugar. At americano, viennese
@@ -93,7 +89,6 @@ export const Default = (args: any) => {
 				plunger pot. Single shot variety pumpkin spice seasonal
 				skinny barista carajillo robust cream.`}
 				</ClayTabs.TabPane>
-
 				<ClayTabs.TabPane id="tabpanel3">
 					{`3. Single origin, extra id beans, eu to go, skinny
 				americano ut aftertaste sugar. At americano, viennese
@@ -104,7 +99,6 @@ export const Default = (args: any) => {
 				plunger pot. Single shot variety pumpkin spice seasonal
 				skinny barista carajillo robust cream.`}
 				</ClayTabs.TabPane>
-
 				<ClayTabs.TabPane id="tabpanel4">
 					{`4. Single origin, extra id beans, eu to go, skinny
 				americano ut aftertaste sugar. At americano, viennese
@@ -115,7 +109,6 @@ export const Default = (args: any) => {
 				plunger pot. Single shot variety pumpkin spice seasonal
 				skinny barista carajillo robust cream.`}
 				</ClayTabs.TabPane>
-
 				<ClayTabs.TabPane id="tabpanel5">
 					{`4. Single origin, extra id beans, eu to go, skinny
 				americano ut aftertaste sugar. At americano, viennese
@@ -146,17 +139,12 @@ export const NewDefault = (args: any) => (
 	<ClayTabs activation={args.activation} displayType={args.displayType}>
 		<ClayTabs.List>
 			<ClayTabs.Item>Tab 1</ClayTabs.Item>
-
 			<ClayTabs.Item>Tab 2</ClayTabs.Item>
-
 			<ClayTabs.Item>Tab 3</ClayTabs.Item>
 		</ClayTabs.List>
-
 		<ClayTabs.Panels>
 			<ClayTabs.TabPanel>Tab Content 1</ClayTabs.TabPanel>
-
 			<ClayTabs.TabPanel>Tab Content 2</ClayTabs.TabPanel>
-
 			<ClayTabs.TabPanel>Tab Content 3</ClayTabs.TabPanel>
 		</ClayTabs.Panels>
 	</ClayTabs>
@@ -188,7 +176,6 @@ export const WithState = () => {
 					pumpkin spice seasonal skinny barista carajillo robust
 					cream.
 				</ClayTabs.TabPane>
-
 				<ClayTabs.TabPane>
 					Iced, crema, coffee id kopi-luwak coffee variety. Skinny
 					extraction, id trifecta qui trifecta grinder. Barista
@@ -197,7 +184,6 @@ export const WithState = () => {
 					steamed to go wings to go cortado. Grinder, siphon coffee
 					acerbic espresso cinnamon crema breve.
 				</ClayTabs.TabPane>
-
 				<ClayTabs.TabPane>
 					Skinny extraction, id trifecta qui trifecta grinder. Barista
 					robusta arabica breve ut skinny milk beans macchiato

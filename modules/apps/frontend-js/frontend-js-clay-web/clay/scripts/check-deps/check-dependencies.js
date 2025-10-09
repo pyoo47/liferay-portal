@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 /* eslint no-for-of-loops/no-for-of-loops: 0 */
@@ -33,8 +33,7 @@ async function walk(directory, predicate = () => true, callback) {
 				predicate,
 				callback
 			);
-		}
-		else if (predicate(entry)) {
+		} else if (predicate(entry)) {
 			await callback(join(directory, entry.name.toString()));
 		}
 	}
@@ -132,9 +131,7 @@ async function checkForMissingDependencies() {
 					}
 				},
 				ImportDeclaration(path) {
-
 					// `importKind` may be "value" or "type".
-
 					if (path.get('importKind').node === 'value') {
 						const source = path.get('source');
 						if (source.isStringLiteral()) {
@@ -163,14 +160,13 @@ async function checkForMissingDependencies() {
 			missing[name].forEach((dependency) =>
 				print.line(`    ${dependency}`)
 			);
-		}
-		else {
+		} else {
 			print.line.green('OK');
 		}
 	}, WORKSPACE_PACKAGES_WHITELIST);
 
 	print();
-	const success = !Object.keys(missing).length;
+	const success = Object.keys(missing).length === 0;
 	if (!success) {
 		print.line.red('Add missing dependencies with:\n');
 		Object.entries(missing).forEach(([name, dependencies]) => {
@@ -209,8 +205,7 @@ async function checkForMismatchedDependencyVersions() {
 		print(`  ${dependency}:  `);
 		if (Object.keys(versions).length === 1) {
 			print.line.green('OK');
-		}
-		else {
+		} else {
 			success = false;
 			print.line.red('BAD');
 			for (const [version, dependees] of Object.entries(versions)) {
@@ -250,8 +245,7 @@ async function checkForDevelopmentDependencies() {
 			devDependencies.forEach((dependency) => {
 				print.line(`    ${dependency}`);
 			});
-		}
-		else {
+		} else {
 			print.line.green('OK');
 		}
 	}, WORKSPACE_PACKAGES_WHITELIST);

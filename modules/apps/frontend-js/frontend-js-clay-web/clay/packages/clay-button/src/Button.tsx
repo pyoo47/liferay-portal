@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import LoadingIndicator from '@clayui/loading-indicator';
@@ -24,7 +24,6 @@ type DisplayType =
 	| 'unstyled';
 
 export interface IProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-
 	/**
 	 * Flag to indicate if button is used within an alert component.
 	 */
@@ -126,9 +125,7 @@ const Button = forwardRef(
 		warning(
 			!(
 				childArray.length === 1 &&
-
 				// @ts-ignore
-
 				childArray[0].type?.displayName === 'ClayIcon' &&
 				typeof otherProps['aria-label'] !== 'string' &&
 				typeof otherProps['aria-labelledby'] !== 'string'
@@ -139,8 +136,7 @@ const Button = forwardRef(
 		if (displayType === 'beta') {
 			displayType = 'info';
 			translucent = true;
-		}
-		else if (displayType === 'beta-dark') {
+		} else if (displayType === 'beta-dark') {
 			dark = true;
 			displayType = 'info';
 			translucent = true;
@@ -172,7 +168,6 @@ const Button = forwardRef(
 						<LoadingIndicator />
 					</span>
 				)}
-
 				{children}
 			</button>
 		);

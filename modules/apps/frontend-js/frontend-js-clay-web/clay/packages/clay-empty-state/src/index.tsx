@@ -1,13 +1,12 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2020 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import classNames from 'classnames';
 import React, {useMemo, useState} from 'react';
 
 interface IProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
-
 	/**
 	 * Message the user will see describing what they can do when on this screen
 	 */
@@ -70,8 +69,7 @@ const EmptyState = ({
 		}
 		if (imgSrcReducedMotion) {
 			return imgSrcReducedMotion;
-		}
-		else if (imgSrc && imgSrcReducedMotion !== null) {
+		} else if (imgSrc && imgSrcReducedMotion !== null) {
 			const url = new URL(
 				imgSrc,
 				imgSrc?.match(/http:\/\/|https:\/\//)
@@ -87,9 +85,9 @@ const EmptyState = ({
 				? `${url.pathname.substring(
 						0,
 						hasImgExtension.index
-					)}_reduced_motion${url.pathname.substring(
+				  )}_reduced_motion${url.pathname.substring(
 						hasImgExtension.index!
-					)}`
+				  )}`
 				: null;
 		}
 	}, [error, imgSrcReducedMotion]);
@@ -120,7 +118,6 @@ const EmptyState = ({
 							src={imgSrc}
 							{...imgProps}
 						/>
-
 						{reducedMotionImage && (
 							<img
 								alt=""
@@ -141,9 +138,7 @@ const EmptyState = ({
 			<div className="c-empty-state-title">
 				<span>{title || defaultTile}</span>
 			</div>
-
 			<div className="c-empty-state-text">{description}</div>
-
 			{children && <div className="c-empty-state-footer">{children}</div>}
 		</div>
 	);

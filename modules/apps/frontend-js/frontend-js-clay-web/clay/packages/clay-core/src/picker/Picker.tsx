@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import Button from '@clayui/button';
@@ -31,11 +31,10 @@ import type {ICollectionProps} from '../collection';
 import type {AnnouncerAPI} from '../live-announcer';
 
 type Props<T> = {
-
 	/**
 	 * Flag to indicate if the DropDown menu is active or not (controlled).
 	 */
-	'active'?: boolean;
+	active?: boolean;
 
 	/**
 	 * The global `aria-describedby` attribute identifies the element that
@@ -58,7 +57,7 @@ type Props<T> = {
 	/**
 	 * Custom trigger component.
 	 */
-	'as'?:
+	as?:
 		| 'button'
 		| React.ForwardRefExoticComponent<any>
 		| ((props: React.HTMLAttributes<HTMLElement>) => JSX.Element);
@@ -66,37 +65,37 @@ type Props<T> = {
 	/**
 	 * Sets the CSS className for the component.
 	 */
-	'className'?: string;
+	className?: string;
 
 	/**
 	 *  Property to set the default value of `active` (uncontrolled).
 	 */
-	'defaultActive'?: boolean;
+	defaultActive?: boolean;
 
 	/**
 	 * The initial selected key (uncontrolled).
 	 */
-	'defaultSelectedKey'?: React.Key;
+	defaultSelectedKey?: React.Key;
 
 	/**
 	 * Direction the menu will render relative to the Picker.
 	 */
-	'direction'?: 'bottom' | 'top';
+	direction?: 'bottom' | 'top';
 
 	/**
 	 * Flag to indicate that the component is disabled.
 	 */
-	'disabled'?: boolean;
+	disabled?: boolean;
 
 	/**
 	 * The id of the component.
 	 */
-	'id'?: string;
+	id?: string;
 
 	/**
 	 * Messages for the Picker.
 	 */
-	'messages'?: {
+	messages?: {
 		itemSelected?: string;
 		itemDescribedby?: string;
 		scrollToBottomAriaLabel?: string;
@@ -107,47 +106,47 @@ type Props<T> = {
 	 * Flag to make the component hybrid, when identified it is on a mobile
 	 * device it will use the native selector.
 	 */
-	'native'?: boolean;
+	native?: boolean;
 
 	/**
 	 * Callback for when the active state changes (controlled).
 	 */
-	'onActiveChange'?: InternalDispatch<boolean>;
+	onActiveChange?: InternalDispatch<boolean>;
 
 	/**
 	 * Callback calling when an option is selected.
 	 */
-	'onSelectionChange'?: InternalDispatch<React.Key>;
+	onSelectionChange?: InternalDispatch<React.Key>;
 
 	/**
 	 * Text that appears when you don't have an item selected.
 	 */
-	'placeholder'?: string;
+	placeholder?: string;
 
 	/**
 	 * The currently selected key (controlled).
 	 */
-	'selectedKey'?: React.Key;
+	selectedKey?: React.Key;
 
 	/**
 	 * Flag to make the picker only as wide as its contents.
 	 */
-	'shrink'?: boolean;
+	shrink?: boolean;
 
 	/**
 	 * Sets the width of the panel.
 	 */
-	'width'?: number;
+	width?: number;
 
 	/**
 	 * Sets the className for the React.Portal Menu element.
 	 */
-	'UNSAFE_menuClassName'?: string;
+	UNSAFE_menuClassName?: string;
 
 	/**
 	 * @ignore
 	 */
-	'UNSAFE_behavior'?: 'secondary';
+	UNSAFE_behavior?: 'secondary';
 
 	[key: string]: any;
 } & Omit<ICollectionProps<T, unknown>, 'virtualize'>;
@@ -208,7 +207,6 @@ export function Picker<T extends Record<string, any> | string | number>({
 
 	// We initialize the collection in the picker and then pass it down so the
 	// collection can be cached even before the listbox is not mounted.
-
 	const collection = useCollection<T, unknown>({
 		children,
 		items,
@@ -227,7 +225,7 @@ export function Picker<T extends Record<string, any> | string | number>({
 	const menuRef = useRef<HTMLDivElement | null>(null);
 	const listRef = useRef<HTMLUListElement | null>(null);
 
-	const announcerAPIRef = useRef<AnnouncerAPI>(null);
+	const announcerAPI = useRef<AnnouncerAPI>(null);
 
 	const {isFocusVisible} = useInteractionFocus();
 
@@ -270,10 +268,9 @@ export function Picker<T extends Record<string, any> | string | number>({
 	// opened. There is a bug with `aria-activedescendant` when the element is
 	// not an input and uses `aria-controls` or `aria-owns`.
 	// https://github.com/liferay/clay/issues/5281#issuecomment-1399151900
-
 	useEffect(() => {
 		if (
-			announcerAPIRef.current &&
+			announcerAPI.current &&
 			isAppleDevice() &&
 			activeDescendant &&
 			active
@@ -284,16 +281,15 @@ export function Picker<T extends Record<string, any> | string | number>({
 				return;
 			}
 
-			announcerAPIRef.current.announce(
+			announcerAPI.current.announce(
 				selectedKey === activeDescendant
 					? sub(messages.itemSelected, [item.value])
 					: `${item.value}`
 			);
 
 			// Announces item description with delay to replace combobox description.
-
 			setTimeout(() => {
-				announcerAPIRef.current!.announce(messages.itemDescribedby);
+				announcerAPI.current!.announce(messages.itemDescribedby);
 			}, 1000);
 		}
 	}, [active]);
@@ -302,7 +298,6 @@ export function Picker<T extends Record<string, any> | string | number>({
 	// navigating via the keyboard it will not work because the key does not
 	// exist in the list, so we need to update the visual focus when the list
 	// is updated during the component life cycle.
-
 	useEffect(() => {
 		if (
 			!collection.getItem(selectedKey) &&
@@ -336,11 +331,9 @@ export function Picker<T extends Record<string, any> | string | number>({
 
 			if (scrollTop >= THRESHOLD && scrollTop <= scrollHeightMax) {
 				setIsArrowVisible('both');
-			}
-			else if (scrollTop >= THRESHOLD) {
+			} else if (scrollTop >= THRESHOLD) {
 				setIsArrowVisible('top');
-			}
-			else if (scrollTop <= scrollHeightMax) {
+			} else if (scrollTop <= scrollHeightMax) {
 				setIsArrowVisible('bottom');
 			}
 		}
@@ -410,7 +403,7 @@ export function Picker<T extends Record<string, any> | string | number>({
 
 	return (
 		<>
-			<LiveAnnouncer ref={announcerAPIRef} />
+			<LiveAnnouncer ref={announcerAPI} />
 
 			<As
 				{...otherProps}
@@ -535,8 +528,7 @@ export function Picker<T extends Record<string, any> | string | number>({
 							action === 'blur'
 						) {
 							onPress();
-						}
-						else {
+						} else {
 							const key =
 								selectedKey || selectedKey === 0
 									? selectedKey

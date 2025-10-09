@@ -1,19 +1,14 @@
-/**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
- */
-
-// @ts-ignore
-
-import clay from '@clayui/css';
 import createMDXPlugin from '@next/mdx';
-import path from 'path';
 import rehypeMdxCodeProps from 'rehype-mdx-code-props';
-import {rehypePlugins, remarkPlugins} from 'renoun/mdx';
+import {remarkPlugins, rehypePlugins} from 'renoun/mdx';
 import webpack from 'webpack';
+import path from 'path';
 
 import {unwrapMdxBlockElements} from './plugins/remark-unwrap-paragraphs/index.mjs';
 import {buildIcons} from './plugins/scss/index.mjs';
+
+// @ts-ignore
+import clay from '@clayui/css';
 
 buildIcons();
 
@@ -383,12 +378,10 @@ const nextConfig = {
 					for (const dependency of data.dependencies) {
 						delete dependency.critical;
 					}
-
 					return data;
 				}
 			)
 		);
-
 		return config;
 	},
 };

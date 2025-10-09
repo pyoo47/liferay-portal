@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {Keys, useId} from '@clayui/shared';
@@ -184,8 +184,7 @@ export function DragAndDropProvider<T>({
 					mode: 'mouse',
 					status: null,
 				}));
-			}
-			else {
+			} else {
 				const nextTargetKey = getNextTarget(rootRef, dragKey);
 
 				if (nextTargetKey === null) {
@@ -376,27 +375,23 @@ export function DragAndDropProvider<T>({
 								event.key === Keys.Up ? 'top' : 'bottom';
 							newState.currentTarget =
 								type === 'number' ? Number(key) : key!;
-						}
-						else if (
+						} else if (
 							(event.key === Keys.Up &&
 								state.position === 'bottom') ||
 							(event.key === Keys.Down &&
 								state.position === 'top')
 						) {
 							newState.position = 'middle';
-						}
-						else if (
+						} else if (
 							event.key === Keys.Down &&
 							state.position === 'middle'
 						) {
 							newState.position = 'bottom';
-						}
-						else {
+						} else {
 							if (!item) {
 								newState.position =
 									position === 0 ? 'top' : 'bottom';
-							}
-							else {
+							} else {
 								const [type, key] = item
 									.getAttribute('data-id')!
 									.split(',');
@@ -443,14 +438,11 @@ export function DragAndDropProvider<T>({
 							);
 
 							if (!isHovered) {
-
 								// Removes the item from the list so that the next function
 								// call looks for the next element.
-
 								denylist.add(newState.currentTarget!);
 
 								// Try moving to the next item.
-
 								onKeyDown(event);
 
 								return;

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2020 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 // Aliases for Clay CSS Language Flag SVG Icons. Only a subset of these flags
@@ -775,6 +775,10 @@ export const iconsData = [
 	{
 		aliases: ['copy', 'editor', 'paste', 'scissors', 'text'],
 		name: 'cut',
+	},
+	{
+		aliases: ['archive', 'catalog', 'datastore', 'hub', 'index', 'record'],
+		name: 'database',
 	},
 	{
 		aliases: [''],
@@ -1633,6 +1637,10 @@ export const iconsData = [
 		name: 'select',
 	},
 	{
+		aliases: ['find', 'identify', 'interpretive', 'locate', 'suggestion'],
+		name: 'semantic-search',
+	},
+	{
 		aliases: [''],
 		name: 'send',
 	},
@@ -1839,6 +1847,10 @@ export const iconsData = [
 	{
 		aliases: ['arrow', 'top', 'up'],
 		name: 'tap-ahead',
+	},
+	{
+		aliases: [''],
+		name: 'task-status',
 	},
 	{
 		aliases: ['experiment', 'lab'],

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import DropDown from '@clayui/drop-down';
@@ -15,16 +15,15 @@ export interface IProps
 	extends React.HTMLAttributes<
 		HTMLSpanElement | HTMLButtonElement | HTMLAnchorElement
 	> {
-
 	/**
 	 * Flag that indicates if item is selected.
 	 */
-	'active'?: boolean;
+	active?: boolean;
 
 	/**
 	 * Flag that indicates if item is disabled or not.
 	 */
-	'disabled'?: boolean;
+	disabled?: boolean;
 
 	/**
 	 * @ignore
@@ -34,64 +33,64 @@ export interface IProps
 	/**
 	 * Flag to indicate if matched text is highlighted
 	 */
-	'highlightMatch'?: boolean;
+	highlightMatch?: boolean;
 
 	/**
 	 * Path for item to link to.
 	 */
-	'href'?: string;
+	href?: string;
 
 	/**
 	 * Sets the role accessibility property of the item. Set the item's
 	 * container (<li />) role use the role="" prop instead of roleItem="".
 	 */
-	'roleItem'?: string;
+	roleItem?: string;
 
 	/**
 	 * Path to icon spritemap from clay-css.
 	 */
-	'spritemap'?: string;
+	spritemap?: string;
 
 	/**
 	 * Flag that indicates if there is an icon symbol on the left side.
 	 */
-	'symbolLeft'?: string;
+	symbolLeft?: string;
 
 	/**
 	 * Flag that indicates if there is an icon symbol on the right side.
 	 */
-	'symbolRight'?: string;
+	symbolRight?: string;
 
 	/**
 	 * The item content.
 	 */
-	'children'?: React.ReactNode;
+	children?: React.ReactNode;
 
-	'innerRef'?: React.Ref<HTMLAnchorElement>;
+	innerRef?: React.Ref<HTMLAnchorElement>;
 
 	/**
 	 * Match is the string that will be compared with value.
 	 */
-	'match'?: string;
+	match?: string;
 
 	/**
 	 * Value is the string that will be compared to the characters of
 	 * the match property.
 	 * @deprecated since v3.74.0 - use `children` instead.
 	 */
-	'value'?: string;
+	value?: string;
 
 	/**
 	 * Internal property.
 	 * @ignore
 	 */
-	'keyValue'?: React.Key;
+	keyValue?: React.Key;
 
 	/**
 	 * Sets a text value if the component's content is not plain text. This value
 	 * is used in the combobox element to show the selected option.
 	 */
-	'textValue'?: string;
+	textValue?: string;
 }
 
 const optionsFuzzy = {post: '|}', pre: '}|'};

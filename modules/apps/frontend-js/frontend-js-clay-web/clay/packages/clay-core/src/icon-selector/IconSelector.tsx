@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2025 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import Button, {ClayButtonWithIcon} from '@clayui/button';
@@ -28,7 +28,6 @@ enum alignPosition {
 }
 
 export type Props = {
-
 	/**
 	 * Flag to indicate if menu is showing or not (controlled).
 	 */
@@ -341,7 +340,7 @@ export function IconSelector({
 								</ClayInput.Group>
 							</div>
 
-							{!!filteredIcons.length && (
+							{filteredIcons.length > 0 && (
 								<ul
 									className="dropdown-section-grid list-unstyled"
 									onKeyDown={(event) => {
@@ -392,7 +391,7 @@ export function IconSelector({
 														? sub(
 																messages?.selectIcon,
 																[item]
-															)
+														  )
 														: ''
 												}
 												borderless
@@ -403,8 +402,7 @@ export function IconSelector({
 													if (isFocusVisible()) {
 														if (selectedIcon) {
 															triggerRef.current!.focus();
-														}
-														else {
+														} else {
 															setTimeout(
 																() =>
 																	triggerRef.current!.focus(),
@@ -427,7 +425,8 @@ export function IconSelector({
 								className="dropdown-caption"
 								id={inputId}
 							>
-								{!filteredIcons.length && messages?.notFound}
+								{filteredIcons.length === 0 &&
+									messages?.notFound}
 							</div>
 						</FocusMenu>
 					</div>
@@ -446,7 +445,6 @@ export function IconSelector({
 								<ClayIcon symbol={selectedIcon} />
 							</ClayInput.GroupText>
 						</ClayInput.GroupItem>
-
 						<ClayInput.GroupItem append>
 							<ClayInput readOnly value={selectedIcon} />
 						</ClayInput.GroupItem>
@@ -458,7 +456,6 @@ export function IconSelector({
 						<ClayInput.GroupItem shrink>
 							{content}
 						</ClayInput.GroupItem>
-
 						<ClayInput.GroupItem shrink>
 							<ClayButtonWithIcon
 								aria-label={defaultMessages.removeIcon}

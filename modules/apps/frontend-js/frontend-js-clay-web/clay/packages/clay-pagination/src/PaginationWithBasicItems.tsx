@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayIcon from '@clayui/icon';
@@ -18,7 +18,6 @@ import {Pagination} from './Pagination';
 const ELLIPSIS_BUFFER = 2;
 
 interface IProps extends React.ComponentProps<typeof Pagination> {
-
 	/**
 	 * Sets the currently active page (controlled).
 	 */
@@ -117,7 +116,7 @@ export const ClayPaginationWithBasicItems = React.forwardRef(
 			ellipsisBuffer = ELLIPSIS_BUFFER,
 			ellipsisProps = {
 				'aria-label': 'Show pages {0} through {1}',
-				'title': 'Show pages {0} through {1}',
+				title: 'Show pages {0} through {1}',
 			},
 			hrefConstructor,
 			onActiveChange,
@@ -189,7 +188,7 @@ export const ClayPaginationWithBasicItems = React.forwardRef(
 							},
 							ellipsisBuffer,
 							internalActive - 1
-						)
+					  )
 					: pages
 				).map((page: number | JSX.Element | Object, index: number) =>
 					React.isValidElement(page) ? (

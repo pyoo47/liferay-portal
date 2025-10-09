@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {__NOT_PUBLIC_COLLECTION} from '@clayui/core';
@@ -37,7 +37,6 @@ interface IProps<T>
 		React.HTMLAttributes<HTMLDivElement | HTMLLIElement>,
 		'children'
 	> {
-
 	/**
 	 * Children content to render a dynamic or static content.
 	 */
@@ -244,11 +243,9 @@ function DropDown<T>({
 				'aria-controls': ariaControls,
 				'aria-expanded': internalActive,
 				'aria-haspopup': 'true',
-				'children':
+				children:
 					React.isValidElement(trigger) &&
-
 					// @ts-ignore
-
 					trigger?.type.displayName === 'ClayButton' &&
 					triggerIcon ? (
 						<>
@@ -258,20 +255,18 @@ function DropDown<T>({
 					) : (
 						trigger.props.children
 					),
-				'className': classNames(
+				className: classNames(
 					'dropdown-toggle',
 					trigger.props.className
 				),
-				'onClick': (event: React.MouseEvent<HTMLButtonElement>) => {
+				onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
 					if (trigger.props.onClick) {
 						trigger.props.onClick(event);
 					}
 
 					openMenu(!internalActive);
 				},
-				'onKeyDown': (
-					event: React.KeyboardEvent<HTMLButtonElement>
-				) => {
+				onKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => {
 					if (trigger.props.onKeyDown) {
 						trigger.props.onKeyDown(event);
 					}
@@ -302,11 +297,9 @@ function DropDown<T>({
 						event.preventDefault();
 					}
 				},
-				'ref': (node: HTMLButtonElement) => {
+				ref: (node: HTMLButtonElement) => {
 					triggerElementRef.current = node;
-
 					// Call the original ref, if any.
-
 					const {ref} = trigger;
 					if (typeof ref === 'function') {
 						ref(node);
@@ -364,13 +357,11 @@ function DropDown<T>({
 					<FocusMenu
 						condition={internalActive}
 						onRender={() => {
-
 							// After a few milliseconds querying the elements in the DOM
 							// inside the menu. This especially when the menu is not
 							// rendered yet only after the menu is opened, React needs
 							// to commit the changes to the DOM so that the elements are
 							// visible and we can move the focus.
-
 							setTimeout(() => {
 								const list = getFocusableList(menuElementRef);
 

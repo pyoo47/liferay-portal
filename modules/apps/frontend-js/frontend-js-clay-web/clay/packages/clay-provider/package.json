@@ -22,10 +22,10 @@
 		"react"
 	],
 	"dependencies": {
-		"@clayui/icon": "*"
+		"@clayui/icon": "^3.144.1"
 	},
 	"peerDependencies": {
-		"@clayui/css": "*",
+		"@clayui/css": "3.x",
 		"react": "^16.0.0 || ^17.0.0 || ^18.0.0",
 		"react-dom": "^16.0.0 || ^17.0.0 || ^18.0.0"
 	},

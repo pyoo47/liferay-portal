@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {useProvider} from '@clayui/provider';
@@ -13,19 +13,18 @@ import {ContentContext} from './Content';
 import {VerticalBarContext} from './context';
 
 function useIsFirstRender(): boolean {
-	const isFirstRef = useRef(true);
+	const isFirst = useRef(true);
 
-	if (isFirstRef.current) {
-		isFirstRef.current = false;
+	if (isFirst.current) {
+		isFirst.current = false;
 
 		return true;
 	}
 
-	return isFirstRef.current;
+	return isFirst.current;
 }
 
 type Props = {
-
 	/**
 	 * The panel content.
 	 */

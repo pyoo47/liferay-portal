@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {
@@ -118,7 +118,6 @@ function SVG({children}: ContainerProps) {
 }
 
 type Props<T> = {
-
 	/**
 	 * Sets the current value of bounds to define the highlight area (controlled).
 	 */
@@ -201,14 +200,11 @@ export function OverlayMask<T>({
 						childrenRef.current = node;
 
 						// @ts-ignore
-
 						const {ref} = children;
 
 						if (typeof ref === 'function') {
 							ref(node);
-						}
-						else if (ref !== null) {
-
+						} else if (ref !== null) {
 							// eslint-disable-next-line react-compiler/react-compiler
 							(ref as React.MutableRefObject<any>).current = node;
 						}

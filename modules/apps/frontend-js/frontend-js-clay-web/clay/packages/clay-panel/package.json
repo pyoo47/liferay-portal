@@ -30,15 +30,15 @@
 		"react"
 	],
 	"dependencies": {
-		"@clayui/button": "*",
-		"@clayui/icon": "*",
-		"@clayui/provider": "*",
-		"@clayui/shared": "*",
+		"@clayui/button": "^3.144.1",
+		"@clayui/icon": "^3.144.1",
+		"@clayui/provider": "^3.144.1",
+		"@clayui/shared": "^3.148.0",
 		"classnames": "^2.2.6",
 		"react-transition-group": "^4.4.1"
 	},
 	"peerDependencies": {
-		"@clayui/css": "*",
+		"@clayui/css": "3.x",
 		"react": "^16.0.0 || ^17.0.0 || ^18.0.0",
 		"react-dom": "^16.0.0 || ^17.0.0 || ^18.0.0"
 	},

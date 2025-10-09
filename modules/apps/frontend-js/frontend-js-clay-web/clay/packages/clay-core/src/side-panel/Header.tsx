@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2025 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
@@ -11,7 +11,6 @@ import React from 'react';
 import {useSidePanel} from './context';
 
 type Props = {
-
 	/**
 	 * Children content to render a content.
 	 */
@@ -79,9 +78,7 @@ export const Header = ({
 						/>
 					</div>
 				) : null}
-
 				<div className="autofit-col autofit-col-expand">{children}</div>
-
 				<div className="autofit-col">
 					<button
 						aria-label={messages.closeAriaLabel}

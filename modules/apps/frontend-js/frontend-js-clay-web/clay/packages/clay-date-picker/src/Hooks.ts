@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {Keys} from '@clayui/shared';
@@ -22,15 +22,12 @@ export const useDaysSelected = (defaultDays: () => readonly [Date, Date]) => {
 	const [daysSelected, set] = useState(defaultDays);
 
 	const setDaysSelected = useCallback(([start, end]: [Date, Date]) => {
-
 		// Preserves the reference of dates
-
 		if (start === end) {
 			const date = normalizeTime(start);
 
 			set([date, date]);
-		}
-		else {
+		} else {
 			set([normalizeTime(start), normalizeTime(end)]);
 		}
 	}, []);
@@ -77,8 +74,7 @@ export const useCurrentTime = (
 			if (typeof hours !== 'string') {
 				if (use12Hours) {
 					hours = formatDate(date, 'hh');
-				}
-				else {
+				} else {
 					hours = formatDate(date, 'HH');
 				}
 			}
@@ -117,8 +113,8 @@ export const useCalendarNavigation = ({
 	const [lastItemFocused, setLastItemFocused] = useState<string | null>(null);
 
 	const gridRef = useRef<HTMLDivElement>(null);
-	const lastKeyPressedRef = useRef<string>('');
-	const hasNextFocusRef = useRef<boolean>(false);
+	const lastKeyPressed = useRef<string>('');
+	const hasNextFocus = useRef<boolean>(false);
 
 	const focusNext = useCallback((day: IDay) => {
 		if (!gridRef.current) {
@@ -207,15 +203,14 @@ export const useCalendarNavigation = ({
 						!nextFocus.previousMonth
 					) {
 						focusNext(nextFocus);
-					}
-					else {
+					} else {
 						onChangeMonth(
 							event.key === Keys.Left || event.key === Keys.Up
 								? -1
 								: 1
 						);
-						lastKeyPressedRef.current = event.key;
-						hasNextFocusRef.current = true;
+						lastKeyPressed.current = event.key;
+						hasNextFocus.current = true;
 					}
 
 					break;
@@ -246,13 +241,12 @@ export const useCalendarNavigation = ({
 
 					if (event.shiftKey) {
 						onChangeMonth(0, value);
-					}
-					else {
+					} else {
 						onChangeMonth(value);
 					}
 
-					lastKeyPressedRef.current = event.key;
-					hasNextFocusRef.current = true;
+					lastKeyPressed.current = event.key;
+					hasNextFocus.current = true;
 					break;
 				}
 				default:
@@ -281,7 +275,6 @@ export const useCalendarNavigation = ({
 	);
 
 	// Moves the focus to the cell when selected if it is not yet in focus.
-
 	useEffect(() => {
 		if (gridRef.current && isOpen) {
 			focusNext({date: daysSelected[0]});
@@ -298,46 +291,41 @@ export const useCalendarNavigation = ({
 				if (focusNext) {
 					focusNext.focus();
 				}
-			}
-			else {
+			} else {
 				setLastItemFocused(null);
 			}
 		}
 	}, [isOpen]);
 
 	useEffect(() => {
-
 		// Recalculates the focus position when changing the calendar month when
 		// navigating via keyboard.
-
-		if (hasNextFocusRef.current && gridRef.current) {
-			hasNextFocusRef.current = false;
+		if (hasNextFocus.current && gridRef.current) {
+			hasNextFocus.current = false;
 
 			const position = Number(
 				document.activeElement!.getAttribute('data-index')
 			);
 			const row =
 				weeks[
-					lastKeyPressedRef.current === Keys.Left ||
-					lastKeyPressedRef.current === Keys.Up
+					lastKeyPressed.current === Keys.Left ||
+					lastKeyPressed.current === Keys.Up
 						? weeks.length - 1
 						: 0
 				]!;
 
-			switch (lastKeyPressedRef.current) {
+			switch (lastKeyPressed.current) {
 				case Keys.Right:
 				case Keys.Left: {
-
 					// Remaps the row to remove out-of-month dates for horizontal
 					// navigation.
-
 					const newRow = row.filter(
 						(value) => !value.nextMonth && !value.previousMonth
 					);
 
 					focusNext(
 						newRow[
-							lastKeyPressedRef.current === Keys.Left
+							lastKeyPressed.current === Keys.Left
 								? newRow.length - 1
 								: 0
 						]!
@@ -346,10 +334,8 @@ export const useCalendarNavigation = ({
 				}
 				case Keys.Down:
 				case Keys.Up: {
-
 					// Remap the row to remove dates outside the month but keep the
 					// position to find the next element in the vertical navigation.
-
 					let nextFocus = row.map((value) =>
 						!value.nextMonth && !value.previousMonth ? value : null
 					)[position];
@@ -357,7 +343,7 @@ export const useCalendarNavigation = ({
 					if (!nextFocus) {
 						nextFocus =
 							weeks[
-								lastKeyPressedRef.current === Keys.Up
+								lastKeyPressed.current === Keys.Up
 									? weeks.length - 2
 									: 1
 							]![position]!;
@@ -382,7 +368,7 @@ export const useCalendarNavigation = ({
 					break;
 			}
 
-			lastKeyPressedRef.current = '';
+			lastKeyPressed.current = '';
 		}
 	}, [weeks]);
 
@@ -439,7 +425,7 @@ function getWeekArray(d: Date, firstDayOfWeek = 0): Month {
 	}
 
 	dayArray.forEach((day) => {
-		if (!!week.length && day.date.getDay() === firstDayOfWeek) {
+		if (week.length > 0 && day.date.getDay() === firstDayOfWeek) {
 			weekArray.push(week);
 			week = [];
 		}
@@ -450,7 +436,6 @@ function getWeekArray(d: Date, firstDayOfWeek = 0): Month {
 	});
 
 	// unshift days from start of the first week
-
 	const firstWeek = weekArray[0]!;
 	for (let i = 7 - firstWeek.length; i > 0; i -= 1) {
 		const outsideDate = clone(firstWeek[0]!.date);
@@ -459,7 +444,6 @@ function getWeekArray(d: Date, firstDayOfWeek = 0): Month {
 	}
 
 	// push days until the end of the last week
-
 	const lastWeek = weekArray[weekArray.length - 1]!;
 	for (let i = lastWeek.length; i < 7; i += 1) {
 		const outsideDate = clone(lastWeek[lastWeek.length - 1]!.date);

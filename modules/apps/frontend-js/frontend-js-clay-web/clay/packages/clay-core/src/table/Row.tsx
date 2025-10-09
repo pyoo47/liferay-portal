@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2023 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {Keys} from '@clayui/shared';
@@ -14,7 +14,6 @@ import {Cell} from './Cell';
 import {RowContext, useBody, useTable} from './context';
 
 interface IProps<T> extends React.HTMLAttributes<HTMLTableRowElement> {
-
 	/**
 	 * Children content to render a dynamic or static content.
 	 */
@@ -145,10 +144,8 @@ export function Row<T extends Record<string, any>>(
 	const ref = useForwardRef(outRef);
 
 	const visibleKeys = useMemo(() => {
-
 		// This is a speculation/inference about the size of items to decide
 		// to render a last cell as an action.
-
 		const count = items ? items.length : React.Children.count(children);
 
 		return [
@@ -204,8 +201,7 @@ export function Row<T extends Record<string, any>>(
 					case Keys.Right: {
 						if (onLoadMore && lazy && !_expandable) {
 							loadMore();
-						}
-						else {
+						} else {
 							if (!expandedKeys.has(keyValue!)) {
 								const newExpandedKeys = new Set(expandedKeys);
 								newExpandedKeys.add(keyValue!);
@@ -259,5 +255,4 @@ export const ForwardRow = React.forwardRef(Row) as ForwardRef;
 ForwardRow.displayName = 'TableRow';
 
 // @ts-ignore
-
 ForwardRow.passthroughKey = true;

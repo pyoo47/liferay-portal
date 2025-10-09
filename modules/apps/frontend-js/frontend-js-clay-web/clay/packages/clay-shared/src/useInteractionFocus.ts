@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {useEffect, useState} from 'react';
@@ -19,9 +19,7 @@ type Handler = (interaction: Interaction) => void;
 const handlers = new Set<Handler>();
 
 function isValidKey(event: KeyboardEvent) {
-
 	// Control and Shift keys trigger when navigating back to the tab with keyboard.
-
 	return !(
 		event.metaKey ||
 		(!isMac() && event.altKey) ||
@@ -124,8 +122,7 @@ export function useInteractionFocus() {
 			document.addEventListener('pointerdown', onPointer, true);
 			document.addEventListener('pointermove', onPointer, true);
 			document.addEventListener('pointerup', onPointer, true);
-		}
-		else {
+		} else {
 			document.addEventListener('mousedown', onPointer, true);
 			document.addEventListener('mousemove', onPointer, true);
 			document.addEventListener('mouseup', onPointer, true);
@@ -145,8 +142,7 @@ export function useInteractionFocus() {
 				document.removeEventListener('pointerdown', onPointer, true);
 				document.removeEventListener('pointermove', onPointer, true);
 				document.removeEventListener('pointerup', onPointer, true);
-			}
-			else {
+			} else {
 				document.removeEventListener('mousedown', onPointer, true);
 				document.removeEventListener('mousemove', onPointer, true);
 				document.removeEventListener('mouseup', onPointer, true);

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayIcon from '@clayui/icon';
@@ -16,45 +16,33 @@ export default {
 export const Default = () => (
 	<div>
 		<h1>Regular</h1>
-
 		<ClayLink href="#link-styles">Default</ClayLink>{' '}
-
 		<ClayLink aria-label="My Link" href="#link-styles">
 			With Aria Label
 		</ClayLink>{' '}
-
 		<ClayLink displayType="primary" href="#link-styles">
 			Primary
 		</ClayLink>{' '}
-
 		<ClayLink displayType="secondary" href="#link-styles">
 			Secondary
 		</ClayLink>{' '}
-
 		<ClayLink displayType="danger" href="#link-styles">
 			Danger
 		</ClayLink>{' '}
-
 		<ClayLink displayType="tertiary" href="#link-styles">
 			Tertiary
 		</ClayLink>{' '}
-
 		<ClayLink displayType="unstyled" href="#link-styles">
 			Unstyled
 		</ClayLink>{' '}
-
 		<div id="link-styles" />
-
 		<h1>Semi Bold</h1>
-
 		<ClayLink href="#link-styles" weight="semi-bold">
 			Default
 		</ClayLink>{' '}
-
 		<ClayLink displayType="primary" href="#link-styles" weight="semi-bold">
 			Primary
 		</ClayLink>{' '}
-
 		<ClayLink
 			displayType="secondary"
 			href="#link-styles"
@@ -62,11 +50,9 @@ export const Default = () => (
 		>
 			Secondary
 		</ClayLink>{' '}
-
 		<ClayLink displayType="danger" href="#link-styles" weight="semi-bold">
 			Danger
 		</ClayLink>{' '}
-
 		<ClayLink displayType="tertiary" href="#link-styles" weight="semi-bold">
 			Tertiary
 		</ClayLink>{' '}

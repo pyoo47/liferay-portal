@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2021 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {isAppleDevice, useNavigation} from '@clayui/shared';
@@ -25,7 +25,6 @@ interface ITreeViewProps<T extends Record<string, any>>
 		>,
 		ITreeProps<T>,
 		ICollectionProps<T> {
-
 	/**
 	 * Flag to determine which style the TreeView will display.
 	 */
@@ -247,7 +246,6 @@ export function TreeView<T extends Record<string, any>>({
 								<Collection<T> items={state.items}>
 									{children}
 								</Collection>
-
 								<DragLayer itemNameKey={itemNameKey} />
 							</FocusWithinProvider>
 						</DragAndDropProvider>

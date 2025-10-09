@@ -31,13 +31,13 @@
 		"react"
 	],
 	"dependencies": {
-		"@clayui/shared": "*",
+		"@clayui/shared": "^3.148.0",
 		"classnames": "^2.2.6",
 		"dom-align": "^1.12.2",
 		"warning": "^4.0.3"
 	},
 	"peerDependencies": {
-		"@clayui/css": "*",
+		"@clayui/css": "3.x",
 		"react": "^16.0.0 || ^17.0.0 || ^18.0.0",
 		"react-dom": "^16.0.0 || ^17.0.0 || ^18.0.0"
 	},

@@ -1,8 +1,3 @@
-/**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
- */
-
 if (!Element.prototype.matches) {
 	Element.prototype.matches =
 		Element.prototype.msMatchesSelector ||
@@ -11,7 +6,7 @@ if (!Element.prototype.matches) {
 
 if (!Element.prototype.closest) {
 	Element.prototype.closest = function (selector) {
-		let node = this;
+		var node = this;
 
 		while (node.nodeType === 1) {
 			if (node.matches(selector)) {
@@ -26,21 +21,21 @@ if (!Element.prototype.closest) {
 }
 
 (function () {
-	document.addEventListener('click', (event) => {
-		const t = event.target;
+	document.addEventListener('click', function (event) {
+		var t = event.target;
 
-		const a =
+		var a =
 			t.tagName === 'a' || t.tagName === 'button'
 				? t
 				: t.closest('a') || t.closest('button');
-		const column = t.closest('.autofit-col-toggle') || false;
+		var column = t.closest('.autofit-col-toggle') || false;
 
 		if (a) {
 			if (a.getAttribute('href') === '#1') {
 				event.preventDefault();
 			}
 
-			const dataToggle = a.getAttribute('data-toggle');
+			var dataToggle = a.getAttribute('data-toggle');
 
 			if (dataToggle && dataToggle.startsWith('c-prefers')) {
 				document
@@ -63,24 +58,24 @@ if (!Element.prototype.closest) {
 
 (function () {
 	function calcProgressWidth(el) {
-		const clayRange = el.closest('[data-toggle="clay-css-range"]');
+		var clayRange = el.closest('[data-toggle="clay-css-range"]');
 
-		const min = el.getAttribute('min') || 0;
-		const max = el.getAttribute('max') || 100;
-		const step = el.getAttribute('step') || 1;
+		var min = el.getAttribute('min') || 0;
+		var max = el.getAttribute('max') || 100;
+		var step = el.getAttribute('step') || 1;
 
-		const thumbWidth = parseInt(
+		var thumbWidth = parseInt(
 			clayRange.querySelector('.clay-range-progress .clay-range-thumb')
 				.offsetWidth
 		);
-		const rangeWidth = parseInt(el.offsetWidth);
+		var rangeWidth = parseInt(el.offsetWidth);
 
-		const currentStep = (el.value - min) / step;
-		const totalSteps = (max - min) / step;
-		const progressWidth = (currentStep / totalSteps) * 100;
+		var currentStep = (el.value - min) / step;
+		var totalSteps = (max - min) / step;
+		var progressWidth = (currentStep / totalSteps) * 100;
 
-		let offsetWidth = progressWidth;
-		const ratio =
+		var offsetWidth = progressWidth;
+		var ratio =
 			(((1 - progressWidth * 0.01) * (thumbWidth / 1.001)) / rangeWidth) *
 			100;
 
@@ -93,9 +88,7 @@ if (!Element.prototype.closest) {
 	}
 
 	function clayRange(e) {
-		const clayRangeInput = e.target.closest(
-			'[data-toggle="clay-css-range"]'
-		);
+		var clayRangeInput = e.target.closest('[data-toggle="clay-css-range"]');
 
 		if (clayRangeInput) {
 			offsetWidth = calcProgressWidth(e.target);
@@ -103,11 +96,11 @@ if (!Element.prototype.closest) {
 			clayRangeInput.querySelector('.clay-range-progress').style.width =
 				offsetWidth + '%';
 
-			const currentVal = e.target.value;
+			var currentVal = e.target.value;
 
-			const title = clayRangeInput.querySelectorAll('.clay-range-value');
+			var title = clayRangeInput.querySelectorAll('.clay-range-value');
 
-			for (let i = 0; i < title.length; i++) {
+			for (var i = 0; i < title.length; i++) {
 				title[i].innerHTML = currentVal;
 			}
 		}

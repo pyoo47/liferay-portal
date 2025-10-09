@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayIcon from '@clayui/icon';
@@ -8,7 +8,6 @@ import classNames from 'classnames';
 import React from 'react';
 
 interface IGroup extends React.HTMLAttributes<HTMLDivElement> {
-
 	/**
 	 * Indicates Form Group should be a small variant.
 	 */
@@ -112,7 +111,6 @@ FeedbackItem.displayName = 'ClayFormFeedbackItem';
 
 interface IFeedbackIndicatorProps
 	extends React.HTMLAttributes<HTMLSpanElement> {
-
 	/**
 	 * Path to the location of the spritemap resource.
 	 */

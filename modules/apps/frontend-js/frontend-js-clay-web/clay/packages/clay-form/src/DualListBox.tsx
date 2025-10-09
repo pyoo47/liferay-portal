@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2020 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
@@ -33,7 +33,6 @@ function swapArrayItems(
 }
 
 type BoxProps = {
-
 	/**
 	 * Id of the selectbox to be used with the label
 	 */
@@ -56,7 +55,6 @@ type BoxProps = {
 };
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
-
 	/**
 	 * Labels for the aria attributes
 	 */

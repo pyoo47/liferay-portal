@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2021 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayAlert from '@clayui/alert';
@@ -109,7 +109,6 @@ const cache = new Map();
 // This method is just a simulation of filtering a tree but don't consider
 // using it in production. This is not performative at runtime because it
 // will traverse the entire tree and create a copy.
-
 function createFilter<T extends Array<any>>(
 	tree: T,
 	nestedKey: string,
@@ -145,7 +144,7 @@ function createFilter<T extends Array<any>>(
 			})
 			.filter(Boolean) as T;
 
-		return filteredTree.length ? filteredTree : undefined;
+		return filteredTree.length > 0 ? filteredTree : undefined;
 	}
 
 	return {
@@ -212,7 +211,6 @@ export const ThemeLight = () => (
 				<Icon symbol="folder" />
 				Root
 			</TreeView.ItemStack>
-
 			<TreeView.Group>
 				<TreeView.Item>Item</TreeView.Item>
 			</TreeView.Group>
@@ -227,7 +225,6 @@ export const ThemeDark = () => (
 				<Icon symbol="folder" />
 				Root
 			</TreeView.ItemStack>
-
 			<TreeView.Group>
 				<TreeView.Item>Item</TreeView.Item>
 			</TreeView.Group>
@@ -270,16 +267,12 @@ export const Actions = () => (
 				<Icon symbol="folder" />
 				Folder 1
 			</TreeView.ItemStack>
-
 			<TreeView.Group>
 				<TreeView.Item>Item 1</TreeView.Item>
-
 				<TreeView.Item>Item 2</TreeView.Item>
-
 				<TreeView.Item>Item 3</TreeView.Item>
 			</TreeView.Group>
 		</TreeView.Item>
-
 		<TreeView.Item
 			actions={
 				<>
@@ -309,12 +302,9 @@ export const Actions = () => (
 				<Icon symbol="folder" />
 				Folder 2
 			</TreeView.ItemStack>
-
 			<TreeView.Group>
 				<TreeView.Item>Item 4</TreeView.Item>
-
 				<TreeView.Item>Item 5</TreeView.Item>
-
 				<TreeView.Item>Item 6</TreeView.Item>
 			</TreeView.Group>
 		</TreeView.Item>
@@ -362,10 +352,8 @@ export const Dynamic = () => (
 			<TreeView.Item>
 				<TreeView.ItemStack>
 					<Icon symbol="folder" />
-
 					{item.name}
 				</TreeView.ItemStack>
-
 				<TreeView.Group items={item.children}>
 					{(item) => <TreeView.Item>{item.name}</TreeView.Item>}
 				</TreeView.Group>
@@ -394,10 +382,8 @@ export const Styling = () => (
 			<TreeView.Item className="parent-list-item">
 				<TreeView.ItemStack>
 					<Icon symbol="folder" />
-
 					{item.name}
 				</TreeView.ItemStack>
-
 				<TreeView.Group items={item.children}>
 					{(item) => (
 						<TreeView.Item className="nested-list-item">
@@ -443,9 +429,7 @@ export const Nested = () => {
 				<TreeView.Item>
 					<TreeView.ItemStack>
 						<Icon symbol={item.type ?? 'folder'} />
-
 						{item.name}
-
 						{item.status && (
 							<Icon
 								className={TYPES_TO_COLORS[item.status]}
@@ -453,7 +437,6 @@ export const Nested = () => {
 							/>
 						)}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{({name, status, type}: IItem) => (
 							<TreeView.Item>
@@ -463,9 +446,7 @@ export const Nested = () => {
 										symbol={TYPES_TO_SYMBOLS[type]}
 									/>
 								)}
-
 								{name}
-
 								{status && (
 									<Icon
 										className={TYPES_TO_COLORS[status]}
@@ -490,7 +471,6 @@ export const WithSticker = () => (
 				</Sticker>
 				Juan Hidalgo
 			</TreeView.ItemStack>
-
 			<TreeView.Group>
 				<TreeView.Item key="Victor Valle">
 					<TreeView.ItemStack>
@@ -503,7 +483,6 @@ export const WithSticker = () => (
 						</Sticker>
 						Victor Valle
 					</TreeView.ItemStack>
-
 					<TreeView.Group>
 						<TreeView.Item key="susana-vázquez">
 							<Sticker
@@ -515,7 +494,6 @@ export const WithSticker = () => (
 							</Sticker>
 							Susana Vázquez
 						</TreeView.Item>
-
 						<TreeView.Item key="myriam-manso">
 							<Sticker
 								displayType="primary"
@@ -528,7 +506,6 @@ export const WithSticker = () => (
 						</TreeView.Item>
 					</TreeView.Group>
 				</TreeView.Item>
-
 				<TreeView.Item key="emily-young">
 					<Sticker displayType="primary" shape="user-icon" size="sm">
 						EY
@@ -542,12 +519,12 @@ export const WithSticker = () => (
 
 export const PageElements = () => {
 	const TYPES_TO_SYMBOLS = {
-		'container': 'container',
-		'editable': 'text',
+		container: 'container',
+		editable: 'text',
 		'fragment-image': 'picture',
 		'fragment-text': 'h1',
-		'paragraph': 'paragraph',
-		'row': 'table',
+		paragraph: 'paragraph',
+		row: 'table',
 	} as Record<string, string>;
 
 	const items = [
@@ -646,15 +623,12 @@ export const PageElements = () => {
 						{item.type && (
 							<Icon symbol={TYPES_TO_SYMBOLS[item.type]} />
 						)}
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{({name, type}) => (
 							<TreeView.Item>
 								<Icon symbol={TYPES_TO_SYMBOLS[type]} />
-
 								{name}
 							</TreeView.Item>
 						)}
@@ -671,7 +645,6 @@ export const PreSelectedItems = (args: any) => {
 	);
 
 	// Just to avoid TypeScript error with required props
-
 	const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 	return (
@@ -687,19 +660,14 @@ export const PreSelectedItems = (args: any) => {
 				<TreeView.Item>
 					<TreeView.ItemStack>
 						<OptionalCheckbox />
-
 						<Icon symbol="folder" />
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item>
 								<OptionalCheckbox />
-
 								<Icon symbol="folder" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -722,9 +690,7 @@ PreSelectedItems.args = {
 };
 
 export const Disabled = () => {
-
 	// Just to avoid TypeScript error with required props
-
 	const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 	return (
@@ -738,19 +704,14 @@ export const Disabled = () => {
 				<TreeView.Item>
 					<TreeView.ItemStack disabled={item.disabled}>
 						<OptionalCheckbox />
-
 						<Icon symbol="folder" />
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item: any) => (
 							<TreeView.Item disabled={item.disabled}>
 								<OptionalCheckbox />
-
 								<Icon symbol="folder" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -767,7 +728,6 @@ export const MultipleSelection = (args: any) => {
 	);
 
 	// Just to avoid TypeScript error with required props
-
 	const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 	return (
@@ -784,19 +744,14 @@ export const MultipleSelection = (args: any) => {
 				<TreeView.Item>
 					<TreeView.ItemStack>
 						<OptionalCheckbox />
-
 						<Icon symbol="folder" />
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item>
 								<OptionalCheckbox />
-
 								<Icon symbol="folder" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -824,7 +779,6 @@ export const MultipleSelectionWithAsyncLoad = (args: any) => {
 	);
 
 	// Just to avoid TypeScript error with required props
-
 	const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 	return (
@@ -832,9 +786,7 @@ export const MultipleSelectionWithAsyncLoad = (args: any) => {
 			defaultItems={ITEMS_DRIVE}
 			nestedKey="children"
 			onLoadMore={async (item) => {
-
 				// Delay to simulate loading of new data
-
 				await new Promise((resolve) => {
 					setTimeout(() => resolve(''), 1000);
 				});
@@ -863,19 +815,14 @@ export const MultipleSelectionWithAsyncLoad = (args: any) => {
 				<TreeView.Item>
 					<TreeView.ItemStack>
 						<OptionalCheckbox />
-
 						<Icon symbol="folder" />
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item>
 								<OptionalCheckbox />
-
 								<Icon symbol="folder" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -920,21 +867,16 @@ export const ManuallyTriggerMultipleSelection = (args: any) => {
 							onClick={() => selection.toggle(item.id)}
 						>
 							<Icon symbol="folder" />
-
 							{item.name}
-
 							{item.id}
 						</TreeView.ItemStack>
-
 						<TreeView.Group items={item.children}>
 							{(item) => (
 								<TreeView.Item
 									onClick={() => selection.toggle(item.id)}
 								>
 									<Icon symbol="folder" />
-
 									{item.name}
-
 									{item.id}
 								</TreeView.Item>
 							)}
@@ -963,7 +905,6 @@ export const ExpandOnCheck = (args: any) => {
 	);
 
 	// Just to avoid TypeScript error with required props
-
 	const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 	return (
@@ -981,19 +922,14 @@ export const ExpandOnCheck = (args: any) => {
 				<TreeView.Item>
 					<TreeView.ItemStack>
 						<OptionalCheckbox />
-
 						<Icon symbol="folder" />
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item>
 								<OptionalCheckbox />
-
 								<Icon symbol="folder" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -1033,15 +969,12 @@ export const SingleSelection = () => {
 				<TreeView.Item>
 					<TreeView.ItemStack>
 						<Icon symbol="folder" />
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item>
 								<Icon symbol="folder" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -1070,15 +1003,12 @@ export const ManuallyTriggerSingleSelection = () => {
 				<TreeView.Item>
 					<TreeView.ItemStack>
 						<Icon symbol="folder" />
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item>
 								<Icon symbol="folder" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -1101,7 +1031,6 @@ export const LargeData = () => {
 			{(item) => (
 				<TreeView.Item>
 					<TreeView.ItemStack>{item.name}</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item: typeof rootNode) => (
 							<TreeView.Item>{item.name}</TreeView.Item>
@@ -1118,9 +1047,7 @@ export const AsyncLoad = () => (
 		defaultItems={ITEMS_DRIVE}
 		nestedKey="children"
 		onLoadMore={async (item) => {
-
 			// Delay to simulate loading of new data
-
 			await new Promise((resolve) => {
 				setTimeout(() => resolve(''), 1000);
 			});
@@ -1145,15 +1072,12 @@ export const AsyncLoad = () => (
 			<TreeView.Item>
 				<TreeView.ItemStack>
 					<Icon symbol="folder" />
-
 					{item.name}
 				</TreeView.ItemStack>
-
 				<TreeView.Group items={item.children}>
 					{(item) => (
 						<TreeView.Item expandable>
 							<Icon symbol="folder" />
-
 							{item.name}
 						</TreeView.Item>
 					)}
@@ -1175,22 +1099,18 @@ export const AsyncLoadDataPaginated = () => (
 		]}
 		nestedKey="children"
 		onLoadMore={async (item, cursor: number = 1) => {
-
 			// Example conditional, I don't want to load data for an item that has
 			// no children.
-
 			if (!item.children) {
 				return;
 			}
 
 			// No more data to fetch.
-
 			if (cursor === null) {
 				return;
 			}
 
 			// Delay to simulate loading of new data
-
 			await new Promise((resolve) => {
 				setTimeout(() => resolve(''), 1000);
 			});
@@ -1198,9 +1118,7 @@ export const AsyncLoadDataPaginated = () => (
 			const newCursor = cursor + 1;
 
 			return {
-
 				// Just for simulation
-
 				cursor: newCursor <= 3 ? newCursor : null,
 				items: [
 					{
@@ -1223,15 +1141,12 @@ export const AsyncLoadDataPaginated = () => (
 			<TreeView.Item>
 				<TreeView.ItemStack>
 					<Icon symbol="folder" />
-
 					{item.name}
 				</TreeView.ItemStack>
-
 				<TreeView.Group items={item.children}>
 					{(item) => (
 						<TreeView.Item>
 							<Icon symbol="folder" />
-
 							{item.name}
 						</TreeView.Item>
 					)}
@@ -1275,15 +1190,12 @@ export const AsyncLoadWithErrorHandling = () => {
 					<TreeView.Item>
 						<TreeView.ItemStack>
 							<Icon symbol="folder" />
-
 							{item.name}
 						</TreeView.ItemStack>
-
 						<TreeView.Group items={item.children}>
 							{(item) => (
 								<TreeView.Item>
 									<Icon symbol="folder" />
-
 									{item.name}
 								</TreeView.Item>
 							)}
@@ -1345,15 +1257,12 @@ export const SelectionWithFilter = () => {
 					<TreeView.Item>
 						<TreeView.ItemStack>
 							<OptionalCheckbox />
-
 							{item.name}
 						</TreeView.ItemStack>
-
 						<TreeView.Group items={item.children}>
 							{(item) => (
 								<TreeView.Item>
 									<OptionalCheckbox />
-
 									{item.name}
 								</TreeView.Item>
 							)}
@@ -1382,7 +1291,6 @@ export const PerformanceTest = () => {
 	const [value, setValue] = useState('');
 
 	// Just to avoid TypeScript error with required props
-
 	const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 	const itemsFiltered = useMemo<Data>(() => {
@@ -1423,7 +1331,6 @@ export const PerformanceTest = () => {
 						<TreeView.ItemStack>
 							<OptionalCheckbox /> {item.label}
 						</TreeView.ItemStack>
-
 						<TreeView.Group items={item.itemSubtypes}>
 							{(item) => (
 								<TreeView.Item>
@@ -1535,9 +1442,7 @@ export const DemoCategoriesSingle = () => {
 							event.preventDefault();
 
 							if (item.vocabulary) {
-
 								// @ts-ignore
-
 								switch (event.detail) {
 									case 1:
 										clickTimerRef.current = setTimeout(
@@ -1553,12 +1458,9 @@ export const DemoCategoriesSingle = () => {
 									default:
 										break;
 								}
-							}
-							else {
+							} else {
 								onCategoryClick(
-
 									// @ts-ignore
-
 									event.detail,
 									item,
 									false,
@@ -1573,10 +1475,8 @@ export const DemoCategoriesSingle = () => {
 								item.vocabulary ? 'vocabulary' : 'categories'
 							}
 						/>
-
 						{item.name}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item
@@ -1584,9 +1484,7 @@ export const DemoCategoriesSingle = () => {
 									clearTimeout(clickTimerRef.current);
 									event.preventDefault();
 									onCategoryClick(
-
 										// @ts-ignore
-
 										event.detail,
 										item,
 										false,
@@ -1596,7 +1494,6 @@ export const DemoCategoriesSingle = () => {
 								}}
 							>
 								<Icon symbol="categories" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -1608,9 +1505,7 @@ export const DemoCategoriesSingle = () => {
 };
 
 export const DemoCategoriesMultiple = () => {
-
 	// Just to avoid TypeScript error with required props
-
 	const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 	return (
@@ -1710,22 +1605,18 @@ export const DemoCategoriesMultiple = () => {
 
 							if (item.vocabulary) {
 								expand.toggle(item.id);
-							}
-							else {
+							} else {
 								selection.toggle(item.id);
 							}
 						}}
 					>
 						{!item.vocabulary && <OptionalCheckbox />}
-
 						<Icon
 							symbol={
 								item.vocabulary ? 'vocabulary' : 'categories'
 							}
 						/>
-
 						{item.name}
-
 						{item.vocabulary && (
 							<div className="pl-4">
 								<Button
@@ -1745,16 +1636,13 @@ export const DemoCategoriesMultiple = () => {
 							</div>
 						)}
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item
 								onClick={() => selection.toggle(item.id)}
 							>
 								<OptionalCheckbox />
-
 								<Icon symbol="categories" />
-
 								{item.name}
 							</TreeView.Item>
 						)}
@@ -1766,9 +1654,7 @@ export const DemoCategoriesMultiple = () => {
 };
 
 export const DemoDocumentsMultiple = () => {
-
 	// Just to avoid TypeScript error with required props
-
 	const OptionalCheckbox = (props: any) => <Checkbox {...props} />;
 
 	const MAPPING_ICON = {
@@ -1808,23 +1694,18 @@ export const DemoDocumentsMultiple = () => {
 				<TreeView.Item>
 					<TreeView.ItemStack>
 						<OptionalCheckbox />
-
 						{MAPPING_ICON[item.type] && (
 							<Icon symbol={MAPPING_ICON[item.type]} />
 						)}
-
 						{item.name}
-
 						<div className="pl-2">
 							<Badge label={item.children.length} />
 						</div>
 					</TreeView.ItemStack>
-
 					<TreeView.Group items={item.children}>
 						{(item) => (
 							<TreeView.Item>
 								<OptionalCheckbox />
-
 								{item.name}
 							</TreeView.Item>
 						)}

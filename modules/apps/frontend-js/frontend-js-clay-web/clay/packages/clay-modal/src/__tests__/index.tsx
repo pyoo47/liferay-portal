@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayModal, {useModal} from '..';
@@ -13,9 +13,7 @@ const spritemap = 'icons.svg';
 
 describe('ClayModal', () => {
 	beforeAll(() => {
-
 		// @ts-ignore
-
 		ReactDOM.createPortal = jest.fn((element) => {
 			return element;
 		});
@@ -39,11 +37,9 @@ describe('ClayModal', () => {
 			return (
 				<ClayModal observer={observer} spritemap={spritemap}>
 					<ClayModal.Header>Foo</ClayModal.Header>
-
 					<ClayModal.Body>
 						<h1>Hello world!</h1>
 					</ClayModal.Body>
-
 					<ClayModal.Footer
 						last={<Button onClick={onClose}>Primary</Button>}
 					/>
@@ -95,7 +91,6 @@ describe('ClayModal', () => {
 									</ClayModal.Title>
 								</ClayModal.TitleSection>
 							</ClayModal.Item>
-
 							<ClayModal.Item shrink>
 								<ClayModal.SubtitleSection>
 									<ClayModal.Subtitle>

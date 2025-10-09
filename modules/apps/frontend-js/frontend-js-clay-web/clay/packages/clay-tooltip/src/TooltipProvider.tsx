@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {
@@ -72,7 +72,6 @@ type TContentRenderer = (props: {
 }) => React.ReactElement | React.ReactNode;
 
 type Props = {
-
 	/**
 	 * Flag to indicate if tooltip should automatically align based on the window
 	 */
@@ -120,8 +119,8 @@ export const ClayTooltipProvider = ({
 
 	const {getInteraction, isFocusVisible} = useInteractionFocus();
 
-	const isHoveredRef = useRef(false);
-	const isFocusedRef = useRef(false);
+	const isHovered = useRef(false);
+	const isFocused = useRef(false);
 
 	const {close, isOpen, open} = useTooltipState({delay});
 
@@ -131,11 +130,11 @@ export const ClayTooltipProvider = ({
 			close();
 		}, []),
 		onClick: useCallback(() => {
-			isFocusedRef.current = false;
-			isHoveredRef.current = false;
+			isFocused.current = false;
+			isHovered.current = false;
 		}, []),
 		onHide: useCallback(() => {
-			if (!isHoveredRef.current && !isFocusedRef.current) {
+			if (!isHovered.current && !isFocused.current) {
 				dispatch({type: 'reset'});
 				close();
 			}
@@ -156,8 +155,8 @@ export const ClayTooltipProvider = ({
 
 	const onShow = useCallback(
 		(event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-			if (isHoveredRef.current || isFocusedRef.current) {
-				const props = getProps(event, isHoveredRef.current);
+			if (isHovered.current || isFocused.current) {
+				const props = getProps(event, isHovered.current);
 
 				if (props) {
 					dispatch({
@@ -168,7 +167,7 @@ export const ClayTooltipProvider = ({
 						type: 'update',
 					});
 					open(
-						isFocusedRef.current,
+						isFocused.current,
 						props.delay ? Number(props.delay) : undefined
 					);
 				}
@@ -193,33 +192,32 @@ export const ClayTooltipProvider = ({
 
 	const onHoverStart = (event: any) => {
 		if (getInteraction() === 'pointer') {
-			isHoveredRef.current = true;
-		}
-		else {
-			isHoveredRef.current = false;
+			isHovered.current = true;
+		} else {
+			isHovered.current = false;
 		}
 
 		onShow(event);
 	};
 
 	const onHoverEnd = (event: any) => {
-		isFocusedRef.current = false;
-		isHoveredRef.current = false;
+		isFocused.current = false;
+		isHovered.current = false;
 
 		onHide(event);
 	};
 
 	const onFocus = (event: any) => {
 		if (isFocusVisible()) {
-			isFocusedRef.current = true;
+			isFocused.current = true;
 
 			onShow(event);
 		}
 	};
 
 	const onBlur = (event: any) => {
-		isFocusedRef.current = false;
-		isHoveredRef.current = false;
+		isFocused.current = false;
+		isHovered.current = false;
 
 		onHide(event);
 	};

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import React, {useCallback, useEffect, useRef} from 'react';
@@ -12,7 +12,6 @@ import type {CollectionState, ICollectionProps, Props} from './types';
 
 interface IProps
 	extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
-
 	/**
 	 * Component to render.
 	 */
@@ -50,7 +49,7 @@ interface IProps
 function VirtualDynamicCollection<
 	T extends Record<string, any> | string | number,
 	P = unknown,
-	K = unknown,
+	K = unknown
 >({
 	as,
 	children,
@@ -108,7 +107,7 @@ function VirtualDynamicCollection<
 function DynamicCollection<
 	T extends Record<string, any> | string | number,
 	P = unknown,
-	K = unknown,
+	K = unknown
 >({
 	children,
 	connectNested,
@@ -144,7 +143,7 @@ function DynamicCollection<
 export function Collection<
 	T extends Record<string, any> | string | number,
 	P = unknown,
-	K = unknown,
+	K = unknown
 >({
 	as,
 	children,
@@ -201,8 +200,7 @@ export function Collection<
 
 	if (collection) {
 		content = <>{collection.collection}</>;
-	}
-	else if (
+	} else if (
 		virtualize &&
 		children instanceof Function &&
 		items &&
@@ -226,8 +224,7 @@ export function Collection<
 				{children}
 			</VirtualDynamicCollection>
 		);
-	}
-	else {
+	} else {
 		content = (
 			<DynamicCollection
 				connectNested={connectNested}
@@ -254,7 +251,7 @@ export function Collection<
 					position: 'relative',
 					width: '100%',
 				} as React.CSSProperties,
-			}
+		  }
 		: {};
 
 	const props = as || isVirtual ? {ref: containerRef} : {};

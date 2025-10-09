@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayButton from '@clayui/button';
@@ -24,11 +24,9 @@ const ClayDatePickerWithState = (props: {[key: string]: any}) => {
 				Date Picker
 				<ClayForm.HelpText>(Not Localizable)</ClayForm.HelpText>
 			</label>
-
 			<ClayForm.FeedbackGroup>
 				<ClayForm.HelpText>Help Text</ClayForm.HelpText>
 			</ClayForm.FeedbackGroup>
-
 			<ClayDatePicker
 				{...props}
 				ariaLabels={{
@@ -50,7 +48,6 @@ const ClayDatePickerWithState = (props: {[key: string]: any}) => {
 				onChange={setValue}
 				value={value}
 			/>
-
 			<ClayForm.FeedbackGroup>
 				<ClayForm.BlockquoteText>
 					Date to localize

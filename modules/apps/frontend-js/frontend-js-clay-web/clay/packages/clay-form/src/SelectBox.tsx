@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2020 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
@@ -56,7 +56,6 @@ function reorderDown(array: Array<TItem>, selectedIndexes: Array<number>) {
 }
 
 interface IProps extends React.HTMLAttributes<HTMLSelectElement> {
-
 	/**
 	 * Labels for aria attributes
 	 */
@@ -89,7 +88,6 @@ interface IProps extends React.HTMLAttributes<HTMLSelectElement> {
 	 * Defines whether the Select Box supports selection of multiple items.
 	 */
 	multiple?: boolean;
-
 	/**
 	 * Handler that triggers when the content of the items prop are changed caused by reordering of items.
 	 */
@@ -109,7 +107,6 @@ interface IProps extends React.HTMLAttributes<HTMLSelectElement> {
 	 * Amount of items that can fit inside the both Select Boxes before a scrollbar is introduced.
 	 */
 	size?: number;
-
 	/**
 	 * Defines whether the component should render buttons that allow reordering of items.
 	 */

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayAutocomplete from '@clayui/autocomplete';
@@ -41,7 +41,6 @@ export const Default = (args: any) => {
 					status={args.status}
 				>
 					<ClayModal.Header>{args.title}</ClayModal.Header>
-
 					<ClayModal.Body
 						iFrameProps={{
 							'aria-label': 'Hello World',
@@ -67,7 +66,6 @@ export const Default = (args: any) => {
 							dictum ut eu velit.
 						</p>
 					</ClayModal.Body>
-
 					<ClayModal.Footer
 						last={
 							<ClayButton.Group spaced>
@@ -77,7 +75,6 @@ export const Default = (args: any) => {
 								>
 									Cancel
 								</ClayButton>
-
 								<ClayButton onClick={() => onOpenChange(false)}>
 									Save changes
 								</ClayButton>
@@ -125,7 +122,6 @@ export const CustomHeader = () => {
 									</ClayModal.Title>
 								</ClayModal.TitleSection>
 							</ClayModal.Item>
-
 							<ClayModal.Item shrink>
 								<ClayModal.SubtitleSection>
 									<ClayModal.Subtitle>
@@ -144,7 +140,6 @@ export const CustomHeader = () => {
 							<ClayIcon symbol="times" />
 						</ClayButton>
 					</ClayModal.Header>
-
 					<ClayModal.Body />
 				</ClayModal>
 			)}
@@ -263,7 +258,6 @@ export const AutocompleteAndDropDown = () => {
 			{open && (
 				<ClayModal observer={observer} size="lg">
 					<ClayModal.Header>Title</ClayModal.Header>
-
 					<ClayModal.Body
 						iFrameProps={{
 							'aria-label': 'Hello World',
@@ -273,7 +267,6 @@ export const AutocompleteAndDropDown = () => {
 							<div className="col-md-3">
 								<Autocomplete />
 							</div>
-
 							<div className="col-md-3">
 								<ClayDropDownWithItems
 									items={dropDownItems}
@@ -378,7 +371,6 @@ export const CardStyleModal = (args: any) => {
 						>
 							<ClayIcon symbol="times" />
 						</ClayButton>
-
 						<div className="aspect-ratio aspect-ratio-16-to-9 bg-primary-l3 modal-banner-img">
 							<div className="aspect-ratio-item aspect-ratio-item-center-middle aspect-ratio-item-fluid">
 								<img
@@ -387,9 +379,7 @@ export const CardStyleModal = (args: any) => {
 								/>
 							</div>
 						</div>
-
 						<ClayModal.Title>{args.title}</ClayModal.Title>
-
 						<p>
 							Lorem ipsum dolor sit amet, consectetur adipiscing
 							elit. Curabitur dignissim eu ante eget lobortis.
@@ -397,7 +387,6 @@ export const CardStyleModal = (args: any) => {
 							lobortis massa hendrerit sagittis.
 						</p>
 					</ClayModal.Body>
-
 					<ClayModal.Footer
 						last={
 							<ClayButton.Group spaced>
@@ -407,7 +396,6 @@ export const CardStyleModal = (args: any) => {
 								>
 									Cancel
 								</ClayButton>
-
 								<ClayButton onClick={() => onOpenChange(false)}>
 									<span className="inline-item inline-item-before">
 										<ClayIcon symbol="marketplace" />

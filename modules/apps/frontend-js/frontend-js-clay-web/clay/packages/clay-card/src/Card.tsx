@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import classNames from 'classnames';
@@ -17,7 +17,6 @@ import Group from './Group';
 import Row from './Row';
 
 interface ICardProps extends IContext {
-
 	/**
 	 * Flag that indicates if `active` class is applied
 	 */
@@ -61,7 +60,7 @@ const CardBase = ({
 					className,
 					{
 						active,
-						'card': !selectable,
+						card: !selectable,
 						'file-card': isCardType.file,
 						'form-check-card form-check form-check-top-left':
 							selectable,
@@ -82,8 +81,8 @@ function Card({children, horizontal, interactive, ...otherProps}: IProps) {
 	const Container = interactive
 		? ClayCardNavigation
 		: horizontal
-			? ClayCardHorizontal
-			: CardBase;
+		? ClayCardHorizontal
+		: CardBase;
 
 	return (
 		<Container horizontal={horizontal} {...otherProps}>

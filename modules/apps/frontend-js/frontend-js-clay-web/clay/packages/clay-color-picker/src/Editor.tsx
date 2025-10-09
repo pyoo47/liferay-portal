@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayForm, {ClayInput} from '@clayui/form';
@@ -54,7 +54,6 @@ export function useEditor(
 }
 
 type RGBInputProps = {
-
 	/**
 	 * Callback function for when the input value is changed
 	 */
@@ -104,8 +103,7 @@ const RGBInput = ({name, onChange, value}: RGBInputProps) => {
 
 							if (newVal < LimitValue.min) {
 								newVal = LimitValue.min;
-							}
-							else if (newVal > LimitValue.maxRGB) {
+							} else if (newVal > LimitValue.maxRGB) {
 								newVal = LimitValue.maxRGB;
 							}
 
@@ -117,7 +115,6 @@ const RGBInput = ({name, onChange, value}: RGBInputProps) => {
 						type="number"
 						value={inputValue}
 					/>
-
 					<ClayInput.GroupInsetItem before tag="label">
 						{name.toUpperCase()}
 					</ClayInput.GroupInsetItem>
@@ -165,8 +162,7 @@ export function Editor({
 				onChange={(hue) => {
 					if (hue < LimitValue.min) {
 						hue = LimitValue.min;
-					}
-					else if (hue > LimitValue.maxHue) {
+					} else if (hue > LimitValue.maxHue) {
 						hue = LimitValue.maxHue;
 					}
 					onHueChange(hue);
@@ -236,8 +232,7 @@ export function Editor({
 
 									if (newColor.isValid()) {
 										onHexChange(internalToHex(newColor));
-									}
-									else {
+									} else {
 										onHexChange(internalToHex(color));
 									}
 								}}

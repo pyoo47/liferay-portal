@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {
@@ -50,7 +50,6 @@ export interface IProps<T>
 			'onChange' | 'children'
 		>,
 		Omit<Partial<ICollectionProps<T, unknown>>, 'virtualize' | 'items'> {
-
 	/**
 	 * Internal property to change the loading indicator markup to shrink.
 	 * @ignore
@@ -267,7 +266,7 @@ function AutocompleteInner<T extends Item>(
 
 	const inputRef = useRef<HTMLInputElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
-	const shouldIgnoreOpenMenuOnFocusRef = useRef(false);
+	const shouldIgnoreOpenMenuOnFocus = useRef(false);
 
 	const inputElementRef =
 		(ref as React.RefObject<HTMLInputElement>) || inputRef;
@@ -275,11 +274,11 @@ function AutocompleteInner<T extends Item>(
 	const isLoading = Boolean(loadingState !== undefined && loadingState === 1);
 	const debouncedLoadingChange = useDebounce(isLoading, 500);
 
-	const currentItemSelectedRef = useRef<string>('');
+	const currentItemSelected = useRef<string>('');
 
 	const ariaControlsId = useId();
 
-	const announcerAPIRef = useRef<AnnouncerAPI>(null);
+	const announcerAPI = useRef<AnnouncerAPI>(null);
 
 	const isFirst = useIsFirstRender();
 
@@ -292,17 +291,15 @@ function AutocompleteInner<T extends Item>(
 	);
 
 	useEffect(() => {
-
 		// Validates that the initial value exists in the items.
-
 		if (
 			!allowsCustomValue &&
-			!currentItemSelectedRef.current &&
+			!currentItemSelected.current &&
 			value &&
 			items
 		) {
 			if (hasItem(items, value, filterKey)) {
-				currentItemSelectedRef.current = value;
+				currentItemSelected.current = value;
 			}
 
 			if (!filterKey && items.length && typeof items[0] === 'object') {
@@ -314,26 +311,22 @@ function AutocompleteInner<T extends Item>(
 	}, [items]);
 
 	useEffect(() => {
-
 		// Does not update state on first render, if the custom value is allowed
 		// or if the value is empty.
-
 		if (isFirst || allowsCustomValue || !value) {
 			return;
 		}
 
-		if (active === false && currentItemSelectedRef.current !== value) {
-
+		if (active === false && currentItemSelected.current !== value) {
 			// The state is controlled so we have to revalidate if the typed value
 			// exists in the suggestion list.
-
 			if (!isUncontrolled && items && hasItem(items, value, filterKey)) {
-				currentItemSelectedRef.current = value;
+				currentItemSelected.current = value;
 
 				return;
 			}
 
-			setValue(currentItemSelectedRef.current);
+			setValue(currentItemSelected.current);
 		}
 	}, [active]);
 
@@ -412,18 +405,15 @@ function AutocompleteInner<T extends Item>(
 
 				return children(item, ...args);
 			};
-		}
-		else if (Array.isArray(children)) {
+		} else if (Array.isArray(children)) {
 			wrappedChildren = [primaryActionChild, ...children];
-		}
-		else {
+		} else {
 			wrappedChildren = [primaryActionChild, children];
 		}
 	}
 
 	// We initialize the collection in the picker and then pass it down so the
 	// collection can be cached even before the listbox is not mounted.
-
 	const collection = useCollection<T, unknown>({
 		children: wrappedChildren,
 		filter: isItemsUncontrolled ? filterFn : undefined,
@@ -455,10 +445,10 @@ function AutocompleteInner<T extends Item>(
 
 						setActive(false);
 
-						currentItemSelectedRef.current = itemValue;
+						currentItemSelected.current = itemValue;
 						setValue(itemValue);
 
-						shouldIgnoreOpenMenuOnFocusRef.current = true;
+						shouldIgnoreOpenMenuOnFocus.current = true;
 						inputElementRef.current?.focus();
 					},
 					roleItem: 'option',
@@ -508,7 +498,6 @@ function AutocompleteInner<T extends Item>(
 	// Resets `activeDescendant` when the menu is closed, this avoids a bug when
 	// the `active` state is controlled and closes the menu with different
 	// statements than what is expected internally.
-
 	useEffect(() => {
 		if (!active && activeDescendant) {
 			setActiveDescendant('');
@@ -516,24 +505,22 @@ function AutocompleteInner<T extends Item>(
 	}, [active]);
 
 	const optionCount = collection.getItems().length;
-	const lastSizeRef = useRef(optionCount);
+	const lastSize = useRef(optionCount);
 
 	useEffect(() => {
-
 		// Only announces the number of options available when the menu is open
 		// if there is no item with focus, with the exception of Voice Over
 		// which does not include the message.
-
 		if (
-			announcerAPIRef.current &&
+			announcerAPI.current &&
 			active &&
 			(!activeDescendant ||
 				isAppleDevice() ||
-				optionCount !== lastSizeRef.current)
+				optionCount !== lastSize.current)
 		) {
 			const optionCount = collection.getItems().length;
 
-			announcerAPIRef.current.announce(
+			announcerAPI.current.announce(
 				sub(
 					optionCount === 1
 						? messages!.listCount!
@@ -543,7 +530,7 @@ function AutocompleteInner<T extends Item>(
 			);
 		}
 
-		lastSizeRef.current = optionCount;
+		lastSize.current = optionCount;
 	}, [active, value]);
 
 	const onClose = useCallback(() => setActive(false), []);
@@ -564,7 +551,7 @@ function AutocompleteInner<T extends Item>(
 
 	return (
 		<>
-			<LiveAnnouncer ref={announcerAPIRef} />
+			<LiveAnnouncer ref={announcerAPI} />
 
 			<As
 				{...otherProps}
@@ -581,7 +568,7 @@ function AutocompleteInner<T extends Item>(
 					const {value} = event.target;
 
 					if (!value) {
-						currentItemSelectedRef.current = value;
+						currentItemSelected.current = value;
 					}
 
 					if (items !== null) {
@@ -600,8 +587,8 @@ function AutocompleteInner<T extends Item>(
 					}
 
 					if (menuTrigger === 'focus' && items !== null) {
-						if (shouldIgnoreOpenMenuOnFocusRef.current) {
-							shouldIgnoreOpenMenuOnFocusRef.current = false;
+						if (shouldIgnoreOpenMenuOnFocus.current) {
+							shouldIgnoreOpenMenuOnFocus.current = false;
 
 							return;
 						}

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import Icon from '@clayui/icon';
@@ -37,7 +37,6 @@ describe('FocusScope', () => {
 			<FocusScope>
 				<div id="wrapper">
 					<button id="reactButton">React</button>
-
 					<ClayPortal>
 						<ul>
 							<li>
@@ -45,13 +44,11 @@ describe('FocusScope', () => {
 									link 1
 								</a>
 							</li>
-
 							<li>
 								<a href="#" id="linkInPortal2">
 									link 2
 								</a>
 							</li>
-
 							<li>
 								<a href="#" id="linkInPortal3">
 									link 3
@@ -66,9 +63,7 @@ describe('FocusScope', () => {
 	});
 
 	it('manages focus order when using portals', () => {
-
 		// Putting this snapshot inline to reference the structure of the DOM
-
 		expect(document.body).toMatchInlineSnapshot(`
 		<body>
 		  <button
@@ -255,7 +250,6 @@ describe('FocusScope', () => {
 							<FocusScope>
 								<div id="content">
 									<button>one</button>
-
 									<button>two</button>
 								</div>
 							</FocusScope>
@@ -300,7 +294,6 @@ describe('FocusScope', () => {
 							<FocusScope>
 								<div id="content">
 									<button>one</button>
-
 									<button>two</button>
 								</div>
 							</FocusScope>
@@ -370,7 +363,6 @@ describe('FocusScope', () => {
 									symbol={active ? 'up' : 'down'}
 								/>
 							</button>
-
 							<ClayPortal>
 								<OnRender
 									condition={active}
@@ -382,13 +374,11 @@ describe('FocusScope', () => {
 												link 1
 											</a>
 										</li>
-
 										<li role="presentation">
 											<a href="#" role="menuitem">
 												link 2
 											</a>
 										</li>
-
 										<li role="presentation">
 											<a href="#" role="menuitem">
 												link 3

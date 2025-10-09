@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {ClayInput} from '@clayui/form';
@@ -9,7 +9,6 @@ import React from 'react';
 
 import {LimitValue} from './Editor';
 type Props = {
-
 	/**
 	 * Callback function for when the hue value changes
 	 */
@@ -40,7 +39,6 @@ const ClayColorPickerHue = ({value = 0, onChange = () => {}}: Props) => {
 				}}
 				value={value}
 			/>
-
 			<ClayInput.Group>
 				<ClayInput.GroupItem>
 					<ClayInput
@@ -55,8 +53,7 @@ const ClayColorPickerHue = ({value = 0, onChange = () => {}}: Props) => {
 
 							if (newVal < 0) {
 								newVal = 0;
-							}
-							else if (newVal > 360) {
+							} else if (newVal > 360) {
 								newVal = 360;
 							}
 							onChange(newVal);
@@ -64,7 +61,6 @@ const ClayColorPickerHue = ({value = 0, onChange = () => {}}: Props) => {
 						type="number"
 						value={value}
 					/>
-
 					<ClayInput.GroupInsetItem before tag="label">
 						H
 					</ClayInput.GroupInsetItem>

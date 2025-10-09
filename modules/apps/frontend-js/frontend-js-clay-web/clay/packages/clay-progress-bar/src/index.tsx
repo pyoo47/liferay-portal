@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import Icon from '@clayui/icon';
@@ -9,7 +9,6 @@ import React from 'react';
 import warning from 'warning';
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
-
 	/**
 	 * Flag to indicate if `children` should be wrapped as `feedback`.
 	 */
@@ -63,8 +62,7 @@ const ProgressBar = ({
 
 	if (warn) {
 		status = 'warning';
-	}
-	else if (value === 100) {
+	} else if (value === 100) {
 		status = 'success';
 	}
 

@@ -1,7 +1,5 @@
-$cadmin-custom-forms-transition:
-	background-color 0.15s ease-in-out,
-	border-color 0.15s ease-in-out,
-	box-shadow 0.15s ease-in-out !default;
+$cadmin-custom-forms-transition: background-color 0.15s ease-in-out,
+	border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !default;
 
 // Form File
 
@@ -151,7 +149,7 @@ $cadmin-custom-control-label: map-deep-merge(
 			height: $cadmin-custom-control-indicator-size,
 			left: 0,
 			position: relative,
-			top: 2px,
+			top: 4px,
 			transition: clay-enable-transitions($cadmin-custom-forms-transition),
 			width: $cadmin-custom-control-indicator-size,
 			z-index: 0,
@@ -164,7 +162,7 @@ $cadmin-custom-control-label: map-deep-merge(
 			height: 24px,
 			left: -4px,
 			position: absolute,
-			top: -2px,
+			top: $cadmin-custom-control-indicator-position-top,
 			width: 24px,
 			z-index: 0,
 		),

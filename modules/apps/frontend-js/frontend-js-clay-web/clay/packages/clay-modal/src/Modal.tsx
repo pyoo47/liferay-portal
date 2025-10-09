@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {ClayPortal, IPortalBaseProps, stack} from '@clayui/shared';
@@ -27,7 +27,6 @@ import {Observer, ObserverType} from './types';
 interface IProps
 	extends React.HTMLAttributes<HTMLDivElement>,
 		Omit<IContext, 'onClose' | 'ariaLabelledby'> {
-
 	/**
 	 * Flag indicating to vertically center the modal.
 	 */
@@ -123,8 +122,7 @@ const Modal = ({
 
 			if (focusedElement) {
 				focusedElement.focus();
-			}
-			else {
+			} else {
 				modalBodyElementRef.current.focus();
 			}
 		}
@@ -156,9 +154,7 @@ const Modal = ({
 			show &&
 			stack[stack.length - 1] === modalElementRef
 		) {
-
 			// Hide everything from ARIA except the Modal Body
-
 			return suppressOthers(modalElementRef.current);
 		}
 	}, [show]);
@@ -176,7 +172,6 @@ const Modal = ({
 				})}
 				style={{zIndex}}
 			/>
-
 			<div
 				{...otherProps}
 				className={classNames('fade modal d-block', className, {

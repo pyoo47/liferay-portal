@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2020 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
@@ -35,7 +35,6 @@ type TriggerElement = React.ReactElement & {
 };
 
 export type Props = {
-
 	/**
 	 * Flag to indicate if the menu should be initially open (controlled).
 	 */
@@ -246,7 +245,7 @@ export const ClayDropDownWithDrilldown = ({
 		value: externalActive,
 	});
 
-	const focusHistoryRef = useRef<Array<HTMLElement>>([]);
+	const focusHistory = useRef<Array<HTMLElement>>([]);
 
 	const innerRef = useRef<HTMLDivElement>(null);
 
@@ -261,28 +260,27 @@ export const ClayDropDownWithDrilldown = ({
 
 		if (innerRef.current) {
 			if (direction === 'prev') {
-				const [previous] = focusHistoryRef.current.slice(-1);
+				const [previous] = focusHistory.current.slice(-1);
 
-				focusHistoryRef.current = focusHistoryRef.current.slice(
+				focusHistory.current = focusHistory.current.slice(
 					0,
-					focusHistoryRef.current.length - 1
+					focusHistory.current.length - 1
 				);
 
 				previous?.focus();
-			}
-			else {
+			} else {
 				const itemEl = innerRef.current.querySelector<HTMLElement>(
 					'.drilldown-current a.dropdown-item, .drilldown-current button.dropdown-item'
 				);
 
-				focusHistoryRef.current = [
-					...focusHistoryRef.current,
+				focusHistory.current = [
+					...focusHistory.current,
 					document.activeElement as HTMLElement,
 				];
 				itemEl?.focus();
 			}
 		}
-	}, [activeMenu, direction, innerRef, focusHistoryRef, menus]);
+	}, [activeMenu, direction, innerRef, focusHistory, menus]);
 
 	const onBack = useCallback(() => {
 		const [parent] = history.slice(-1);
@@ -333,10 +331,10 @@ export const ClayDropDownWithDrilldown = ({
 			menuHeight={menuHeight}
 			menuWidth={menuWidth}
 			offsetFn={offsetFn}
-			onActiveChange={(value: boolean) => {
+			onActiveChange={(value) => {
 				if (!active) {
 					setActiveMenu(defaultActiveMenu);
-					focusHistoryRef.current = [];
+					focusHistory.current = [];
 					setHistory([]);
 					setDirection('prev');
 				}
@@ -348,9 +346,7 @@ export const ClayDropDownWithDrilldown = ({
 				ref: (node: HTMLButtonElement) => {
 					if (node) {
 						triggerElementRef.current = node;
-
 						// Call the original ref, if any.
-
 						const {ref} = trigger;
 						if (typeof ref === 'function') {
 							ref(node);

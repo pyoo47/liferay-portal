@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2021 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {useControlledState} from '@clayui/shared';
@@ -20,7 +20,6 @@ import type {Position} from './DragAndDrop';
 import type {Cursor} from './useLayout';
 
 export interface IExpandable {
-
 	/**
 	 * Property to set the initial value of `expandedKeys`.
 	 */
@@ -67,7 +66,6 @@ export interface ITreeProps<T extends Record<string, any>>
 	extends IExpandable,
 		IMultipleSelection,
 		Pick<ICollectionProps<T>, 'items' | 'defaultItems'> {
-
 	/**
 	 * Flag to indicate which key name matches the nested rendering of the tree.
 	 */
@@ -107,7 +105,7 @@ export function useTree<T extends Record<string, any>>(
 		value: props.items,
 	});
 
-	const cursorsRef = useRef<Map<React.Key, unknown>>(new Map());
+	const cursors = useRef<Map<React.Key, unknown>>(new Map());
 
 	const layout = useLayout();
 
@@ -144,7 +142,6 @@ export function useTree<T extends Record<string, any>>(
 
 					// TODO try to make it configurable or be able to infer the name of
 					// the property from the key passed in the React rendering.
-
 					'id',
 					selection.selectedKeys
 				);
@@ -190,7 +187,6 @@ export function useTree<T extends Record<string, any>>(
 
 				// TODO try to make it configurable or be able to infer the name of
 				// the property from the key passed in the React rendering.
-
 				'id',
 				selection.selectedKeys
 			);
@@ -278,8 +274,7 @@ export function useTree<T extends Record<string, any>>(
 
 			if (expanded.has(key)) {
 				expanded.delete(key);
-			}
-			else {
+			} else {
 				expanded.add(key);
 			}
 
@@ -307,7 +302,7 @@ export function useTree<T extends Record<string, any>>(
 
 	return {
 		close,
-		cursorsRef,
+		cursors,
 		expandedKeys,
 		insert,
 		items,
@@ -385,7 +380,6 @@ function visit<T extends Array<Record<string, any>>>(
 // Operation of `move` value to the same document structure, removing from
 // `from` and then adding to `path`.
 // RFC 6902 (JSON Patch) 4.4
-
 type PatchMove = {
 	op: 'move';
 	from: Cursor;
@@ -395,7 +389,6 @@ type PatchMove = {
 
 // Operation of `add` value to the document structure.
 // RFC 6902 (JSON Patch) 4.1
-
 type PatchAdd = {
 	op: 'add';
 	path: Array<number>;
@@ -404,7 +397,6 @@ type PatchAdd = {
 
 // Operation of `remove` value to the document structure.
 // RFC 6902 (JSON Patch) 4.2
-
 type PatchRemove = {
 	op: 'remove';
 	path: Array<number>;
@@ -412,7 +404,6 @@ type PatchRemove = {
 
 // Operation of `replace` value to the document structure.
 // RFC 6902 (JSON Patch) 4.3
-
 type PatchReplace = {
 	item: any;
 	op: 'replace';
@@ -423,7 +414,6 @@ type PatchReplace = {
 // https://datatracker.ietf.org/doc/html/rfc6902, we just borrow the document
 // structure to make partial updates to a JSON document.
 // Implementation Detail https://github.com/liferay/clay/pull/4254.
-
 type Patch = PatchMove | PatchAdd | PatchRemove | PatchReplace;
 
 export function createImmutableTree<T extends Array<Record<string, any>>>(
@@ -460,7 +450,6 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 
 				// The Index may still not exist after it's fixed because the
 				// index is to move the item below the last item.
-
 				if (item[nestedKey][index]) {
 					parent = item;
 					item = {...item[nestedKey][index]};
@@ -500,7 +489,6 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 			index = queue.shift() as number;
 
 			if (Array.isArray(item[nestedKey]) && item[nestedKey].length) {
-
 				// This fixes the index when there is a case to move an item
 				// that can be at the same level of the hierarchy inside the
 				// other item at the same level, this causes the array size to
@@ -518,14 +506,12 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 				//   ~1. Item B~ <- Remove item to move
 				//   1. Item C
 				//   2. Item D
-
 				if (index > item[nestedKey].length - 1) {
 					index -= 1;
 				}
 
 				// The Index may still not exist after it's fixed because the
 				// index is to move the item below the last item.
-
 				if (item[nestedKey][index]) {
 					parent = item;
 					item = {...item[nestedKey][index]};
@@ -564,20 +550,17 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 								...node.parent[nestedKey],
 								...(value as Array<unknown>),
 							];
-						}
-						else {
+						} else {
 							node.parent[nestedKey] = value;
 						}
 					}
 
 					break;
 				}
-
 				// Applies the operation on the tree, the move is functionally
 				// identical to a "remove" operation on the `from` location and
 				// immediately followed by the "add" operation at the target
 				// location with the value that was removed.
-
 				case 'move': {
 					const {direction, from, path} = patch;
 
@@ -590,8 +573,7 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 							(item: any) =>
 								item['_key'] !== nodeToRemove.item['_key']
 						);
-					}
-					else {
+					} else {
 						immutableTree = immutableTree.filter(
 							(item: any) =>
 								item['_key'] !== nodeToRemove.item['_key']
@@ -604,8 +586,7 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 
 					if (direction === 'bottom') {
 						index += 1;
-					}
-					else if (direction === 'middle') {
+					} else if (direction === 'middle') {
 						index = 0;
 						pathToAdd.parent = pathToAdd.item;
 
@@ -620,8 +601,7 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 							nodeToRemove.item,
 							...pathToAdd.parent[nestedKey].slice(index),
 						];
-					}
-					else {
+					} else {
 						immutableTree = [
 							...immutableTree.slice(0, index),
 							nodeToRemove.item,
@@ -644,8 +624,7 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 							(_item: any, index: number) =>
 								index !== nodeToRemove.index
 						);
-					}
-					else {
+					} else {
 						immutableTree = immutableTree.filter(
 							(_item: any, index: number) =>
 								index !== nodeToRemove.index
@@ -673,8 +652,7 @@ export function createImmutableTree<T extends Array<Record<string, any>>>(
 							0,
 							item
 						);
-					}
-					else {
+					} else {
 						immutableTree.splice(nodeToReplace.index, 1);
 						immutableTree.splice(nodeToReplace.index, 0, item);
 					}

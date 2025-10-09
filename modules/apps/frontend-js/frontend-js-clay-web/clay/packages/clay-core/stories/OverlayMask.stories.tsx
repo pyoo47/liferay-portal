@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2022 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
@@ -16,7 +16,6 @@ type Props = {
 };
 
 // Use only for demo.
-
 const Dot = ({onClick}: Props) => (
 	<div
 		onClick={onClick}
@@ -78,7 +77,6 @@ export const WithPopover = () => {
 								<ClayLayout.ContentCol expand>
 									<span>Step 1 of 3: Customize logo</span>
 								</ClayLayout.ContentCol>
-
 								<ClayLayout.ContentCol>
 									<ClayButtonWithIcon
 										aria-label="close"
@@ -109,13 +107,11 @@ export const WithPopover = () => {
 									onChange={() => {}}
 								/>
 							</ClayLayout.ContentCol>
-
 							<ClayLayout.ContentCol>
 								<ClayButton.Group spaced>
 									<ClayButton displayType="secondary" small>
 										Previous
 									</ClayButton>
-
 									<ClayButton
 										onClick={() => setVisible(false)}
 										small

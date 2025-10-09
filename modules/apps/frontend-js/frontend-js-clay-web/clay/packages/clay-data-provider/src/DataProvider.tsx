@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import React from 'react';
@@ -17,7 +17,6 @@ type ChildrenProps = {
 
 interface IProps
 	extends Omit<Parameters<typeof useResource>[0], 'onNetworkStatusChange'> {
-
 	/**
 	 * It uses a render props pattern made popular by libraries
 	 * like React Motion and React Router.
@@ -49,7 +48,6 @@ export const DataProvider = ({
 	notifyOnNetworkStatusChange = false,
 	...otherProps
 }: IProps) => {
-
 	/**
 	 * networkStatus is only updated when notifyOnNetworkStatusChange
 	 * is enabled, this will inform of the fetch status and cause
@@ -80,7 +78,6 @@ export const DataProvider = ({
 
 	// Adding a fragment is a hack to dribble the
 	// react-docgen to identify that it is a component.
-
 	return (
 		<>
 			{children({

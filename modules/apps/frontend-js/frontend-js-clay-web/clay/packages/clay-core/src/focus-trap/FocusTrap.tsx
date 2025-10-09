@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2021 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {FOCUSABLE_ELEMENTS, FocusScope} from '@clayui/shared';
@@ -8,7 +8,6 @@ import {hideOthers, supportsInert, suppressOthers} from 'aria-hidden';
 import React, {useEffect, useRef} from 'react';
 
 type Props = {
-
 	/**
 	 * Flag to indicate if the focus trap is activated.
 	 */
@@ -56,15 +55,12 @@ export function FocusTrap({active = false, children, focusElementRef}: Props) {
 
 	useEffect(() => {
 		if (childrenRef.current && active) {
-
 			// Inert is a new native feature to better handle DOM arias that are not
 			// assertive to a SR or that should ignore any user interaction.
 			// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert
-
 			if (supportsInert()) {
 				return suppressOthers(childrenRef.current);
-			}
-			else {
+			} else {
 				return hideOthers(childrenRef.current);
 			}
 		}

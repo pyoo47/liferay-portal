@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {useControlledState, useIsMobileDevice} from '@clayui/shared';
@@ -20,7 +20,6 @@ import type {Item} from './Items';
 import type {IProps as SearchProps} from './Search';
 
 export type Props = {
-
 	/**
 	 * Flag to indicate if the DropDown menu is active or not (controlled).
 	 */
@@ -173,12 +172,10 @@ const transformTreeToLinkedList = (items: any, id: string, menu: any = {}) => {
 				menu[id][index].child = childId;
 
 				transformTreeToLinkedList(item[key], childId, menu);
-			}
-			else {
+			} else {
 				if (item[key] === 'contextual') {
 					menu[id][index].type = 'item';
-				}
-				else {
+				} else {
 					menu[id][index][key] = item[key];
 				}
 			}
@@ -278,8 +275,7 @@ export const ClayDropDownWithItems = ({
 				triggerIcon={triggerIcon}
 			/>
 		);
-	}
-	else {
+	} else {
 		return (
 			<ClayDropDown
 				active={internalActive}
@@ -300,9 +296,7 @@ export const ClayDropDownWithItems = ({
 					ref: (node: HTMLButtonElement) => {
 						if (node) {
 							triggerElementRef.current = node;
-
 							// Call the original ref, if any.
-
 							const {ref} = trigger;
 							if (typeof ref === 'function') {
 								ref(node);

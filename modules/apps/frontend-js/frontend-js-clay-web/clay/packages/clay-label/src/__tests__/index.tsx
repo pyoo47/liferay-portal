@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayLabel from '..';
@@ -70,7 +70,6 @@ describe('Rendering', () => {
 		const testRenderer = TestRenderer.create(
 			<ClayLabel withClose={false}>
 				<ClayLabel.ItemBefore>Content before</ClayLabel.ItemBefore>
-
 				<ClayLabel.ItemExpand>Label</ClayLabel.ItemExpand>
 			</ClayLabel>
 		);
@@ -82,7 +81,6 @@ describe('Rendering', () => {
 		const testRenderer = TestRenderer.create(
 			<ClayLabel withClose={false}>
 				<ClayLabel.ItemExpand>Label</ClayLabel.ItemExpand>
-
 				<ClayLabel.ItemAfter>Content after</ClayLabel.ItemAfter>
 			</ClayLabel>
 		);

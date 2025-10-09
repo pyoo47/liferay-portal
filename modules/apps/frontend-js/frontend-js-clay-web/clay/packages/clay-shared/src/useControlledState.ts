@@ -1,17 +1,12 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2021 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import {useCallback, useRef, useState} from 'react';
 import warning from 'warning';
 
-export type InternalDispatch<Value> =
-	| ((value: Value) => void)
-	| ((value?: Value) => void)
-	| ((value: Value | (() => Value)) => void)
-	| ((value?: Value | (() => Value)) => void)
-	| React.Dispatch<React.SetStateAction<Value>>;
+export type InternalDispatch<Value> = (value: Value) => void;
 
 type Props<Value> = {
 	defaultName: string;
@@ -34,9 +29,9 @@ export function useControlledState<Value>({
 		defaultValue === undefined ? value : defaultValue
 	);
 
-	const ref = useRef(value !== undefined && onChange !== undefined);
+	const ref = useRef(value !== undefined);
 	const wasControlled = ref.current;
-	const isControlled = value !== undefined && onChange !== undefined;
+	const isControlled = value !== undefined;
 
 	if (wasControlled !== isControlled) {
 		console.warn(
@@ -75,6 +70,6 @@ export function useControlledState<Value>({
 	return [value, setValue, !isControlled] as [
 		Value,
 		InternalDispatch<Value>,
-		boolean,
+		boolean
 	];
 }

@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2023 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayDropDown from '@clayui/drop-down';
@@ -62,7 +62,6 @@ const DEFAULT_ARIA_LABELS = {
 
 interface IProps
 	extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
-
 	/**
 	 * Property to define whether the DropDown menu is expanded or not
 	 * (controlled).
@@ -256,7 +255,7 @@ const ColorPicker = ({
 
 	const inputColorTypeSupport = useMemo(() => {
 		if (typeof document !== 'undefined') {
-			const input = document.createElement('input');
+			var input = document.createElement('input');
 			input.setAttribute('type', 'color');
 
 			return input.value !== '';
@@ -338,8 +337,7 @@ const ColorPicker = ({
 											valueInputRef.current
 										) {
 											valueInputRef.current.click();
-										}
-										else {
+										} else {
 											setInternalActive(!internalActive);
 											if (!showPalette) {
 												setCustomEditorActive(
@@ -434,8 +432,7 @@ const ColorPicker = ({
 										newColors[state.splotch!] = hex;
 
 										onColorsChange(newColors);
-									}
-									else {
+									} else {
 										dispatch({splotch: undefined});
 									}
 
@@ -491,14 +488,12 @@ const ColorPicker = ({
 											colorFormat === 'hex8'
 										) {
 											value = internalToHex(newColor);
-										}
-										else if (
+										} else if (
 											newColor.toString() !== value
 										) {
 											value = newColor.toString();
 										}
-									}
-									else if (!value.includes('var(')) {
+									} else if (!value.includes('var(')) {
 										value = '';
 									}
 
@@ -544,14 +539,13 @@ const ColorPicker = ({
 												internalToHex(color);
 
 											onColorsChange(newColors);
-										}
-										else {
+										} else {
 											const colorIndex = findColorIndex(
 												customColors,
 												value!.includes('var(')
 													? getCSSVariableColor(
 															value!
-														)
+													  )
 													: tinycolor(value)
 											);
 

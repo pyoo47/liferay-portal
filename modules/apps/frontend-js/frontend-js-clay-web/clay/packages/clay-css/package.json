@@ -1,6 +1,6 @@
 {
 	"name": "@clayui/css",
-	"version": "3.149.2",
+	"version": "3.150.0",
 	"description": "Liferay's web implementation of the Lexicon Design Language",
 	"main": "index.js",
 	"files": [
@@ -51,9 +51,7 @@
 	],
 	"license": "MIT",
 	"devDependencies": {
-		"bootstrap": "4.4.1",
 		"jsdom": "^18.0.0",
-		"popper.js": "1.16.0",
 		"sass": "^1.42.0",
 		"sassdoc": "^2.5.1",
 		"svgo": "^2.7.0"

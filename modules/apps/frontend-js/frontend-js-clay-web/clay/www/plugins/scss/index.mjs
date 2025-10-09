@@ -1,12 +1,7 @@
-/**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
- */
-
 import clay from '@clayui/css';
-import fs from 'node:fs';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import fs from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -34,8 +29,7 @@ export function buildIcons() {
 			if (!viewBox) {
 				throw `Viewbox attribute not found for icon: ${id}`;
 			}
-		}
-		catch (error) {
+		} catch (error) {
 			console.warn(error);
 		}
 

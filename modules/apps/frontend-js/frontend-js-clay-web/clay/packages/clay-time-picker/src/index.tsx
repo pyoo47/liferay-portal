@@ -1,6 +1,6 @@
 /**
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ * SPDX-FileCopyrightText: © 2019 Liferay, Inc. <https://liferay.com>
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 import ClayButton from '@clayui/button';
@@ -45,7 +45,6 @@ interface IProps
 		React.HTMLAttributes<HTMLDivElement>,
 		'onChange' | 'defaultValue'
 	> {
-
 	/**
 	 * Add the labels for the input elements and the input clear button,
 	 * use this to provide accessibility and internationalization.
@@ -221,8 +220,7 @@ const TimePicker = ({
 
 		if (intrinsicValue > config.max) {
 			return String(config.min);
-		}
-		else if (intrinsicValue < config.min) {
+		} else if (intrinsicValue < config.min) {
 			return String(config.max);
 		}
 
@@ -244,7 +242,6 @@ const TimePicker = ({
 
 			return setValue({
 				...internalValue,
-
 				// eslint-disable-next-line sort-keys
 				[configName]: String(newVal).padStart(2, '0'),
 			});
@@ -260,8 +257,7 @@ const TimePicker = ({
 
 				if (configName === TimeType.ampm) {
 					onValue((config as ConfigAmpm).pm);
-				}
-				else {
+				} else {
 					onValue(
 						value !== DEFAULT_VALUE
 							? intrinsicValue + 1
@@ -275,8 +271,7 @@ const TimePicker = ({
 
 				if (configName === TimeType.ampm) {
 					onValue((config as ConfigAmpm).am);
-				}
-				else {
+				} else {
 					onValue(
 						value !== DEFAULT_VALUE
 							? intrinsicValue - 1
@@ -301,11 +296,10 @@ const TimePicker = ({
 						Number(value) > maxSecondDigit
 							? `0${keyVal}`
 							: (value && value !== DEFAULT_VALUE ? value : '') +
-								keyVal;
+							  keyVal;
 
 					onValue(newVal);
-				}
-				else if (
+				} else if (
 					configName === TimeType.ampm &&
 					(event.key === 'a' || event.key === 'p')
 				) {
@@ -330,15 +324,14 @@ const TimePicker = ({
 				direction === 1
 					? (config as ConfigAmpm).pm
 					: (config as ConfigAmpm).am;
-		}
-		else {
+		} else {
 			value = handleMaxAndMin(
 				String(
 					prevValue !== DEFAULT_VALUE
 						? Number(prevValue) + direction
 						: direction === -1
-							? (config as ConfigMaxMin).max
-							: 0
+						? (config as ConfigMaxMin).max
+						: 0
 				),
 				config as ConfigMaxMin
 			);
@@ -350,7 +343,6 @@ const TimePicker = ({
 		});
 		setValue({
 			...internalValue,
-
 			// eslint-disable-next-line sort-keys
 			[configName]: String(value).padStart(2, '0'),
 		});
@@ -399,7 +391,6 @@ const TimePicker = ({
 						</ClayInput.GroupText>
 					</ClayInput.GroupItem>
 				)}
-
 				<FocusScope arrowKeysLeftRight arrowKeysUpDown={false}>
 					<ClayInput.GroupItem>
 						<div
@@ -449,9 +440,7 @@ const TimePicker = ({
 									type="text"
 									value={internalValue.hours}
 								/>
-
 								<span className="clay-time-divider">:</span>
-
 								<input
 									aria-label={ariaLabels.minutes}
 									className={classNames(
@@ -479,7 +468,6 @@ const TimePicker = ({
 									type="text"
 									value={internalValue.minutes}
 								/>
-
 								{use12Hours && (
 									<input
 										aria-label={ariaLabels.ampm}
@@ -511,7 +499,6 @@ const TimePicker = ({
 										}
 									/>
 								)}
-
 								{name && (
 									<input
 										name={name}
@@ -520,7 +507,6 @@ const TimePicker = ({
 									/>
 								)}
 							</div>
-
 							<div className="clay-time-action-group">
 								<div
 									className="clay-time-action-group-item"
@@ -545,12 +531,12 @@ const TimePicker = ({
 															hours: DEFAULT_VALUE,
 															minutes:
 																DEFAULT_VALUE,
-														}
+													  }
 													: {
 															hours: DEFAULT_VALUE,
 															minutes:
 																DEFAULT_VALUE,
-														}
+													  }
 											)
 										}
 										tabIndex={visibleActionReset ? 0 : -1}
@@ -561,7 +547,6 @@ const TimePicker = ({
 										/>
 									</ClayButton>
 								</div>
-
 								<div
 									className="clay-time-action-group-item"
 									data-testid="containerSpin"
@@ -586,7 +571,6 @@ const TimePicker = ({
 												symbol="angle-up"
 											/>
 										</ClayButton>
-
 										<ClayButton
 											aria-label={ariaLabels.timeDown}
 											className="clay-time-inner-spin-btn clay-time-inner-spin-btn-dec"
@@ -606,7 +590,6 @@ const TimePicker = ({
 						</div>
 					</ClayInput.GroupItem>
 				</FocusScope>
-
 				{timezone && (
 					<ClayInput.GroupItem shrink>
 						<ClayInput.GroupText>{`(${timezone})`}</ClayInput.GroupText>
