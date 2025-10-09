@@ -18,7 +18,6 @@ export async function createGlobalConfig(hashOnly = false) {
 
 	for (const projectDir of projectDirs) {
 		const {
-			packages,
 			exports = [],
 			submodules,
 			symbols,
@@ -29,11 +28,12 @@ export async function createGlobalConfig(hashOnly = false) {
 			projectDir
 		);
 
+		const exportedModuleNames = exports.map((item) =>
+			typeof item === 'string' ? item : item.moduleName
+		);
+
 		for (const symbolPackage in symbols) {
-			if (
-				!exports.includes(symbolPackage) &&
-				!packages?.[symbolPackage]
-			) {
+			if (!exportedModuleNames.includes(symbolPackage)) {
 				throw Error(
 					`❌ 'node-scripts.config.js' is invalid. Only declare symbols for packages your module 'exports'. Reading '${symbolPackage}'.`
 				);
@@ -41,7 +41,7 @@ export async function createGlobalConfig(hashOnly = false) {
 		}
 
 		allDependencies = {...allDependencies, ...dependencies};
-		allImports[name] = [...exports, ...Object.keys(packages || {})];
+		allImports[name] = exportedModuleNames;
 
 		if (submodules) {
 			allImports[name].push(
