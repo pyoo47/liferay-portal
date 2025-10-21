@@ -869,9 +869,9 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 		if (!topLevelBuildURL.contains("(release)") ||
 			!topLevelBuildURL.contains(
-				"test-portal-acceptance-upstream-dxp(master)") ||
+				"test-portal-testsuite-upstream(master)") ||
 			!topLevelBuildURL.contains(
-				"test-portal-testsuite-upstream(master)")) {
+				"test-portal-acceptance-upstream-dxp(master)")) {
 
 			return;
 		}
