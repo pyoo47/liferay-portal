@@ -49,6 +49,8 @@ public class Dom4JUtil {
 	public static void addRawXMLToElement(Element element, String xml)
 		throws DocumentException {
 
+		xml = xml.replaceAll("\u001B", "");
+
 		Document document = parse("<div>" + xml + "</div>");
 
 		Element rootElement = document.getRootElement();
