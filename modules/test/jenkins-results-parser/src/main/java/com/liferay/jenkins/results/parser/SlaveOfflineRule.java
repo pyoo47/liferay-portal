@@ -154,12 +154,9 @@ public class SlaveOfflineRule {
 
 		jenkinsSlave.takeSlavesOffline(message);
 
-		if (!JenkinsResultsParserUtil.isCloudCINode() &&
-			(notificationRecipients != null) &&
-			!notificationRecipients.isEmpty()) {
-
-			NotificationUtil.sendEmail(
-				message, "jenkins", "Slave offline", notificationRecipients);
+		if (!JenkinsResultsParserUtil.isCloudCINode()) {
+			NotificationUtil.sendSlackNotification(
+				message, "ci-notifications-slave-offline", "Slave offline");
 		}
 	}
 
