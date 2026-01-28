@@ -64,6 +64,10 @@ public class SlaveOfflineRule {
 		return notificationRecipients;
 	}
 
+	public String getSlackChannel() {
+		return slackChannel;
+	}
+
 	public boolean isOfflineSibling() {
 		return Boolean.parseBoolean(offlineSibling);
 	}
@@ -154,12 +158,19 @@ public class SlaveOfflineRule {
 
 		jenkinsSlave.takeSlavesOffline(message);
 
-		if (!JenkinsResultsParserUtil.isCloudCINode() &&
-			(notificationRecipients != null) &&
-			!notificationRecipients.isEmpty()) {
+		if (!JenkinsResultsParserUtil.isCloudCINode()) {
+			if ((notificationRecipients != null) &&
+				!notificationRecipients.isEmpty()) {
 
-			NotificationUtil.sendEmail(
-				message, "jenkins", "Slave offline", notificationRecipients);
+				NotificationUtil.sendEmail(
+					message, "jenkins", "Slave offline",
+					notificationRecipients);
+			}
+
+			if ((slackChannel != null) && !slackChannel.isEmpty()) {
+				NotificationUtil.sendSlackNotification(
+					message, slackChannel, "Slave offline");
+			}
 		}
 	}
 
@@ -186,6 +197,12 @@ public class SlaveOfflineRule {
 		if (offlineSibling != null) {
 			sb.append("offlineSibling=");
 			sb.append(offlineSibling);
+			sb.append("\n");
+		}
+
+		if (slackChannel != null) {
+			sb.append("slackChannel=");
+			sb.append(slackChannel);
 			sb.append("\n");
 		}
 
@@ -236,6 +253,7 @@ public class SlaveOfflineRule {
 	protected String notificationRecipients;
 	protected String offlineSibling;
 	protected boolean shutdown;
+	protected String slackChannel;
 
 	private SlaveOfflineRule(String configurations, String ruleName) {
 		name = ruleName;
@@ -254,6 +272,8 @@ public class SlaveOfflineRule {
 			"notificationRecipients");
 
 		offlineSibling = configurationsMap.get("offlineSiblings");
+
+		slackChannel = configurationsMap.get("slackChannel");
 
 		if (configurationsMap.containsKey("shutdown")) {
 			shutdown = Boolean.parseBoolean(configurationsMap.get("shutdown"));
