@@ -16,6 +16,8 @@ import hudson.model.ParameterValue
 import hudson.model.Result
 import hudson.model.Run
 
+import org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterValue;
+
 Date endDate = new Date()
 
 Date startDate = endDate.minus(1)
@@ -67,10 +69,14 @@ items.each {
 
 						Object parameterValueObject = parameterValue.getValue()
 
+						if (parameterValue instanceof LabelParameterValue) {
+							parameterValueObject = parameterValue.getLabel()
+						}
+
 						if ((parameterValueObject != null) && !parameterValueObject.isEmpty()) {
 							String parameterValueName = parameterValue.getName()
 
-							if ((buildURL.contains("-batch") || buildURL.contains("-downstream")) && !(parameterValueName.equals("DIST_PATH") || parameterValueName.equals("JOB_VARIANT"))) {
+							if ((buildURL.contains("app-server-bundle-builder") || buildURL.contains("-batch") || buildURL.contains("-downstream")) && !(parameterValueName.equals("DIST_PATH") || parameterValueName.equals("JOB_VARIANT") || parameterValueName.equals("SLAVE_LABEL"))) {
 								return
 							}
 
