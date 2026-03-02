@@ -257,6 +257,10 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 		String portalLatestBundleVersion = System.getenv(
 			"PORTAL_LATEST_BUNDLE_VERSION");
 
+		System.out.println(
+			JenkinsResultsParserUtil.combine(
+				"portal.latest.bundle.version: ", portalLatestBundleVersion));
+
 		if (!JenkinsResultsParserUtil.isNullOrEmpty(
 				portalLatestBundleVersion)) {
 
@@ -268,6 +272,13 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 
 			try {
 				buildProperties = JenkinsResultsParserUtil.getBuildProperties();
+
+				int buildPropertiesSize = buildProperties.size();
+
+				System.out.println(
+					JenkinsResultsParserUtil.combine(
+						"Found", String.valueOf(buildPropertiesSize),
+						" build properties."));
 			}
 			catch (IOException ioException) {
 				throw new RuntimeException(ioException);
