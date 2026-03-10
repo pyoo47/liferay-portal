@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ public class EnvironmentBuildPropertiesUtil {
 
 			String masterHostname = System.getenv("MASTER_HOSTNAME");
 
-			if (masterHostname.equals("test-5-1")) {
+			if (Objects.equals(masterHostname, "test-5-1")) {
 				environmentBuildProperties.setProperty(
 					"github.webhook.base.invocation.url",
 					environmentBuildProperties.getProperty(
