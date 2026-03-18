@@ -85,12 +85,38 @@ public class JUnitTestSelector extends BaseTestSelector {
 
 	@Override
 	public void validate() throws RelevantRuleConfigurationException {
-		validate(_MODULES_INCLUDES_REQUIRED_TEST_BATCH_CLASS_NAMES_INCLUDES);
+		String modulesIncludesRequiredTestBatchClassNamesIncludes = getProperty(
+			_MODULES_INCLUDES_REQUIRED_TEST_BATCH_CLASS_NAMES_INCLUDES);
+		String testBatchClassNamesIncludesRequired = getProperty(
+			_TEST_BATCH_CLASS_NAMES_INCLUDES_REQUIRED);
+
+		if ((modulesIncludesRequiredTestBatchClassNamesIncludes == null) &&
+			(testBatchClassNamesIncludesRequired == null)) {
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Unable to create batch ");
+			sb.append(getBatchName());
+			sb.append(" since ");
+			sb.append(
+				_MODULES_INCLUDES_REQUIRED_TEST_BATCH_CLASS_NAMES_INCLUDES);
+			sb.append(" or ");
+			sb.append(_TEST_BATCH_CLASS_NAMES_INCLUDES_REQUIRED);
+			sb.append(" is not set in ");
+			sb.append(getPropertiesFile());
+
+			throw new RelevantRuleConfigurationException(sb.toString());
+		}
 	}
 
 	private void _addJobProperties() {
 		_excludesJobProperties.add(getExcludesJobProperty());
 		_includesJobProperties.add(getIncludesJobProperty());
+
+		_includesJobProperties.add(
+			getJobProperty(
+				_TEST_BATCH_CLASS_NAMES_INCLUDES_REQUIRED,
+				JobProperty.Type.MODULE_INCLUDE_GLOB));
 	}
 
 	private static final String
@@ -100,6 +126,9 @@ public class JUnitTestSelector extends BaseTestSelector {
 	private static final String
 		_MODULES_INCLUDES_REQUIRED_TEST_BATCH_CLASS_NAMES_INCLUDES =
 			"modules.includes.required.test.batch.class.names.includes";
+
+	private static final String _TEST_BATCH_CLASS_NAMES_INCLUDES_REQUIRED =
+		"test.batch.class.names.includes.required";
 
 	private final List<JobProperty> _excludesJobProperties = new ArrayList<>();
 	private final List<JobProperty> _includesJobProperties = new ArrayList<>();

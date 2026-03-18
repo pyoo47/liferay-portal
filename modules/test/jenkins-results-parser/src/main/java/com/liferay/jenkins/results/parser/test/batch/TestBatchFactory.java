@@ -25,7 +25,10 @@ public class TestBatchFactory {
 		}
 
 		try {
-			if (batchName.startsWith("functional")) {
+			if (batchName.startsWith("functional") ||
+				batchName.startsWith("modules-functional") ||
+				batchName.startsWith("subrepository-functional")) {
+
 				PoshiTestSelector poshiTestSelector = new PoshiTestSelector(
 					propertiesFile, properties, batchName, relevantRuleName,
 					testSuiteName);
@@ -38,8 +41,13 @@ public class TestBatchFactory {
 				return poshiTestBatch;
 			}
 
-			if (batchName.startsWith("modules-integration") ||
-				batchName.startsWith("modules-unit")) {
+			if (batchName.startsWith("integration") ||
+				batchName.startsWith("junit-test") ||
+				batchName.startsWith("unit") ||
+				batchName.startsWith("modules-integration") ||
+				batchName.startsWith("modules-unit") ||
+				batchName.startsWith("subrepository-integration") ||
+				batchName.startsWith("subrepository-unit")) {
 
 				JUnitTestSelector jUnitTestSelector = new JUnitTestSelector(
 					propertiesFile, properties, batchName, relevantRuleName,
