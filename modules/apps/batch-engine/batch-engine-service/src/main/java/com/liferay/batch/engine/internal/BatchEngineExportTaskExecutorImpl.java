@@ -296,9 +296,14 @@ public class BatchEngineExportTaskExecutorImpl
 			Sort[] sorts = _getSorts(
 				batchEngineTaskItemDelegate, parameters, user);
 
-			boolean cursorPaginationActive =
-				_USE_EXPORT_CURSOR_PAGINATION &&
-					_isSearchCursorPaginationEnabled(sorts);
+			boolean cursorPaginationActive = false;
+
+			if (_USE_EXPORT_CURSOR_PAGINATION &&
+				_isSearchCursorPaginationEnabled(sorts)) {
+
+				cursorPaginationActive = true;
+			}
+
 			Page<?> page = batchEngineTaskItemDelegate.read(
 				filter, Pagination.of(1, exportBatchSize), sorts,
 				filteredParameters, (String)parameters.get("search"));
@@ -376,14 +381,14 @@ public class BatchEngineExportTaskExecutorImpl
 				if (cursorPaginationActive) {
 					page = batchEngineTaskItemDelegate.read(
 						_createCursorFilter(filter, lastItemId),
-						Pagination.of(1, exportBatchSize), sorts, filteredParameters,
-						(String)parameters.get("search"));
+						Pagination.of(1, exportBatchSize), sorts,
+						filteredParameters, (String)parameters.get("search"));
 				}
 				else {
 					page = batchEngineTaskItemDelegate.read(
-						filter, Pagination.of(
-							(int)page.getPage() + 1, exportBatchSize), sorts,
-						filteredParameters,
+						filter,
+						Pagination.of((int)page.getPage() + 1, exportBatchSize),
+						sorts, filteredParameters,
 						(String)parameters.get("search"));
 				}
 
@@ -528,17 +533,12 @@ public class BatchEngineExportTaskExecutorImpl
 		return filteredParameters;
 	}
 
-	private Long _getFirstItemId(Collection<?> items) {
-		if (items.isEmpty()) {
-			return null;
-		}
-
-		return _getItemId(items.iterator().next());
-	}
-
 	private Long _getItemId(Object item) {
 		try {
-			Method method = item.getClass().getMethod("getId");
+			Method method = item.getClass(
+			).getMethod(
+				"getId"
+			);
 
 			Object id = method.invoke(item);
 
@@ -547,14 +547,15 @@ public class BatchEngineExportTaskExecutorImpl
 			}
 
 			if (id instanceof Number) {
-				return ((Number)id).longValue();
+				Number number = (Number)id;
+
+				return number.longValue();
 			}
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Unable to extract ID from " + item.getClass(),
-					exception);
+					"Unable to extract ID from " + item.getClass(), exception);
 			}
 		}
 
@@ -649,7 +650,11 @@ public class BatchEngineExportTaskExecutorImpl
 	}
 
 	private boolean _isSearchCursorPaginationEnabled(Sort[] sorts) {
-		return sorts == null;
+		if (sorts == null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private Map<String, List<String>> _toMultivaluedMap(
