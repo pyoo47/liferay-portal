@@ -235,16 +235,17 @@ $c-root: map-merge(
 		--transition-collapse: height 0.35s ease,
 		--transition-fade: opacity 0.15s linear,
 
-		--component-transition: unquote(
+		--component-transition:
+			unquote(
 				'color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out'
 			),
 		--component-active-background-color: $primary,
 		--component-active-color: $white,
 
-		--component-focus-box-shadow: unquote(
-				'0 0 0 0.125rem #{$white}, 0 0 0 0.25rem #{$primary-l1}'
-			),
-		--component-focus-inset-box-shadow: unquote(
+		--component-focus-box-shadow:
+			unquote('0 0 0 0.125rem #{$white}, 0 0 0 0.25rem #{$primary-l1}'),
+		--component-focus-inset-box-shadow:
+			unquote(
 				'inset 0 0 0 0.125rem #{$primary-l1}, inset 0 0 0 0.25rem #{$white}'
 			),
 		--component-disabled-opacity: 0.4,
@@ -253,10 +254,12 @@ $c-root: map-merge(
 		--container-max-md: map-get($container-max-widths, 'md'),
 		--container-max-lg: map-get($container-max-widths, 'lg'),
 		--container-max-xl: map-get($container-max-widths, 'xl'),
-		--font-family-monospace: unquote(
+		--font-family-monospace:
+			unquote(
 				"sfmono-regular, menlo, monaco, consolas, 'Liberation Mono', 'Courier New', monospace"
 			),
-		--font-family-sans-serif: unquote(
+		--font-family-sans-serif:
+			unquote(
 				"system-ui, -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, oxygen-sans, ubuntu, cantarell, 'Helvetica Neue', arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'"
 			),
 		--font-family-serif: unquote("georgia, 'Times New Roman', times, serif"),
@@ -331,12 +334,10 @@ $c-root: map-merge(
 		--code-color: $pink,
 		--code-font-size: 87.5%,
 
-		--focus-ring-animation-from-box-shadow: unquote(
-				'0 0 0 0.25rem #{$white}, 0 0 0 0.75rem #{$primary-l2}'
-			),
-		--focus-ring-animation-to-box-shadow: unquote(
-				'0 0 0 0.125rem #{$white}, 0 0 0 0.25rem #{$primary-l0}'
-			),
+		--focus-ring-animation-from-box-shadow:
+			unquote('0 0 0 0.25rem #{$white}, 0 0 0 0.75rem #{$primary-l2}'),
+		--focus-ring-animation-to-box-shadow:
+			unquote('0 0 0 0.125rem #{$white}, 0 0 0 0.25rem #{$primary-l0}'),
 	),
 	$c-root
 );
