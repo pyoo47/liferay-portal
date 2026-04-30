@@ -10413,6 +10413,12 @@ tar --extract --file=liferay-portal-source.tar.gz modules/core/portal-bootstrap/
 					</else>
 				</if>
 
+				<exec executable="git" failonerror="true">
+					<arg value="checkout" />
+					<arg value="--" />
+					<arg value="." />
+				</exec>
+
 				<if>
 					<or>
 						<contains string="${git.diff}" substring="modules${file.separator}util${file.separator}source-formatter" />
