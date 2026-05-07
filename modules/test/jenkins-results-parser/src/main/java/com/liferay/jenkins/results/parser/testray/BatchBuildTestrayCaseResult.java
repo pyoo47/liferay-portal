@@ -253,6 +253,7 @@ public class BatchBuildTestrayCaseResult
 
 		testrayAttachments.add(_getGradlePluginsAttachment());
 		testrayAttachments.add(_getJenkinsConsoleTestrayAttachment());
+		testrayAttachments.add(_getParentTestrayCaseResultTestrayAttachment());
 		testrayAttachments.add(getTopLevelBuildDatabaseTestrayAttachment());
 		testrayAttachments.add(getTopLevelBuildReportTestrayAttachment());
 		testrayAttachments.add(getTopLevelJenkinsConsoleTestrayAttachment());
@@ -824,6 +825,19 @@ public class BatchBuildTestrayCaseResult
 		}
 
 		return testrayAttachments;
+	}
+
+	private TestrayAttachment _getParentTestrayCaseResultTestrayAttachment() {
+		TestrayCaseResult parentTestrayCaseResult =
+			getParentTestrayCaseResult();
+
+		if (parentTestrayCaseResult == null) {
+			return null;
+		}
+
+		return new DefaultTestrayAttachment(
+			this, "Parent", parentTestrayCaseResult.getName(),
+			parentTestrayCaseResult.getTestrayCaseResultURL());
 	}
 
 	private TestrayAttachment _getWarningsTestrayAttachment() {
