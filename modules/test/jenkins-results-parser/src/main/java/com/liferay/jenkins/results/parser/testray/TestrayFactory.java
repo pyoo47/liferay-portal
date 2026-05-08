@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -199,17 +200,57 @@ public class TestrayFactory {
 	public static TestrayBuild newTestrayBuild(
 		TestrayRoutine testrayRoutine, JSONObject jsonObject) {
 
-		return new TestrayBuild(testrayRoutine, jsonObject);
+		synchronized (_testrayBuilds) {
+			long id = jsonObject.getLong("id");
+
+			TestrayBuild testrayBuild = _testrayBuilds.get(id);
+
+			if (testrayBuild != null) {
+				return testrayBuild;
+			}
+
+			testrayBuild = new TestrayBuild(testrayRoutine, jsonObject);
+
+			_testrayBuilds.put(id, testrayBuild);
+
+			return testrayBuild;
+		}
 	}
 
 	public static TestrayBuild newTestrayBuild(
-		TestrayServer testrayServer, JSONObject jsonObject) {
+		TestrayServer testrayServer, long id) {
 
-		return new TestrayBuild(testrayServer, jsonObject);
+		synchronized (_testrayBuilds) {
+			TestrayBuild testrayBuild = _testrayBuilds.get(id);
+
+			if (testrayBuild != null) {
+				return testrayBuild;
+			}
+
+			testrayBuild = new TestrayBuild(testrayServer, id);
+
+			_testrayBuilds.put(id, testrayBuild);
+
+			return testrayBuild;
+		}
 	}
 
 	public static TestrayBuild newTestrayBuild(URL url) {
-		return new TestrayBuild(url);
+		synchronized (_testrayBuilds) {
+			long id = TestrayBuild.getID(url);
+
+			TestrayBuild testrayBuild = _testrayBuilds.get(id);
+
+			if (testrayBuild != null) {
+				return testrayBuild;
+			}
+
+			testrayBuild = new TestrayBuild(url);
+
+			_testrayBuilds.put(id, testrayBuild);
+
+			return testrayBuild;
+		}
 	}
 
 	public static TestrayCase newTestrayCase(
@@ -375,6 +416,8 @@ public class TestrayFactory {
 		_testrayAttachmentRecorders = new ConcurrentHashMap<>();
 	private static final Map<String, TestrayAttachmentUploader>
 		_testrayAttachmentUploaders = new ConcurrentHashMap<>();
+	private static final Map<Long, TestrayBuild> _testrayBuilds =
+		new HashMap<>();
 	private static final Map<String, TestrayRoutine> _testrayRoutines =
 		new ConcurrentHashMap<>();
 	private static final Map<String, TestrayServer> _testrayServers =

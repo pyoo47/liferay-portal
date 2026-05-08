@@ -194,8 +194,8 @@ public class TestrayCaseResult {
 			"buildToCaseResult");
 
 		if (buildJSONObject != null) {
-			_testrayBuild = _testrayServer.getTestrayBuildByID(
-				buildJSONObject.getLong("id"));
+			_testrayBuild = TestrayFactory.newTestrayBuild(
+				_testrayServer, buildJSONObject.getLong("id"));
 		}
 
 		return _testrayBuild;
