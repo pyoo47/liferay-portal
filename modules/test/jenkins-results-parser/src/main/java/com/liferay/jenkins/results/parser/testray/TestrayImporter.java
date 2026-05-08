@@ -978,13 +978,35 @@ public class TestrayImporter {
 				testBaseDir = axisTestClassGroup.getTestBaseDir();
 			}
 
-			_recordAppServerTestrayCaseResult(
-				job, PersistentResource.Type.ASAH_BUNDLE, testBaseDir);
-			_recordAppServerTestrayCaseResult(
-				job, PersistentResource.Type.FARO_BUNDLE, testBaseDir);
-			_recordAppServerTestrayCaseResult(
-				job, PersistentResource.Type.PORTAL_BUNDLE, testBaseDir);
-			_recordTopLevelTestrayCaseResult(job, testBaseDir);
+			final TestrayCaseResult topLevelTestrayCaseResult =
+				_recordTopLevelTestrayCaseResult(job, testBaseDir);
+
+			TestrayCaseResult asahAppServerTestrayCaseResult =
+				_recordAppServerTestrayCaseResult(
+					job, PersistentResource.Type.ASAH_BUNDLE, testBaseDir);
+
+			if (asahAppServerTestrayCaseResult != null) {
+				asahAppServerTestrayCaseResult.setParentTestrayCaseResult(
+					topLevelTestrayCaseResult);
+			}
+
+			TestrayCaseResult faroAppServerTestrayCaseResult =
+				_recordAppServerTestrayCaseResult(
+					job, PersistentResource.Type.FARO_BUNDLE, testBaseDir);
+
+			if (faroAppServerTestrayCaseResult != null) {
+				faroAppServerTestrayCaseResult.setParentTestrayCaseResult(
+					topLevelTestrayCaseResult);
+			}
+
+			TestrayCaseResult portalAppServerTestrayCaseResult =
+				_recordAppServerTestrayCaseResult(
+					job, PersistentResource.Type.PORTAL_BUNDLE, testBaseDir);
+
+			if (portalAppServerTestrayCaseResult != null) {
+				portalAppServerTestrayCaseResult.setParentTestrayCaseResult(
+					topLevelTestrayCaseResult);
+			}
 
 			for (final AxisTestClassGroup axisTestClassGroup :
 					axisTestClassGroups) {
@@ -994,7 +1016,8 @@ public class TestrayImporter {
 
 						@Override
 						public Void call() throws Exception {
-							_recordAxisTestClassGroup(axisTestClassGroup);
+							_recordAxisTestClassGroup(
+								axisTestClassGroup, topLevelTestrayCaseResult);
 
 							return null;
 						}
@@ -1355,7 +1378,7 @@ public class TestrayImporter {
 		return "Liferay CI";
 	}
 
-	private void _recordAppServerTestrayCaseResult(
+	private TestrayCaseResult _recordAppServerTestrayCaseResult(
 		Job job, PersistentResource.Type persistentResourceType,
 		File testBaseDir) {
 
@@ -1371,15 +1394,18 @@ public class TestrayImporter {
 			appServerBundleStandaloneBuildTestrayCaseResult.getBuildReport();
 
 		if (buildReport == null) {
-			return;
+			return null;
 		}
 
 		appServerBundleStandaloneBuildTestrayCaseResult.recordTestrayCaseResult(
 			job);
+
+		return appServerBundleStandaloneBuildTestrayCaseResult;
 	}
 
 	private void _recordAxisTestClassGroup(
-		AxisTestClassGroup axisTestClassGroup) {
+		AxisTestClassGroup axisTestClassGroup,
+		TestrayCaseResult topLevelTestrayCaseResult) {
 
 		Job job = axisTestClassGroup.getJob();
 
@@ -1459,6 +1485,9 @@ public class TestrayImporter {
 		TestrayCaseResult buildTestrayCaseResult =
 			TestrayFactory.newBuildTestrayCaseResult(
 				axisTestClassGroup, testrayBuild, _topLevelBuildReport);
+
+		buildTestrayCaseResult.setParentTestrayCaseResult(
+			topLevelTestrayCaseResult);
 
 		buildTestrayCaseResult.setTestrayRun(testrayRun);
 
@@ -1650,13 +1679,17 @@ public class TestrayImporter {
 					currentTimeMillis - start)));
 	}
 
-	private void _recordTopLevelTestrayCaseResult(Job job, File testBaseDir) {
+	private TestrayCaseResult _recordTopLevelTestrayCaseResult(
+		Job job, File testBaseDir) {
+
 		TopLevelStandaloneBuildTestrayCaseResult
 			topLevelStandaloneBuildTestrayCaseResult =
 				TestrayFactory.newTopLevelStandaloneBuildTestrayCaseResult(
 					getTestrayBuild(testBaseDir), _topLevelBuildReport);
 
 		topLevelStandaloneBuildTestrayCaseResult.recordTestrayCaseResult(job);
+
+		return topLevelStandaloneBuildTestrayCaseResult;
 	}
 
 	private String _replaceEnvVars(String string, boolean truncate) {

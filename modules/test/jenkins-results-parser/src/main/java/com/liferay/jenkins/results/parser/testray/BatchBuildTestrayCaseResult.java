@@ -836,7 +836,8 @@ public class BatchBuildTestrayCaseResult
 		}
 
 		return new DefaultTestrayAttachment(
-			this, "Parent", parentTestrayCaseResult.getName(),
+			this, parentTestrayCaseResult.getName(),
+			parentTestrayCaseResult.getName(),
 			parentTestrayCaseResult.getTestrayCaseResultURL());
 	}
 
