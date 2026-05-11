@@ -283,9 +283,13 @@ public class TestrayFactory {
 	}
 
 	public static TestrayBuild newTestrayBuild(URL url) {
-		synchronized (_testrayBuilds) {
-			long id = TestrayBuild.getID(url);
+		long id = TestrayBuild.getID(url);
 
+		if (id <= 0) {
+			return new TestrayBuild(url);
+		}
+
+		synchronized (_testrayBuilds) {
 			TestrayBuild testrayBuild = _testrayBuilds.get(id);
 
 			if (testrayBuild != null) {
