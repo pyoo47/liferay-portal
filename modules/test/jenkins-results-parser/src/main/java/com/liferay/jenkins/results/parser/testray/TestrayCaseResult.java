@@ -6,6 +6,7 @@
 package com.liferay.jenkins.results.parser.testray;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.Retryable;
 
 import java.io.IOException;
 
@@ -556,9 +557,9 @@ public class TestrayCaseResult {
 	protected Map<String, TestrayAttachment> testrayAttachments;
 
 	private synchronized URL _createTestrayCaseResultURL() {
-		long start = JenkinsResultsParserUtil.getCurrentTimeMillis();
+		final long start = JenkinsResultsParserUtil.getCurrentTimeMillis();
 
-		JSONObject requestJSONObject = new JSONObject();
+		final JSONObject requestJSONObject = new JSONObject();
 
 		JSONArray testrayAttachmentsJSONArray = new JSONArray();
 
@@ -589,7 +590,7 @@ public class TestrayCaseResult {
 			requestJSONObject.put("errors", errors);
 		}
 
-		TestrayBuild testrayBuild = getTestrayBuild();
+		final TestrayBuild testrayBuild = getTestrayBuild();
 
 		if (testrayBuild != null) {
 			requestJSONObject.put(
@@ -623,28 +624,46 @@ public class TestrayCaseResult {
 				"r_teamToCaseResult_c_teamId", testrayTeam.getID());
 		}
 
-		try {
-			JSONObject responseJSONObject = new JSONObject(
-				_testrayServer.requestPost(
-					"/o/c/caseresults", requestJSONObject.toString()));
+		Retryable<URL> retryable = new Retryable<URL>(true, 3, 5, true) {
 
-			URL testrayCaseResultURL = new URL(
-				testrayBuild.getURL() + "/case-result/" +
-					responseJSONObject.getLong("id"));
+			@Override
+			public URL execute() {
+				URL cachedTestrayCaseResultURL =
+					_getCachedTestrayCaseResultURL();
 
-			long end = JenkinsResultsParserUtil.getCurrentTimeMillis();
+				if (cachedTestrayCaseResultURL != null) {
+					return cachedTestrayCaseResultURL;
+				}
 
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"Testray Case Result '", getName(), "' ",
-					String.valueOf(testrayCaseResultURL), " created in ",
-					JenkinsResultsParserUtil.toDurationString(end - start)));
+				try {
+					JSONObject responseJSONObject = new JSONObject(
+						_testrayServer.requestPost(
+							"/o/c/caseresults", requestJSONObject.toString()));
 
-			return testrayCaseResultURL;
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
+					URL testrayCaseResultURL = new URL(
+						testrayBuild.getURL() + "/case-result/" +
+							responseJSONObject.getLong("id"));
+
+					long end = JenkinsResultsParserUtil.getCurrentTimeMillis();
+
+					System.out.println(
+						JenkinsResultsParserUtil.combine(
+							"Testray Case Result '", getName(), "' ",
+							String.valueOf(testrayCaseResultURL),
+							" created in ",
+							JenkinsResultsParserUtil.toDurationString(
+								end - start)));
+
+					return testrayCaseResultURL;
+				}
+				catch (IOException ioException) {
+					throw new RuntimeException(ioException);
+				}
+			}
+
+		};
+
+		return retryable.executeWithRetries();
 	}
 
 	private URL _getCachedTestrayCaseResultURL() {

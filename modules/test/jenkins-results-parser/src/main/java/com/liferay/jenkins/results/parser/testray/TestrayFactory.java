@@ -7,6 +7,7 @@ package com.liferay.jenkins.results.parser.testray;
 
 import com.liferay.jenkins.results.parser.Build;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.Retryable;
 import com.liferay.jenkins.results.parser.TopLevelBuildReport;
 import com.liferay.jenkins.results.parser.test.clazz.BaseAntTargetTestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
@@ -306,53 +307,69 @@ public class TestrayFactory {
 	}
 
 	public static TestrayCase newTestrayCase(
-		TestrayProject testrayProject, String name,
-		TestrayCaseType testrayCaseType) {
+		final TestrayProject testrayProject, final String name,
+		final TestrayCaseType testrayCaseType) {
 
-		String filter = JenkinsResultsParserUtil.combine(
+		final String filter = JenkinsResultsParserUtil.combine(
 			"name eq '", name, "' and ", "r_caseTypeToCases_c_caseTypeId eq '",
 			String.valueOf(testrayCaseType.getID()), "' and ",
 			"r_projectToCases_c_projectId eq '",
 			String.valueOf(testrayProject.getID()), "'");
 
-		TestrayServer testrayServer = testrayProject.getTestrayServer();
+		final TestrayServer testrayServer = testrayProject.getTestrayServer();
 
-		try {
-			Set<JSONObject> entityJSONObjects = testrayServer.requestGraphQL(
-				"cases", TestrayCase.FIELD_NAMES, filter, null, 1, 1);
+		Retryable<TestrayCase> retryable = new Retryable<TestrayCase>(
+			true, 3, 5, true) {
 
-			for (JSONObject entityJSONObject : entityJSONObjects) {
-				return new TestrayCase(testrayProject, entityJSONObject);
+			@Override
+			public TestrayCase execute() {
+				try {
+					Set<JSONObject> entityJSONObjects =
+						testrayServer.requestGraphQL(
+							"cases", TestrayCase.FIELD_NAMES, filter, null, 1,
+							1);
+
+					for (JSONObject entityJSONObject : entityJSONObjects) {
+						return new TestrayCase(
+							testrayProject, entityJSONObject);
+					}
+
+					long start =
+						JenkinsResultsParserUtil.getCurrentTimeMillis();
+
+					JSONObject requestJSONObject = new JSONObject();
+
+					requestJSONObject.put(
+						"name", name
+					).put(
+						"r_caseTypeToCases_c_caseTypeId",
+						testrayCaseType.getID()
+					).put(
+						"r_projectToCases_c_projectId", testrayProject.getID()
+					);
+
+					JSONObject responseJSONObject = new JSONObject(
+						testrayServer.requestPost(
+							"/o/c/cases", requestJSONObject.toString()));
+
+					long end = JenkinsResultsParserUtil.getCurrentTimeMillis();
+
+					System.out.println(
+						JenkinsResultsParserUtil.combine(
+							"Testray Case '", name, "' created in ",
+							JenkinsResultsParserUtil.toDurationString(
+								end - start)));
+
+					return new TestrayCase(testrayProject, responseJSONObject);
+				}
+				catch (IOException ioException) {
+					throw new RuntimeException(ioException);
+				}
 			}
 
-			long start = JenkinsResultsParserUtil.getCurrentTimeMillis();
+		};
 
-			JSONObject requestJSONObject = new JSONObject();
-
-			requestJSONObject.put(
-				"name", name
-			).put(
-				"r_caseTypeToCases_c_caseTypeId", testrayCaseType.getID()
-			).put(
-				"r_projectToCases_c_projectId", testrayProject.getID()
-			);
-
-			JSONObject responseJSONObject = new JSONObject(
-				testrayServer.requestPost(
-					"/o/c/cases", requestJSONObject.toString()));
-
-			long end = JenkinsResultsParserUtil.getCurrentTimeMillis();
-
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"Testray Case '", name, "' created in ",
-					JenkinsResultsParserUtil.toDurationString(end - start)));
-
-			return new TestrayCase(testrayProject, responseJSONObject);
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
+		return retryable.executeWithRetries();
 	}
 
 	public static TestrayCaseType newTestrayCaseType(

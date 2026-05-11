@@ -7,6 +7,7 @@ package com.liferay.jenkins.results.parser.testray;
 
 import com.liferay.jenkins.results.parser.Dom4JUtil;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.Retryable;
 
 import java.io.IOException;
 
@@ -180,51 +181,62 @@ public class TestrayRun {
 			return _jsonObject;
 		}
 
-		TestrayBuild testrayBuild = getTestrayBuild();
+		final TestrayBuild testrayBuild = getTestrayBuild();
+		final TestrayServer testrayServer = getTestrayServer();
 
-		String filter = JenkinsResultsParserUtil.combine(
+		final String filter = JenkinsResultsParserUtil.combine(
 			"environmentHash eq '", getEnvironmentHash(), "' and name eq '",
 			getRunIDString(), "' and r_buildToRuns_c_buildId eq '",
 			String.valueOf(testrayBuild.getID()), "'");
 
-		try {
-			TestrayServer testrayServer = getTestrayServer();
+		Retryable<JSONObject> retryable = new Retryable<JSONObject>(
+			true, 3, 5, true) {
 
-			JSONObject jsonObject = new JSONObject(
-				testrayServer.requestGet(
-					"/o/c/runs?filter=" + URLEncoder.encode(filter, "UTF-8")));
+			@Override
+			public JSONObject execute() {
+				try {
+					JSONObject existingJSONObject = new JSONObject(
+						testrayServer.requestGet(
+							"/o/c/runs?filter=" +
+								URLEncoder.encode(filter, "UTF-8")));
 
-			JSONArray itemsJSONArray = jsonObject.optJSONArray("items");
+					JSONArray existingItemsJSONArray =
+						existingJSONObject.optJSONArray("items");
 
-			if ((itemsJSONArray != null) && !itemsJSONArray.isEmpty()) {
-				_jsonObject = itemsJSONArray.getJSONObject(0);
+					if ((existingItemsJSONArray != null) &&
+						!existingItemsJSONArray.isEmpty()) {
 
-				_cached = true;
+						return existingItemsJSONArray.getJSONObject(0);
+					}
 
-				return _jsonObject;
+					JSONObject postRequestJSONObject = new JSONObject();
+
+					postRequestJSONObject.put(
+						"environmentHash", getEnvironmentHash()
+					).put(
+						"name", getRunIDString()
+					).put(
+						"number", _getNextRunNumber()
+					).put(
+						"r_buildToRuns_c_buildId", testrayBuild.getID()
+					);
+
+					return new JSONObject(
+						testrayServer.requestPost(
+							"/o/c/runs", postRequestJSONObject.toString()));
+				}
+				catch (IOException ioException) {
+					throw new RuntimeException(ioException);
+				}
 			}
 
-			JSONObject requestJSONObject = new JSONObject();
+		};
 
-			requestJSONObject.put(
-				"environmentHash", getEnvironmentHash()
-			).put(
-				"name", getRunIDString()
-			).put(
-				"number", _getNextRunNumber()
-			).put(
-				"r_buildToRuns_c_buildId", testrayBuild.getID()
-			);
+		_jsonObject = retryable.executeWithRetries();
 
-			_jsonObject = new JSONObject(
-				testrayServer.requestPost(
-					"/o/c/runs", requestJSONObject.toString()));
+		_cached = true;
 
-			return _jsonObject;
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
+		return _jsonObject;
 	}
 
 	private static String _getFactorName(

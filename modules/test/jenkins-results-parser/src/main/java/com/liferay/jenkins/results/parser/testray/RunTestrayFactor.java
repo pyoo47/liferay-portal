@@ -6,6 +6,7 @@
 package com.liferay.jenkins.results.parser.testray;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.Retryable;
 
 import java.io.IOException;
 
@@ -31,7 +32,7 @@ public class RunTestrayFactor extends BaseTestrayFactor {
 	}
 
 	@Override
-	public JSONObject getJSONObject() {
+	public synchronized JSONObject getJSONObject() {
 		if (_jsonObject != null) {
 			return _jsonObject;
 		}
@@ -44,54 +45,65 @@ public class RunTestrayFactor extends BaseTestrayFactor {
 			return _jsonObject;
 		}
 
-		TestrayServer testrayServer = _testrayBuild.getTestrayServer();
+		final TestrayServer testrayServer = _testrayBuild.getTestrayServer();
 
-		Category category = getCategory();
+		final Category category = getCategory();
+		final Option option = getOption();
+		final TestrayRun testrayRun = getTestrayRun();
 
-		Option option = getOption();
-
-		TestrayRun testrayRun = getTestrayRun();
-
-		String filter = JenkinsResultsParserUtil.combine(
+		final String filter = JenkinsResultsParserUtil.combine(
 			"r_factorCategoryToFactors_c_factorCategoryId eq '",
 			String.valueOf(category.getID()),
 			"' and r_factorOptionToFactors_c_factorOptionId eq '",
 			String.valueOf(option.getID()), "' and r_runToFactors_c_runId eq '",
 			String.valueOf(testrayRun.getID()), "'");
 
-		try {
-			JSONObject jsonObject = new JSONObject(
-				testrayServer.requestGet(
-					"/o/c/factors?filter=" +
-						URLEncoder.encode(filter, "UTF-8")));
+		Retryable<JSONObject> retryable = new Retryable<JSONObject>(
+			true, 3, 5, true) {
 
-			JSONArray itemsJSONArray = jsonObject.optJSONArray("items");
+			@Override
+			public JSONObject execute() {
+				try {
+					JSONObject existingJSONObject = new JSONObject(
+						testrayServer.requestGet(
+							"/o/c/factors?filter=" +
+								URLEncoder.encode(filter, "UTF-8")));
 
-			if ((itemsJSONArray != null) && !itemsJSONArray.isEmpty()) {
-				_jsonObject = itemsJSONArray.getJSONObject(0);
+					JSONArray existingItemsJSONArray =
+						existingJSONObject.optJSONArray("items");
 
-				return _jsonObject;
+					if ((existingItemsJSONArray != null) &&
+						!existingItemsJSONArray.isEmpty()) {
+
+						return existingItemsJSONArray.getJSONObject(0);
+					}
+
+					JSONObject postRequestJSONObject = new JSONObject();
+
+					postRequestJSONObject.put(
+						"r_factorCategoryToFactors_c_factorCategoryId",
+						category.getID()
+					).put(
+						"r_factorOptionToFactors_c_factorOptionId",
+						option.getID()
+					).put(
+						"r_runToFactors_c_runId", testrayRun.getID()
+					);
+
+					return new JSONObject(
+						testrayServer.requestPost(
+							"/o/c/factors", postRequestJSONObject.toString()));
+				}
+				catch (IOException ioException) {
+					throw new RuntimeException(ioException);
+				}
 			}
 
-			JSONObject requestJSONObject = new JSONObject();
+		};
 
-			requestJSONObject.put(
-				"r_factorCategoryToFactors_c_factorCategoryId", category.getID()
-			).put(
-				"r_factorOptionToFactors_c_factorOptionId", option.getID()
-			).put(
-				"r_runToFactors_c_runId", testrayRun.getID()
-			);
+		_jsonObject = retryable.executeWithRetries();
 
-			_jsonObject = new JSONObject(
-				testrayServer.requestPost(
-					"/o/c/factors", requestJSONObject.toString()));
-
-			return _jsonObject;
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
+		return _jsonObject;
 	}
 
 	@Override
