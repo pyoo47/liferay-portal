@@ -835,9 +835,15 @@ public class BatchBuildTestrayCaseResult
 			return null;
 		}
 
+		String testrayCaseResultURL = String.valueOf(
+			parentTestrayCaseResult.getTestrayCaseResultURL());
+
+		TestrayServer testrayServer = getTestrayServer();
+
 		return new DefaultTestrayAttachment(
 			this, parentTestrayCaseResult.getName(),
-			parentTestrayCaseResult.getName(),
+			testrayCaseResultURL.replace(
+				String.valueOf(testrayServer.getURL()), ""),
 			parentTestrayCaseResult.getTestrayCaseResultURL());
 	}
 
