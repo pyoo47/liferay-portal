@@ -91,7 +91,8 @@ public class TestrayRoutine {
 				_testrayServer.requestPost(
 					"/o/c/builds", requestJSONObject.toString()));
 
-			return getTestrayBuildByID(responseJSONObject.getLong("id"));
+			return TestrayFactory.newTestrayBuild(
+				this, responseJSONObject.getLong("id"));
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(
@@ -115,9 +116,7 @@ public class TestrayRoutine {
 		return TestrayFactory.newTestrayBuild(_testrayServer, buildID);
 	}
 
-	public TestrayBuild getTestrayBuildByName(
-		String buildName, String... names) {
-
+	public TestrayBuild getTestrayBuildByName(String buildName) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("name eq '");

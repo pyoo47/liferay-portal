@@ -163,10 +163,34 @@ public interface TestrayFactor {
 		}
 
 		public Long getID() {
+			if (_cached || (_id <= 0)) {
+				return _id;
+			}
+
+			JSONObject jsonObject = _getJSONObject();
+
+			if (jsonObject == null) {
+				return _id;
+			}
+
+			_id = jsonObject.optLong("id");
+
 			return _id;
 		}
 
 		public String getName() {
+			if (_cached || (_name != null)) {
+				return _name;
+			}
+
+			JSONObject jsonObject = _getJSONObject();
+
+			if (jsonObject == null) {
+				return _name;
+			}
+
+			_name = jsonObject.optString("name");
+
 			return _name;
 		}
 

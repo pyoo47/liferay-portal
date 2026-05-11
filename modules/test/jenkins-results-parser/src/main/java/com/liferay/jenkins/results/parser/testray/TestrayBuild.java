@@ -467,6 +467,41 @@ public class TestrayBuild implements Comparable<TestrayBuild> {
 		_jsonObject = jsonObject;
 	}
 
+	protected TestrayBuild(TestrayRoutine testrayRoutine, long id) {
+		_testrayRoutine = testrayRoutine;
+
+		_testrayServer = testrayRoutine.getTestrayServer();
+
+		try {
+			String filter = JenkinsResultsParserUtil.combine(
+				"id eq '", String.valueOf(id),
+				"' and r_routineToBuilds_c_routineId eq '",
+				String.valueOf(testrayRoutine.getID()), "'");
+
+			Set<JSONObject> entityJSONObjects = _testrayServer.requestGraphQL(
+				"builds", FIELD_NAMES, filter, null, 1, 1);
+
+			if (entityJSONObjects.isEmpty()) {
+				throw new RuntimeException("Build ID not found: " + id);
+			}
+
+			Iterator<JSONObject> iterator = entityJSONObjects.iterator();
+
+			JSONObject entityJSONObject = iterator.next();
+
+			JSONObject projectJSONObject = entityJSONObject.getJSONObject(
+				"projectToBuilds");
+
+			_testrayProject = _testrayServer.getTestrayProjectByID(
+				projectJSONObject.getLong("id"));
+
+			_jsonObject = entityJSONObject;
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+	}
+
 	protected TestrayBuild(TestrayServer testrayServer, long id) {
 		_testrayServer = testrayServer;
 

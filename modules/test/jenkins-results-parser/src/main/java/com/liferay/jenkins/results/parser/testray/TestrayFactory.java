@@ -246,6 +246,24 @@ public class TestrayFactory {
 	}
 
 	public static TestrayBuild newTestrayBuild(
+		TestrayRoutine testrayRoutine, long id) {
+
+		synchronized (_testrayBuilds) {
+			TestrayBuild testrayBuild = _testrayBuilds.get(id);
+
+			if (testrayBuild != null) {
+				return testrayBuild;
+			}
+
+			testrayBuild = new TestrayBuild(testrayRoutine, id);
+
+			_testrayBuilds.put(id, testrayBuild);
+
+			return testrayBuild;
+		}
+	}
+
+	public static TestrayBuild newTestrayBuild(
 		TestrayServer testrayServer, long id) {
 
 		synchronized (_testrayBuilds) {

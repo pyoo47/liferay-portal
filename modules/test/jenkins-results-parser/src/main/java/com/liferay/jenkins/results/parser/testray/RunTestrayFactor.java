@@ -23,6 +23,10 @@ public class RunTestrayFactor extends BaseTestrayFactor {
 	public Category getCategory() {
 		Option option = getOption();
 
+		if (option == null) {
+			return null;
+		}
+
 		return option.getCategory();
 	}
 
