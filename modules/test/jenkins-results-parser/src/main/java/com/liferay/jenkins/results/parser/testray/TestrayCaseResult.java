@@ -560,6 +560,17 @@ public class TestrayCaseResult {
 
 		JSONObject requestJSONObject = new JSONObject();
 
+		JSONArray testrayAttachmentsJSONArray = new JSONArray();
+
+		for (TestrayAttachment testrayAttachment : getTestrayAttachments()) {
+			testrayAttachmentsJSONArray.put(testrayAttachment.getJSONObject());
+		}
+
+		if (!testrayAttachmentsJSONArray.isEmpty()) {
+			requestJSONObject.put(
+				"attachments", String.valueOf(testrayAttachmentsJSONArray));
+		}
+
 		Status status = getStatus();
 
 		if (status != null) {
