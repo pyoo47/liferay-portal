@@ -18,6 +18,8 @@ import com.liferay.jenkins.results.parser.test.clazz.group.JUnitAxisTestClassGro
 import com.liferay.jenkins.results.parser.test.clazz.group.ModulesAxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.PlaywrightAxisTestClassGroup;
 
+import java.io.IOException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -282,6 +285,56 @@ public class TestrayFactory {
 		TestrayProject testrayProject, JSONObject jsonObject) {
 
 		return new TestrayCase(testrayProject, jsonObject);
+	}
+
+	public static TestrayCase newTestrayCase(
+		TestrayProject testrayProject, String name,
+		TestrayCaseType testrayCaseType) {
+
+		String filter = JenkinsResultsParserUtil.combine(
+			"name eq '", name, "' and ", "r_caseTypeToCases_c_caseTypeId eq '",
+			String.valueOf(testrayCaseType.getID()), "' and ",
+			"r_projectToCases_c_projectId eq '",
+			String.valueOf(testrayProject.getID()), "'");
+
+		TestrayServer testrayServer = testrayProject.getTestrayServer();
+
+		try {
+			Set<JSONObject> entityJSONObjects = testrayServer.requestGraphQL(
+				"cases", TestrayCase.FIELD_NAMES, filter, null, 1, 1);
+
+			for (JSONObject entityJSONObject : entityJSONObjects) {
+				return new TestrayCase(testrayProject, entityJSONObject);
+			}
+
+			long start = JenkinsResultsParserUtil.getCurrentTimeMillis();
+
+			JSONObject requestJSONObject = new JSONObject();
+
+			requestJSONObject.put(
+				"name", name
+			).put(
+				"r_caseTypeToCases_c_caseTypeId", testrayCaseType.getID()
+			).put(
+				"r_projectToCases_c_projectId", testrayProject.getID()
+			);
+
+			JSONObject responseJSONObject = new JSONObject(
+				testrayServer.requestPost(
+					"/o/c/cases", requestJSONObject.toString()));
+
+			long end = JenkinsResultsParserUtil.getCurrentTimeMillis();
+
+			System.out.println(
+				JenkinsResultsParserUtil.combine(
+					"Testray Case '", name, "' created in ",
+					JenkinsResultsParserUtil.toDurationString(end - start)));
+
+			return new TestrayCase(testrayProject, responseJSONObject);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	public static TestrayCaseType newTestrayCaseType(

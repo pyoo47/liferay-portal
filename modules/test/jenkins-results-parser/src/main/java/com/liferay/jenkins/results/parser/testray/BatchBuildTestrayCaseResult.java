@@ -267,42 +267,6 @@ public class BatchBuildTestrayCaseResult
 	}
 
 	@Override
-	public TestrayCase getTestrayCase() {
-		TestrayCase testrayCase = super.getTestrayCase();
-
-		if (testrayCase != null) {
-			return testrayCase;
-		}
-
-		String name = getName();
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(name)) {
-			return null;
-		}
-
-		String type = getType();
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(type)) {
-			return null;
-		}
-
-		TestrayServer testrayServer = getTestrayServer();
-
-		TestrayCaseType testrayCaseType =
-			testrayServer.getTestrayCaseTypeByName(type);
-
-		if (testrayCaseType == null) {
-			return null;
-		}
-
-		TestrayBuild testrayBuild = getTestrayBuild();
-
-		TestrayProject testrayProject = testrayBuild.getTestrayProject();
-
-		return testrayProject.getTestrayCase(name, testrayCaseType);
-	}
-
-	@Override
 	public TestrayComponent getTestrayComponent() {
 		TestrayComponent testrayComponent = super.getTestrayComponent();
 
