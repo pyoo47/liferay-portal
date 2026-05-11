@@ -1136,6 +1136,33 @@ public class TestrayImporter {
 		return buildParameters.get(buildParameterName);
 	}
 
+	private String _getEnhancedBatchName(
+		AxisTestClassGroup axisTestClassGroup) {
+
+		if (!(axisTestClassGroup instanceof FunctionalAxisTestClassGroup)) {
+			return axisTestClassGroup.getBatchName();
+		}
+
+		String batchName = axisTestClassGroup.getBatchName();
+
+		FunctionalAxisTestClassGroup functionalAxisTestClassGroup =
+			(FunctionalAxisTestClassGroup)axisTestClassGroup;
+
+		Properties poshiProperties =
+			functionalAxisTestClassGroup.getPoshiProperties();
+
+		String browserChromeVersion = poshiProperties.getProperty(
+			"browser.chrome.version");
+
+		if ((browserChromeVersion != null) &&
+			browserChromeVersion.equals("139.0")) {
+
+			batchName += "-chrome139";
+		}
+
+		return batchName;
+	}
+
 	private Element _getJenkinsBuildDescriptionCodeElement(
 		String title, String name) {
 
@@ -1412,19 +1439,9 @@ public class TestrayImporter {
 		TestrayBuild testrayBuild = getTestrayBuild(
 			axisTestClassGroup.getTestBaseDir());
 
-		TestrayRun testrayRun = null;
-
-		String testSuiteName = _topLevelBuildReport.getTestSuiteName();
-
-		if (axisTestClassGroup instanceof FunctionalAxisTestClassGroup) {
-			testrayRun = TestrayFactory.newTestrayRun(
-				testrayBuild, axisTestClassGroup, job.getJobPropertiesFiles());
-		}
-		else {
-			testrayRun = TestrayFactory.newTestrayRun(
-				testrayBuild, axisTestClassGroup.getBatchName(), testSuiteName,
-				job.getJobPropertiesFiles());
-		}
+		TestrayRun testrayRun = TestrayFactory.newTestrayRun(
+			testrayBuild, _getEnhancedBatchName(axisTestClassGroup),
+			_topLevelBuildReport.getTestSuiteName(), job.getJobProperties());
 
 		long start = JenkinsResultsParserUtil.getCurrentTimeMillis();
 
@@ -1432,15 +1449,7 @@ public class TestrayImporter {
 
 		Element rootElement = document.addElement("testsuite");
 
-		Element environmentsElement = rootElement.addElement("environments");
-
-		for (TestrayRun.Factor factor : testrayRun.getFactors()) {
-			Element environmentElement = environmentsElement.addElement(
-				"environment");
-
-			environmentElement.addAttribute("type", factor.getName());
-			environmentElement.addAttribute("option", factor.getValue());
-		}
+		rootElement.add(testrayRun.getEnvironmentsElement());
 
 		Map<String, String> propertiesMap = new HashMap<>();
 
@@ -1584,6 +1593,8 @@ public class TestrayImporter {
 
 			Element propertiesElement = testcaseElement.addElement(
 				"properties");
+
+			String testSuiteName = _topLevelBuildReport.getTestSuiteName();
 
 			if (testSuiteName.equals("upstream-dxp")) {
 				if (testrayCaseResult instanceof
