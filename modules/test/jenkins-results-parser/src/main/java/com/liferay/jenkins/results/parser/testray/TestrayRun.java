@@ -80,9 +80,13 @@ public class TestrayRun {
 
 			sb.append(category.getID());
 
+			sb.append(':');
+
 			TestrayFactor.Option option = testrayFactor.getOption();
 
 			sb.append(option.getID());
+
+			sb.append('|');
 		}
 
 		String environment = sb.toString();
