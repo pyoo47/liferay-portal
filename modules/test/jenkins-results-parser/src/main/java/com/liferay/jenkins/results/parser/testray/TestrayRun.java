@@ -138,18 +138,13 @@ public class TestrayRun {
 			return _testrayFactors;
 		}
 
-		_testrayFactors = new ArrayList<>();
+		List<TestrayFactor> testrayFactors = _loadTestrayFactorsByRunID();
 
-		String name = getRunIDString();
-
-		for (String optionName : name.split("\\|")) {
-			TestrayFactor.Option testrayFactorOption =
-				TestrayFactory.newTestrayFactorOption(
-					_testrayBuild.getTestrayServer(), optionName);
-
-			_testrayFactors.add(
-				TestrayFactory.newRunTestrayFactor(this, testrayFactorOption));
+		if (testrayFactors == null) {
+			testrayFactors = _loadTestrayFactorsByName();
 		}
+
+		_testrayFactors = testrayFactors;
 
 		return _testrayFactors;
 	}
@@ -411,6 +406,79 @@ public class TestrayRun {
 		}
 
 		return sb.toString();
+	}
+
+	private List<TestrayFactor> _loadTestrayFactorsByName() {
+		List<TestrayFactor> testrayFactors = new ArrayList<>();
+
+		String name = getRunIDString();
+
+		for (String optionName : name.split("\\|")) {
+			TestrayFactor.Option testrayFactorOption =
+				TestrayFactory.newTestrayFactorOption(
+					_testrayBuild.getTestrayServer(), optionName);
+
+			testrayFactors.add(
+				TestrayFactory.newRunTestrayFactor(this, testrayFactorOption));
+		}
+
+		return testrayFactors;
+	}
+
+	private List<TestrayFactor> _loadTestrayFactorsByRunID() {
+		long runID = 0;
+
+		if (_id != null) {
+			runID = _id;
+		}
+		else if (_jsonObject != null) {
+			runID = _jsonObject.optLong("id");
+		}
+
+		if (runID <= 0) {
+			return null;
+		}
+
+		String filter = "r_runToFactors_c_runId eq '" + runID + "'";
+
+		try {
+			JSONObject responseJSONObject = new JSONObject(
+				_testrayBuild.getTestrayServer().requestGet(
+					"/o/c/factors?filter=" +
+						URLEncoder.encode(filter, "UTF-8")));
+
+			JSONArray itemsJSONArray = responseJSONObject.optJSONArray("items");
+
+			if ((itemsJSONArray == null) || itemsJSONArray.isEmpty()) {
+				return null;
+			}
+
+			List<TestrayFactor> testrayFactors = new ArrayList<>();
+
+			for (int i = 0; i < itemsJSONArray.length(); i++) {
+				JSONObject factorJSONObject = itemsJSONArray.getJSONObject(i);
+
+				JSONObject optionJSONObject = factorJSONObject.optJSONObject(
+					"factorOptionToFactors");
+
+				if (optionJSONObject == null) {
+					continue;
+				}
+
+				TestrayFactor.Option testrayFactorOption =
+					TestrayFactory.newTestrayFactorOption(
+						_testrayBuild.getTestrayServer(), optionJSONObject);
+
+				testrayFactors.add(
+					TestrayFactory.newRunTestrayFactor(
+						this, testrayFactorOption));
+			}
+
+			return testrayFactors;
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	private synchronized int _getNextRunNumber() {
