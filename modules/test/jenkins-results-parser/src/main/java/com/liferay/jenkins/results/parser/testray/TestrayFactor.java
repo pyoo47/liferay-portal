@@ -164,7 +164,7 @@ public interface TestrayFactor {
 		}
 
 		public Long getID() {
-			if (_cached || (_id <= 0)) {
+			if (_cached || (_id > 0)) {
 				return _id;
 			}
 
@@ -174,7 +174,7 @@ public interface TestrayFactor {
 				return _id;
 			}
 
-			_id = jsonObject.optLong("id");
+			_id = jsonObject.getLong("id");
 
 			return _id;
 		}
@@ -190,7 +190,7 @@ public interface TestrayFactor {
 				return _name;
 			}
 
-			_name = jsonObject.optString("name");
+			_name = jsonObject.getString("name");
 
 			return _name;
 		}
