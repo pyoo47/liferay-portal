@@ -185,7 +185,8 @@ public class TestrayRun {
 
 		final String filter = JenkinsResultsParserUtil.combine(
 			"environmentHash eq '", getEnvironmentHash(), "' and name eq '",
-			getRunIDString(), "' and r_buildToRuns_c_buildId eq '",
+			TestrayServer.escapeFilterValue(getRunIDString()),
+			"' and r_buildToRuns_c_buildId eq '",
 			String.valueOf(testrayBuild.getID()), "'");
 
 		Retryable<JSONObject> retryable = new Retryable<JSONObject>(
@@ -408,6 +409,26 @@ public class TestrayRun {
 		return sb.toString();
 	}
 
+	private synchronized int _getNextRunNumber() {
+		TestrayBuild testrayBuild = getTestrayBuild();
+
+		String filter =
+			"r_buildToRuns_c_buildId eq '" + testrayBuild.getID() + "'";
+
+		try {
+			TestrayServer testrayServer = getTestrayServer();
+
+			JSONObject jsonObject = new JSONObject(
+				testrayServer.requestGet(
+					"/o/c/runs?filter=" + URLEncoder.encode(filter, "UTF-8")));
+
+			return jsonObject.optInt("totalCount") + 1;
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+	}
+
 	private List<TestrayFactor> _loadTestrayFactorsByName() {
 		List<TestrayFactor> testrayFactors = new ArrayList<>();
 
@@ -443,9 +464,10 @@ public class TestrayRun {
 
 		try {
 			JSONObject responseJSONObject = new JSONObject(
-				_testrayBuild.getTestrayServer().requestGet(
-					"/o/c/factors?filter=" +
-						URLEncoder.encode(filter, "UTF-8")));
+				_testrayBuild.getTestrayServer(
+				).requestGet(
+					"/o/c/factors?filter=" + URLEncoder.encode(filter, "UTF-8")
+				));
 
 			JSONArray itemsJSONArray = responseJSONObject.optJSONArray("items");
 
@@ -475,26 +497,6 @@ public class TestrayRun {
 			}
 
 			return testrayFactors;
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
-	}
-
-	private synchronized int _getNextRunNumber() {
-		TestrayBuild testrayBuild = getTestrayBuild();
-
-		String filter =
-			"r_buildToRuns_c_buildId eq '" + testrayBuild.getID() + "'";
-
-		try {
-			TestrayServer testrayServer = getTestrayServer();
-
-			JSONObject jsonObject = new JSONObject(
-				testrayServer.requestGet(
-					"/o/c/runs?filter=" + URLEncoder.encode(filter, "UTF-8")));
-
-			return jsonObject.optInt("totalCount") + 1;
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);

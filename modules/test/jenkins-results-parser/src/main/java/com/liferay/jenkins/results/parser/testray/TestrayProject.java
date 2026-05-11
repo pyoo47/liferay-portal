@@ -186,8 +186,15 @@ public class TestrayProject {
 				return testrayComponent;
 			}
 
+			String escapedComponentName = TestrayServer.escapeFilterValue(
+				componentName);
+
+			if (escapedComponentName == null) {
+				return null;
+			}
+
 			String filter = JenkinsResultsParserUtil.combine(
-				"name eq '", componentName,
+				"name eq '", escapedComponentName,
 				"' and r_projectToComponents_c_projectId eq '",
 				String.valueOf(getID()), "'");
 
