@@ -496,6 +496,10 @@ public class TestrayRun {
 						this, testrayFactorOption));
 			}
 
+			if (testrayFactors.isEmpty()) {
+				return null;
+			}
+
 			return testrayFactors;
 		}
 		catch (IOException ioException) {
