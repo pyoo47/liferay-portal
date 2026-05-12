@@ -143,7 +143,7 @@ public class TestrayServer {
 				throw new RuntimeException(ioException);
 			}
 
-			return _testrayCaseTypesID.get(testrayCaseTypeID);
+			return testrayCaseType;
 		}
 	}
 
@@ -188,7 +188,7 @@ public class TestrayServer {
 				throw new RuntimeException(ioException);
 			}
 
-			return _testrayCaseTypesName.get(testrayCaseTypeName);
+			return testrayCaseType;
 		}
 	}
 
