@@ -207,11 +207,11 @@ public class TestrayCaseResult {
 			return _testrayCase;
 		}
 
-		if (_resolvingTestrayCase) {
+		if (_testrayCaseCached) {
 			return null;
 		}
 
-		_resolvingTestrayCase = true;
+		_testrayCaseCached = true;
 
 		try {
 			if (_jsonObject != null) {
@@ -233,7 +233,7 @@ public class TestrayCaseResult {
 			return _testrayCase;
 		}
 		finally {
-			_resolvingTestrayCase = false;
+			_testrayCaseCached = false;
 		}
 	}
 
@@ -300,11 +300,11 @@ public class TestrayCaseResult {
 			return _testrayComponent;
 		}
 
-		if (_resolvingTestrayComponent) {
+		if (_testrayComponentCached) {
 			return null;
 		}
 
-		_resolvingTestrayComponent = true;
+		_testrayComponentCached = true;
 
 		try {
 			TestrayBuild testrayBuild = getTestrayBuild();
@@ -334,7 +334,7 @@ public class TestrayCaseResult {
 			return _testrayComponent;
 		}
 		finally {
-			_resolvingTestrayComponent = false;
+			_testrayComponentCached = false;
 		}
 	}
 
@@ -802,12 +802,12 @@ public class TestrayCaseResult {
 	private ErrorType _errorType;
 	private final JSONObject _jsonObject;
 	private TestrayCaseResult _parentTestrayCaseResult;
-	private boolean _resolvingTestrayCase;
-	private boolean _resolvingTestrayComponent;
 	private TestrayBuild _testrayBuild;
 	private TestrayCase _testrayCase;
+	private boolean _testrayCaseCached;
 	private URL _testrayCaseResultURL;
 	private TestrayComponent _testrayComponent;
+	private boolean _testrayComponentCached;
 	private TestrayRun _testrayRun;
 	private final TestrayServer _testrayServer;
 	private TestrayTeam _testrayTeam;

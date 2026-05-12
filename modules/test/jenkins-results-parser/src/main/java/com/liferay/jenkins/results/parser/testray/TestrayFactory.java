@@ -283,13 +283,13 @@ public class TestrayFactory {
 	}
 
 	public static TestrayBuild newTestrayBuild(URL url) {
-		long id = TestrayBuild.getID(url);
-
-		if (id <= 0) {
-			return new TestrayBuild(url);
-		}
-
 		synchronized (_testrayBuilds) {
+			long id = TestrayBuild.getID(url);
+
+			if (id <= 0) {
+				return new TestrayBuild(url);
+			}
+
 			TestrayBuild testrayBuild = _testrayBuilds.get(id);
 
 			if (testrayBuild != null) {
@@ -632,17 +632,15 @@ public class TestrayFactory {
 		TestrayBuild testrayBuild, String batchName, String testSuiteName,
 		Properties properties) {
 
-		String name = TestrayRun.getRunIDString(
-			batchName, testSuiteName, properties);
-
-		if (name == null) {
-			throw new RuntimeException(
-				"Unable to resolve Testray run name; check that " +
-					"testray.environment.default[master] is set or that " +
-						"factor properties are present");
-		}
-
 		synchronized (_testrayRuns) {
+			String name = TestrayRun.getRunIDString(
+				batchName, testSuiteName, properties);
+
+			if (name == null) {
+				throw new RuntimeException(
+					"Please set testray.environment.default[master]");
+			}
+
 			String key = testrayBuild.getID() + "__" + name;
 
 			TestrayRun testrayRun = _testrayRuns.get(key);
