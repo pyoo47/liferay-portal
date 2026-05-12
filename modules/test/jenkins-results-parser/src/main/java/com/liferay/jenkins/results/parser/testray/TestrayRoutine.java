@@ -117,16 +117,14 @@ public class TestrayRoutine {
 	}
 
 	public TestrayBuild getTestrayBuildByName(String buildName) {
-		String escapedBuildName = TestrayServer.escapeFilterValue(buildName);
-
-		if (escapedBuildName == null) {
+		if (JenkinsResultsParserUtil.isNullOrEmpty(buildName)) {
 			return null;
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("name eq '");
-		sb.append(escapedBuildName);
+		sb.append(buildName);
 		sb.append("'");
 
 		TestrayProject testrayProject = getTestrayProject();

@@ -183,8 +183,7 @@ public class TestrayRun {
 
 		final String filter = JenkinsResultsParserUtil.combine(
 			"environmentHash eq '", getEnvironmentHash(), "' and name eq '",
-			TestrayServer.escapeFilterValue(getRunIDString()),
-			"' and r_buildToRuns_c_buildId eq '",
+			getRunIDString(), "' and r_buildToRuns_c_buildId eq '",
 			String.valueOf(testrayBuild.getID()), "'");
 
 		Retryable<JSONObject> retryable = new Retryable<JSONObject>(

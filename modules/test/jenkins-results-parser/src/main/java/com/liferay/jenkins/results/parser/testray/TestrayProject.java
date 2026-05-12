@@ -179,6 +179,10 @@ public class TestrayProject {
 
 	public TestrayComponent getTestrayComponentByName(String componentName) {
 		synchronized (_testrayComponentsID) {
+			if (JenkinsResultsParserUtil.isNullOrEmpty(componentName)) {
+				return null;
+			}
+
 			TestrayComponent testrayComponent = _testrayComponentsName.get(
 				componentName);
 
@@ -186,15 +190,8 @@ public class TestrayProject {
 				return testrayComponent;
 			}
 
-			String escapedComponentName = TestrayServer.escapeFilterValue(
-				componentName);
-
-			if (escapedComponentName == null) {
-				return null;
-			}
-
 			String filter = JenkinsResultsParserUtil.combine(
-				"name eq '", escapedComponentName,
+				"name eq '", componentName,
 				"' and r_projectToComponents_c_projectId eq '",
 				String.valueOf(getID()), "'");
 

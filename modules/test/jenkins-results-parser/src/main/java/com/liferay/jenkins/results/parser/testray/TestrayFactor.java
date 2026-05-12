@@ -99,8 +99,7 @@ public interface TestrayFactor {
 				filter = "id eq '" + _id + "'";
 			}
 			else if (!JenkinsResultsParserUtil.isNullOrEmpty(_name)) {
-				filter =
-					"name eq '" + TestrayServer.escapeFilterValue(_name) + "'";
+				filter = "name eq '" + _name + "'";
 			}
 
 			if (filter == null) {
@@ -228,8 +227,7 @@ public interface TestrayFactor {
 				filter = "id eq '" + _id + "'";
 			}
 			else if (!JenkinsResultsParserUtil.isNullOrEmpty(_name)) {
-				filter =
-					"name eq '" + TestrayServer.escapeFilterValue(_name) + "'";
+				filter = "name eq '" + _name + "'";
 			}
 
 			if (filter == null) {

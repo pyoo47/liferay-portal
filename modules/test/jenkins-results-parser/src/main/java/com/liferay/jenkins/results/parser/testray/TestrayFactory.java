@@ -314,15 +314,12 @@ public class TestrayFactory {
 		final TestrayProject testrayProject, final String name,
 		final TestrayCaseType testrayCaseType) {
 
-		String escapedName = TestrayServer.escapeFilterValue(name);
-
-		if (escapedName == null) {
+		if (JenkinsResultsParserUtil.isNullOrEmpty(name)) {
 			return null;
 		}
 
 		final String filter = JenkinsResultsParserUtil.combine(
-			"name eq '", escapedName, "' and ",
-			"r_caseTypeToCases_c_caseTypeId eq '",
+			"name eq '", name, "' and ", "r_caseTypeToCases_c_caseTypeId eq '",
 			String.valueOf(testrayCaseType.getID()), "' and ",
 			"r_projectToCases_c_projectId eq '",
 			String.valueOf(testrayProject.getID()), "'");

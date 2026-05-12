@@ -151,6 +151,10 @@ public class TestrayServer {
 		String testrayCaseTypeName) {
 
 		synchronized (_testrayCaseTypesID) {
+			if (JenkinsResultsParserUtil.isNullOrEmpty(testrayCaseTypeName)) {
+				return null;
+			}
+
 			TestrayCaseType testrayCaseType = _testrayCaseTypesName.get(
 				testrayCaseTypeName);
 
@@ -158,17 +162,10 @@ public class TestrayServer {
 				return testrayCaseType;
 			}
 
-			String escapedTestrayCaseTypeName = escapeFilterValue(
-				testrayCaseTypeName);
-
-			if (escapedTestrayCaseTypeName == null) {
-				return null;
-			}
-
 			try {
 				Set<JSONObject> entityJSONObjects = requestGraphQL(
 					"caseTypes", TestrayCaseType.FIELD_NAMES,
-					"name eq '" + escapedTestrayCaseTypeName + "'", null, 1, 1);
+					"name eq '" + testrayCaseTypeName + "'", null, 1, 1);
 
 				if (entityJSONObjects.isEmpty()) {
 					return null;
@@ -377,14 +374,6 @@ public class TestrayServer {
 		}
 		catch (IOException ioException) {
 		}
-	}
-
-	protected static String escapeFilterValue(String value) {
-		if (value == null) {
-			return null;
-		}
-
-		return value.replace("'", "''");
 	}
 
 	protected TestrayServer(String urlString) {
