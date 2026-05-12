@@ -407,6 +407,10 @@ public class TestrayCaseResult {
 		_parentTestrayCaseResult = parentTestrayCaseResult;
 	}
 
+	public void setTestrayComponent(TestrayComponent testrayComponent) {
+		_testrayComponent = testrayComponent;
+	}
+
 	public void setTestrayRun(TestrayRun testrayRun) {
 		_testrayRun = testrayRun;
 	}

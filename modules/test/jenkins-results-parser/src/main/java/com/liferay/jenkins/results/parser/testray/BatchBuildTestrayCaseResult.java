@@ -288,7 +288,12 @@ public class BatchBuildTestrayCaseResult
 
 		TestrayProject testrayProject = testrayBuild.getTestrayProject();
 
-		return testrayProject.getTestrayComponentByName(componentName);
+		testrayComponent = testrayProject.getTestrayComponentByName(
+			componentName);
+
+		setTestrayComponent(testrayComponent);
+
+		return testrayComponent;
 	}
 
 	@Override
