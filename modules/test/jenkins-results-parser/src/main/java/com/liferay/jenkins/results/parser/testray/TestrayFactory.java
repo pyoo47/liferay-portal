@@ -632,10 +632,17 @@ public class TestrayFactory {
 		TestrayBuild testrayBuild, String batchName, String testSuiteName,
 		Properties properties) {
 
-		synchronized (_testrayRuns) {
-			String name = TestrayRun.getRunIDString(
-				batchName, testSuiteName, properties);
+		String name = TestrayRun.getRunIDString(
+			batchName, testSuiteName, properties);
 
+		if (name == null) {
+			throw new RuntimeException(
+				"Unable to resolve Testray run name; check that " +
+					"testray.environment.default[master] is set or that " +
+						"factor properties are present");
+		}
+
+		synchronized (_testrayRuns) {
 			String key = testrayBuild.getID() + "__" + name;
 
 			TestrayRun testrayRun = _testrayRuns.get(key);
