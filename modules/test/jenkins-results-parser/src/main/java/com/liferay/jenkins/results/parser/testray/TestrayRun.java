@@ -134,13 +134,15 @@ public class TestrayRun {
 			return _testrayFactors;
 		}
 
-		List<TestrayFactor> testrayFactors = _loadTestrayFactorsByRunID();
+		_testrayFactors = new ArrayList<>();
+
+		List<TestrayFactor> testrayFactors = _getTestrayFactorsByRunID();
 
 		if (testrayFactors == null) {
-			testrayFactors = _loadTestrayFactorsByName();
+			testrayFactors = _getTestrayFactorsByName();
 		}
 
-		_testrayFactors = testrayFactors;
+		_testrayFactors.addAll(testrayFactors);
 
 		return _testrayFactors;
 	}
@@ -425,7 +427,7 @@ public class TestrayRun {
 		}
 	}
 
-	private List<TestrayFactor> _loadTestrayFactorsByName() {
+	private List<TestrayFactor> _getTestrayFactorsByName() {
 		List<TestrayFactor> testrayFactors = new ArrayList<>();
 
 		String name = getRunIDString();
@@ -442,7 +444,7 @@ public class TestrayRun {
 		return testrayFactors;
 	}
 
-	private List<TestrayFactor> _loadTestrayFactorsByRunID() {
+	private List<TestrayFactor> _getTestrayFactorsByRunID() {
 		long runID = 0;
 
 		if (_id != null) {
