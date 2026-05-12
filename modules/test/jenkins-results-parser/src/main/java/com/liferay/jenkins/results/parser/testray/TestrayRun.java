@@ -466,7 +466,8 @@ public class TestrayRun {
 			JSONObject responseJSONObject = new JSONObject(
 				_testrayBuild.getTestrayServer(
 				).requestGet(
-					"/o/c/factors?filter=" + URLEncoder.encode(filter, "UTF-8")
+					"/o/c/factors?filter=" +
+						URLEncoder.encode(filter, "UTF-8") + "&pageSize=100"
 				));
 
 			JSONArray itemsJSONArray = responseJSONObject.optJSONArray("items");
