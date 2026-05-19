@@ -108,7 +108,9 @@ public class FileUtil {
 
 		boolean tryLocalNetwork = false;
 
-		if (System.getenv("JENKINS_HOME") != null) {
+		if ((System.getenv("JENKINS_URL") != null) ||
+			(System.getenv("MASTER_NETWORK_NAME") != null)) {
+
 			tryLocalNetwork = true;
 		}
 
