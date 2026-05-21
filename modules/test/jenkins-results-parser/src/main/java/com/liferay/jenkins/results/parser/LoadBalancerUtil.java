@@ -75,11 +75,24 @@ public class LoadBalancerUtil {
 	}
 
 	public static String getMostAvailableMasterURL(Properties properties) {
-		return getMostAvailableMasterURL(properties, true);
+		return getMostAvailableMasterURL(null, properties, true);
 	}
 
 	public static String getMostAvailableMasterURL(
 		Properties properties, boolean verbose) {
+
+		return getMostAvailableMasterURL(null, properties, verbose);
+	}
+
+	public static String getMostAvailableMasterURL(
+			String... overridePropertiesArray)
+		throws Exception {
+
+		return getMostAvailableMasterURL(null, overridePropertiesArray, true);
+	}
+
+	public static String getMostAvailableMasterURL(
+		String scopeKey, Properties properties, boolean verbose) {
 
 		String baseInvocationURL = JenkinsResultsParserUtil.getProperty(
 			properties, "base.invocation.url");
@@ -100,8 +113,10 @@ public class LoadBalancerUtil {
 			return null;
 		}
 
+		String counterKey = _toCounterKey(scopeKey, masterPrefix);
+
 		AtomicInteger counter = _roundRobinCounters.computeIfAbsent(
-			masterPrefix, key -> new AtomicInteger());
+			counterKey, key -> new AtomicInteger());
 
 		int index = Math.floorMod(
 			counter.getAndIncrement(), eligibleJenkinsMasters.size());
@@ -115,21 +130,14 @@ public class LoadBalancerUtil {
 			sb.append(selectedJenkinsMaster.getName());
 			sb.append(" via round-robin (");
 			sb.append(eligibleJenkinsMasters.size());
-			sb.append(" eligible masters under prefix ");
-			sb.append(masterPrefix);
+			sb.append(" eligible masters under counter key ");
+			sb.append(counterKey);
 			sb.append(")");
 
 			System.out.println(sb.toString());
 		}
 
 		return "http://" + selectedJenkinsMaster.getName();
-	}
-
-	public static String getMostAvailableMasterURL(
-			String... overridePropertiesArray)
-		throws Exception {
-
-		return getMostAvailableMasterURL(null, overridePropertiesArray, true);
 	}
 
 	public static String getMostAvailableMasterURL(
@@ -217,6 +225,14 @@ public class LoadBalancerUtil {
 		}
 
 		return blacklist;
+	}
+
+	private static String _toCounterKey(String scopeKey, String masterPrefix) {
+		if ((scopeKey == null) || scopeKey.isEmpty()) {
+			return masterPrefix;
+		}
+
+		return scopeKey + ":" + masterPrefix;
 	}
 
 	private static final Map<String, List<JenkinsMaster>> _jenkinsMastersMap =
