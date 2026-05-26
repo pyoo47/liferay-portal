@@ -9,10 +9,15 @@ clean {
 
 dependencies {
 	compileOnly group: "org.apache.ant", name: "ant", transitive: false, version: "1.10.14"
+	testImplementation group: "org.apache.ant", name: "ant", transitive: false, version: "1.10.14"
 }
 
 liferay {
 	deployDir = file("../../../lib/development")
+}
+
+test {
+	jvmArgs "--add-opens", "java.base/java.util=ALL-UNNAMED"
 }
 
 updateFileVersions {
