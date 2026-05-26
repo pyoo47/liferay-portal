@@ -224,7 +224,7 @@ describe('ActivityStreamTimeline rendering', () => {
 	it('renders the empty data state when hasQuery=false and no sessions', () => {
 		const {getByText} = render(<ActivityStreamTimeline {...baseProps} />);
 
-		expect(getByText('There is no data found.')).toBeInTheDocument();
+		expect(getByText('Conflict test marker for LRCI-7477.')).toBeInTheDocument();
 	});
 
 	it('renders a known user with the user icon', () => {
