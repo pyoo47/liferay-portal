@@ -51,6 +51,9 @@ public class AssetAnalyticsAttributesProviderTest {
 
 	@After
 	public void tearDown() {
+
+		// Release the mocked statics and the mocked construction.
+
 		_featureFlagManagerUtilMockedStatic.close();
 		_objectDefinitionLocalServiceUtilMockedStatic.close();
 		_snapshotMockedConstruction.close();
