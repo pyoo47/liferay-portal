@@ -278,29 +278,6 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		return new ArrayList<>(_buildURLs);
 	}
 
-	public List<DefaultBuild> getDefaultBuilds() {
-		List<String> buildURLs = getBuildURLs();
-
-		List<DefaultBuild> oldDefaultBuilds = new ArrayList<>();
-
-		for (DefaultBuild defaultBuild : _defaultBuilds) {
-			if (!buildURLs.contains(defaultBuild.getBuildURL())) {
-				oldDefaultBuilds.add(defaultBuild);
-			}
-			else {
-				buildURLs.remove(defaultBuild.getBuildURL());
-			}
-		}
-
-		_defaultBuilds.removeAll(oldDefaultBuilds);
-
-		for (String buildURL : buildURLs) {
-			_defaultBuilds.add(BuildFactory.newDefaultBuild(buildURL));
-		}
-
-		return _defaultBuilds;
-	}
-
 	public Map<String, String> getGlobalEnvironmentVariables() {
 		if (_globalEnvironmentVariables != null) {
 			return _globalEnvironmentVariables;
@@ -1637,7 +1614,6 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		new HashMap<>();
 	private final Map<String, Long> _buildsUpdateTimes = new HashMap<>();
 	private final List<String> _buildURLs = new CopyOnWriteArrayList<>();
-	private final List<DefaultBuild> _defaultBuilds = new ArrayList<>();
 	private Map<String, String> _globalEnvironmentVariables;
 	private boolean _idle;
 	private JenkinsCohort _jenkinsCohort;

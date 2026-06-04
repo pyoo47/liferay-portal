@@ -38,10 +38,6 @@ public class PushEventPayload extends Payload {
 		return get("after");
 	}
 
-	public String getBeforeSHA() {
-		return get("before");
-	}
-
 	public GitHubRemoteGitCommit getHeadGitHubRemoteGitCommit() {
 		if (headGitHubRemoteGitCommit == null) {
 			headGitHubRemoteGitCommit =
