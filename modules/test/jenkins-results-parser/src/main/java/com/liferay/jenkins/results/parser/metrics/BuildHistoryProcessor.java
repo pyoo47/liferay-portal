@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,12 +50,6 @@ public class BuildHistoryProcessor {
 		return _mergeBuildHistories(new ArrayList<>(buildHistories), name);
 	}
 
-	public static BuildHistory mergeBuildHistories(
-		String name, BuildHistory... buildHistories) {
-
-		return _mergeBuildHistories(Arrays.asList(buildHistories), name);
-	}
-
 	public static Collection<BuildHistory> newAggregateJobHistories(
 		long duration, long startTime) {
 
@@ -71,27 +64,6 @@ public class BuildHistoryProcessor {
 					_addToBuildHistoriesMap(
 						buildJSONObjects, buildHistories, duration,
 						new GroupByCategory(), startTime);
-				}
-
-			};
-
-		return _getBuildHistories(biConsumer, duration, null, null, startTime);
-	}
-
-	public static Collection<BuildHistory> newDefaultJobHistories(
-		long duration, long startTime) {
-
-		BiConsumer<Set<BuildJSONObject>, Map<String, BuildHistory>> biConsumer =
-			new BiConsumer<Set<BuildJSONObject>, Map<String, BuildHistory>>() {
-
-				@Override
-				public void accept(
-					Set<BuildJSONObject> buildJSONObjects,
-					Map<String, BuildHistory> buildHistories) {
-
-					_addToBuildHistoriesMap(
-						buildJSONObjects, buildHistories, duration,
-						new GroupByJobName(), startTime);
 				}
 
 			};

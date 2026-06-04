@@ -21,13 +21,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.dom4j.Text;
 import org.dom4j.XPath;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.OutputFormat;
@@ -255,7 +253,7 @@ public class Dom4JUtil {
 
 		elements.add(targetElementIndex + 1, newElement);
 
-		setElements(parentElement, elements);
+		_setElements(parentElement, elements);
 	}
 
 	public static void insertElementBefore(
@@ -282,7 +280,7 @@ public class Dom4JUtil {
 
 		elements.add(targetElementIndex, newElement);
 
-		setElements(parentElement, elements);
+		_setElements(parentElement, elements);
 	}
 
 	public static Document parse(String xml) throws DocumentException {
@@ -339,54 +337,6 @@ public class Dom4JUtil {
 
 				throw new RuntimeException(exception2);
 			}
-		}
-	}
-
-	public static void replace(
-		Element element, boolean cascade, String replacementText,
-		String targetText) {
-
-		for (Attribute attribute : element.attributes()) {
-			String text = attribute.getValue();
-
-			attribute.setValue(text.replace(targetText, replacementText));
-		}
-
-		Iterator<? extends Node> nodeIterator = element.nodeIterator();
-
-		while (nodeIterator.hasNext()) {
-			Node node = nodeIterator.next();
-
-			if (node instanceof Text) {
-				Text textNode = (Text)node;
-
-				String text = textNode.getText();
-
-				if (text.contains(targetText)) {
-					text = text.replace(targetText, replacementText);
-
-					textNode.setText(text);
-				}
-			}
-			else if ((node instanceof Element) && cascade) {
-				replace((Element)node, cascade, replacementText, targetText);
-			}
-		}
-	}
-
-	public static void setElements(
-		Element parentElement, List<Element> elements) {
-
-		if (parentElement == null) {
-			throw new IllegalArgumentException("Parent is null");
-		}
-
-		for (Element element : parentElement.elements()) {
-			parentElement.remove(element);
-		}
-
-		for (Element element : elements) {
-			parentElement.add(element);
 		}
 	}
 
@@ -489,6 +439,22 @@ public class Dom4JUtil {
 		sb.append(path);
 
 		return JenkinsResultsParserUtil.toJSONObject(sb.toString());
+	}
+
+	private static void _setElements(
+		Element parentElement, List<Element> elements) {
+
+		if (parentElement == null) {
+			throw new IllegalArgumentException("Parent is null");
+		}
+
+		for (Element element : parentElement.elements()) {
+			parentElement.remove(element);
+		}
+
+		for (Element element : elements) {
+			parentElement.add(element);
+		}
 	}
 
 	private static String _entities;

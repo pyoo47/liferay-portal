@@ -403,14 +403,6 @@ public class GitHubWebhookPayloadProcessor {
 		}
 	}
 
-	public void removeTestPullRequestQueryString(String queryString) {
-		_testPullRequestQueryStrings.remove(queryString);
-	}
-
-	public void removeTestPullRequestURL(String url) {
-		_testPullRequestURLs.remove(url);
-	}
-
 	protected void commentMergeSubrepoPullRequest(PullRequest pullRequest) {
 		try {
 			String currentSHA = "";

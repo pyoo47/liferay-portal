@@ -31,35 +31,6 @@ import org.json.JSONObject;
  */
 public class BuildArchiverUtil {
 
-	public static void archive(
-		String startDateString, String endDateString, String outputDirPath) {
-
-		try {
-			String groovyScript = JenkinsResultsParserUtil.readInputStream(
-				JenkinsResultsParserUtil.class.getResourceAsStream(
-					"dependencies/get-build-data.groovy"));
-
-			groovyScript = groovyScript.replaceFirst(
-				"new Date\\(\\)",
-				"Date.parse(\"yyyyMMdd hh:mm:ss\", \"" + endDateString +
-					" 00:00:00\")");
-			groovyScript = groovyScript.replaceFirst(
-				"startDate\\.format\\(\"yyyyMMdd\"\\) \\+ \"",
-				"\"" + startDateString);
-
-			System.out.println(groovyScript);
-
-			_recordGroovyScriptResponses(
-				JenkinsResultsParserUtil.getJenkinsMasters(
-					_buildProperties, 12, 2, "test-1"),
-				groovyScript, new File(outputDirPath));
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(
-				"Unable to get get-build-data.groovy", ioException);
-		}
-	}
-
 	public static void archiveOneDay(String startDateString) {
 		String outputDirPath = null;
 
@@ -100,7 +71,7 @@ public class BuildArchiverUtil {
 		String endDateString = localDateTime.format(
 			DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-		archive(
+		_archive(
 			startDateString, endDateString,
 			outputDirPath + "/" + startDateString + "/");
 	}
@@ -119,6 +90,35 @@ public class BuildArchiverUtil {
 		}
 
 		return true;
+	}
+
+	private static void _archive(
+		String startDateString, String endDateString, String outputDirPath) {
+
+		try {
+			String groovyScript = JenkinsResultsParserUtil.readInputStream(
+				JenkinsResultsParserUtil.class.getResourceAsStream(
+					"dependencies/get-build-data.groovy"));
+
+			groovyScript = groovyScript.replaceFirst(
+				"new Date\\(\\)",
+				"Date.parse(\"yyyyMMdd hh:mm:ss\", \"" + endDateString +
+					" 00:00:00\")");
+			groovyScript = groovyScript.replaceFirst(
+				"startDate\\.format\\(\"yyyyMMdd\"\\) \\+ \"",
+				"\"" + startDateString);
+
+			System.out.println(groovyScript);
+
+			_recordGroovyScriptResponses(
+				JenkinsResultsParserUtil.getJenkinsMasters(
+					_buildProperties, 12, 2, "test-1"),
+				groovyScript, new File(outputDirPath));
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(
+				"Unable to get get-build-data.groovy", ioException);
+		}
 	}
 
 	private static Boolean _call(

@@ -94,10 +94,6 @@ public class ParallelExecutor<T> {
 		return true;
 	}
 
-	public void shutdownNow() {
-		_executorService.shutdownNow();
-	}
-
 	public synchronized void start() {
 		_taskRunnable = new TaskRunnable<>(_callables, this);
 

@@ -35,14 +35,6 @@ public class MultiPattern {
 		return null;
 	}
 
-	public int getSize() {
-		return _patterns.size();
-	}
-
-	public int indexOf(Pattern pattern) {
-		return _patterns.indexOf(pattern);
-	}
-
 	public Matcher matches(String input) {
 		for (Pattern pattern : _patterns) {
 			Matcher matcher = pattern.matcher(input);
