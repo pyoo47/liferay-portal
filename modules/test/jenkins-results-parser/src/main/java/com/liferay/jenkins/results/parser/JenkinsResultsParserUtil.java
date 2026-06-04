@@ -191,22 +191,6 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
-	public static void cancelQueuedItem(
-		long itemID, JenkinsMaster jenkinsMaster) {
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("def queue = Jenkins.instance.queue;\n");
-
-		sb.append("def items = queue.items.findAll{it.getId() == ");
-		sb.append(itemID);
-		sb.append("};\n");
-
-		sb.append("queue.cancel(items[0]);");
-
-		executeJenkinsScript(jenkinsMaster.getName(), sb.toString());
-	}
-
 	public static void clearCache() {
 		File cacheDirectory = new File(
 			System.getProperty("java.io.tmpdir"), "jenkins-cached-files");
@@ -2047,24 +2031,6 @@ public class JenkinsResultsParserUtil {
 		return targetGitDirectoryName;
 	}
 
-	public static String getGitHubAPIRateLimitStatusMessage() {
-		try {
-			JSONObject jsonObject = toJSONObject(
-				"https://api.github.com/rate_limit");
-
-			jsonObject = jsonObject.getJSONObject("rate");
-
-			return _getGitHubAPIRateLimitStatusMessage(
-				jsonObject.getInt("limit"), jsonObject.getInt("remaining"),
-				jsonObject.getLong("reset"));
-		}
-		catch (Exception exception) {
-			System.out.println("Unable to get GitHub API rate limit");
-		}
-
-		return "";
-	}
-
 	public static String getGitHubApiSearchUrl(List<String> filters) {
 		return combine(
 			"https://api.github.com/search/issues?q=", join("+", filters));
@@ -2195,35 +2161,6 @@ public class JenkinsResultsParserUtil {
 		return globs.toArray(new String[0]);
 	}
 
-	public static String getHeadersString(URLConnection urlConnection) {
-		Map<String, List<String>> headersMap = urlConnection.getHeaderFields();
-
-		StringBuilder sb = new StringBuilder();
-
-		for (Map.Entry<String, List<String>> entry : headersMap.entrySet()) {
-			sb.append(entry.getKey());
-			sb.append(": ");
-
-			sb.append(join(", ", entry.getValue()));
-			sb.append("\n");
-		}
-
-		sb.append("\n");
-
-		return sb.toString();
-	}
-
-	public static String getHostIPAddress() {
-		try {
-			InetAddress inetAddress = InetAddress.getLocalHost();
-
-			return inetAddress.getHostAddress();
-		}
-		catch (UnknownHostException unknownHostException) {
-			return "127.0.0.1";
-		}
-	}
-
 	public static String getHostName(String defaultHostName) {
 		try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
@@ -2311,53 +2248,6 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return includedFiles;
-	}
-
-	public static List<URL> getIncludedResourceURLs(
-			String[] resourceIncludesRelativeGlobs, File rootDir)
-		throws IOException {
-
-		final List<PathMatcher> pathMatchers = toPathMatchers(
-			getCanonicalPath(rootDir) + File.separator,
-			resourceIncludesRelativeGlobs);
-
-		Path rootDirPath = rootDir.toPath();
-
-		if (!Files.exists(rootDirPath)) {
-			System.out.println(
-				combine(
-					"Directory ", rootDirPath.toString(), " does not exist."));
-
-			return Collections.emptyList();
-		}
-
-		final List<URL> includedResourceURLs = new ArrayList<>();
-
-		Files.walkFileTree(
-			rootDirPath,
-			new SimpleFileVisitor<Path>() {
-
-				@Override
-				public FileVisitResult visitFile(
-						Path filePath, BasicFileAttributes basicFileAttributes)
-					throws IOException {
-
-					for (PathMatcher pathMatcher : pathMatchers) {
-						if (pathMatcher.matches(filePath)) {
-							URI uri = filePath.toUri();
-
-							includedResourceURLs.add(uri.toURL());
-
-							break;
-						}
-					}
-
-					return FileVisitResult.CONTINUE;
-				}
-
-			});
-
-		return includedResourceURLs;
 	}
 
 	public static float getJavaVersionNumber() {
@@ -3228,37 +3118,6 @@ public class JenkinsResultsParserUtil {
 		return getRandomString(gitHubDevNodeHostnames);
 	}
 
-	public static List<String> getRandomList(List<String> list, int size) {
-		if (list.size() < size) {
-			throw new IllegalStateException(
-				"Size must not exceed the size of the list");
-		}
-
-		if (size == list.size()) {
-			return list;
-		}
-
-		List<String> randomList = new ArrayList<>(size);
-
-		for (int i = 0; i < size; i++) {
-			String item = null;
-
-			while (true) {
-				item = getRandomString(list);
-
-				if (randomList.contains(item)) {
-					continue;
-				}
-
-				randomList.add(item);
-
-				break;
-			}
-		}
-
-		return randomList;
-	}
-
 	public static <T> T getRandomListItem(List<T> list) {
 		return list.get(getRandomValue(0, list.size() - 1));
 	}
@@ -3487,21 +3346,6 @@ public class JenkinsResultsParserUtil {
 
 			return readInputStream(resourceInputStream);
 		}
-	}
-
-	public static String getResponseHeaders(URLConnection urlConnection) {
-		StringBuilder sb = new StringBuilder();
-
-		Map<String, List<String>> map = urlConnection.getHeaderFields();
-
-		for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-			sb.append(entry.getKey());
-			sb.append(":");
-			sb.append(join(",", entry.getValue()));
-			sb.append("\n");
-		}
-
-		return sb.toString();
 	}
 
 	public static String getSHA(File file) {
@@ -4389,111 +4233,6 @@ public class JenkinsResultsParserUtil {
 		executeJenkinsScript(masterHostname, sb.toString());
 	}
 
-	public static int lastIndexOfRegex(String string, String regex) {
-		Pattern pattern = Pattern.compile(regex);
-
-		Matcher matcher = pattern.matcher(string);
-
-		int lastIndex = -1;
-
-		while (matcher.find()) {
-			lastIndex = matcher.start();
-		}
-
-		return lastIndex;
-	}
-
-	public static void loadBalanceQueuedBuilds(
-			String jobName, JenkinsMaster jenkinsMaster)
-		throws IOException {
-
-		List<JenkinsMaster> availableJenkinsMasters = new ArrayList<>();
-
-		JenkinsCohort jenkinsCohort = jenkinsMaster.getJenkinsCohort();
-
-		for (JenkinsMaster availableJenkinsMaster :
-				jenkinsCohort.getJenkinsMasters()) {
-
-			if (!availableJenkinsMaster.isAvailable() ||
-				availableJenkinsMaster.isBlackListed()) {
-
-				continue;
-			}
-
-			availableJenkinsMasters.add(availableJenkinsMaster);
-		}
-
-		JSONObject jsonObject = toJSONObject(
-			combine(
-				"https://", jenkinsMaster.getName(),
-				".liferay.com/queue/api/json"));
-
-		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
-
-		for (int i = 0; i < itemsJSONArray.length(); i++) {
-			JSONObject itemJSONObject = itemsJSONArray.getJSONObject(i);
-
-			JSONObject taskJSONObject = itemJSONObject.getJSONObject("task");
-
-			String name = taskJSONObject.getString("name");
-
-			if (!name.equals(jobName)) {
-				continue;
-			}
-
-			JSONArray actionsJSONArray = itemJSONObject.optJSONArray("actions");
-
-			StringBuilder sb = new StringBuilder();
-
-			JenkinsMaster availableJenkinsMaster = getRandomListItem(
-				availableJenkinsMasters);
-
-			sb.append("http://");
-			sb.append(availableJenkinsMaster.getName());
-			sb.append("/job/");
-			sb.append(jobName);
-			sb.append("/buildWithParameters?");
-			sb.append("token=raen3Aib");
-
-			for (int j = 0; j < actionsJSONArray.length(); j++) {
-				JSONObject actionJSONObject = actionsJSONArray.getJSONObject(j);
-
-				if (!Objects.equals(
-						actionJSONObject.optString("_class"),
-						"hudson.model.ParametersAction")) {
-
-					continue;
-				}
-
-				JSONArray parametersJSONArray = actionJSONObject.optJSONArray(
-					"parameters");
-
-				for (int k = 0; k < parametersJSONArray.length(); k++) {
-					JSONObject parameterJSONObject =
-						parametersJSONArray.getJSONObject(k);
-
-					String paramName = parameterJSONObject.getString("name");
-					String paramValue = parameterJSONObject.getString("value");
-
-					if (isNullOrEmpty(paramName) || isNullOrEmpty(paramValue)) {
-						continue;
-					}
-
-					sb.append("&");
-					sb.append(paramName);
-					sb.append("=");
-					sb.append(paramValue);
-				}
-			}
-
-			System.out.println(sb);
-
-			toString(sb.toString());
-
-			cancelQueuedItem(itemJSONObject.getLong("id"), jenkinsMaster);
-		}
-	}
-
 	public static void move(File sourceFile, File targetFile)
 		throws IOException {
 
@@ -4533,66 +4272,6 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return Lists.partition(list, partitionSize);
-	}
-
-	public static void printTable(String[][] table) {
-		if (table.length == 0) {
-			return;
-		}
-
-		int[] maxColumnWidth = new int[table[0].length];
-
-		for (String[] row : table) {
-			for (int columnNumber = 0; columnNumber < row.length;
-				 columnNumber++) {
-
-				String item = row[columnNumber];
-
-				if (maxColumnWidth[columnNumber] <= item.length()) {
-					maxColumnWidth[columnNumber] = item.length();
-				}
-			}
-		}
-
-		StringBuilder rowsStringBuilder = new StringBuilder();
-
-		for (String[] row : table) {
-			for (int columnNumber = 0; columnNumber < row.length;
-				 columnNumber++) {
-
-				String cellText = row[columnNumber];
-
-				rowsStringBuilder.append(
-					String.format(
-						combine(
-							"| %-",
-							String.valueOf(maxColumnWidth[columnNumber]), "s "),
-						cellText));
-			}
-
-			rowsStringBuilder.append("|\n");
-		}
-
-		int rowTotalSize = rowsStringBuilder.indexOf("\n");
-
-		StringBuilder tableStringBuilder = new StringBuilder();
-
-		for (int columnNumber = 0; columnNumber < rowTotalSize;
-			 columnNumber++) {
-
-			tableStringBuilder.append("-");
-		}
-
-		tableStringBuilder.append("\n");
-		tableStringBuilder.append(rowsStringBuilder);
-
-		for (int columnNumber = 0; columnNumber < rowTotalSize;
-			 columnNumber++) {
-
-			tableStringBuilder.append("-");
-		}
-
-		System.out.println(tableStringBuilder.toString());
 	}
 
 	public static void pullDockerImageDependencies(
