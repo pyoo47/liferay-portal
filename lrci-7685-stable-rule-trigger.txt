@@ -1,0 +1,1 @@
+# LRCI-7685 stable-rule validation trigger - inert root file so stable-rule matches in ci:test:relevant. Safe to delete.
