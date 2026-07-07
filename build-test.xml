@@ -6380,6 +6380,8 @@ ${custom.upgrade.properties}</echo>
 												#!/bin/bash
 
 												sqlplus ${oracle.admin.user}/${oracle.admin.password} @/tmp/create.sql ${database.username} ${database.password}
+
+												echo "grant select_catalog_role to ${database.username};" | sqlplus sys/${oracle.admin.password} as sysdba
 											]]>
 										</echo>
 									</then>
@@ -6554,6 +6556,10 @@ ${custom.upgrade.properties}</echo>
 														<arg value="${database.password}" />
 													</exec>
 												</retry>
+
+												<exec executable="${oracle.sqlplus.executable}" failonerror="true" inputstring="whenever sqlerror exit failure&#10;connect sys/&quot;${oracle.admin.password}&quot; as sysdba&#10;grant select_catalog_role to ${database.username};&#10;exit&#10;">
+													<arg value="/nolog" />
+												</exec>
 											</else>
 										</if>
 									</then>
