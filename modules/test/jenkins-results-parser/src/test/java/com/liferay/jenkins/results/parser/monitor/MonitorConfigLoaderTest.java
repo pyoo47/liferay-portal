@@ -28,6 +28,7 @@ public class MonitorConfigLoaderTest
 			"https://test-1-0.liferay.com/computer/api/json");
 		buildProperties.setProperty("monitor[masters].severity", "high");
 		buildProperties.setProperty("monitor[masters].threshold[disk]", "85");
+		buildProperties.setProperty("monitor[masters].timeout", "30");
 		buildProperties.setProperty("monitor[masters].type", "http-endpoint");
 
 		List<MonitorConfig> monitorConfigs =
@@ -42,6 +43,7 @@ public class MonitorConfigLoaderTest
 		testEquals("http-endpoint", monitorConfig.getType());
 		testEquals(MonitorConfig.Severity.HIGH, monitorConfig.getSeverity());
 		testEquals(900L, monitorConfig.getCadence());
+		testEquals(30L, monitorConfig.getTimeout());
 
 		Map<String, String> parameters = monitorConfig.getParameters();
 
@@ -81,6 +83,30 @@ public class MonitorConfigLoaderTest
 		buildProperties.setProperty("monitor[a].type", "http-endpoint");
 
 		_testGetMonitorConfigsExpectedIllegalArgumentException(buildProperties);
+	}
+
+	@Test
+	public void testGetMonitorConfigsTimeout() {
+		Properties buildProperties = new Properties();
+
+		buildProperties.setProperty("monitor[a].timeout", "not-a-number");
+		buildProperties.setProperty("monitor[a].type", "http-endpoint");
+
+		_testGetMonitorConfigsExpectedIllegalArgumentException(buildProperties);
+	}
+
+	@Test
+	public void testGetMonitorConfigsTimeoutDefault() {
+		Properties buildProperties = new Properties();
+
+		buildProperties.setProperty("monitor[a].type", "http-endpoint");
+
+		List<MonitorConfig> monitorConfigs =
+			MonitorConfigLoader.getMonitorConfigs(buildProperties);
+
+		MonitorConfig monitorConfig = monitorConfigs.get(0);
+
+		testEquals(60L, monitorConfig.getTimeout());
 	}
 
 	private void _testGetMonitorConfigsExpectedIllegalArgumentException(
