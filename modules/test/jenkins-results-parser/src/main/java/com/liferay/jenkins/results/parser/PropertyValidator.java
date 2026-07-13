@@ -96,6 +96,48 @@ public class PropertyValidator {
 			_getUnconsumedKeys(consumedKeys, definedKeys));
 	}
 
+	public static void validate(
+			String jenkinsRepositoryDirPath,
+			String jenkinsResultsParserSourceDirPath)
+		throws IOException {
+
+		File jenkinsRepositoryDir = new File(jenkinsRepositoryDirPath);
+
+		if (!jenkinsRepositoryDir.isDirectory()) {
+			throw new IllegalArgumentException(
+				jenkinsRepositoryDirPath + " is not a directory");
+		}
+
+		File jenkinsResultsParserSourceDir = new File(
+			jenkinsResultsParserSourceDirPath);
+
+		if (!jenkinsResultsParserSourceDir.isDirectory()) {
+			throw new IllegalArgumentException(
+				jenkinsResultsParserSourceDirPath + " is not a directory");
+		}
+
+		ValidationResult validationResult = validate(
+			jenkinsRepositoryDir, jenkinsResultsParserSourceDir);
+
+		List<ConsumedKeyFailure> consumedKeyFailures =
+			validationResult.getConsumedKeyFailures();
+
+		if (consumedKeyFailures.isEmpty()) {
+			return;
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Undefined build properties are consumed:\n");
+
+		for (ConsumedKeyFailure consumedKeyFailure : consumedKeyFailures) {
+			sb.append("\n");
+			sb.append(consumedKeyFailure.getMessage());
+		}
+
+		throw new RuntimeException(sb.toString());
+	}
+
 	public static class ConsumedKey {
 
 		public ConsumedKey(
