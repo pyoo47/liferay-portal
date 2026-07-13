@@ -404,10 +404,13 @@ public class PropertyValidator {
 				"jenkins.queue.rebalance.threshold",
 				"master.auto.scaling.group.name",
 				"one.password.access.token.key", "one.password.connect.url",
+				"one.password.secret.retries.max",
+				"one.password.secret.retry.period.seconds",
 				"scancode.s3.bucket", "test.history.batch.maximum.duration",
 				"test.history.test.maximum.duration",
 				"test.history.test.maximum.overhead.duration",
 				"test.results.consistency.report.suites",
+				"testray.case.result.error.message.max.length",
 				"testray.cloud.bucket"));
 	private static final Pattern _getBuildPropertyPattern = Pattern.compile(
 		"\\bgetBuildProperty(?:AsList)?\\(\\s*(?:[\\w.()]+\\s*,\\s*)?\"" +
