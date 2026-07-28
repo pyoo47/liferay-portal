@@ -746,6 +746,34 @@ public class TestrayFactory {
 
 		testrayServer = new TestrayServer(testrayServerURL);
 
+		try {
+			Properties buildProperties =
+				JenkinsResultsParserUtil.getBuildProperties();
+
+			String lxcEnvironment = testrayURLMatcher.group("lxcEnvironment");
+
+			String clientId = JenkinsResultsParserUtil.getProperty(
+				buildProperties, "testray.oauth2.client.id", lxcEnvironment);
+			String clientSecret = JenkinsResultsParserUtil.getProperty(
+				buildProperties, "testray.oauth2.client.secret",
+				lxcEnvironment);
+
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(clientId) &&
+				!JenkinsResultsParserUtil.isNullOrEmpty(clientSecret)) {
+
+				URL tokenURL = new URL(
+					testrayServer.getURL() + "/o/oauth2/token");
+
+				testrayServer.setHTTPAuthorization(
+					new JenkinsResultsParserUtil.
+						ClientCredentialsHTTPAuthorization(
+							clientId, clientSecret, tokenURL));
+			}
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+
 		_testrayServers.put(testrayServerURL, testrayServer);
 
 		return testrayServer;
@@ -814,7 +842,7 @@ public class TestrayFactory {
 		new ConcurrentHashMap<>();
 	private static final Pattern _testrayURLPattern = Pattern.compile(
 		"https://(testray\\.liferay\\.com|webserver-testray2" +
-			"(-prd\\d*|-uat\\d*)?.lfr.cloud)");
+			"(-(?<lxcEnvironment>prd\\d*|uat\\d*))?.lfr.cloud)");
 	private static final Map<Long, TopLevelStandaloneBuildTestrayCaseResult>
 		_topLevelBuildTestrayCaseResults = new ConcurrentHashMap<>();
 
