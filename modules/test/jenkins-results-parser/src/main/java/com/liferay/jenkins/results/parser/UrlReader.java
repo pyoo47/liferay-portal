@@ -461,6 +461,17 @@ public class UrlReader {
 					}
 
 					System.out.println(sb.toString());
+
+					if (httpAuthorization instanceof
+							ClientCredentialsHTTPAuthorization) {
+
+						ClientCredentialsHTTPAuthorization
+							clientCredentialsHTTPAuthorization =
+								(ClientCredentialsHTTPAuthorization)
+									httpAuthorization;
+
+						clientCredentialsHTTPAuthorization.invalidateToken();
+					}
 				}
 
 				Integer retryPeriodOverride = null;

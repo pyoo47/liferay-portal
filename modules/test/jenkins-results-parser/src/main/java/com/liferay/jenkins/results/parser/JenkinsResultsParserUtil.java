@@ -5959,6 +5959,10 @@ public class JenkinsResultsParserUtil {
 					String.valueOf(_tokenURL)));
 		}
 
+		public synchronized void invalidateToken() {
+			_tokenExpirationDate = null;
+		}
+
 		@Override
 		public String toString() {
 			_refreshToken();

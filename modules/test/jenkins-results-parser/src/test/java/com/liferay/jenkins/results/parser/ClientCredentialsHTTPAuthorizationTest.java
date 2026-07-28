@@ -24,6 +24,28 @@ public class ClientCredentialsHTTPAuthorizationTest
 	extends com.liferay.jenkins.results.parser.Test {
 
 	@Test
+	public void testInvalidateToken() throws Exception {
+		try (MockedStatic<JenkinsResultsParserUtil>
+				jenkinsResultsParserUtilMockedStatic = _mockTokenRequest()) {
+
+			JenkinsResultsParserUtil.ClientCredentialsHTTPAuthorization
+				clientCredentialsHTTPAuthorization =
+					_newClientCredentialsHTTPAuthorization();
+
+			clientCredentialsHTTPAuthorization.toString();
+
+			clientCredentialsHTTPAuthorization.invalidateToken();
+
+			clientCredentialsHTTPAuthorization.toString();
+
+			jenkinsResultsParserUtilMockedStatic.verify(
+				() -> JenkinsResultsParserUtil.toJSONObject(
+					Mockito.anyString(), Mockito.anyString()),
+				Mockito.times(2));
+		}
+	}
+
+	@Test
 	public void testToStringCachesToken() throws Exception {
 		try (MockedStatic<JenkinsResultsParserUtil>
 				jenkinsResultsParserUtilMockedStatic = _mockTokenRequest()) {
