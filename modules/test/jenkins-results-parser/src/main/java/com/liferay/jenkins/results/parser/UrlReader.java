@@ -390,12 +390,12 @@ public class UrlReader {
 
 				return urlConnection.getInputStream();
 			}
-			catch (IOException ioException) {
-				if (ioException instanceof FileNotFoundException) {
-					throw ioException;
+			catch (IOException ioException1) {
+				if (ioException1 instanceof FileNotFoundException) {
+					throw ioException1;
 				}
 
-				if ((ioException instanceof UnknownHostException) &&
+				if ((ioException1 instanceof UnknownHostException) &&
 					url.matches("http://test-\\d+-\\d+/.*")) {
 
 					return doRead(
@@ -406,7 +406,7 @@ public class UrlReader {
 							"https://$1.liferay.com$2"));
 				}
 
-				String exceptionMessage = ioException.getMessage();
+				String exceptionMessage = ioException1.getMessage();
 
 				if (exceptionMessage.matches(
 						".*HTTP response code\\: 422 .*") &&
@@ -424,7 +424,43 @@ public class UrlReader {
 
 					System.out.println(sb.toString());
 
-					throw new RuntimeException(exceptionMessage, ioException);
+					throw new RuntimeException(exceptionMessage, ioException1);
+				}
+
+				Matcher testray2URLMatcher = _testray2URLPattern.matcher(url);
+
+				if (exceptionMessage.matches(
+						".*HTTP response code\\: 403 .*") &&
+					testray2URLMatcher.find() &&
+					(urlConnection instanceof HttpURLConnection)) {
+
+					HttpURLConnection httpURLConnection =
+						(HttpURLConnection)urlConnection;
+
+					StringBuilder sb = new StringBuilder();
+
+					sb.append(exceptionMessage);
+
+					try (InputStream errorInputStream =
+							httpURLConnection.getErrorStream()) {
+
+						if (errorInputStream != null) {
+							sb.append("\nError response:\n");
+							sb.append(
+								JenkinsResultsParserUtil.readInputStream(
+									errorInputStream));
+						}
+					}
+					catch (IOException ioException2) {
+						sb.append("\nUnable to read the error response");
+					}
+
+					if (!JenkinsResultsParserUtil.isNullOrEmpty(postContent)) {
+						sb.append("\nPost content:\n");
+						sb.append(postContent);
+					}
+
+					System.out.println(sb.toString());
 				}
 
 				Integer retryPeriodOverride = null;
@@ -456,7 +492,7 @@ public class UrlReader {
 						(retryPeriodOverride > _SECONDS_RETRY_PERIOD_MAX)) {
 
 						throw new GitHubSecondaryRateLimitRuntimeException(
-							url, retryPeriodOverride, ioException);
+							url, retryPeriodOverride, ioException1);
 					}
 				}
 
@@ -469,7 +505,7 @@ public class UrlReader {
 				}
 
 				if ((maxRetries >= 0) && (retryCount >= maxRetries)) {
-					throw ioException;
+					throw ioException1;
 				}
 
 				System.out.println(
