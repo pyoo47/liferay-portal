@@ -122,12 +122,22 @@ public class MonitorMetricsWriter {
 
 		MonitorConfig.Severity severity = monitorConfig.getSeverity();
 
+		if (severity == null) {
+			severity = MonitorConfig.Severity.MEDIUM;
+		}
+
 		String severityName = severity.name();
+
+		String type = monitorConfig.getType();
+
+		if (type == null) {
+			type = "unknown";
+		}
 
 		return JenkinsResultsParserUtil.combine(
 			"check=\"", _escapeLabelValue(monitor.getId()), "\",severity=\"",
 			severityName.toLowerCase(Locale.ENGLISH), "\",type=\"",
-			_escapeLabelValue(monitorConfig.getType()), "\"");
+			_escapeLabelValue(type), "\"");
 	}
 
 	private long _getLastRunTimestamp(MonitorResult monitorResult) {
