@@ -58,7 +58,7 @@ public class MonitorMetricsWriter {
 
 		return JenkinsResultsParserUtil.combine(
 			"monitor_check_last_run_timestamp_seconds{", _getLabels(monitor),
-			"} ", String.valueOf(_getLastRunTimestamp(monitorResult)));
+			"} ", String.valueOf(_getLastRunTimestampSeconds(monitorResult)));
 	}
 
 	private String _getCheckStatusLine(
@@ -140,7 +140,7 @@ public class MonitorMetricsWriter {
 			_escapeLabelValue(type), "\"");
 	}
 
-	private long _getLastRunTimestamp(MonitorResult monitorResult) {
+	private long _getLastRunTimestampSeconds(MonitorResult monitorResult) {
 		if (monitorResult == null) {
 			return 0;
 		}
