@@ -7,10 +7,8 @@ package com.liferay.jenkins.results.parser.monitor;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Brittney Nguyen
@@ -20,16 +18,7 @@ public class MonitorEngine {
 	public MonitorEngine(
 		MonitorResultStore monitorResultStore, List<Monitor> monitors) {
 
-		Set<String> ids = new HashSet<>();
-
-		for (Monitor monitor : monitors) {
-			String id = monitor.getId();
-
-			if (!ids.add(id)) {
-				throw new IllegalArgumentException(
-					"Duplicate monitor ID: " + id);
-			}
-		}
+		MonitorIdValidator.validate(monitors);
 
 		_monitorResultStore = monitorResultStore;
 		_monitors = monitors;
