@@ -89,7 +89,7 @@ public class MonitorMetricsWriterTest
 				"monitor_check_last_run_timestamp_seconds{check=\"testray\",",
 				"severity=\"low\",type=\"external-status\"} 0\n",
 				"# HELP monitor_heartbeat_timestamp_seconds Unix timestamp of ",
-				"the last completed monitor cycle\n",
+				"the last metrics write\n",
 				"# TYPE monitor_heartbeat_timestamp_seconds gauge\n",
 				"monitor_heartbeat_timestamp_seconds 1750000000\n"),
 			read(metricsFile));

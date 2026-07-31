@@ -88,7 +88,7 @@ public class MonitorMetricsWriter {
 
 		sb.append(
 			"# HELP monitor_heartbeat_timestamp_seconds Unix timestamp of " +
-				"the last completed monitor cycle\n");
+				"the last metrics write\n");
 		sb.append("# TYPE monitor_heartbeat_timestamp_seconds gauge\n");
 		sb.append("monitor_heartbeat_timestamp_seconds ");
 		sb.append(JenkinsResultsParserUtil.getCurrentTimeMillis() / 1000);
