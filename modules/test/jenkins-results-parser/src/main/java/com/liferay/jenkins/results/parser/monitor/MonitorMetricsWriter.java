@@ -13,10 +13,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author Brittney Nguyen
@@ -53,31 +51,19 @@ public class MonitorMetricsWriter {
 		return labelValue.replace("\n", "\\n");
 	}
 
-	private String _getCheckLastRunTimestampLine(
-		Monitor monitor, MonitorResult monitorResult) {
-
+	private String _getCheckLastRunTimestampLine(Monitor monitor) {
 		return JenkinsResultsParserUtil.combine(
 			"monitor_check_last_run_timestamp_seconds{", _getLabels(monitor),
-			"} ", String.valueOf(_getLastRunTimestampSeconds(monitorResult)));
+			"} ", String.valueOf(_getLastRunTimestampSeconds(monitor)));
 	}
 
-	private String _getCheckStatusLine(
-		Monitor monitor, MonitorResult monitorResult) {
-
+	private String _getCheckStatusLine(Monitor monitor) {
 		return JenkinsResultsParserUtil.combine(
 			"monitor_check_status{", _getLabels(monitor), "} ",
-			String.valueOf(_getSeverityRank(monitorResult)));
+			String.valueOf(_getSeverityRank(monitor)));
 	}
 
 	private String _getContent() {
-		Map<Monitor, MonitorResult> monitorResultsMap = new LinkedHashMap<>();
-
-		for (Monitor monitor : _monitors) {
-			monitorResultsMap.put(
-				monitor,
-				_monitorResultStore.getLatestMonitorResult(monitor.getId()));
-		}
-
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(
@@ -85,10 +71,8 @@ public class MonitorMetricsWriter {
 				"1 UNKNOWN, 2 WARN, 3 CRITICAL\n");
 		sb.append("# TYPE monitor_check_status gauge\n");
 
-		for (Map.Entry<Monitor, MonitorResult> entry :
-				monitorResultsMap.entrySet()) {
-
-			sb.append(_getCheckStatusLine(entry.getKey(), entry.getValue()));
+		for (Monitor monitor : _monitors) {
+			sb.append(_getCheckStatusLine(monitor));
 			sb.append("\n");
 		}
 
@@ -97,12 +81,8 @@ public class MonitorMetricsWriter {
 				"of the last check run, 0 if never run\n");
 		sb.append("# TYPE monitor_check_last_run_timestamp_seconds gauge\n");
 
-		for (Map.Entry<Monitor, MonitorResult> entry :
-				monitorResultsMap.entrySet()) {
-
-			sb.append(
-				_getCheckLastRunTimestampLine(
-					entry.getKey(), entry.getValue()));
+		for (Monitor monitor : _monitors) {
+			sb.append(_getCheckLastRunTimestampLine(monitor));
 			sb.append("\n");
 		}
 
@@ -140,7 +120,10 @@ public class MonitorMetricsWriter {
 			_escapeLabelValue(type), "\"");
 	}
 
-	private long _getLastRunTimestampSeconds(MonitorResult monitorResult) {
+	private long _getLastRunTimestampSeconds(Monitor monitor) {
+		MonitorResult monitorResult =
+			_monitorResultStore.getLatestMonitorResult(monitor.getId());
+
 		if (monitorResult == null) {
 			return 0;
 		}
@@ -148,7 +131,10 @@ public class MonitorMetricsWriter {
 		return monitorResult.getTimestamp() / 1000;
 	}
 
-	private int _getSeverityRank(MonitorResult monitorResult) {
+	private int _getSeverityRank(Monitor monitor) {
+		MonitorResult monitorResult =
+			_monitorResultStore.getLatestMonitorResult(monitor.getId());
+
 		if (monitorResult == null) {
 			return MonitorResult.Status.UNKNOWN.getSeverityRank();
 		}
