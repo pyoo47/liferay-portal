@@ -516,6 +516,10 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		return new ArrayList<>(_jenkinsSlavesMap.values());
 	}
 
+	public int getMaximumRunningBuildCount() {
+		return Math.max(_busyExecutorCount, _runningBuilds.size());
+	}
+
 	@Override
 	public String getName() {
 		return _masterName;
@@ -761,6 +765,10 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		return _masterRemoteURL;
 	}
 
+	public List<RunningBuild> getRunningBuilds() {
+		return new ArrayList<>(_runningBuilds);
+	}
+
 	public Integer getSlaveRAM() {
 		return _slaveRAM;
 	}
@@ -849,12 +857,10 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 				_AVAILABLE_TIMEOUT)) {
 
 			try {
-				if (!isBlacklisted()) {
-					JenkinsResultsParserUtil.toJSONObject(
-						getURL() + "/api/json?tree=mode", false, 1, 1, 1000);
+				JenkinsResultsParserUtil.toJSONObject(
+					getURL() + "/api/json?tree=mode", false, 1, 1, 1000);
 
-					_available = true;
-				}
+				_available = true;
 			}
 			catch (Exception exception) {
 				System.out.println(getName() + " is unreachable.");
@@ -960,7 +966,9 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		if (!isAvailable()) {
 			_assignedLabels.clear();
 			_buildURLs.clear();
+			_busyExecutorCount = 0;
 			_jenkinsSlavesMap.clear();
+			_runningBuilds.clear();
 
 			return;
 		}
@@ -972,17 +980,23 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		try {
 			computerAPIJSONObject = JenkinsResultsParserUtil.toJSONObject(
 				JenkinsResultsParserUtil.combine(
-					getURL(), "/computer/api/json?tree=computer",
-					"[assignedLabels[name],displayName,",
-					"executors[currentExecutable[url]],idle,offline,",
-					"offlineCauseReason]"),
+					getURL(), "/computer/api/json?tree=busyExecutors,computer",
+					"[assignedLabels[name],displayName,executors",
+					"[currentExecutable[building,estimatedDuration,",
+					"fullDisplayName,number,timestamp,url],",
+					"likelyStuck],idle,offline,offlineCauseReason,",
+					"oneOffExecutors[currentExecutable[building,",
+					"estimatedDuration,fullDisplayName,number,timestamp,",
+					"url],likelyStuck]]"),
 				false, 5000);
 		}
 		catch (Exception exception) {
 			_assignedLabels.clear();
 			_buildURLs.clear();
+			_busyExecutorCount = 0;
 			_jenkinsSlavesMap.clear();
 			_labelExpressionLabels.clear();
+			_runningBuilds.clear();
 
 			System.out.println("Unable to read " + _masterURL);
 
@@ -990,6 +1004,7 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		}
 
 		List<String> buildURLs = new ArrayList<>();
+		List<RunningBuild> runningBuilds = new ArrayList<>();
 
 		JSONArray computerJSONArray = computerAPIJSONObject.getJSONArray(
 			"computer");
@@ -999,6 +1014,9 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 
 			String jenkinsSlaveName = JenkinsSlave.getDisplayName(
 				computerJSONObject);
+
+			_addRunningBuilds(
+				runningBuilds, computerJSONObject, jenkinsSlaveName);
 
 			if (jenkinsSlaveName.equals("Built-In Node") ||
 				jenkinsSlaveName.equals("master")) {
@@ -1075,6 +1093,12 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		_buildURLs.clear();
 
 		_buildURLs.addAll(buildURLs);
+
+		_busyExecutorCount = computerAPIJSONObject.optInt("busyExecutors", 0);
+
+		_runningBuilds.clear();
+
+		_runningBuilds.addAll(runningBuilds);
 	}
 
 	public static class QueueItem implements Comparable<QueueItem> {
@@ -1231,6 +1255,95 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 
 	}
 
+	public static class RunningBuild {
+
+		public long getElapsedDuration() {
+			long timestamp = getTimestamp();
+
+			if (timestamp <= 0) {
+				return 0;
+			}
+
+			return JenkinsResultsParserUtil.getCurrentTimeMillis() - timestamp;
+		}
+
+		public long getEstimatedDuration() {
+			return _jsonObject.optLong("estimatedDuration", -1);
+		}
+
+		public String getFullDisplayName() {
+			return _jsonObject.optString("fullDisplayName");
+		}
+
+		public JenkinsMaster getJenkinsMaster() {
+			return _jenkinsMaster;
+		}
+
+		public String getJenkinsSlaveName() {
+			return _jenkinsSlaveName;
+		}
+
+		public int getNumber() {
+			return _jsonObject.optInt("number", -1);
+		}
+
+		public String getOfflineCauseReason() {
+			return _offlineCauseReason;
+		}
+
+		public long getTimestamp() {
+			return _jsonObject.optLong("timestamp", -1);
+		}
+
+		public String getURL() {
+			return _jsonObject.optString("url");
+		}
+
+		public boolean isBuilding() {
+			return _jsonObject.optBoolean("building", true);
+		}
+
+		public boolean isJenkinsSlaveOffline() {
+			return _jenkinsSlaveOffline;
+		}
+
+		public boolean isLikelyStuck() {
+			return _likelyStuck;
+		}
+
+		@Override
+		public String toString() {
+			return JenkinsResultsParserUtil.combine(
+				_jenkinsMaster.getName(), " ", getFullDisplayName(), " (",
+				getURL(), ")");
+		}
+
+		protected RunningBuild(
+			JenkinsMaster jenkinsMaster, String jenkinsSlaveName,
+			JSONObject computerJSONObject,
+			JSONObject currentExecutableJSONObject, boolean likelyStuck) {
+
+			_jenkinsMaster = jenkinsMaster;
+			_jenkinsSlaveName = jenkinsSlaveName;
+			_likelyStuck = likelyStuck;
+
+			_jsonObject = currentExecutableJSONObject;
+
+			_jenkinsSlaveOffline = computerJSONObject.optBoolean(
+				"offline", false);
+			_offlineCauseReason = computerJSONObject.optString(
+				"offlineCauseReason");
+		}
+
+		private final JenkinsMaster _jenkinsMaster;
+		private final String _jenkinsSlaveName;
+		private final boolean _jenkinsSlaveOffline;
+		private final JSONObject _jsonObject;
+		private final boolean _likelyStuck;
+		private final String _offlineCauseReason;
+
+	}
+
 	protected static long maxRecentBatchAge = 120 * 1000;
 
 	private static Map<String, String> _getParameters(JSONObject jsonObject) {
@@ -1340,6 +1453,39 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		catch (Exception exception) {
 			throw new RuntimeException(
 				"Unable to determine URL for master " + _masterName, exception);
+		}
+	}
+
+	private void _addRunningBuilds(
+		List<RunningBuild> runningBuilds, JSONObject computerJSONObject,
+		String jenkinsSlaveName) {
+
+		for (String key : new String[] {"executors", "oneOffExecutors"}) {
+			JSONArray executorsJSONArray = computerJSONObject.optJSONArray(key);
+
+			if (executorsJSONArray == null) {
+				continue;
+			}
+
+			for (int i = 0; i < executorsJSONArray.length(); i++) {
+				JSONObject executorJSONObject =
+					executorsJSONArray.getJSONObject(i);
+
+				JSONObject currentExecutableJSONObject =
+					executorJSONObject.optJSONObject("currentExecutable");
+
+				if ((currentExecutableJSONObject == null) ||
+					!currentExecutableJSONObject.has("url")) {
+
+					continue;
+				}
+
+				runningBuilds.add(
+					new RunningBuild(
+						this, jenkinsSlaveName, computerJSONObject,
+						currentExecutableJSONObject,
+						executorJSONObject.optBoolean("likelyStuck", false)));
+			}
 		}
 	}
 
@@ -1712,6 +1858,7 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		new HashMap<>();
 	private final Map<String, Long> _buildsUpdateTimes = new HashMap<>();
 	private final List<String> _buildURLs = new CopyOnWriteArrayList<>();
+	private int _busyExecutorCount;
 	private final List<DefaultBuild> _defaultBuilds = new ArrayList<>();
 	private Map<String, String> _globalEnvironmentVariables;
 	private boolean _idle;
@@ -1728,6 +1875,8 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 	private boolean _offline;
 	private final List<QueueItem> _queueItems = new ArrayList<>();
 	private Long _queueUpdateTime;
+	private final List<RunningBuild> _runningBuilds =
+		new CopyOnWriteArrayList<>();
 	private final Integer _slaveRAM;
 	private final Integer _slavesPerHost;
 	private List<String> _topLevelJobNames;
