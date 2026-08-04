@@ -1,0 +1,2 @@
+Throwaway file for LRCI-7854 sandbox webhook validation (case B2 retry).
+Safe to delete.
