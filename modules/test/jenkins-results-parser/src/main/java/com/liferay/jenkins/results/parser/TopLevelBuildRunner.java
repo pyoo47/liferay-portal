@@ -320,31 +320,12 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 		invocationParameters.put(
 			"PARENT_BUILD_URL", _topLevelBuild.getBuildURL());
 
-		StringBuilder sb = new StringBuilder();
+		String jobURL = JenkinsResultsParserUtil.combine(
+			getBaseInvocationURL(cohortName, jobName), "/job/", jobName,
+			"/buildWithParameters");
 
-		sb.append(getBaseInvocationURL(cohortName, jobName));
-		sb.append("/job/");
-		sb.append(jobName);
-		sb.append("/buildWithParameters?");
-
-		for (Map.Entry<String, String> invocationParameter :
-				invocationParameters.entrySet()) {
-
-			sb.append(
-				JenkinsResultsParserUtil.encodeURLParameterPart(
-					invocationParameter.getKey()));
-			sb.append("=");
-			sb.append(
-				JenkinsResultsParserUtil.encodeURLParameterPart(
-					invocationParameter.getValue()));
-			sb.append("&");
-		}
-
-		if (sb.charAt(sb.length() - 1) == '&') {
-			sb.deleteCharAt(sb.length() - 1);
-		}
-
-		_topLevelBuild.addDownstreamBuilds(sb.toString());
+		_topLevelBuild.addDownstreamBuilds(
+			URLBuilderUtil.buildURL(jobURL, invocationParameters));
 	}
 
 	private void _invokeDownstreamBuild(BuildData buildData) {

@@ -238,15 +238,11 @@ public class PoshiReleasePortalTopLevelBuildRunner
 	private String _getBuildInvocationURL(
 		String jobName, Map.Entry<GitWorkingDirectory, PullRequest> entry) {
 
-		StringBuilder sb = new StringBuilder();
-
 		BuildData buildData = getBuildData();
 
-		sb.append(getBaseInvocationURL(buildData.getCohortName(), jobName));
-
-		sb.append("/job/");
-		sb.append(jobName);
-		sb.append("/buildWithParameters?");
+		String jobURL = JenkinsResultsParserUtil.combine(
+			getBaseInvocationURL(buildData.getCohortName(), jobName), "/job/",
+			jobName, "/buildWithParameters");
 
 		try {
 			Map<String, String> invocationParameters = new HashMap<>();
@@ -305,6 +301,8 @@ public class PoshiReleasePortalTopLevelBuildRunner
 						upstreamBranchName));
 			}
 
+			Map<String, String> parameters = new HashMap<>();
+
 			for (Map.Entry<String, String> invocationParameter :
 					invocationParameters.entrySet()) {
 
@@ -317,25 +315,15 @@ public class PoshiReleasePortalTopLevelBuildRunner
 					continue;
 				}
 
-				sb.append(
-					JenkinsResultsParserUtil.encodeURLParameterPart(
-						invocationParameter.getKey()));
-				sb.append("=");
-				sb.append(
-					JenkinsResultsParserUtil.encodeURLParameterPart(
-						invocationParameterValue));
-				sb.append("&");
+				parameters.put(
+					invocationParameter.getKey(), invocationParameterValue);
 			}
+
+			return URLBuilderUtil.buildURL(jobURL, parameters);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);
 		}
-
-		if (sb.charAt(sb.length() - 1) == '&') {
-			sb.deleteCharAt(sb.length() - 1);
-		}
-
-		return sb.toString();
 	}
 
 	private File _getBuildTestGradleFile(
