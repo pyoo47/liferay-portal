@@ -202,6 +202,19 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
+	public void testNormalizeURLWithEncodedParameters() {
+		String[] values = {"a#b", "a&b", "100% pass", "a=b", "a+b", "a b"};
+
+		for (String value : values) {
+			String url = JenkinsResultsParserUtil.combine(
+				"http://test-1-1/job/x/buildWithParameters?V=",
+				JenkinsResultsParserUtil.encodeURLParameterPart(value));
+
+			testEquals(url, URLBuilderUtil.normalizeURL(url));
+		}
+	}
+
+	@Test
 	public void testNormalizeURLWithIllegalPathCharacters() {
 		testEquals(
 			"http://test-1-1/job/a%20b/1/",
