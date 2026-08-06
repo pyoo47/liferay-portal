@@ -679,7 +679,8 @@ public class JenkinsResultsParserUtil {
 			try (OutputStream outputStream =
 					httpURLConnection.getOutputStream()) {
 
-				String post = "script=" + URLEncoder.encode(script, "UTF-8");
+				String post = URLBuilderUtil.buildFormContent(
+					Collections.singletonMap("script", script));
 
 				outputStream.write(post.getBytes("UTF-8"));
 
@@ -3713,31 +3714,23 @@ public class JenkinsResultsParserUtil {
 		String jenkinsJobURL, Map<String, String> buildParameters,
 		int timeout) {
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> parameters = new LinkedHashMap<>();
+
+		if (buildParameters != null) {
+			for (Map.Entry<String, String> buildParameter :
+					buildParameters.entrySet()) {
+
+				String value = buildParameter.getValue();
+
+				if (isNullOrEmpty(value)) {
+					continue;
+				}
+
+				parameters.put(buildParameter.getKey(), value);
+			}
+		}
 
 		try {
-			if (buildParameters != null) {
-				for (Map.Entry<String, String> buildParameter :
-						buildParameters.entrySet()) {
-
-					String value = buildParameter.getValue();
-
-					if (isNullOrEmpty(value)) {
-						continue;
-					}
-
-					sb.append(
-						URLEncoder.encode(buildParameter.getKey(), "UTF-8"));
-					sb.append("=");
-					sb.append(URLEncoder.encode(value, "UTF-8"));
-					sb.append("&");
-				}
-			}
-
-			if (sb.length() > 0) {
-				sb.deleteCharAt(sb.length() - 1);
-			}
-
 			Map<String, String> requestHeaders = new HashMap<>();
 
 			requestHeaders.put(
@@ -3746,7 +3739,8 @@ public class JenkinsResultsParserUtil {
 			return getJenkinsBuildQueueId(
 				UrlReader.getResponseHeader(
 					"Location", getJenkinsHTTPAuthorization(),
-					HttpRequestMethod.POST, sb.toString(), requestHeaders,
+					HttpRequestMethod.POST,
+					URLBuilderUtil.buildFormContent(parameters), requestHeaders,
 					timeout, combine(jenkinsJobURL, "/buildWithParameters")));
 		}
 		catch (IOException ioException) {
@@ -5940,16 +5934,16 @@ public class JenkinsResultsParserUtil {
 				return;
 			}
 
-			StringBuilder sb = new StringBuilder();
+			Map<String, String> parameters = new LinkedHashMap<>();
 
-			sb.append("grant_type=client_credentials&client_id=");
-			sb.append(_clientId);
-			sb.append("&client_secret=");
-			sb.append(_clientSecret);
+			parameters.put("client_id", _clientId);
+			parameters.put("client_secret", _clientSecret);
+			parameters.put("grant_type", "client_credentials");
 
 			try {
 				JSONObject jsonObject = toJSONObject(
-					String.valueOf(_tokenURL), sb.toString());
+					String.valueOf(_tokenURL),
+					URLBuilderUtil.buildFormContent(parameters));
 
 				_token = jsonObject.getString("access_token");
 				_tokenExpirationDate = new Date(
