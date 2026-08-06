@@ -800,26 +800,8 @@ public abstract class BaseBuild implements Build {
 			return null;
 		}
 
-		StringBuffer sb = new StringBuffer(jobURL);
-
-		sb.append("/buildWithParameters?");
-
-		Map<String, String> parameters = new HashMap<>(getParameters());
-
-		for (Map.Entry<String, String> parameter : parameters.entrySet()) {
-			sb.append(
-				JenkinsResultsParserUtil.encodeURLParameterPart(
-					parameter.getKey()));
-			sb.append("=");
-			sb.append(
-				JenkinsResultsParserUtil.encodeURLParameterPart(
-					parameter.getValue()));
-			sb.append("&");
-		}
-
-		sb.deleteCharAt(sb.length() - 1);
-
-		return sb.toString();
+		return URLBuilderUtil.buildURL(
+			jobURL + "/buildWithParameters", getParameters());
 	}
 
 	@Override
@@ -3657,8 +3639,11 @@ public abstract class BaseBuild implements Build {
 			JenkinsResultsParserUtil.decodeURLParameterPart(
 				invocationURLMatcher.group("jobName")));
 
-		loadParametersFromQueryString(
-			invocationURLMatcher.group("queryString"));
+		String queryString = invocationURLMatcher.group("queryString");
+
+		if (queryString != null) {
+			loadParametersFromQueryString(queryString);
+		}
 
 		String masterId = invocationURLMatcher.group("masterId");
 
@@ -3701,7 +3686,7 @@ public abstract class BaseBuild implements Build {
 		JenkinsResultsParserUtil.combine(
 			"\\w+://(?<cohortName>test-\\d+)(-(?<masterId>\\d+))?",
 			"(\\.liferay\\.com)?/+job\\/+(?<jobName>[^\\/]+).*\\/",
-			"buildWithParameters\\?(?<queryString>.*)"));
+			"buildWithParameters(\\?(?<queryString>.*))?"));
 	private static final Pattern _testrayCloudObjectURLPattern =
 		Pattern.compile(
 			JenkinsResultsParserUtil.combine(

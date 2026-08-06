@@ -30,7 +30,9 @@ public class JenkinsStopBuildUtil {
 			JenkinsResultsParserUtil.getLocalURL(jenkinsMaster.getURL()));
 
 		URL urlObject = new URL(
-			normalizedURL + "/queue/cancelItem?id=" + queueId);
+			URLBuilderUtil.buildURL(
+				normalizedURL + "/queue/cancelItem", "id",
+				String.valueOf(queueId)));
 
 		HttpURLConnection httpConnection =
 			(HttpURLConnection)urlObject.openConnection();

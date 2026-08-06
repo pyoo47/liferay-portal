@@ -71,6 +71,34 @@ public class BaseBuildTest extends com.liferay.jenkins.results.parser.Test {
 	}
 
 	@Test
+	public void testGetInvocationURL() throws Exception {
+		Map<String, String> parameters = _newParameters(
+			"PORTAL BUILD NOTES", "encoded name", "PORTAL_BATCH_TEST_SELECTOR",
+			"PortalSmoke#Smoke", "PORTAL_BUILD_NOTES", "100% pass",
+			"PORTAL_QUERY", "a=b", "PORTAL_UPSTREAM", "a+b",
+			"TESTRAY_PROJECT_NAME", "AWS & CI");
+
+		Map<String, String> roundTrippedParameters = _setInvocationURL(
+			_getInvocationURL(parameters));
+
+		for (Map.Entry<String, String> entry : parameters.entrySet()) {
+			Assert.assertEquals(
+				entry.getValue(), roundTrippedParameters.get(entry.getKey()));
+		}
+	}
+
+	@Test
+	public void testGetInvocationURLWithoutParameters() throws Exception {
+		String invocationURL = _getInvocationURL(new HashMap<String, String>());
+
+		Assert.assertEquals(_JOB_URL + "/buildWithParameters", invocationURL);
+
+		Map<String, String> parameters = _setInvocationURL(invocationURL);
+
+		Assert.assertTrue(parameters.isEmpty());
+	}
+
+	@Test
 	public void testLoadParametersFromQueryString() {
 		Map<String, String> parameters = _loadParametersFromQueryString(
 			JenkinsResultsParserUtil.combine(
@@ -159,6 +187,29 @@ public class BaseBuildTest extends com.liferay.jenkins.results.parser.Test {
 			ReflectionTestUtil.getFieldValue(baseBuild, "_jobName"));
 	}
 
+	private String _getInvocationURL(Map<String, String> parameters) {
+		BaseBuild baseBuild = Mockito.mock(BaseBuild.class);
+
+		Mockito.when(
+			baseBuild.getJobURL()
+		).thenReturn(
+			_JOB_URL
+		);
+
+		Mockito.when(
+			baseBuild.getParameters()
+		).thenReturn(
+			parameters
+		);
+
+		Mockito.doCallRealMethod(
+		).when(
+			baseBuild
+		).getInvocationURL();
+
+		return baseBuild.getInvocationURL();
+	}
+
 	private Map<String, String> _loadParametersFromQueryString(
 		String queryString) {
 
@@ -195,6 +246,48 @@ public class BaseBuildTest extends com.liferay.jenkins.results.parser.Test {
 		).getDisplayName();
 
 		return baseDownstreamBuild;
+	}
+
+	private Map<String, String> _newParameters(String... namesAndValues) {
+		Map<String, String> parameters = new HashMap<>();
+
+		for (int i = 0; i < namesAndValues.length; i = i + 2) {
+			parameters.put(namesAndValues[i], namesAndValues[i + 1]);
+		}
+
+		return parameters;
+	}
+
+	private Map<String, String> _setInvocationURL(String invocationURL)
+		throws Exception {
+
+		BaseBuild baseBuild = Mockito.mock(BaseBuild.class);
+
+		ReflectionTestUtil.setFieldValue(
+			baseBuild, "_parameters", new HashMap<String, String>());
+
+		Mockito.doCallRealMethod(
+		).when(
+			baseBuild
+		).loadParametersFromQueryString(
+			Mockito.anyString()
+		);
+
+		Mockito.doCallRealMethod(
+		).when(
+			baseBuild
+		).setJobName(
+			Mockito.anyString()
+		);
+
+		Method method = BaseBuild.class.getDeclaredMethod(
+			"_setInvocationURL", String.class);
+
+		method.setAccessible(true);
+
+		method.invoke(baseBuild, invocationURL);
+
+		return ReflectionTestUtil.getFieldValue(baseBuild, "_parameters");
 	}
 
 	private void _testSaveBuildURLInBuildDatabase(
@@ -239,5 +332,9 @@ public class BaseBuildTest extends com.liferay.jenkins.results.parser.Test {
 			Mockito.verifyNoInteractions(buildDatabase);
 		}
 	}
+
+	private static final String _JOB_URL = JenkinsResultsParserUtil.combine(
+		"https://test-1.liferay.com/job/",
+		"test-portal-acceptance-pullrequest(master)");
 
 }
