@@ -1309,8 +1309,9 @@ public class JenkinsResultsParserUtil {
 		}
 
 		if (jsonObject == null) {
-			String buildParametersURL = getLocalURL(
-				buildURL + "api/json?tree=actions[parameters[name,value]]");
+			String buildParametersURL = URLBuilderUtil.buildURL(
+				getLocalURL(buildURL + "api/json"), "tree",
+				"actions[parameters[name,value]]");
 
 			try {
 				jsonObject = toJSONObject(buildParametersURL);
@@ -2331,7 +2332,9 @@ public class JenkinsResultsParserUtil {
 	public static String getJenkinsBuildResult(String buildURL) {
 		try {
 			JSONObject jsonObject = toJSONObject(
-				buildURL + "/api/json?tree=result", false);
+				URLBuilderUtil.buildURL(
+					buildURL + "/api/json", "tree", "result"),
+				false);
 
 			if (!jsonObject.has("result") || jsonObject.isNull("result")) {
 				return null;
@@ -4121,8 +4124,10 @@ public class JenkinsResultsParserUtil {
 
 				try {
 					topLevelBuildsJSONObject = toJSONObject(
-						jenkinsMaster.getRemoteURL() +
-							"/view/Top%20Level/api/json?tree=jobs[name]");
+						URLBuilderUtil.buildURL(
+							jenkinsMaster.getRemoteURL() +
+								"/view/Top%20Level/api/json",
+							"tree", "jobs[name]"));
 				}
 				catch (IOException ioException) {
 					throw new RuntimeException(ioException);

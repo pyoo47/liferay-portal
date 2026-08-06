@@ -311,8 +311,10 @@ public abstract class BasePortalControllerBuildRunner
 
 			try {
 				JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-					JenkinsResultsParserUtil.getLocalURL(
-						buildURL + "/api/json?tree=result"));
+					URLBuilderUtil.buildURL(
+						JenkinsResultsParserUtil.getLocalURL(
+							buildURL + "/api/json"),
+						"tree", "result"));
 
 				Object result = jsonObject.get("result");
 

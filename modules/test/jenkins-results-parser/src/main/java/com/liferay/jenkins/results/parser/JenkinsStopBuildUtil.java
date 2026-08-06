@@ -124,7 +124,9 @@ public class JenkinsStopBuildUtil {
 			JenkinsResultsParserUtil.getLocalURL(buildURL));
 
 		JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-			normalizedBuildURL + "/api/json?tree=result", false);
+			URLBuilderUtil.buildURL(
+				normalizedBuildURL + "/api/json", "tree", "result"),
+			false);
 
 		if (jsonObject.has("result") && jsonObject.isNull("result")) {
 			URL urlObject = new URL(normalizedBuildURL + "/stop");

@@ -82,9 +82,10 @@ public class JobReport {
 
 		try {
 			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-				JenkinsResultsParserUtil.combine(
-					String.valueOf(getJobURL()), "/api/json?tree=",
-					"builds[actions[parameters[name,value]],*]"));
+				URLBuilderUtil.buildURL(
+					JenkinsResultsParserUtil.combine(
+						String.valueOf(getJobURL()), "/api/json"),
+					"tree", "builds[actions[parameters[name,value]],*]"));
 
 			if (jsonObject == null) {
 				return _topLevelBuildReports;

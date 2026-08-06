@@ -410,10 +410,13 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 
 		try {
 			JSONObject jobJSONObject = JenkinsResultsParserUtil.toJSONObject(
-				JenkinsResultsParserUtil.combine(
-					getURL(), "/job/", jobName, "/api/json?",
-					"tree=builds[actions[parameters[name,value]],queueId,",
-					"result,url]"),
+				URLBuilderUtil.buildURL(
+					JenkinsResultsParserUtil.combine(
+						getURL(), "/job/", jobName, "/api/json"),
+					"tree",
+					JenkinsResultsParserUtil.combine(
+						"builds[actions[parameters[name,value]],queueId,",
+						"result,url]")),
 				false, 5000);
 
 			JSONArray buildsJSONArray = jobJSONObject.optJSONArray("builds");
@@ -576,9 +579,9 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 
 		try {
 			JSONObject queueJSONObject = JenkinsResultsParserUtil.toJSONObject(
-				JenkinsResultsParserUtil.combine(
-					getURL(), "/queue/api/json?",
-					"tree=items[actions[parameters[name,value]],id,task[url]]"),
+				URLBuilderUtil.buildURL(
+					getURL() + "/queue/api/json", "tree",
+					"items[actions[parameters[name,value]],id,task[url]]"),
 				false, 5000);
 
 			JSONArray itemsJSONArray = queueJSONObject.optJSONArray("items");
@@ -657,10 +660,13 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 	}
 
 	public QueueItem getQueueItem(long queueId) {
-		String queueItemAPIURL = JenkinsResultsParserUtil.combine(
-			getURL(), "/queue/item/", String.valueOf(queueId),
-			"/api/json?tree=actions[parameters[name,value]],",
-			"id,inQueueSince,task[name,url],url,why");
+		String queueItemAPIURL = URLBuilderUtil.buildURL(
+			JenkinsResultsParserUtil.combine(
+				getURL(), "/queue/item/", String.valueOf(queueId), "/api/json"),
+			"tree",
+			JenkinsResultsParserUtil.combine(
+				"actions[parameters[name,value]],",
+				"id,inQueueSince,task[name,url],url,why"));
 
 		try {
 			String response = JenkinsResultsParserUtil.toString(
@@ -716,10 +722,11 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		try {
 			JSONObject queueAPIJSONObject =
 				JenkinsResultsParserUtil.toJSONObject(
-					JenkinsResultsParserUtil.combine(
-						getURL(), "/queue/api/json?tree=items[actions[",
-						"parameters[name,value]],id,inQueueSince,",
-						"task[name,url],url,why]"),
+					URLBuilderUtil.buildURL(
+						getURL() + "/queue/api/json", "tree",
+						JenkinsResultsParserUtil.combine(
+							"items[actions[parameters[name,value]],id,",
+							"inQueueSince,task[name,url],url,why]")),
 					false, 5000);
 
 			if (!queueAPIJSONObject.has("items")) {
@@ -778,7 +785,9 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		if (_buildCountJSONObject == null) {
 			try {
 				_buildCountJSONObject = JenkinsResultsParserUtil.toJSONObject(
-					getURL() + "api/json?tree=jobs[name,allBuilds[timestamp]]");
+					URLBuilderUtil.buildURL(
+						getURL() + "api/json", "tree",
+						"jobs[name,allBuilds[timestamp]]"));
 			}
 			catch (IOException ioException) {
 				return 0;
@@ -856,7 +865,9 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 			try {
 				if (!isBlacklisted()) {
 					JenkinsResultsParserUtil.toJSONObject(
-						getURL() + "/api/json?tree=mode", false, 1, 1, 1000);
+						URLBuilderUtil.buildURL(
+							getURL() + "/api/json", "tree", "mode"),
+						false, 1, 1, 1000);
 
 					_available = true;
 				}
@@ -976,11 +987,12 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 
 		try {
 			computerAPIJSONObject = JenkinsResultsParserUtil.toJSONObject(
-				JenkinsResultsParserUtil.combine(
-					getURL(), "/computer/api/json?tree=computer",
-					"[assignedLabels[name],displayName,",
-					"executors[currentExecutable[url]],idle,offline,",
-					"offlineCauseReason]"),
+				URLBuilderUtil.buildURL(
+					getURL() + "/computer/api/json", "tree",
+					JenkinsResultsParserUtil.combine(
+						"computer[assignedLabels[name],displayName,",
+						"executors[currentExecutable[url]],idle,offline,",
+						"offlineCauseReason]")),
 				false, 5000);
 		}
 		catch (Exception exception) {
@@ -1356,13 +1368,17 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 
 			@Override
 			public JSONArray execute() {
-				String url = JenkinsResultsParserUtil.getLocalURL(
-					JenkinsResultsParserUtil.combine(
-						String.valueOf(getURL()), "/job/", jobName,
-						"/api/json?tree=allBuilds[actions[parameters",
-						"[name,value]],queueId,timestamp,url]{",
-						String.valueOf(page * 100), ",",
-						String.valueOf((page + 1) * 100), "}"));
+				String tree = JenkinsResultsParserUtil.combine(
+					"allBuilds[actions[parameters[name,value]],queueId,",
+					"timestamp,url]{", String.valueOf(page * 100), ",",
+					String.valueOf((page + 1) * 100), "}");
+
+				String url = URLBuilderUtil.buildURL(
+					JenkinsResultsParserUtil.getLocalURL(
+						JenkinsResultsParserUtil.combine(
+							String.valueOf(getURL()), "/job/", jobName,
+							"/api/json")),
+					"tree", tree);
 
 				try {
 					JSONObject jsonObject =
@@ -1593,7 +1609,9 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		try {
 			JSONObject topLevelBuildsJSONObject =
 				JenkinsResultsParserUtil.toJSONObject(
-					getURL() + "/view/Top%20Level/api/json?tree=jobs[name]");
+					URLBuilderUtil.buildURL(
+						getURL() + "/view/Top%20Level/api/json", "tree",
+						"jobs[name]"));
 
 			JSONArray jobsJSONArray = topLevelBuildsJSONObject.optJSONArray(
 				"jobs");

@@ -1424,19 +1424,18 @@ public abstract class BaseJob implements Job {
 			return null;
 		}
 
-		StringBuffer sb = new StringBuffer();
-
-		sb.append(
-			JenkinsResultsParserUtil.getLocalURL(getJobURL(jenkinsMaster)));
-		sb.append("/api/json?pretty");
+		String apiURL = URLBuilderUtil.buildURL(
+			JenkinsResultsParserUtil.combine(
+				JenkinsResultsParserUtil.getLocalURL(getJobURL(jenkinsMaster)),
+				"/api/json"),
+			"pretty", null);
 
 		if (tree != null) {
-			sb.append("&tree=");
-			sb.append(tree);
+			apiURL = URLBuilderUtil.appendParameter(apiURL, "tree", tree);
 		}
 
 		try {
-			return JenkinsResultsParserUtil.toJSONObject(sb.toString(), false);
+			return JenkinsResultsParserUtil.toJSONObject(apiURL, false);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException("Unable to get job JSON", ioException);
