@@ -8,10 +8,9 @@ package com.liferay.jenkins.results.parser.testray;
 import com.liferay.jenkins.results.parser.Dom4JUtil;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.Retryable;
+import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.IOException;
-
-import java.net.URLEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -193,8 +192,8 @@ public class TestrayRun {
 				try {
 					JSONObject existingJSONObject = new JSONObject(
 						testrayServer.requestGet(
-							"/o/c/runs?filter=" +
-								URLEncoder.encode(filterString, "UTF-8")));
+							URLBuilderUtil.buildURL(
+								"/o/c/runs", "filter", filterString)));
 
 					JSONArray existingItemsJSONArray =
 						existingJSONObject.optJSONArray("items");
@@ -417,8 +416,8 @@ public class TestrayRun {
 
 			JSONObject jsonObject = new JSONObject(
 				testrayServer.requestGet(
-					"/o/c/runs?filter=" +
-						URLEncoder.encode(filterString, "UTF-8")));
+					URLBuilderUtil.buildURL(
+						"/o/c/runs", "filter", filterString)));
 
 			return jsonObject.optInt("totalCount") + 1;
 		}
@@ -464,12 +463,13 @@ public class TestrayRun {
 		try {
 			TestrayServer testrayServer = _testrayBuild.getTestrayServer();
 
+			String urlPath = URLBuilderUtil.buildURL(
+				"/o/c/factors", "filter", filterString);
+
 			JSONObject responseJSONObject = new JSONObject(
 				testrayServer.requestGet(
-					JenkinsResultsParserUtil.combine(
-						"/o/c/factors?filter=",
-						URLEncoder.encode(filterString, "UTF-8"),
-						"&pageSize=100")));
+					URLBuilderUtil.appendParameter(
+						urlPath, "pageSize", "100")));
 
 			JSONArray itemsJSONArray = responseJSONObject.optJSONArray("items");
 

@@ -7,10 +7,9 @@ package com.liferay.jenkins.results.parser.testray;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.Retryable;
+import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.IOException;
-
-import java.net.URLEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -81,8 +80,8 @@ public class RunTestrayFactor extends BaseTestrayFactor {
 				try {
 					JSONObject existingJSONObject = new JSONObject(
 						testrayServer.requestGet(
-							"/o/c/factors?filter=" +
-								URLEncoder.encode(filterString, "UTF-8")));
+							URLBuilderUtil.buildURL(
+								"/o/c/factors", "filter", filterString)));
 
 					JSONArray existingItemsJSONArray =
 						existingJSONObject.optJSONArray("items");

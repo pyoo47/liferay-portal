@@ -6,10 +6,9 @@
 package com.liferay.jenkins.results.parser.testray;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.IOException;
-
-import java.net.URLEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -113,8 +112,8 @@ public interface TestrayFactor {
 			try {
 				JSONObject jsonObject = new JSONObject(
 					_testrayServer.requestGet(
-						"/o/c/factorcategories?filter=" +
-							URLEncoder.encode(filterString, "UTF-8")));
+						URLBuilderUtil.buildURL(
+							"/o/c/factorcategories", "filter", filterString)));
 
 				JSONArray itemsJSONArray = jsonObject.optJSONArray("items");
 
@@ -243,8 +242,8 @@ public interface TestrayFactor {
 			try {
 				JSONObject jsonObject = new JSONObject(
 					_testrayServer.requestGet(
-						"/o/c/factoroptions?filter=" +
-							URLEncoder.encode(filterString, "UTF-8")));
+						URLBuilderUtil.buildURL(
+							"/o/c/factoroptions", "filter", filterString)));
 
 				JSONArray itemsJSONArray = jsonObject.optJSONArray("items");
 
