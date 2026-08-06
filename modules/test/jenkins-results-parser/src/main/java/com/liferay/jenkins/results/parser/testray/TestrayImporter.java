@@ -26,6 +26,7 @@ import com.liferay.jenkins.results.parser.QAWebsitesGitRepositoryJob;
 import com.liferay.jenkins.results.parser.QAWebsitesWorkspaceGitRepository;
 import com.liferay.jenkins.results.parser.TestSuiteJob;
 import com.liferay.jenkins.results.parser.TopLevelBuildReport;
+import com.liferay.jenkins.results.parser.URLBuilderUtil;
 import com.liferay.jenkins.results.parser.Workspace;
 import com.liferay.jenkins.results.parser.WorkspaceGitRepository;
 import com.liferay.jenkins.results.parser.job.property.JobProperty;
@@ -394,8 +395,9 @@ public class TestrayImporter {
 				"jenkins-report.html.gz");
 
 		if (testrayAttachmentURL != null) {
-			sb.append(testrayAttachmentURL);
-			sb.append("?authuser=0");
+			sb.append(
+				URLBuilderUtil.buildURL(
+					String.valueOf(testrayAttachmentURL), "authuser", "0"));
 		}
 		else {
 			sb.append(_topLevelBuildReport.getJenkinsReportURL());
@@ -1487,7 +1489,15 @@ public class TestrayImporter {
 			attachmentFileElement.addAttribute(
 				"name", testrayAttachment.getName());
 			attachmentFileElement.addAttribute(
-				"url", testrayAttachment.getURL() + "?authuser=0");
+				"url",
+				URLBuilderUtil.buildURL(
+					String.valueOf(testrayAttachment.getURL()), "authuser",
+					"0"));
+
+			// The value attribute carries a cloud storage object key rather
+			// than a URL, and Testray matches it against the key the uploader
+			// wrote, so it is left concatenated
+
 			attachmentFileElement.addAttribute(
 				"value", testrayAttachment.getKey() + "?authuser=0");
 		}

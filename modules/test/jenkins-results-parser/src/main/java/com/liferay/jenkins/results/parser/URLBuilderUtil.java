@@ -419,13 +419,31 @@ public class URLBuilderUtil {
 		}
 	}
 
+	/**
+	 * Returns a builder over the URL, repairing the URL first when it does not
+	 * parse.
+	 *
+	 * <p>
+	 * A URL assembled outside this class may carry a raw space or square
+	 * bracket, most often from a test name or a cloud storage object key.
+	 * Repairing it keeps appending a parameter to such a URL from throwing
+	 * where plain concatenation would have quietly succeeded.
+	 * </p>
+	 */
 	private static URIBuilder _newURIBuilder(String url) {
 		try {
 			return new URIBuilder(url);
 		}
-		catch (URISyntaxException uriSyntaxException) {
-			throw new RuntimeException(
-				"Unable to parse the URL " + url, uriSyntaxException);
+		catch (URISyntaxException uriSyntaxException1) {
+			String normalizedURL = normalizeURL(url);
+
+			try {
+				return new URIBuilder(normalizedURL);
+			}
+			catch (URISyntaxException uriSyntaxException2) {
+				throw new RuntimeException(
+					"Unable to parse the URL " + url, uriSyntaxException2);
+			}
 		}
 	}
 

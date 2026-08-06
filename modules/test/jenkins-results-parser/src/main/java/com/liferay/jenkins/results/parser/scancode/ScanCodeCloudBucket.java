@@ -16,6 +16,7 @@ import com.google.cloud.storage.StorageOptions;
 
 import com.liferay.jenkins.results.parser.Environment;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -316,9 +317,11 @@ public class ScanCodeCloudBucket {
 	public URL getURL() {
 		try {
 			return new URL(
-				JenkinsResultsParserUtil.combine(
-					"https://console.cloud.google.com/storage/browser/",
-					getName(), "?authuser=0"));
+				URLBuilderUtil.buildURL(
+					JenkinsResultsParserUtil.combine(
+						"https://console.cloud.google.com/storage/browser/",
+						getName()),
+					"authuser", "0"));
 		}
 		catch (MalformedURLException malformedURLException) {
 			throw new RuntimeException(malformedURLException);

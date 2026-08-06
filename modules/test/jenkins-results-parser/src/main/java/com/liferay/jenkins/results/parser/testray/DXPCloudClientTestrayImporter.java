@@ -8,6 +8,7 @@ package com.liferay.jenkins.results.parser.testray;
 import com.liferay.jenkins.results.parser.Dom4JUtil;
 import com.liferay.jenkins.results.parser.Environment;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -246,9 +247,15 @@ public class DXPCloudClientTestrayImporter {
 		attachmentElement.addAttribute("name", "Poshi Log");
 		attachmentElement.addAttribute(
 			"url",
-			JenkinsResultsParserUtil.combine(
-				_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key,
-				"?authuser=0"));
+			URLBuilderUtil.buildURL(
+				JenkinsResultsParserUtil.combine(
+					_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key),
+				"authuser", "0"));
+
+		// The value attribute carries a cloud storage object key rather than a
+		// URL, and Testray matches it against the key the uploader wrote, so
+		// it is left concatenated
+
 		attachmentElement.addAttribute("value", key + "?authuser=0");
 
 		return attachmentElement;
@@ -395,9 +402,15 @@ public class DXPCloudClientTestrayImporter {
 
 			attachmentElement.addAttribute(
 				"url",
-				JenkinsResultsParserUtil.combine(
-					_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key,
-					"?authuser=0"));
+				URLBuilderUtil.buildURL(
+					JenkinsResultsParserUtil.combine(
+						_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key),
+					"authuser", "0"));
+
+			// The value attribute carries a cloud storage object key rather
+			// than a URL, and Testray matches it against the key the uploader
+			// wrote, so it is left concatenated
+
 			attachmentElement.addAttribute("value", key + "?authuser=0");
 		}
 
