@@ -85,7 +85,7 @@ public class UrlReader {
 			Map<String, String> requestHeaders, int timeout, String url)
 		throws IOException {
 
-		URL urlObject = new URL(JenkinsResultsParserUtil.fixURL(url));
+		URL urlObject = new URL(URLBuilderUtil.normalizeURL(url));
 
 		HttpURLConnection httpURLConnection =
 			(HttpURLConnection)urlObject.openConnection();
@@ -160,7 +160,7 @@ public class UrlReader {
 			}
 		}
 
-		url = JenkinsResultsParserUtil.fixURL(url);
+		url = URLBuilderUtil.normalizeURL(url);
 
 		if (url.startsWith("file:")) {
 			url = JenkinsResultsParserUtil.fixFileURL(url);

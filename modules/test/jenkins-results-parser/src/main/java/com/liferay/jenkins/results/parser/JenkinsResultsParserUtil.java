@@ -658,7 +658,7 @@ public class JenkinsResultsParserUtil {
 					combine("http://", jenkinsMasterName, "/script"));
 			}
 
-			URL urlObject = new URL(fixURL(url));
+			URL urlObject = new URL(URLBuilderUtil.normalizeURL(url));
 
 			HttpURLConnection httpURLConnection =
 				(HttpURLConnection)urlObject.openConnection();
