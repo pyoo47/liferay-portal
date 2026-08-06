@@ -622,7 +622,8 @@ public abstract class BaseTopLevelBuild
 
 		try {
 			JSONObject buildJSONObject = JenkinsResultsParserUtil.toJSONObject(
-				buildURL + "/api/json?tree=result");
+				URLBuilderUtil.buildURL(
+					buildURL + "/api/json", "tree", "result"));
 
 			if (!JenkinsResultsParserUtil.isNullOrEmpty(
 					buildJSONObject.optString("result", null))) {

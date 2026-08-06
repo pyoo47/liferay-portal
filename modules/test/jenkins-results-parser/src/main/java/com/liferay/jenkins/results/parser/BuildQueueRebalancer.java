@@ -459,9 +459,11 @@ public class BuildQueueRebalancer {
 		private boolean _isBuildInProgress(String buildURL) {
 			try {
 				JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-					JenkinsResultsParserUtil.combine(
-						JenkinsResultsParserUtil.getLocalURL(buildURL),
-						"/api/json?tree=result"),
+					URLBuilderUtil.buildURL(
+						JenkinsResultsParserUtil.combine(
+							JenkinsResultsParserUtil.getLocalURL(buildURL),
+							"/api/json"),
+						"tree", "result"),
 					false, 5000);
 
 				String result = jsonObject.optString("result");

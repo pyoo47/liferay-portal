@@ -94,14 +94,15 @@ public class GenerateReportsControllerBuildRunner
 
 		BuildData buildData = getBuildData();
 
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(JenkinsResultsParserUtil.getLocalURL(buildData.getJobURL()));
-		sb.append("/api/json?tree=builds[description,timestamp,url]");
+		String jobAPIURL = URLBuilderUtil.buildURL(
+			JenkinsResultsParserUtil.combine(
+				JenkinsResultsParserUtil.getLocalURL(buildData.getJobURL()),
+				"/api/json"),
+			"tree", "builds[description,timestamp,url]");
 
 		try {
 			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-				sb.toString(), false);
+				jobAPIURL, false);
 
 			JSONArray buildsJSONArray = jsonObject.getJSONArray("builds");
 
