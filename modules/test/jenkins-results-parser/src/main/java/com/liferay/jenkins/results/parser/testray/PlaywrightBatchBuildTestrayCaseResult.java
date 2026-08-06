@@ -11,6 +11,7 @@ import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.TestClassReport;
 import com.liferay.jenkins.results.parser.TestReport;
 import com.liferay.jenkins.results.parser.TopLevelBuildReport;
+import com.liferay.jenkins.results.parser.URLBuilderUtil;
 import com.liferay.jenkins.results.parser.test.clazz.PlaywrightJUnitTestClass;
 import com.liferay.jenkins.results.parser.test.clazz.PlaywrightTestClassMethod;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
@@ -288,7 +289,9 @@ public class PlaywrightBatchBuildTestrayCaseResult
 
 		try {
 			URL url = new URL(
-				"https://playwright.liferay.com/?trace=" + traceZipURLPath);
+				URLBuilderUtil.buildURL(
+					"https://playwright.liferay.com/", "trace",
+					traceZipURLPath));
 
 			return new DefaultTestrayAttachment(
 				this, "Trace Viewer", traceZipURLPath, url);
