@@ -200,8 +200,7 @@ public class CentralGitSubrepository {
 
 		for (int i = 0; i < 15; i++) {
 			JSONArray statusesJSONArray = JenkinsResultsParserUtil.toJSONArray(
-				JenkinsResultsParserUtil.combine(
-					url, "?page=", String.valueOf(i + 1)),
+				URLBuilderUtil.buildURL(url, "page", String.valueOf(i + 1)),
 				true);
 
 			if ((statusesJSONArray == null) ||

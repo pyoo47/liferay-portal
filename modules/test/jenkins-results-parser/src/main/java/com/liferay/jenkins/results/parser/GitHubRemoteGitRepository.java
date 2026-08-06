@@ -132,13 +132,15 @@ public class GitHubRemoteGitRepository extends BaseRemoteGitRepository {
 			 pageNumber++) {
 
 			try {
+				String labelsURL = URLBuilderUtil.buildURL(
+					labelRequestURL, "per_page",
+					String.valueOf(
+						JenkinsResultsParserUtil.
+							PER_PAGE_GITHUB_API_PAGES_SIZE_MAX));
+
 				labelsJSONArray = JenkinsResultsParserUtil.toJSONArray(
-					JenkinsResultsParserUtil.combine(
-						labelRequestURL, "?per_page=",
-						String.valueOf(
-							JenkinsResultsParserUtil.
-								PER_PAGE_GITHUB_API_PAGES_SIZE_MAX),
-						"&page=", String.valueOf(pageNumber)),
+					URLBuilderUtil.appendParameter(
+						labelsURL, "page", String.valueOf(pageNumber)),
 					false);
 			}
 			catch (IOException ioException) {

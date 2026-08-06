@@ -11,6 +11,7 @@ import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.Job;
 import com.liferay.jenkins.results.parser.TestSuiteJob;
 import com.liferay.jenkins.results.parser.TopLevelBuildReport;
+import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -243,7 +244,15 @@ public abstract class BaseStandaloneBuildTestrayCaseResult
 					attachmentFileElement.addAttribute(
 						"name", testrayAttachment.getName());
 					attachmentFileElement.addAttribute(
-						"url", testrayAttachment.getURL() + "?authuser=0");
+						"url",
+						URLBuilderUtil.buildURL(
+							String.valueOf(testrayAttachment.getURL()),
+							"authuser", "0"));
+
+					// The value attribute carries a cloud storage object key
+					// rather than a URL, and Testray matches it against the
+					// key the uploader wrote, so it is left concatenated
+
 					attachmentFileElement.addAttribute(
 						"value", testrayAttachment.getKey() + "?authuser=0");
 				}
