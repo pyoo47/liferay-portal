@@ -26,7 +26,7 @@ public class JenkinsStopBuildUtil {
 			JenkinsMaster jenkinsMaster, long queueId)
 		throws Exception {
 
-		String normalizedURL = JenkinsResultsParserUtil.fixURL(
+		String normalizedURL = URLBuilderUtil.normalizeURL(
 			JenkinsResultsParserUtil.getLocalURL(jenkinsMaster.getURL()));
 
 		URL urlObject = new URL(
@@ -122,7 +122,7 @@ public class JenkinsStopBuildUtil {
 	}
 
 	private static void _stopBuild(String buildURL) throws Exception {
-		String normalizedBuildURL = JenkinsResultsParserUtil.fixURL(
+		String normalizedBuildURL = URLBuilderUtil.normalizeURL(
 			JenkinsResultsParserUtil.getLocalURL(buildURL));
 
 		JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(

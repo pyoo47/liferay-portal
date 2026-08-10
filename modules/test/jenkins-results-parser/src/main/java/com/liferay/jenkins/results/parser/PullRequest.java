@@ -1003,7 +1003,7 @@ public class PullRequest {
 
 		String path = JenkinsResultsParserUtil.combine(
 			"issues/", getNumber(), "/labels/",
-			JenkinsResultsParserUtil.fixURL(labelName));
+			JenkinsResultsParserUtil.encodeLegacyURLPart(labelName));
 
 		String gitHubAPIURL = JenkinsResultsParserUtil.getGitHubAPIURL(
 			getGitHubRemoteGitRepositoryName(), getOwnerUsername(), path);
