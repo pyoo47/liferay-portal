@@ -56,6 +56,17 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
+	public void testBuildFormContentWithReservedCharacters() {
+		testEquals(
+			JenkinsResultsParserUtil.combine(
+				"A=a%23b&B=a%26b&C=100%25+pass&D=a%3Db&E=a%2Bb&F=a+b"),
+			URLBuilderUtil.buildFormContent(
+				_newParameters(
+					"A", "a#b", "B", "a&b", "C", "100% pass", "D", "a=b", "E",
+					"a+b", "F", "a b")));
+	}
+
+	@Test
 	public void testBuildURL() {
 		testEquals(
 			JenkinsResultsParserUtil.combine(
@@ -80,6 +91,20 @@ public class URLBuilderUtilTest
 					"http://test-1-1/job/test-portal-acceptance-pullrequest",
 					"(master)/buildWithParameters"),
 				"a", "1"));
+	}
+
+	@Test
+	public void testBuildURLRoundTripsReservedCharacters() {
+		Map<String, String> parameters = _newParameters(
+			"A", "a#b", "B", "a&b", "C", "100% pass", "D", "a=b", "E", "a+b",
+			"F", "a b", "G a", "name with a space");
+
+		Map<String, String> roundTrippedParameters =
+			URLBuilderUtil.getParameters(
+				URLBuilderUtil.buildURL(
+					"http://test-1-1/job/x/buildWithParameters", parameters));
+
+		testEquals(parameters, roundTrippedParameters);
 	}
 
 	@Test
@@ -249,14 +274,15 @@ public class URLBuilderUtilTest
 		Map<String, String> parameters = URLBuilderUtil.parseQueryString(
 			JenkinsResultsParserUtil.combine(
 				"A=PortalSmoke%23Smoke&B=AWS%20%26%20CI&C=a%3Db&D=a%2Bb&",
-				"E=a+b"));
+				"E=a+b&F=100%25%20pass"));
 
-		testEquals(5, parameters.size());
+		testEquals(6, parameters.size());
 		testEquals("PortalSmoke#Smoke", parameters.get("A"));
 		testEquals("AWS & CI", parameters.get("B"));
 		testEquals("a=b", parameters.get("C"));
 		testEquals("a+b", parameters.get("D"));
 		testEquals("a b", parameters.get("E"));
+		testEquals("100% pass", parameters.get("F"));
 	}
 
 	private Map<String, String> _newParameters(String... namesAndValues) {
