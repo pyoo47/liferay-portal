@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 
@@ -68,9 +69,15 @@ public class BuildFactory {
 		if (jobName.contains("-downstream")) {
 			String queryString = matcher.group("queryString");
 
-			if ((queryString != null) && queryString.contains("JOB_VARIANT")) {
-				jobVariant = queryString.replaceAll(
-					".*JOB_VARIANT=([^&]+).*", "$1");
+			Map<String, String> parameters = URLBuilderUtil.parseQueryString(
+				queryString);
+
+			String queryStringJobVariant = parameters.get("JOB_VARIANT");
+
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(
+					queryStringJobVariant)) {
+
+				jobVariant = queryStringJobVariant;
 			}
 
 			if (JenkinsResultsParserUtil.isNullOrEmpty(jobVariant)) {

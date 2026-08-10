@@ -3080,18 +3080,17 @@ public abstract class BaseBuild implements Build {
 	}
 
 	protected void loadParametersFromQueryString(String queryString) {
-		for (String parameter : queryString.split("&")) {
-			if (!parameter.contains("=")) {
+		Map<String, String> parameters = URLBuilderUtil.parseQueryString(
+			queryString);
+
+		for (Map.Entry<String, String> entry : parameters.entrySet()) {
+			String value = entry.getValue();
+
+			if (value == null) {
 				continue;
 			}
 
-			String[] parameterParts = parameter.split("=", 2);
-
-			_parameters.put(
-				JenkinsResultsParserUtil.decodeURLParameterPart(
-					parameterParts[0]),
-				JenkinsResultsParserUtil.decodeURLParameterPart(
-					parameterParts[1]));
+			_parameters.put(entry.getKey(), value);
 		}
 	}
 
