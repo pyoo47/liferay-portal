@@ -51,6 +51,35 @@ public class JenkinsResultsParserUtilTest
 	}
 
 	@Test
+	public void testEncodeLegacyURLPart() {
+		testEquals(
+			"ABC%28123",
+			JenkinsResultsParserUtil.encodeLegacyURLPart("ABC(123"));
+		testEquals(
+			"ABC%29123",
+			JenkinsResultsParserUtil.encodeLegacyURLPart("ABC)123"));
+		testEquals(
+			"ABC%5B123",
+			JenkinsResultsParserUtil.encodeLegacyURLPart("ABC[123"));
+		testEquals(
+			"ABC%5D123",
+			JenkinsResultsParserUtil.encodeLegacyURLPart("ABC]123"));
+		testEquals(
+			"!master", JenkinsResultsParserUtil.encodeLegacyURLPart("!master"));
+		testEquals(
+			"0%201%202", JenkinsResultsParserUtil.encodeLegacyURLPart("0 1 2"));
+
+		// A percent sign and a plus sign survive unencoded. That is wrong in
+		// principle and is why this spelling is confined to callers matching a
+		// name that was already written
+
+		testEquals(
+			"100%%20pass",
+			JenkinsResultsParserUtil.encodeLegacyURLPart("100% pass"));
+		testEquals("a+b", JenkinsResultsParserUtil.encodeLegacyURLPart("a+b"));
+	}
+
+	@Test
 	public void testEncodeURLParameterPart() {
 		testEquals(
 			"100%25%20pass",
@@ -126,22 +155,6 @@ public class JenkinsResultsParserUtilTest
 		testEquals("ABC&#125;123", JenkinsResultsParserUtil.fixJSON("ABC}123"));
 		testEquals(
 			"ABC<br />123", JenkinsResultsParserUtil.fixJSON("ABC\n123"));
-	}
-
-	@Test
-	public void testFixURL() {
-		testEquals("ABC%28123", _fixURLMultipleTimes("ABC(123"));
-		testEquals("ABC%29123", _fixURLMultipleTimes("ABC)123"));
-		testEquals("ABC%5B123", _fixURLMultipleTimes("ABC[123"));
-		testEquals("ABC%5D123", _fixURLMultipleTimes("ABC]123"));
-		testEquals("!master", _fixURLMultipleTimes("!master"));
-		testEquals("0%201%202", _fixURLMultipleTimes("0 1 2"));
-		testEquals(
-			"https://test-1-1.liferay.com/job(master)?" +
-				"AXIS_VARIABLE=0%201&label_exp=!master&job=test%287.2.x%29",
-			_fixURLMultipleTimes(
-				"https://test-1-1.liferay.com/job(master)?" +
-					"AXIS_VARIABLE=0 1&label_exp=!master&job=test(7.2.x)"));
 	}
 
 	@Test
@@ -706,12 +719,6 @@ public class JenkinsResultsParserUtilTest
 
 	private ServerSocket _createServerSocket() throws Exception {
 		return new ServerSocket(0, 1, InetAddress.getByName("localhost"));
-	}
-
-	private String _fixURLMultipleTimes(String urlString) {
-		return JenkinsResultsParserUtil.fixURL(
-			JenkinsResultsParserUtil.fixURL(
-				JenkinsResultsParserUtil.fixURL(urlString)));
 	}
 
 	private Properties _getBuildAwsProperties() {
