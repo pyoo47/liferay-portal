@@ -501,23 +501,11 @@ public class JenkinsResultsParserUtil {
 
 	/**
 	 * Returns the part encoded the way this repository has always encoded a
-	 * single path part, for a caller that has to keep matching a string
-	 * written earlier.
-	 *
-	 * <p>
-	 * This is form encoding with four characters put back afterwards, so an
-	 * exclamation mark, a percent sign, and a plus sign survive unencoded. The
-	 * percent sign and the plus sign are the reason the spelling is wrong in
-	 * principle. It is kept only because a cloud storage object key and a
-	 * GitHub label are matched against a name that was already written with
-	 * this spelling, and changing it would stop the match without reporting
-	 * anything.
-	 * </p>
-	 *
-	 * <p>
-	 * Do not use this to build a URL. Use
-	 * {@link URLBuilderUtil#buildURL(String, String, String)} instead.
-	 * </p>
+	 * single path part. This is form encoding with four characters put back
+	 * afterwards, so a percent sign and a plus sign survive unencoded, which
+	 * is wrong in principle and kept only because a cloud storage object key
+	 * is matched against a name already written this way. Do not build a URL
+	 * with this. Use {@link URLBuilderUtil#buildURL(String, String, String)}.
 	 */
 	public static String encodeLegacyURLPart(String part) {
 		try {

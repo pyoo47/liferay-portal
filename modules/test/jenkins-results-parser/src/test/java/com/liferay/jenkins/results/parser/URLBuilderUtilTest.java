@@ -57,49 +57,6 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
-	public void testBuildURLPreservesPath() {
-		testEquals(
-			JenkinsResultsParserUtil.combine(
-				"http://test-1-1/job/test-portal-acceptance-pullrequest",
-				"(master)/buildWithParameters?a=1"),
-			URLBuilderUtil.buildURL(
-				JenkinsResultsParserUtil.combine(
-					"http://test-1-1/job/test-portal-acceptance-pullrequest",
-					"(master)/buildWithParameters"),
-				"a", "1"));
-	}
-
-	@Test
-	public void testBuildURLRepairsIllegalBaseURL() {
-		testEquals(
-			"http://test-1-1/job/a%20b/api/json?tree=result",
-			URLBuilderUtil.buildURL(
-				"http://test-1-1/job/a b/api/json", "tree", "result"));
-	}
-
-	@Test
-	public void testBuildURLRoundTripsReservedCharacters() throws Exception {
-		Map<String, String> parameters = newParameters(
-			"A", "a#b", "B", "a&b", "C", "100% pass", "D", "a=b", "E", "a+b",
-			"F", "a b", "G a", "name with a space");
-
-		URL url = new URL(
-			URLBuilderUtil.buildURL(
-				"http://test-1-1/job/x/buildWithParameters", parameters));
-
-		testEquals(parameters, URLBuilderUtil.parseQueryString(url.getQuery()));
-	}
-
-	@Test
-	public void testBuildURLSortsParameters() {
-		testEquals(
-			"http://test-1-1/job/x?alpha=1&beta=2&gamma=3",
-			URLBuilderUtil.buildURL(
-				"http://test-1-1/job/x",
-				newParameters("gamma", "3", "beta", "2", "alpha", "1")));
-	}
-
-	@Test
 	public void testBuildURLWithEmptyValue() {
 		testEquals(
 			"http://test-1-1/job/x?AXIS_VARIABLE=",
@@ -123,6 +80,14 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
+	public void testBuildURLWithIllegalBaseURL() {
+		testEquals(
+			"http://test-1-1/job/a%20b/api/json?tree=result",
+			URLBuilderUtil.buildURL(
+				"http://test-1-1/job/a b/api/json", "tree", "result"));
+	}
+
+	@Test
 	public void testBuildURLWithNullValue() {
 		testEquals(
 			"http://test-1-1/job/x/api/json?pretty",
@@ -137,6 +102,19 @@ public class URLBuilderUtilTest
 			URLBuilderUtil.buildURL(
 				"http://test-1-1/job/x/buildWithParameters",
 				Collections.emptyMap()));
+	}
+
+	@Test
+	public void testBuildURLWithParenthesesInPath() {
+		testEquals(
+			JenkinsResultsParserUtil.combine(
+				"http://test-1-1/job/test-portal-acceptance-pullrequest",
+				"(master)/buildWithParameters?a=1"),
+			URLBuilderUtil.buildURL(
+				JenkinsResultsParserUtil.combine(
+					"http://test-1-1/job/test-portal-acceptance-pullrequest",
+					"(master)/buildWithParameters"),
+				"a", "1"));
 	}
 
 	@Test
@@ -163,15 +141,23 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
-	public void testNormalizeURLIsIdempotent() {
-		String normalizedURL = URLBuilderUtil.normalizeURL(
-			"http://test-1-1/job/x?tree=actions[parameters[name,value]]");
-
-		testEquals(normalizedURL, URLBuilderUtil.normalizeURL(normalizedURL));
+	public void testBuildURLWithUnsortedParameters() {
+		testEquals(
+			"http://test-1-1/job/x?alpha=1&beta=2&gamma=3",
+			URLBuilderUtil.buildURL(
+				"http://test-1-1/job/x",
+				newParameters("gamma", "3", "beta", "2", "alpha", "1")));
 	}
 
 	@Test
-	public void testNormalizeURLPreservesEncodedParameters() {
+	public void testNormalizeURLWithBarePercent() {
+		testEquals(
+			"http://test-1-1/job/x?V=100%25%20pass",
+			URLBuilderUtil.normalizeURL("http://test-1-1/job/x?V=100% pass"));
+	}
+
+	@Test
+	public void testNormalizeURLWithEncodedParameters() {
 		String url = JenkinsResultsParserUtil.combine(
 			"http://test-1-1/job/x/buildWithParameters?",
 			"A=a%23b&B=a%26b&C=100%25%20pass&D=a%3Db&E=a%2Bb&F=a%20b");
@@ -180,26 +166,10 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
-	public void testNormalizeURLPreservesFragment() {
+	public void testNormalizeURLWithFragment() {
 		testEquals(
 			"http://test-1-1/job/x?a=1#summary",
 			URLBuilderUtil.normalizeURL("http://test-1-1/job/x?a=1#summary"));
-	}
-
-	@Test
-	public void testNormalizeURLPreservesLegalURL() {
-		String url = JenkinsResultsParserUtil.combine(
-			"http://test-1-1/job/test-portal-acceptance-pullrequest(master)/",
-			"buildWithParameters?V=a%2Bb&W=AWS%20%26%20CI");
-
-		testSame(url, URLBuilderUtil.normalizeURL(url));
-	}
-
-	@Test
-	public void testNormalizeURLWithBarePercent() {
-		testEquals(
-			"http://test-1-1/job/x?V=100%25%20pass",
-			URLBuilderUtil.normalizeURL("http://test-1-1/job/x?V=100% pass"));
 	}
 
 	@Test
@@ -211,6 +181,36 @@ public class URLBuilderUtilTest
 			"http://test-1-1/job/x?tree=result%5B0%5D",
 			URLBuilderUtil.normalizeURL(
 				"http://test-1-1/job/x?tree=result[0]"));
+	}
+
+	@Test
+	public void testNormalizeURLWithLegalURL() {
+		String url = JenkinsResultsParserUtil.combine(
+			"http://test-1-1/job/test-portal-acceptance-pullrequest(master)/",
+			"buildWithParameters?V=a%2Bb&W=AWS%20%26%20CI");
+
+		testSame(url, URLBuilderUtil.normalizeURL(url));
+	}
+
+	@Test
+	public void testNormalizeURLWithNormalizedURL() {
+		String normalizedURL = URLBuilderUtil.normalizeURL(
+			"http://test-1-1/job/x?tree=actions[parameters[name,value]]");
+
+		testEquals(normalizedURL, URLBuilderUtil.normalizeURL(normalizedURL));
+	}
+
+	@Test
+	public void testParseQueryStringWithBuiltURL() throws Exception {
+		Map<String, String> parameters = newParameters(
+			"A", "a#b", "B", "a&b", "C", "100% pass", "D", "a=b", "E", "a+b",
+			"F", "a b", "G a", "name with a space");
+
+		URL url = new URL(
+			URLBuilderUtil.buildURL(
+				"http://test-1-1/job/x/buildWithParameters", parameters));
+
+		testEquals(parameters, URLBuilderUtil.parseQueryString(url.getQuery()));
 	}
 
 	@Test
