@@ -23,30 +23,19 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
 /**
- * Builds and decomposes URLs so that a value is encoded exactly once, at the
- * point the URL is assembled, and is held decoded everywhere else.
- *
- * <p>
- * This is the only class in the module that references
- * <code>org.apache.http</code>. Confining the dependency here keeps a
- * <code>URIBuilder</code> from being held as a field or a static, which
- * matters because downstream work runs concurrently through
- * <code>ParallelExecutor</code> and <code>URIBuilder</code> is mutable and not
- * thread safe. Every method below constructs its own instance and discards it.
- * </p>
+ * Builds and decomposes URLs so that a value is encoded exactly once, when the
+ * URL is assembled, and is held decoded everywhere else. This is the only
+ * class here that references <code>org.apache.http</code>, which keeps a
+ * mutable <code>URIBuilder</code> from being shared across the threads
+ * <code>ParallelExecutor</code> runs.
  *
  * @author Calum Ragan
  */
 public class URLBuilderUtil {
 
 	/**
-	 * Returns the parameters encoded as an
-	 * <code>application/x-www-form-urlencoded</code> request body.
-	 *
-	 * <p>
-	 * This is for a POST body, not a URL. A body carries no leading question
-	 * mark.
-	 * </p>
+	 * Returns an <code>application/x-www-form-urlencoded</code> request body,
+	 * which unlike a URL carries no leading question mark.
 	 */
 	public static String buildFormContent(Map<String, String> parameters) {
 		if ((parameters == null) || parameters.isEmpty()) {
@@ -67,33 +56,13 @@ public class URLBuilderUtil {
 	}
 
 	/**
-	 * Returns the base URL with the parameters appended as a query string,
-	 * each name and value percent encoded exactly once.
-	 *
-	 * <p>
-	 * The base URL's path is passed through untouched, so a job name such as
-	 * <code>test-portal-acceptance-pullrequest(master)</code> is preserved
-	 * verbatim. A base URL that is not a legal URI reference is repaired with
-	 * {@link #normalizeURL(String)} first, which percent encodes an octet that
-	 * is illegal where it sits, so a raw space in a path becomes
-	 * <code>%20</code>.
-	 * </p>
-	 *
-	 * <p>
-	 * The base URL may already carry a query string and a fragment. Parameters
-	 * are inserted before the fragment, and a pre-existing query string is
-	 * re-emitted in canonical form, so a space already spelled
-	 * <code>%20</code> comes back as <code>+</code>. The two are equivalent
-	 * under form decoding but are not byte identical.
-	 * </p>
-	 *
-	 * <p>
-	 * Parameters are emitted in ascending name order so that the same map
-	 * always produces the same URL. A null value emits a valueless parameter,
-	 * an empty value emits a name followed by an equals sign, and both round
-	 * trip through {@link #parseQueryString(String)}. A null or empty map
-	 * returns the base URL unchanged, without a trailing question mark.
-	 * </p>
+	 * Returns the base URL with the parameters appended, each name and value
+	 * percent encoded exactly once and emitted in ascending name order so that
+	 * the same map always produces the same URL. The path is passed through
+	 * untouched. A base URL that is not a legal URI reference is repaired with
+	 * {@link #normalizeURL(String)} first, and one that already carries a
+	 * query string has it re-emitted in canonical form. A null or empty map
+	 * returns the base URL unchanged, with no trailing question mark.
 	 */
 	public static String buildURL(
 		String baseURL, Map<String, String> parameters) {
@@ -116,8 +85,6 @@ public class URLBuilderUtil {
 	}
 
 	/**
-	 * Returns the base URL with a single query parameter appended.
-	 *
 	 * @see #buildURL(String, Map)
 	 */
 	public static String buildURL(String baseURL, String name, String value) {
@@ -131,28 +98,12 @@ public class URLBuilderUtil {
 	}
 
 	/**
-	 * Returns a URL that <code>java.net.URL</code> and
-	 * <code>HttpURLConnection</code> can use verbatim.
-	 *
-	 * <p>
-	 * A URL that already parses as a legal URI reference is returned
-	 * unchanged. Nothing is re-encoded, no escape is reversed, and the
-	 * fragment is preserved, so every URL built by this class passes through
-	 * untouched.
-	 * </p>
-	 *
-	 * <p>
-	 * Otherwise the URL arrived already assembled from an external source and
-	 * carries an octet that is illegal where it sits, most often a raw space,
-	 * a raw square bracket, or a bare percent sign. Each illegal octet is
-	 * percent encoded in place. A valid escape is left alone, so the method is
-	 * idempotent.
-	 * </p>
-	 *
-	 * <p>
-	 * A URL that cannot be repaired is returned unchanged after a warning.
-	 * This method never throws.
-	 * </p>
+	 * Returns a URL that <code>HttpURLConnection</code> can use verbatim. One
+	 * that already parses as a legal URI reference is returned unchanged, so
+	 * nothing this class builds is altered. Otherwise each octet that is
+	 * illegal where it sits is percent encoded in place, leaving a valid
+	 * escape alone, which makes this idempotent. A URL that cannot be repaired
+	 * is returned unchanged after a warning. This never throws.
 	 */
 	public static String normalizeURL(String url) {
 		if (JenkinsResultsParserUtil.isNullOrEmpty(url) ||
@@ -209,18 +160,10 @@ public class URLBuilderUtil {
 	}
 
 	/**
-	 * Returns the query string decomposed into decoded name and value pairs.
-	 *
-	 * <p>
-	 * A parameter that carries an invalid escape is kept as raw text rather
-	 * than failing, matching how a query string that was never encoded is
-	 * still readable.
-	 * </p>
-	 *
-	 * <p>
-	 * When a name repeats, the first value wins and the duplicate is reported.
-	 * A valueless parameter yields a null value.
-	 * </p>
+	 * Returns the query string decomposed into decoded name and value pairs. A
+	 * parameter carrying an invalid escape is kept as raw text rather than
+	 * failing. When a name repeats the first value wins and the duplicate is
+	 * reported, and a valueless parameter yields a null value.
 	 */
 	public static Map<String, String> parseQueryString(String queryString) {
 		if (JenkinsResultsParserUtil.isNullOrEmpty(queryString)) {
@@ -277,9 +220,9 @@ public class URLBuilderUtil {
 	}
 
 	private static void _escapeCodePoint(StringBuilder sb, int codePoint) {
-		String value = new String(Character.toChars(codePoint));
+		String codePointString = new String(Character.toChars(codePoint));
 
-		byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+		byte[] bytes = codePointString.getBytes(StandardCharsets.UTF_8);
 
 		for (byte b : bytes) {
 			int octet = b & 0xff;
@@ -292,17 +235,9 @@ public class URLBuilderUtil {
 
 	/**
 	 * Returns <code>true</code> when the URL carries a raw square bracket in
-	 * its query string or fragment.
-	 *
-	 * <p>
-	 * RFC 3986 does not permit a square bracket outside the authority, but
-	 * <code>URI</code> accepts one in a query string and in a fragment.
-	 * Escaping it is therefore the conformant reading, and it is also what
-	 * this repository has always put on the wire for a Jenkins
-	 * <code>tree</code> expression, so a converted call site is not observable
-	 * by a server. This is the one place where a URL that <code>URI</code>
-	 * accepts is still treated as needing repair.
-	 * </p>
+	 * its query string or fragment. RFC 3986 does not permit one outside the
+	 * authority but <code>URI</code> accepts it there, so this is the one case
+	 * where a URL <code>URI</code> accepts still needs repair.
 	 */
 	private static boolean _hasRawSquareBracket(String url) {
 		int index = url.indexOf('?');
@@ -362,15 +297,9 @@ public class URLBuilderUtil {
 	}
 
 	/**
-	 * Returns a builder over the URL, repairing the URL first when it does not
-	 * parse.
-	 *
-	 * <p>
-	 * A URL assembled outside this class may carry a raw space or square
-	 * bracket, most often from a test name or a cloud storage object key.
-	 * Repairing it keeps appending a parameter to such a URL from throwing
-	 * where plain concatenation would have quietly succeeded.
-	 * </p>
+	 * Returns a builder over the URL, repairing it first when it does not
+	 * parse, so that a URL assembled elsewhere with a raw space does not throw
+	 * where plain concatenation used to succeed.
 	 */
 	private static URIBuilder _newURIBuilder(String url) {
 		try {

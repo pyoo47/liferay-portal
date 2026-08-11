@@ -1354,12 +1354,10 @@ public class PullRequest {
 	}
 
 	private void _initCommits() {
-		String commitsURL = _jsonObject.getString("commits_url");
-
 		_gitHubRemoteGitCommits = new ArrayList<>();
 
-		String pageCommitsURL = URLBuilderUtil.buildURL(
-			commitsURL, "per_page", "100");
+		String commitsURL = URLBuilderUtil.buildURL(
+			_jsonObject.getString("commits_url"), "per_page", "100");
 
 		try {
 			for (int pageNumber = 1;
@@ -1370,8 +1368,7 @@ public class PullRequest {
 				JSONArray commitsJSONArray =
 					JenkinsResultsParserUtil.toJSONArray(
 						URLBuilderUtil.buildURL(
-							pageCommitsURL, "page",
-							String.valueOf(pageNumber)));
+							commitsURL, "page", String.valueOf(pageNumber)));
 
 				if (commitsJSONArray.length() == 0) {
 					break;
