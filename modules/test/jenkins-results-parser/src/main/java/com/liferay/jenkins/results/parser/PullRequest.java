@@ -362,7 +362,7 @@ public class PullRequest {
 			try {
 				JSONArray commentJSONArray =
 					JenkinsResultsParserUtil.toJSONArray(
-						URLBuilderUtil.appendParameter(
+						URLBuilderUtil.buildURL(
 							gitHubAPIURL, "page", String.valueOf(pageNumber)),
 						false);
 
@@ -1358,18 +1358,18 @@ public class PullRequest {
 
 		_gitHubRemoteGitCommits = new ArrayList<>();
 
+		String pageCommitsURL = URLBuilderUtil.buildURL(
+			commitsURL, "per_page", "100");
+
 		try {
 			for (int pageNumber = 1;
 				 pageNumber <=
 					 JenkinsResultsParserUtil.PAGES_GITHUB_API_PAGES_SIZE_MAX;
 				 pageNumber++) {
 
-				String pageCommitsURL = URLBuilderUtil.buildURL(
-					commitsURL, "per_page", "100");
-
 				JSONArray commitsJSONArray =
 					JenkinsResultsParserUtil.toJSONArray(
-						URLBuilderUtil.appendParameter(
+						URLBuilderUtil.buildURL(
 							pageCommitsURL, "page",
 							String.valueOf(pageNumber)));
 

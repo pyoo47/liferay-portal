@@ -40,55 +40,6 @@ import org.apache.http.message.BasicNameValuePair;
 public class URLBuilderUtil {
 
 	/**
-	 * Returns the URL with one more query parameter appended.
-	 *
-	 * <p>
-	 * The URL may already carry a query string and a fragment. The parameter
-	 * is inserted before the fragment. Any pre-existing query string is
-	 * re-emitted in canonical form, so a space already spelled
-	 * <code>%20</code> comes back as <code>+</code>. The two are equivalent
-	 * under form decoding but are not byte identical.
-	 * </p>
-	 */
-	public static String appendParameter(
-		String url, String name, String value) {
-
-		Map<String, String> parameters = new LinkedHashMap<>();
-
-		parameters.put(name, value);
-
-		return appendParameters(url, parameters);
-	}
-
-	/**
-	 * Returns the URL with the parameters appended, in ascending name order.
-	 *
-	 * <p>
-	 * Returns the URL unchanged when the parameters are null or empty, without
-	 * appending a trailing question mark.
-	 * </p>
-	 */
-	public static String appendParameters(
-		String url, Map<String, String> parameters) {
-
-		if ((parameters == null) || parameters.isEmpty()) {
-			return url;
-		}
-
-		URIBuilder uriBuilder = _newURIBuilder(url);
-
-		Map<String, String> sortedParameters = new TreeMap<>(parameters);
-
-		for (Map.Entry<String, String> entry : sortedParameters.entrySet()) {
-			uriBuilder.addParameter(entry.getKey(), entry.getValue());
-		}
-
-		URI uri = _build(uriBuilder, url);
-
-		return uri.toString();
-	}
-
-	/**
 	 * Returns the parameters encoded as an
 	 * <code>application/x-www-form-urlencoded</code> request body.
 	 *
@@ -120,55 +71,63 @@ public class URLBuilderUtil {
 	 * each name and value percent encoded exactly once.
 	 *
 	 * <p>
-	 * The base URL must already be a legal URI reference. Its path is passed
-	 * through untouched, so a job name such as
+	 * The base URL's path is passed through untouched, so a job name such as
 	 * <code>test-portal-acceptance-pullrequest(master)</code> is preserved
-	 * verbatim.
+	 * verbatim. A base URL that is not a legal URI reference is repaired with
+	 * {@link #normalizeURL(String)} first, which percent encodes an octet that
+	 * is illegal where it sits, so a raw space in a path becomes
+	 * <code>%20</code>.
+	 * </p>
+	 *
+	 * <p>
+	 * The base URL may already carry a query string and a fragment. Parameters
+	 * are inserted before the fragment, and a pre-existing query string is
+	 * re-emitted in canonical form, so a space already spelled
+	 * <code>%20</code> comes back as <code>+</code>. The two are equivalent
+	 * under form decoding but are not byte identical.
 	 * </p>
 	 *
 	 * <p>
 	 * Parameters are emitted in ascending name order so that the same map
 	 * always produces the same URL. A null value emits a valueless parameter,
 	 * an empty value emits a name followed by an equals sign, and both round
-	 * trip through {@link #parseQueryString(String)}.
+	 * trip through {@link #parseQueryString(String)}. A null or empty map
+	 * returns the base URL unchanged, without a trailing question mark.
 	 * </p>
 	 */
 	public static String buildURL(
 		String baseURL, Map<String, String> parameters) {
 
-		return appendParameters(baseURL, parameters);
+		if ((parameters == null) || parameters.isEmpty()) {
+			return baseURL;
+		}
+
+		URIBuilder uriBuilder = _newURIBuilder(baseURL);
+
+		Map<String, String> sortedParameters = new TreeMap<>(parameters);
+
+		for (Map.Entry<String, String> entry : sortedParameters.entrySet()) {
+			uriBuilder.addParameter(entry.getKey(), entry.getValue());
+		}
+
+		URI uri = _build(uriBuilder, baseURL);
+
+		return uri.toString();
 	}
 
 	/**
 	 * Returns the base URL with a single query parameter appended.
+	 *
+	 * @see #buildURL(String, Map)
 	 */
 	public static String buildURL(String baseURL, String name, String value) {
-		return appendParameter(baseURL, name, value);
-	}
+		URIBuilder uriBuilder = _newURIBuilder(baseURL);
 
-	/**
-	 * Returns the URL's query string decomposed into decoded name and value
-	 * pairs.
-	 *
-	 * <p>
-	 * Falls back to {@link #parseQueryString(String)} when the URL is not a
-	 * legal URI reference, so a URL carrying an invalid escape is decomposed
-	 * rather than rejected.
-	 * </p>
-	 */
-	public static Map<String, String> getParameters(String url) {
-		if (JenkinsResultsParserUtil.isNullOrEmpty(url)) {
-			return Collections.emptyMap();
-		}
+		uriBuilder.addParameter(name, value);
 
-		try {
-			URIBuilder uriBuilder = new URIBuilder(url);
+		URI uri = _build(uriBuilder, baseURL);
 
-			return _toMap(uriBuilder.getQueryParams());
-		}
-		catch (URISyntaxException uriSyntaxException) {
-			return parseQueryString(_getQueryString(url));
-		}
+		return uri.toString();
 	}
 
 	/**
@@ -290,64 +249,45 @@ public class URLBuilderUtil {
 		while (i < value.length()) {
 			char c = value.charAt(i);
 
-			if (c == '%') {
-				if (_isEscapeSequence(value, i)) {
-					sb.append(value, i, i + 3);
+			if ((c == '%') && _isEscapeSequence(value, i)) {
+				sb.append(value, i, i + 3);
 
-					i = i + 3;
-				}
-				else {
-					sb.append("%25");
-
-					i++;
-				}
-
-				continue;
+				i = i + 3;
 			}
-
-			if (_isLegalCharacter(c, legalCharacters)) {
+			else if (_isLegalCharacter(c, legalCharacters)) {
 				sb.append(c);
 
 				i++;
-
-				continue;
 			}
+			else {
 
-			int codePoint = value.codePointAt(i);
+				// A percent sign is in neither legal character set, so a bare
+				// one that starts no escape sequence lands here and is encoded
+				// as %25
 
-			_escapeCodePoint(sb, new String(Character.toChars(codePoint)));
+				int codePoint = value.codePointAt(i);
 
-			i = i + Character.charCount(codePoint);
+				_escapeCodePoint(sb, codePoint);
+
+				i = i + Character.charCount(codePoint);
+			}
 		}
 
 		return sb.toString();
 	}
 
-	private static void _escapeCodePoint(StringBuilder sb, String value) {
+	private static void _escapeCodePoint(StringBuilder sb, int codePoint) {
+		String value = new String(Character.toChars(codePoint));
+
 		byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
 
 		for (byte b : bytes) {
+			int octet = b & 0xff;
+
 			sb.append("%");
-			sb.append(String.format("%02X", b & 0xff));
+			sb.append(_HEXADECIMAL_CHARACTERS.charAt(octet >> 4));
+			sb.append(_HEXADECIMAL_CHARACTERS.charAt(octet & 0x0f));
 		}
-	}
-
-	private static String _getQueryString(String url) {
-		int index = url.indexOf('?');
-
-		if (index == -1) {
-			return null;
-		}
-
-		String queryString = url.substring(index + 1);
-
-		index = queryString.indexOf('#');
-
-		if (index != -1) {
-			queryString = queryString.substring(0, index);
-		}
-
-		return queryString;
 	}
 
 	/**
@@ -355,11 +295,13 @@ public class URLBuilderUtil {
 	 * its query string or fragment.
 	 *
 	 * <p>
-	 * <code>URI</code> tolerates a square bracket there, deviating
-	 * from RFC 3986 to stay compatible with the Jenkins <code>tree</code>
-	 * syntax. Escaping it anyway keeps the bytes on the wire identical to what
-	 * this repository has always sent, so converting a call site to
-	 * {@link #buildURL(String, String, String)} is not observable by a server.
+	 * RFC 3986 does not permit a square bracket outside the authority, but
+	 * <code>URI</code> accepts one in a query string and in a fragment.
+	 * Escaping it is therefore the conformant reading, and it is also what
+	 * this repository has always put on the wire for a Jenkins
+	 * <code>tree</code> expression, so a converted call site is not observable
+	 * by a server. This is the one place where a URL that <code>URI</code>
+	 * accepts is still treated as needing repair.
 	 * </p>
 	 */
 	private static boolean _hasRawSquareBracket(String url) {
@@ -450,10 +392,6 @@ public class URLBuilderUtil {
 	private static Map<String, String> _toMap(
 		List<NameValuePair> nameValuePairs) {
 
-		if (nameValuePairs.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
 		Map<String, String> parameters = new LinkedHashMap<>(
 			nameValuePairs.size());
 
@@ -479,6 +417,7 @@ public class URLBuilderUtil {
 
 	private static final String _LEGAL_PATH_CHARACTERS = "-._~!$&'()*+,;=:@/";
 
-	private static final String _LEGAL_QUERY_CHARACTERS = "-._~!$&'()*+,;=:@/?";
+	private static final String _LEGAL_QUERY_CHARACTERS =
+		_LEGAL_PATH_CHARACTERS + "?";
 
 }

@@ -1431,7 +1431,7 @@ public abstract class BaseJob implements Job {
 			"pretty", null);
 
 		if (tree != null) {
-			apiURL = URLBuilderUtil.appendParameter(apiURL, "tree", tree);
+			apiURL = URLBuilderUtil.buildURL(apiURL, "tree", tree);
 		}
 
 		try {

@@ -5,8 +5,9 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.net.URL;
+
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -18,35 +19,11 @@ public class URLBuilderUtilTest
 	extends com.liferay.jenkins.results.parser.Test {
 
 	@Test
-	public void testAppendParameter() {
-		testEquals(
-			"http://test-1-1/job/x?tree=result",
-			URLBuilderUtil.appendParameter(
-				"http://test-1-1/job/x", "tree", "result"));
-	}
-
-	@Test
-	public void testAppendParameterWithExistingQueryString() {
-		testEquals(
-			"http://test-1-1/job/x?a=1&b=2",
-			URLBuilderUtil.appendParameter(
-				"http://test-1-1/job/x?a=1", "b", "2"));
-	}
-
-	@Test
-	public void testAppendParameterWithFragment() {
-		testEquals(
-			"http://test-1-1/job/x?a=1&b=2#summary",
-			URLBuilderUtil.appendParameter(
-				"http://test-1-1/job/x?a=1#summary", "b", "2"));
-	}
-
-	@Test
 	public void testBuildFormContent() {
 		testEquals(
 			"client_id=a%26b&grant_type=client_credentials",
 			URLBuilderUtil.buildFormContent(
-				_newParameters(
+				newParameters(
 					"grant_type", "client_credentials", "client_id", "a&b")));
 	}
 
@@ -58,10 +35,9 @@ public class URLBuilderUtilTest
 	@Test
 	public void testBuildFormContentWithReservedCharacters() {
 		testEquals(
-			JenkinsResultsParserUtil.combine(
-				"A=a%23b&B=a%26b&C=100%25+pass&D=a%3Db&E=a%2Bb&F=a+b"),
+			"A=a%23b&B=a%26b&C=100%25+pass&D=a%3Db&E=a%2Bb&F=a+b",
 			URLBuilderUtil.buildFormContent(
-				_newParameters(
+				newParameters(
 					"A", "a#b", "B", "a&b", "C", "100% pass", "D", "a=b", "E",
 					"a+b", "F", "a b")));
 	}
@@ -75,7 +51,7 @@ public class URLBuilderUtilTest
 				"http%3A%2F%2Ftest-1-1%2Fjob%2Fy%2F1%2F"),
 			URLBuilderUtil.buildURL(
 				"http://test-1-1/job/x/buildWithParameters",
-				_newParameters(
+				newParameters(
 					"PARENT_BUILD_URL", "http://test-1-1/job/y/1/",
 					"JOB_VARIANT", "functional")));
 	}
@@ -94,17 +70,24 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
-	public void testBuildURLRoundTripsReservedCharacters() {
-		Map<String, String> parameters = _newParameters(
+	public void testBuildURLRepairsIllegalBaseURL() {
+		testEquals(
+			"http://test-1-1/job/a%20b/api/json?tree=result",
+			URLBuilderUtil.buildURL(
+				"http://test-1-1/job/a b/api/json", "tree", "result"));
+	}
+
+	@Test
+	public void testBuildURLRoundTripsReservedCharacters() throws Exception {
+		Map<String, String> parameters = newParameters(
 			"A", "a#b", "B", "a&b", "C", "100% pass", "D", "a=b", "E", "a+b",
 			"F", "a b", "G a", "name with a space");
 
-		Map<String, String> roundTrippedParameters =
-			URLBuilderUtil.getParameters(
-				URLBuilderUtil.buildURL(
-					"http://test-1-1/job/x/buildWithParameters", parameters));
+		URL url = new URL(
+			URLBuilderUtil.buildURL(
+				"http://test-1-1/job/x/buildWithParameters", parameters));
 
-		testEquals(parameters, roundTrippedParameters);
+		testEquals(parameters, URLBuilderUtil.parseQueryString(url.getQuery()));
 	}
 
 	@Test
@@ -113,7 +96,7 @@ public class URLBuilderUtilTest
 			"http://test-1-1/job/x?alpha=1&beta=2&gamma=3",
 			URLBuilderUtil.buildURL(
 				"http://test-1-1/job/x",
-				_newParameters("gamma", "3", "beta", "2", "alpha", "1")));
+				newParameters("gamma", "3", "beta", "2", "alpha", "1")));
 	}
 
 	@Test
@@ -122,6 +105,21 @@ public class URLBuilderUtilTest
 			"http://test-1-1/job/x?AXIS_VARIABLE=",
 			URLBuilderUtil.buildURL(
 				"http://test-1-1/job/x", "AXIS_VARIABLE", ""));
+	}
+
+	@Test
+	public void testBuildURLWithExistingQueryString() {
+		testEquals(
+			"http://test-1-1/job/x?a=1&b=2",
+			URLBuilderUtil.buildURL("http://test-1-1/job/x?a=1", "b", "2"));
+	}
+
+	@Test
+	public void testBuildURLWithFragment() {
+		testEquals(
+			"http://test-1-1/job/x?a=1&b=2#summary",
+			URLBuilderUtil.buildURL(
+				"http://test-1-1/job/x?a=1#summary", "b", "2"));
 	}
 
 	@Test
@@ -165,42 +163,20 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
-	public void testGetParameters() {
-		Map<String, String> parameters = URLBuilderUtil.getParameters(
-			JenkinsResultsParserUtil.combine(
-				"http://test-1-1/job/x/buildWithParameters?",
-				"JOB_VARIANT=functional&PARENT_BUILD_URL=",
-				"http%3A%2F%2Ftest-1-1%2Fjob%2Fy%2F1%2F"));
-
-		testEquals(2, parameters.size());
-		testEquals("functional", parameters.get("JOB_VARIANT"));
-		testEquals(
-			"http://test-1-1/job/y/1/", parameters.get("PARENT_BUILD_URL"));
-	}
-
-	@Test
-	public void testGetParametersWithInvalidEscape() {
-		Map<String, String> parameters = URLBuilderUtil.getParameters(
-			"http://test-1-1/job/x?PORTAL_BUILD_NOTES=100% pass");
-
-		testEquals(1, parameters.size());
-		testEquals("100% pass", parameters.get("PORTAL_BUILD_NOTES"));
-	}
-
-	@Test
-	public void testGetParametersWithoutQueryString() {
-		Map<String, String> parameters = URLBuilderUtil.getParameters(
-			"http://test-1-1/job/x/1/");
-
-		testEquals(0, parameters.size());
-	}
-
-	@Test
 	public void testNormalizeURLIsIdempotent() {
 		String normalizedURL = URLBuilderUtil.normalizeURL(
 			"http://test-1-1/job/x?tree=actions[parameters[name,value]]");
 
 		testEquals(normalizedURL, URLBuilderUtil.normalizeURL(normalizedURL));
+	}
+
+	@Test
+	public void testNormalizeURLPreservesEncodedParameters() {
+		String url = JenkinsResultsParserUtil.combine(
+			"http://test-1-1/job/x/buildWithParameters?",
+			"A=a%23b&B=a%26b&C=100%25%20pass&D=a%3Db&E=a%2Bb&F=a%20b");
+
+		testSame(url, URLBuilderUtil.normalizeURL(url));
 	}
 
 	@Test
@@ -227,19 +203,6 @@ public class URLBuilderUtilTest
 	}
 
 	@Test
-	public void testNormalizeURLWithEncodedParameters() {
-		String[] values = {"a#b", "a&b", "100% pass", "a=b", "a+b", "a b"};
-
-		for (String value : values) {
-			String url = JenkinsResultsParserUtil.combine(
-				"http://test-1-1/job/x/buildWithParameters?V=",
-				JenkinsResultsParserUtil.encodeURLParameterPart(value));
-
-			testEquals(url, URLBuilderUtil.normalizeURL(url));
-		}
-	}
-
-	@Test
 	public void testNormalizeURLWithIllegalPathCharacters() {
 		testEquals(
 			"http://test-1-1/job/a%20b/1/",
@@ -258,6 +221,42 @@ public class URLBuilderUtilTest
 		testEquals(2, parameters.size());
 		testEquals("", parameters.get("AXIS_VARIABLE"));
 		testEquals(null, parameters.get("pretty"));
+	}
+
+	@Test
+	public void testParseQueryStringWithInvalidEscape() {
+		Map<String, String> parameters = URLBuilderUtil.parseQueryString(
+			"PORTAL_BUILD_NOTES=100% pass");
+
+		testEquals(1, parameters.size());
+		testEquals("100% pass", parameters.get("PORTAL_BUILD_NOTES"));
+	}
+
+	@Test
+	public void testParseQueryStringWithNestedURL() {
+		Map<String, String> parameters = URLBuilderUtil.parseQueryString(
+			JenkinsResultsParserUtil.combine(
+				"JOB_VARIANT=functional&PARENT_BUILD_URL=",
+				"http%3A%2F%2Ftest-1-1%2Fjob%2Fy%2F1%2F"));
+
+		testEquals(2, parameters.size());
+		testEquals("functional", parameters.get("JOB_VARIANT"));
+		testEquals(
+			"http://test-1-1/job/y/1/", parameters.get("PARENT_BUILD_URL"));
+	}
+
+	@Test
+	public void testParseQueryStringWithoutQueryString() {
+		testEquals(
+			0,
+			URLBuilderUtil.parseQueryString(
+				null
+			).size());
+		testEquals(
+			0,
+			URLBuilderUtil.parseQueryString(
+				""
+			).size());
 	}
 
 	@Test
@@ -283,16 +282,6 @@ public class URLBuilderUtilTest
 		testEquals("a+b", parameters.get("D"));
 		testEquals("a b", parameters.get("E"));
 		testEquals("100% pass", parameters.get("F"));
-	}
-
-	private Map<String, String> _newParameters(String... namesAndValues) {
-		Map<String, String> parameters = new LinkedHashMap<>();
-
-		for (int i = 0; i < namesAndValues.length; i = i + 2) {
-			parameters.put(namesAndValues[i], namesAndValues[i + 1]);
-		}
-
-		return parameters;
 	}
 
 }

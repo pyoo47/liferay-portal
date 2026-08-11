@@ -468,8 +468,7 @@ public class TestrayRun {
 
 			JSONObject responseJSONObject = new JSONObject(
 				testrayServer.requestGet(
-					URLBuilderUtil.appendParameter(
-						urlPath, "pageSize", "100")));
+					URLBuilderUtil.buildURL(urlPath, "pageSize", "100")));
 
 			JSONArray itemsJSONArray = responseJSONObject.optJSONArray("items");
 
