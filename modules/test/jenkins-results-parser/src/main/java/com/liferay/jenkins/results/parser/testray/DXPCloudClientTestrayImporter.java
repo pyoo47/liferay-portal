@@ -252,10 +252,6 @@ public class DXPCloudClientTestrayImporter {
 					_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key),
 				"authuser", "0"));
 
-		// The value attribute carries a cloud storage object key rather than a
-		// URL, and Testray matches it against the key the uploader wrote, so
-		// it is left concatenated
-
 		attachmentElement.addAttribute("value", key + "?authuser=0");
 
 		return attachmentElement;
@@ -406,10 +402,6 @@ public class DXPCloudClientTestrayImporter {
 					JenkinsResultsParserUtil.combine(
 						_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key),
 					"authuser", "0"));
-
-			// The value attribute carries a cloud storage object key rather
-			// than a URL, and Testray matches it against the key the uploader
-			// wrote, so it is left concatenated
 
 			attachmentElement.addAttribute("value", key + "?authuser=0");
 		}

@@ -69,10 +69,6 @@ public class JenkinsResultsParserUtilTest
 		testEquals(
 			"0%201%202", JenkinsResultsParserUtil.encodeLegacyURLPart("0 1 2"));
 
-		// A percent sign and a plus sign survive unencoded. That is wrong in
-		// principle and is why this spelling is confined to callers matching a
-		// name that was already written
-
 		testEquals(
 			"100%%20pass",
 			JenkinsResultsParserUtil.encodeLegacyURLPart("100% pass"));

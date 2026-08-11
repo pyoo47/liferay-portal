@@ -3213,11 +3213,6 @@ public abstract class BaseBuild implements Build {
 
 		String urlString = getBuildURL() + urlSuffix;
 
-		// Left as concatenation. The suffix carries no value, so it cannot be
-		// corrupted, and an archive URL may be a file URL or still hold the
-		// unresolved dependencies token, neither of which parses as a URI
-		// reference
-
 		if (urlString.endsWith("json")) {
 			urlString += "?pretty";
 		}
