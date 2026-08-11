@@ -1513,8 +1513,6 @@ public class JenkinsResultsParserUtil {
 	public static String getCacheFileKey(String urlString, String postContent) {
 		String key = URLBuilderUtil.normalizeURL(urlString);
 
-		key.replace("//", "/");
-
 		if (!isNullOrEmpty(postContent)) {
 			key += postContent;
 		}
@@ -2862,7 +2860,7 @@ public class JenkinsResultsParserUtil {
 		String baseInvocationURL, String blacklist, int invokedBatchSize,
 		String jobName) {
 
-		Map<String, String> parameters = new LinkedHashMap<>();
+		Map<String, String> parameters = new HashMap<>();
 
 		parameters.put("baseInvocationURL", baseInvocationURL);
 
@@ -3652,7 +3650,7 @@ public class JenkinsResultsParserUtil {
 		String jenkinsJobURL, Map<String, String> buildParameters,
 		int timeout) {
 
-		Map<String, String> parameters = new LinkedHashMap<>();
+		Map<String, String> parameters = new HashMap<>();
 
 		if (buildParameters != null) {
 			for (Map.Entry<String, String> buildParameter :
@@ -5872,7 +5870,7 @@ public class JenkinsResultsParserUtil {
 				return;
 			}
 
-			Map<String, String> parameters = new LinkedHashMap<>();
+			Map<String, String> parameters = new HashMap<>();
 
 			parameters.put("client_id", _clientId);
 			parameters.put("client_secret", _clientSecret);

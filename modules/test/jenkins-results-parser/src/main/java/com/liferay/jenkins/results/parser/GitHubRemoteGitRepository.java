@@ -126,20 +126,19 @@ public class GitHubRemoteGitRepository extends BaseRemoteGitRepository {
 
 		Set<Label> labels = new HashSet<>();
 
+		String labelsURL = URLBuilderUtil.buildURL(
+			labelRequestURL, "per_page",
+			String.valueOf(
+				JenkinsResultsParserUtil.PER_PAGE_GITHUB_API_PAGES_SIZE_MAX));
+
 		for (int pageNumber = 1;
 			 pageNumber <=
 				 JenkinsResultsParserUtil.PAGES_GITHUB_API_PAGES_SIZE_MAX;
 			 pageNumber++) {
 
 			try {
-				String labelsURL = URLBuilderUtil.buildURL(
-					labelRequestURL, "per_page",
-					String.valueOf(
-						JenkinsResultsParserUtil.
-							PER_PAGE_GITHUB_API_PAGES_SIZE_MAX));
-
 				labelsJSONArray = JenkinsResultsParserUtil.toJSONArray(
-					URLBuilderUtil.appendParameter(
+					URLBuilderUtil.buildURL(
 						labelsURL, "page", String.valueOf(pageNumber)),
 					false);
 			}

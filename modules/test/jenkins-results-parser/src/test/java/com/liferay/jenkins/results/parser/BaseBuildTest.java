@@ -72,7 +72,7 @@ public class BaseBuildTest extends com.liferay.jenkins.results.parser.Test {
 
 	@Test
 	public void testGetInvocationURL() throws Exception {
-		Map<String, String> parameters = _newParameters(
+		Map<String, String> parameters = newParameters(
 			"PORTAL BUILD NOTES", "encoded name", "PORTAL_BATCH_TEST_SELECTOR",
 			"PortalSmoke#Smoke", "PORTAL_BUILD_NOTES", "100% pass",
 			"PORTAL_QUERY", "a=b", "PORTAL_UPSTREAM", "a+b",
@@ -246,16 +246,6 @@ public class BaseBuildTest extends com.liferay.jenkins.results.parser.Test {
 		).getDisplayName();
 
 		return baseDownstreamBuild;
-	}
-
-	private Map<String, String> _newParameters(String... namesAndValues) {
-		Map<String, String> parameters = new HashMap<>();
-
-		for (int i = 0; i < namesAndValues.length; i = i + 2) {
-			parameters.put(namesAndValues[i], namesAndValues[i + 1]);
-		}
-
-		return parameters;
 	}
 
 	private Map<String, String> _setInvocationURL(String invocationURL)

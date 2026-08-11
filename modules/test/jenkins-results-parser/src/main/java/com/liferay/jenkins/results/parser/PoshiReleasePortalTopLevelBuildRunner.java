@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -301,25 +302,21 @@ public class PoshiReleasePortalTopLevelBuildRunner
 						upstreamBranchName));
 			}
 
-			Map<String, String> parameters = new HashMap<>();
+			Iterator<Map.Entry<String, String>> iterator =
+				invocationParameters.entrySet(
+				).iterator();
 
-			for (Map.Entry<String, String> invocationParameter :
-					invocationParameters.entrySet()) {
-
-				String invocationParameterValue =
-					invocationParameter.getValue();
+			while (iterator.hasNext()) {
+				Map.Entry<String, String> invocationParameter = iterator.next();
 
 				if (JenkinsResultsParserUtil.isNullOrEmpty(
-						invocationParameterValue)) {
+						invocationParameter.getValue())) {
 
-					continue;
+					iterator.remove();
 				}
-
-				parameters.put(
-					invocationParameter.getKey(), invocationParameterValue);
 			}
 
-			return URLBuilderUtil.buildURL(jobURL, parameters);
+			return URLBuilderUtil.buildURL(jobURL, invocationParameters);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);
