@@ -203,11 +203,6 @@ public class URLBuilderUtil {
 				i++;
 			}
 			else {
-
-				// A percent sign is in neither legal character set, so a bare
-				// one that starts no escape sequence lands here and is encoded
-				// as %25
-
 				int codePoint = value.codePointAt(i);
 
 				_escapeCodePoint(sb, codePoint);

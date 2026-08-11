@@ -249,10 +249,6 @@ public abstract class BaseStandaloneBuildTestrayCaseResult
 							String.valueOf(testrayAttachment.getURL()),
 							"authuser", "0"));
 
-					// The value attribute carries a cloud storage object key
-					// rather than a URL, and Testray matches it against the
-					// key the uploader wrote, so it is left concatenated
-
 					attachmentFileElement.addAttribute(
 						"value", testrayAttachment.getKey() + "?authuser=0");
 				}
