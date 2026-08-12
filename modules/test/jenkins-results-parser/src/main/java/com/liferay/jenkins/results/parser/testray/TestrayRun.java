@@ -8,7 +8,6 @@ package com.liferay.jenkins.results.parser.testray;
 import com.liferay.jenkins.results.parser.Dom4JUtil;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.Retryable;
-import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.IOException;
 
@@ -20,6 +19,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.http.client.utils.URIBuilder;
 
 import org.dom4j.Element;
 
@@ -190,10 +191,13 @@ public class TestrayRun {
 				TestrayServer testrayServer = getTestrayServer();
 
 				try {
+					URIBuilder uriBuilder =
+						JenkinsResultsParserUtil.newURIBuilder("/o/c/runs");
+
+					uriBuilder.addParameter("filter", filterString);
+
 					JSONObject existingJSONObject = new JSONObject(
-						testrayServer.requestGet(
-							URLBuilderUtil.buildURL(
-								"/o/c/runs", "filter", filterString)));
+						testrayServer.requestGet(uriBuilder.toString()));
 
 					JSONArray existingItemsJSONArray =
 						existingJSONObject.optJSONArray("items");
@@ -414,10 +418,13 @@ public class TestrayRun {
 		try {
 			TestrayServer testrayServer = getTestrayServer();
 
+			URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+				"/o/c/runs");
+
+			uriBuilder.addParameter("filter", filterString);
+
 			JSONObject jsonObject = new JSONObject(
-				testrayServer.requestGet(
-					URLBuilderUtil.buildURL(
-						"/o/c/runs", "filter", filterString)));
+				testrayServer.requestGet(uriBuilder.toString()));
 
 			return jsonObject.optInt("totalCount") + 1;
 		}
@@ -463,12 +470,14 @@ public class TestrayRun {
 		try {
 			TestrayServer testrayServer = _testrayBuild.getTestrayServer();
 
-			String urlPath = URLBuilderUtil.buildURL(
-				"/o/c/factors", "filter", filterString);
+			URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+				"/o/c/factors");
+
+			uriBuilder.addParameter("filter", filterString);
+			uriBuilder.addParameter("pageSize", "100");
 
 			JSONObject responseJSONObject = new JSONObject(
-				testrayServer.requestGet(
-					URLBuilderUtil.buildURL(urlPath, "pageSize", "100")));
+				testrayServer.requestGet(uriBuilder.toString()));
 
 			JSONArray itemsJSONArray = responseJSONObject.optJSONArray("items");
 

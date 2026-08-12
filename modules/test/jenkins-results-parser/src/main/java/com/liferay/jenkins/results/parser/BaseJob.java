@@ -40,6 +40,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -1424,18 +1425,20 @@ public abstract class BaseJob implements Job {
 			return null;
 		}
 
-		String apiURL = URLBuilderUtil.buildURL(
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
 			JenkinsResultsParserUtil.combine(
 				JenkinsResultsParserUtil.getLocalURL(getJobURL(jenkinsMaster)),
-				"/api/json"),
-			"pretty", null);
+				"/api/json"));
+
+		uriBuilder.addParameter("pretty", null);
 
 		if (tree != null) {
-			apiURL = URLBuilderUtil.buildURL(apiURL, "tree", tree);
+			uriBuilder.addParameter("tree", tree);
 		}
 
 		try {
-			return JenkinsResultsParserUtil.toJSONObject(apiURL, false);
+			return JenkinsResultsParserUtil.toJSONObject(
+				uriBuilder.toString(), false);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException("Unable to get job JSON", ioException);

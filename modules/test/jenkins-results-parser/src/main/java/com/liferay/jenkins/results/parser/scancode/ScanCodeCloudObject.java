@@ -8,7 +8,6 @@ package com.liferay.jenkins.results.parser.scancode;
 import com.google.cloud.storage.Blob;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,7 +40,7 @@ public class ScanCodeCloudObject {
 	}
 
 	public String getURLString() {
-		return URLBuilderUtil.normalizeURL(String.valueOf(_url));
+		return JenkinsResultsParserUtil.normalizeURL(String.valueOf(_url));
 	}
 
 	public String getValue() {

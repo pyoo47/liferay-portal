@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.http.client.utils.URIBuilder;
+
 import org.json.JSONObject;
 
 /**
@@ -318,11 +320,14 @@ public class QAWebsitesControllerBuildRunner
 			String buildURL = buildURLMatcher.group("buildURL");
 
 			try {
+				URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+					JenkinsResultsParserUtil.getLocalURL(
+						buildURL + "/api/json"));
+
+				uriBuilder.addParameter("tree", "result");
+
 				JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-					URLBuilderUtil.buildURL(
-						JenkinsResultsParserUtil.getLocalURL(
-							buildURL + "/api/json"),
-						"tree", "result"));
+					uriBuilder.toString());
 
 				Object result = jsonObject.get("result");
 

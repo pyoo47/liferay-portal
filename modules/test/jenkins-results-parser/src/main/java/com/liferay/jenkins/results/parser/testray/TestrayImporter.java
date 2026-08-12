@@ -26,7 +26,6 @@ import com.liferay.jenkins.results.parser.QAWebsitesGitRepositoryJob;
 import com.liferay.jenkins.results.parser.QAWebsitesWorkspaceGitRepository;
 import com.liferay.jenkins.results.parser.TestSuiteJob;
 import com.liferay.jenkins.results.parser.TopLevelBuildReport;
-import com.liferay.jenkins.results.parser.URLBuilderUtil;
 import com.liferay.jenkins.results.parser.Workspace;
 import com.liferay.jenkins.results.parser.WorkspaceGitRepository;
 import com.liferay.jenkins.results.parser.job.property.JobProperty;
@@ -61,6 +60,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -395,9 +395,12 @@ public class TestrayImporter {
 				"jenkins-report.html.gz");
 
 		if (testrayAttachmentURL != null) {
-			sb.append(
-				URLBuilderUtil.buildURL(
-					String.valueOf(testrayAttachmentURL), "authuser", "0"));
+			URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+				String.valueOf(testrayAttachmentURL));
+
+			uriBuilder.addParameter("authuser", "0");
+
+			sb.append(uriBuilder.toString());
 		}
 		else {
 			sb.append(_topLevelBuildReport.getJenkinsReportURL());
@@ -1486,13 +1489,14 @@ public class TestrayImporter {
 			Element attachmentFileElement = attachmentsElement.addElement(
 				"file");
 
+			URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+				String.valueOf(testrayAttachment.getURL()));
+
+			uriBuilder.addParameter("authuser", "0");
+
 			attachmentFileElement.addAttribute(
 				"name", testrayAttachment.getName());
-			attachmentFileElement.addAttribute(
-				"url",
-				URLBuilderUtil.buildURL(
-					String.valueOf(testrayAttachment.getURL()), "authuser",
-					"0"));
+			attachmentFileElement.addAttribute("url", uriBuilder.toString());
 
 			attachmentFileElement.addAttribute(
 				"value", testrayAttachment.getKey() + "?authuser=0");

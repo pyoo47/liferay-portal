@@ -11,7 +11,6 @@ import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.TestClassReport;
 import com.liferay.jenkins.results.parser.TestReport;
 import com.liferay.jenkins.results.parser.TopLevelBuildReport;
-import com.liferay.jenkins.results.parser.URLBuilderUtil;
 import com.liferay.jenkins.results.parser.test.clazz.PlaywrightJUnitTestClass;
 import com.liferay.jenkins.results.parser.test.clazz.PlaywrightTestClassMethod;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
@@ -29,6 +28,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.http.client.utils.URIBuilder;
 
 /**
  * @author Kenji Heigel
@@ -288,10 +289,12 @@ public class PlaywrightBatchBuildTestrayCaseResult
 		}
 
 		try {
-			URL url = new URL(
-				URLBuilderUtil.buildURL(
-					"https://playwright.liferay.com/", "trace",
-					traceZipURLPath));
+			URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+				"https://playwright.liferay.com/");
+
+			uriBuilder.addParameter("trace", traceZipURLPath);
+
+			URL url = new URL(uriBuilder.toString());
 
 			return new DefaultTestrayAttachment(
 				this, "Trace Viewer", traceZipURLPath, url);

@@ -202,7 +202,7 @@ public class JUnitTestResult extends BaseTestResult {
 		String testReportURL = sb.toString();
 
 		if (testReportURL.startsWith("http")) {
-			return URLBuilderUtil.normalizeURL(testReportURL);
+			return JenkinsResultsParserUtil.normalizeURL(testReportURL);
 		}
 
 		return testReportURL;

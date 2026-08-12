@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -348,23 +349,24 @@ public class PullRequest {
 
 		_comments = new ArrayList<>();
 
-		String gitHubAPIURL = URLBuilderUtil.buildURL(
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
 			JenkinsResultsParserUtil.getGitHubAPIURL(
 				getGitHubRemoteGitRepositoryName(), getOwnerUsername(),
-				"issues/" + getNumber() + "/comments"),
-			"per_page", "100");
+				"issues/" + getNumber() + "/comments"));
+
+		uriBuilder.addParameter("per_page", "100");
 
 		for (int pageNumber = 1;
 			 pageNumber <=
 				 JenkinsResultsParserUtil.PAGES_GITHUB_API_PAGES_SIZE_MAX;
 			 pageNumber++) {
 
+			uriBuilder.setParameter("page", String.valueOf(pageNumber));
+
 			try {
 				JSONArray commentJSONArray =
 					JenkinsResultsParserUtil.toJSONArray(
-						URLBuilderUtil.buildURL(
-							gitHubAPIURL, "page", String.valueOf(pageNumber)),
-						false);
+						uriBuilder.toString(), false);
 
 				if (commentJSONArray.length() == 0) {
 					break;
@@ -1356,8 +1358,10 @@ public class PullRequest {
 	private void _initCommits() {
 		_gitHubRemoteGitCommits = new ArrayList<>();
 
-		String commitsURL = URLBuilderUtil.buildURL(
-			_jsonObject.getString("commits_url"), "per_page", "100");
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+			_jsonObject.getString("commits_url"));
+
+		uriBuilder.addParameter("per_page", "100");
 
 		try {
 			for (int pageNumber = 1;
@@ -1365,10 +1369,10 @@ public class PullRequest {
 					 JenkinsResultsParserUtil.PAGES_GITHUB_API_PAGES_SIZE_MAX;
 				 pageNumber++) {
 
+				uriBuilder.setParameter("page", String.valueOf(pageNumber));
+
 				JSONArray commitsJSONArray =
-					JenkinsResultsParserUtil.toJSONArray(
-						URLBuilderUtil.buildURL(
-							commitsURL, "page", String.valueOf(pageNumber)));
+					JenkinsResultsParserUtil.toJSONArray(uriBuilder.toString());
 
 				if (commitsJSONArray.length() == 0) {
 					break;

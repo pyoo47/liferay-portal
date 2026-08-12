@@ -232,7 +232,7 @@ public abstract class BaseTestClassResult implements TestClassResult {
 		String testClassReportURL = sb.toString();
 
 		if (testClassReportURL.startsWith("http")) {
-			return URLBuilderUtil.normalizeURL(testClassReportURL);
+			return JenkinsResultsParserUtil.normalizeURL(testClassReportURL);
 		}
 
 		return testClassReportURL;

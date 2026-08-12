@@ -41,7 +41,7 @@ public class URLCompareUtil {
 	}
 
 	private static Map<String, String> _getQueryMap(URL url) {
-		return URLBuilderUtil.parseQueryString(url.getQuery());
+		return JenkinsResultsParserUtil.getQueryParameters(url.getQuery());
 	}
 
 	private static String _normalizePath(String path) {

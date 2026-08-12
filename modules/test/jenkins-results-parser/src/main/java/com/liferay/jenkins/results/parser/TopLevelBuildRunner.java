@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 import org.dom4j.Element;
 
@@ -324,8 +325,10 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 			getBaseInvocationURL(cohortName, jobName), "/job/", jobName,
 			"/buildWithParameters");
 
-		_topLevelBuild.addDownstreamBuilds(
-			URLBuilderUtil.buildURL(jobURL, invocationParameters));
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+			jobURL, invocationParameters);
+
+		_topLevelBuild.addDownstreamBuilds(uriBuilder.toString());
 	}
 
 	private void _invokeDownstreamBuild(BuildData buildData) {

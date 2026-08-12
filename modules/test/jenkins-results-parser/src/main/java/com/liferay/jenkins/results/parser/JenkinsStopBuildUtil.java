@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.utils.URIBuilder;
 
 import org.json.JSONObject;
 
@@ -26,13 +27,15 @@ public class JenkinsStopBuildUtil {
 			JenkinsMaster jenkinsMaster, long queueId)
 		throws Exception {
 
-		String normalizedURL = URLBuilderUtil.normalizeURL(
+		String normalizedURL = JenkinsResultsParserUtil.normalizeURL(
 			JenkinsResultsParserUtil.getLocalURL(jenkinsMaster.getURL()));
 
-		URL urlObject = new URL(
-			URLBuilderUtil.buildURL(
-				normalizedURL + "/queue/cancelItem", "id",
-				String.valueOf(queueId)));
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+			normalizedURL + "/queue/cancelItem");
+
+		uriBuilder.addParameter("id", String.valueOf(queueId));
+
+		URL urlObject = new URL(uriBuilder.toString());
 
 		HttpURLConnection httpConnection =
 			(HttpURLConnection)urlObject.openConnection();
@@ -122,13 +125,16 @@ public class JenkinsStopBuildUtil {
 	}
 
 	private static void _stopBuild(String buildURL) throws Exception {
-		String normalizedBuildURL = URLBuilderUtil.normalizeURL(
+		String normalizedBuildURL = JenkinsResultsParserUtil.normalizeURL(
 			JenkinsResultsParserUtil.getLocalURL(buildURL));
 
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+			normalizedBuildURL + "/api/json");
+
+		uriBuilder.addParameter("tree", "result");
+
 		JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-			URLBuilderUtil.buildURL(
-				normalizedBuildURL + "/api/json", "tree", "result"),
-			false);
+			uriBuilder.toString(), false);
 
 		if (jsonObject.has("result") && jsonObject.isNull("result")) {
 			URL urlObject = new URL(normalizedBuildURL + "/stop");

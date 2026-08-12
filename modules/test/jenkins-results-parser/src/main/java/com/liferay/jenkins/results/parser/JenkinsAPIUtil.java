@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.client.utils.URIBuilder;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,14 +29,15 @@ public class JenkinsAPIUtil {
 			return null;
 		}
 
-		String apiURL = JenkinsResultsParserUtil.combine(
-			JenkinsResultsParserUtil.getLocalURL(jenkinsURL), "/api/json");
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+			JenkinsResultsParserUtil.combine(
+				JenkinsResultsParserUtil.getLocalURL(jenkinsURL), "/api/json"));
 
 		if (tree != null) {
-			apiURL = URLBuilderUtil.buildURL(apiURL, "tree", tree);
+			uriBuilder.addParameter("tree", tree);
 		}
 
-		final String jenkinsAPIURL = apiURL;
+		final String jenkinsAPIURL = uriBuilder.toString();
 
 		Retryable<JSONObject> retryable = new Retryable<JSONObject>() {
 
@@ -99,16 +102,18 @@ public class JenkinsAPIUtil {
 	public static JSONObject getLastCompletedBuildJSONObject(
 		String jobURL, String tree) {
 
-		String apiURL = JenkinsResultsParserUtil.combine(
-			JenkinsResultsParserUtil.getLocalURL(jobURL),
-			"/lastCompletedBuild/api/json");
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+			JenkinsResultsParserUtil.combine(
+				JenkinsResultsParserUtil.getLocalURL(jobURL),
+				"/lastCompletedBuild/api/json"));
 
 		if (tree != null) {
-			apiURL = URLBuilderUtil.buildURL(apiURL, "tree", tree);
+			uriBuilder.addParameter("tree", tree);
 		}
 
 		try {
-			return JenkinsResultsParserUtil.toJSONObject(apiURL, false);
+			return JenkinsResultsParserUtil.toJSONObject(
+				uriBuilder.toString(), false);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException("Unable to get build JSON", ioException);

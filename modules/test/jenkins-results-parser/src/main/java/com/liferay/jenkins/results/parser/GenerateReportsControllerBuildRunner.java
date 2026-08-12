@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.client.utils.URIBuilder;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -94,15 +96,16 @@ public class GenerateReportsControllerBuildRunner
 
 		BuildData buildData = getBuildData();
 
-		String jobAPIURL = URLBuilderUtil.buildURL(
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
 			JenkinsResultsParserUtil.combine(
 				JenkinsResultsParserUtil.getLocalURL(buildData.getJobURL()),
-				"/api/json"),
-			"tree", "builds[description,timestamp,url]");
+				"/api/json"));
+
+		uriBuilder.addParameter("tree", "builds[description,timestamp,url]");
 
 		try {
 			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-				jobAPIURL, false);
+				uriBuilder.toString(), false);
 
 			JSONArray buildsJSONArray = jsonObject.getJSONArray("builds");
 

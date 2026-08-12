@@ -11,7 +11,6 @@ import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.Job;
 import com.liferay.jenkins.results.parser.TestSuiteJob;
 import com.liferay.jenkins.results.parser.TopLevelBuildReport;
-import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -241,13 +241,16 @@ public abstract class BaseStandaloneBuildTestrayCaseResult
 					Element attachmentFileElement =
 						attachmentsElement.addElement("file");
 
+					URIBuilder uriBuilder =
+						JenkinsResultsParserUtil.newURIBuilder(
+							String.valueOf(testrayAttachment.getURL()));
+
+					uriBuilder.addParameter("authuser", "0");
+
 					attachmentFileElement.addAttribute(
 						"name", testrayAttachment.getName());
 					attachmentFileElement.addAttribute(
-						"url",
-						URLBuilderUtil.buildURL(
-							String.valueOf(testrayAttachment.getURL()),
-							"authuser", "0"));
+						"url", uriBuilder.toString());
 
 					attachmentFileElement.addAttribute(
 						"value", testrayAttachment.getKey() + "?authuser=0");

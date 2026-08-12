@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 /**
  * @author Kenji Heigel
@@ -316,7 +317,10 @@ public class PoshiReleasePortalTopLevelBuildRunner
 				}
 			}
 
-			return URLBuilderUtil.buildURL(jobURL, invocationParameters);
+			URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+				jobURL, invocationParameters);
+
+			return uriBuilder.toString();
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);

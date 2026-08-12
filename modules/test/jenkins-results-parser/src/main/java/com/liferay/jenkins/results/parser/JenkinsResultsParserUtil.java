@@ -33,6 +33,7 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -83,6 +84,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -106,6 +108,10 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -186,6 +192,24 @@ public class JenkinsResultsParserUtil {
 
 			cacheFile.deleteOnExit();
 		}
+	}
+
+	public static String buildFormContent(Map<String, String> parameters) {
+		if ((parameters == null) || parameters.isEmpty()) {
+			return "";
+		}
+
+		Map<String, String> sortedParameters = new TreeMap<>(parameters);
+
+		List<NameValuePair> nameValuePairs = new ArrayList<>(
+			sortedParameters.size());
+
+		for (Map.Entry<String, String> entry : sortedParameters.entrySet()) {
+			nameValuePairs.add(
+				new BasicNameValuePair(entry.getKey(), entry.getValue()));
+		}
+
+		return URLEncodedUtils.format(nameValuePairs, StandardCharsets.UTF_8);
 	}
 
 	public static void clearCache() {
@@ -499,14 +523,6 @@ public class JenkinsResultsParserUtil {
 			});
 	}
 
-	/**
-	 * Returns the part encoded the way this repository has always encoded a
-	 * single path part. This is form encoding with four characters put back
-	 * afterwards, so a percent sign and a plus sign survive unencoded, which
-	 * is wrong in principle and kept only because a cloud storage object key
-	 * is matched against a name already written this way. Do not build a URL
-	 * with this. Use {@link URLBuilderUtil#buildURL(String, String, String)}.
-	 */
 	public static String encodeLegacyURLPart(String part) {
 		try {
 			part = URLEncoder.encode(part, StandardCharsets.UTF_8.name());
@@ -657,7 +673,7 @@ public class JenkinsResultsParserUtil {
 					combine("http://", jenkinsMasterName, "/script"));
 			}
 
-			URL urlObject = new URL(URLBuilderUtil.normalizeURL(url));
+			URL urlObject = new URL(normalizeURL(url));
 
 			HttpURLConnection httpURLConnection =
 				(HttpURLConnection)urlObject.openConnection();
@@ -678,7 +694,7 @@ public class JenkinsResultsParserUtil {
 			try (OutputStream outputStream =
 					httpURLConnection.getOutputStream()) {
 
-				String post = URLBuilderUtil.buildFormContent(
+				String post = buildFormContent(
 					Collections.singletonMap("script", script));
 
 				outputStream.write(post.getBytes("UTF-8"));
@@ -1236,12 +1252,13 @@ public class JenkinsResultsParserUtil {
 		}
 
 		if (jsonObject == null) {
-			String buildParametersURL = URLBuilderUtil.buildURL(
-				getLocalURL(buildURL + "api/json"), "tree",
-				"actions[parameters[name,value]]");
+			URIBuilder uriBuilder = newURIBuilder(
+				getLocalURL(buildURL + "api/json"));
+
+			uriBuilder.addParameter("tree", "actions[parameters[name,value]]");
 
 			try {
-				jsonObject = toJSONObject(buildParametersURL);
+				jsonObject = toJSONObject(uriBuilder.toString());
 			}
 			catch (IOException ioException) {
 				throw new RuntimeException(ioException);
@@ -1499,7 +1516,7 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getCacheFileKey(String urlString, String postContent) {
-		String key = URLBuilderUtil.normalizeURL(urlString);
+		String key = normalizeURL(urlString);
 
 		if (!isNullOrEmpty(postContent)) {
 			key += postContent;
@@ -2256,10 +2273,11 @@ public class JenkinsResultsParserUtil {
 
 	public static String getJenkinsBuildResult(String buildURL) {
 		try {
-			JSONObject jsonObject = toJSONObject(
-				URLBuilderUtil.buildURL(
-					buildURL + "/api/json", "tree", "result"),
-				false);
+			URIBuilder uriBuilder = newURIBuilder(buildURL + "/api/json");
+
+			uriBuilder.addParameter("tree", "result");
+
+			JSONObject jsonObject = toJSONObject(uriBuilder.toString(), false);
 
 			if (!jsonObject.has("result") || jsonObject.isNull("result")) {
 				return null;
@@ -2865,11 +2883,11 @@ public class JenkinsResultsParserUtil {
 			parameters.put("jobName", jobName);
 		}
 
-		String loadBalancerURL = URLBuilderUtil.buildURL(
+		URIBuilder uriBuilder = newURIBuilder(
 			getJenkinsLoadBalancerURL(), parameters);
 
 		try {
-			JSONObject jsonObject = toJSONObject(loadBalancerURL, false);
+			JSONObject jsonObject = toJSONObject(uriBuilder.toString(), false);
 
 			return jsonObject.getString("mostAvailableMasterURL");
 		}
@@ -3106,6 +3124,32 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return propertyOptions;
+	}
+
+	public static Map<String, String> getQueryParameters(String queryString) {
+		Map<String, String> parameters = new LinkedHashMap<>();
+
+		if (isNullOrEmpty(queryString)) {
+			return parameters;
+		}
+
+		URIBuilder uriBuilder = newURIBuilder("?" + queryString);
+
+		for (NameValuePair nameValuePair : uriBuilder.getQueryParams()) {
+			String name = nameValuePair.getName();
+
+			if (parameters.containsKey(name)) {
+				System.out.println(
+					"WARNING: Ignoring the repeated query string parameter " +
+						name);
+
+				continue;
+			}
+
+			parameters.put(name, nameValuePair.getValue());
+		}
+
+		return parameters;
 	}
 
 	public static String getRandomGitHubDevNodeHostname() {
@@ -3663,9 +3707,9 @@ public class JenkinsResultsParserUtil {
 			return getJenkinsBuildQueueId(
 				UrlReader.getResponseHeader(
 					"Location", getJenkinsHTTPAuthorization(),
-					HttpRequestMethod.POST,
-					URLBuilderUtil.buildFormContent(parameters), requestHeaders,
-					timeout, combine(jenkinsJobURL, "/buildWithParameters")));
+					HttpRequestMethod.POST, buildFormContent(parameters),
+					requestHeaders, timeout,
+					combine(jenkinsJobURL, "/buildWithParameters")));
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(
@@ -4039,12 +4083,15 @@ public class JenkinsResultsParserUtil {
 			public Set<String> execute() {
 				JSONObject topLevelBuildsJSONObject;
 
+				URIBuilder uriBuilder = newURIBuilder(
+					jenkinsMaster.getRemoteURL() +
+						"/view/Top%20Level/api/json");
+
+				uriBuilder.addParameter("tree", "jobs[name]");
+
 				try {
 					topLevelBuildsJSONObject = toJSONObject(
-						URLBuilderUtil.buildURL(
-							jenkinsMaster.getRemoteURL() +
-								"/view/Top%20Level/api/json",
-							"tree", "jobs[name]"));
+						uriBuilder.toString());
 				}
 				catch (IOException ioException) {
 					throw new RuntimeException(ioException);
@@ -4318,6 +4365,95 @@ public class JenkinsResultsParserUtil {
 			}
 
 		};
+	}
+
+	public static URIBuilder newURIBuilder(String url) {
+		try {
+			return new URIBuilder(url);
+		}
+		catch (URISyntaxException uriSyntaxException1) {
+			String normalizedURL = normalizeURL(url);
+
+			try {
+				return new URIBuilder(normalizedURL);
+			}
+			catch (URISyntaxException uriSyntaxException2) {
+				throw new RuntimeException(
+					"Unable to parse the URL " + url, uriSyntaxException2);
+			}
+		}
+	}
+
+	public static URIBuilder newURIBuilder(
+		String url, Map<String, String> parameters) {
+
+		URIBuilder uriBuilder = newURIBuilder(url);
+
+		if ((parameters == null) || parameters.isEmpty()) {
+			return uriBuilder;
+		}
+
+		Map<String, String> sortedParameters = new TreeMap<>(parameters);
+
+		for (Map.Entry<String, String> entry : sortedParameters.entrySet()) {
+			uriBuilder.addParameter(entry.getKey(), entry.getValue());
+		}
+
+		return uriBuilder;
+	}
+
+	public static String normalizeURL(String url) {
+		if (isNullOrEmpty(url) ||
+			(_isLegalURI(url) && !_hasRawSquareBracket(url))) {
+
+			return url;
+		}
+
+		String remainder = url;
+
+		String fragment = null;
+
+		int index = remainder.indexOf('#');
+
+		if (index != -1) {
+			fragment = remainder.substring(index + 1);
+
+			remainder = remainder.substring(0, index);
+		}
+
+		String queryString = null;
+
+		index = remainder.indexOf('?');
+
+		if (index != -1) {
+			queryString = remainder.substring(index + 1);
+
+			remainder = remainder.substring(0, index);
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_escape(remainder, _LEGAL_PATH_CHARACTERS));
+
+		if (queryString != null) {
+			sb.append("?");
+			sb.append(_escape(queryString, _LEGAL_QUERY_CHARACTERS));
+		}
+
+		if (fragment != null) {
+			sb.append("#");
+			sb.append(_escape(fragment, _LEGAL_QUERY_CHARACTERS));
+		}
+
+		String normalizedURL = sb.toString();
+
+		if (!_isLegalURI(normalizedURL)) {
+			System.out.println("WARNING: Unable to normalize the URL " + url);
+
+			return url;
+		}
+
+		return normalizedURL;
 	}
 
 	public static <T> List<List<T>> partitionByCount(List<T> list, int count) {
@@ -5866,8 +6002,7 @@ public class JenkinsResultsParserUtil {
 
 			try {
 				JSONObject jsonObject = toJSONObject(
-					String.valueOf(_tokenURL),
-					URLBuilderUtil.buildFormContent(parameters));
+					String.valueOf(_tokenURL), buildFormContent(parameters));
 
 				_token = jsonObject.getString("access_token");
 				_tokenExpirationDate = new Date(
@@ -6045,6 +6180,50 @@ public class JenkinsResultsParserUtil {
 
 	private static String _combineCommandArgs(String... args) {
 		return join(" ", args);
+	}
+
+	private static String _escape(String value, String legalCharacters) {
+		StringBuilder sb = new StringBuilder(value.length());
+
+		int i = 0;
+
+		while (i < value.length()) {
+			char c = value.charAt(i);
+
+			if ((c == '%') && _isEscapeSequence(value, i)) {
+				sb.append(value, i, i + 3);
+
+				i = i + 3;
+			}
+			else if (_isLegalCharacter(c, legalCharacters)) {
+				sb.append(c);
+
+				i++;
+			}
+			else {
+				int codePoint = value.codePointAt(i);
+
+				_escapeCodePoint(sb, codePoint);
+
+				i = i + Character.charCount(codePoint);
+			}
+		}
+
+		return sb.toString();
+	}
+
+	private static void _escapeCodePoint(StringBuilder sb, int codePoint) {
+		String codePointString = new String(Character.toChars(codePoint));
+
+		byte[] bytes = codePointString.getBytes(StandardCharsets.UTF_8);
+
+		for (byte b : bytes) {
+			int octet = b & 0xff;
+
+			sb.append("%");
+			sb.append(_HEXADECIMAL_CHARACTERS.charAt(octet >> 4));
+			sb.append(_HEXADECIMAL_CHARACTERS.charAt(octet & 0x0f));
+		}
 	}
 
 	private static void _executeCommandService(
@@ -6738,6 +6917,22 @@ public class JenkinsResultsParserUtil {
 		return hostName + ":" + filePath;
 	}
 
+	private static boolean _hasRawSquareBracket(String url) {
+		int index = url.indexOf('?');
+
+		if (index == -1) {
+			return false;
+		}
+
+		String remainder = url.substring(index + 1);
+
+		if ((remainder.indexOf('[') != -1) || (remainder.indexOf(']') != -1)) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private static void _initializeRedactTokens() {
 		Properties properties = null;
 
@@ -6767,6 +6962,22 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
+	private static boolean _isEscapeSequence(String value, int index) {
+		if ((index + 2) >= value.length()) {
+			return false;
+		}
+
+		for (int i = index + 1; i <= (index + 2); i++) {
+			char c = value.charAt(i);
+
+			if (_HEXADECIMAL_CHARACTERS.indexOf(c) == -1) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private static boolean _isJSONExpectedAndActualEqual(
 		Object expected, Object actual) {
 
@@ -6791,6 +7002,31 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return true;
+	}
+
+	private static boolean _isLegalCharacter(char c, String legalCharacters) {
+		if (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z')) ||
+			((c >= '0') && (c <= '9'))) {
+
+			return true;
+		}
+
+		if (legalCharacters.indexOf(c) != -1) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private static boolean _isLegalURI(String url) {
+		try {
+			new URI(url);
+
+			return true;
+		}
+		catch (URISyntaxException uriSyntaxException) {
+			return false;
+		}
 	}
 
 	private static synchronized Set<String> _loadForbiddenRedactTokens() {
@@ -6837,7 +7073,15 @@ public class JenkinsResultsParserUtil {
 	private static final String _DIST_PORTAL_BUNDLES_URL_DEFAULT =
 		"http://test-1-0/userContent/bundles/test-portal-acceptance-upstream";
 
+	private static final String _HEXADECIMAL_CHARACTERS =
+		"0123456789ABCDEFabcdef";
+
 	private static final String _JENKINS_DIST_ROOT_PATH_DEFAULT = "/tmp/dist";
+
+	private static final String _LEGAL_PATH_CHARACTERS = "-._~!$&'()*+,;=:@/";
+
+	private static final String _LEGAL_QUERY_CHARACTERS =
+		_LEGAL_PATH_CHARACTERS + "?";
 
 	private static final long _MILLIS_BASH_COMMAND_TIMEOUT_DEFAULT =
 		1000 * 60 * 60;

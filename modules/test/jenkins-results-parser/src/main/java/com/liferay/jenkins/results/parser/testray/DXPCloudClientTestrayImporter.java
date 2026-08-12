@@ -8,7 +8,6 @@ package com.liferay.jenkins.results.parser.testray;
 import com.liferay.jenkins.results.parser.Dom4JUtil;
 import com.liferay.jenkins.results.parser.Environment;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.URLBuilderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +24,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.http.client.utils.URIBuilder;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -242,15 +243,16 @@ public class DXPCloudClientTestrayImporter {
 			return null;
 		}
 
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+			JenkinsResultsParserUtil.combine(
+				_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key));
+
+		uriBuilder.addParameter("authuser", "0");
+
 		Element attachmentElement = Dom4JUtil.getNewElement("file");
 
 		attachmentElement.addAttribute("name", "Poshi Log");
-		attachmentElement.addAttribute(
-			"url",
-			URLBuilderUtil.buildURL(
-				JenkinsResultsParserUtil.combine(
-					_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key),
-				"authuser", "0"));
+		attachmentElement.addAttribute("url", uriBuilder.toString());
 
 		attachmentElement.addAttribute("value", key + "?authuser=0");
 
@@ -392,16 +394,17 @@ public class DXPCloudClientTestrayImporter {
 				continue;
 			}
 
+			URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+				JenkinsResultsParserUtil.combine(
+					_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key));
+
+			uriBuilder.addParameter("authuser", "0");
+
 			Element attachmentElement = attachmentsElement.addElement("file");
 
 			attachmentElement.addAttribute("name", attachmentName);
 
-			attachmentElement.addAttribute(
-				"url",
-				URLBuilderUtil.buildURL(
-					JenkinsResultsParserUtil.combine(
-						_testrayCloudBucket.getTestrayCloudBaseURL(), "/", key),
-					"authuser", "0"));
+			attachmentElement.addAttribute("url", uriBuilder.toString());
 
 			attachmentElement.addAttribute("value", key + "?authuser=0");
 		}

@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -799,8 +800,10 @@ public abstract class BaseBuild implements Build {
 			return null;
 		}
 
-		return URLBuilderUtil.buildURL(
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
 			jobURL + "/buildWithParameters", getParameters());
+
+		return uriBuilder.toString();
 	}
 
 	@Override
@@ -962,7 +965,7 @@ public abstract class BaseBuild implements Build {
 		String jobURL = JenkinsResultsParserUtil.combine(
 			jenkinsMaster.getRemoteURL(), "job/", _jobName);
 
-		return URLBuilderUtil.normalizeURL(jobURL);
+		return JenkinsResultsParserUtil.normalizeURL(jobURL);
 	}
 
 	@Override
@@ -3073,8 +3076,8 @@ public abstract class BaseBuild implements Build {
 	}
 
 	protected void loadParametersFromQueryString(String queryString) {
-		Map<String, String> parameters = URLBuilderUtil.parseQueryString(
-			queryString);
+		Map<String, String> parameters =
+			JenkinsResultsParserUtil.getQueryParameters(queryString);
 
 		for (Map.Entry<String, String> entry : parameters.entrySet()) {
 			String value = entry.getValue();
