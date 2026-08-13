@@ -539,18 +539,6 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
-	public static String encodeURLParameterPart(String parameterPart) {
-		try {
-			parameterPart = URLEncoder.encode(
-				parameterPart, StandardCharsets.UTF_8.name());
-
-			return parameterPart.replace("+", "%20");
-		}
-		catch (UnsupportedEncodingException unsupportedEncodingException) {
-			throw new RuntimeException(unsupportedEncodingException);
-		}
-	}
-
 	public static String escapeForBash(String string) {
 		string = string.replaceAll(" ", "\\\\ ");
 		string = string.replaceAll("'", "\\\\\\\'");
@@ -1940,8 +1928,12 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getGitHubApiSearchUrl(List<String> filters) {
-		return combine(
-			"https://api.github.com/search/issues?q=", join("+", filters));
+		URIBuilder uriBuilder = newURIBuilder(
+			"https://api.github.com/search/issues");
+
+		uriBuilder.addParameter("q", join(" ", filters));
+
+		return uriBuilder.toString();
 	}
 
 	public static String getGitHubAPIURL(

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -303,22 +302,22 @@ public class PoshiReleasePortalTopLevelBuildRunner
 						upstreamBranchName));
 			}
 
-			Iterator<Map.Entry<String, String>> iterator =
-				invocationParameters.entrySet(
-				).iterator();
+			Map<String, String> parameters = new HashMap<>();
 
-			while (iterator.hasNext()) {
-				Map.Entry<String, String> invocationParameter = iterator.next();
+			for (Map.Entry<String, String> invocationParameter :
+					invocationParameters.entrySet()) {
 
-				if (JenkinsResultsParserUtil.isNullOrEmpty(
-						invocationParameter.getValue())) {
+				String value = invocationParameter.getValue();
 
-					iterator.remove();
+				if (JenkinsResultsParserUtil.isNullOrEmpty(value)) {
+					continue;
 				}
+
+				parameters.put(invocationParameter.getKey(), value);
 			}
 
 			URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
-				jobURL, invocationParameters);
+				jobURL, parameters);
 
 			return uriBuilder.toString();
 		}

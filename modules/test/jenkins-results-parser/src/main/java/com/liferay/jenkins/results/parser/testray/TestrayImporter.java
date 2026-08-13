@@ -1497,7 +1497,6 @@ public class TestrayImporter {
 			attachmentFileElement.addAttribute(
 				"name", testrayAttachment.getName());
 			attachmentFileElement.addAttribute("url", uriBuilder.toString());
-
 			attachmentFileElement.addAttribute(
 				"value", testrayAttachment.getKey() + "?authuser=0");
 		}

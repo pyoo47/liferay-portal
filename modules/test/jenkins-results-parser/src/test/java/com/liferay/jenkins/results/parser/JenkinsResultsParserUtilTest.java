@@ -106,27 +106,6 @@ public class JenkinsResultsParserUtilTest
 		testEquals("a+b", JenkinsResultsParserUtil.encodeLegacyURLPart("a+b"));
 	}
 
-	@Test
-	public void testEncodeURLParameterPart() {
-		testEquals(
-			"100%25%20pass",
-			JenkinsResultsParserUtil.encodeURLParameterPart("100% pass"));
-		testEquals(
-			"AWS%20CI",
-			JenkinsResultsParserUtil.encodeURLParameterPart("AWS CI"));
-		testEquals(
-			"PortalSmoke%23Smoke",
-			JenkinsResultsParserUtil.encodeURLParameterPart(
-				"PortalSmoke#Smoke"));
-		testEquals(
-			"a%26b", JenkinsResultsParserUtil.encodeURLParameterPart("a&b"));
-		testEquals(
-			"a%2Bb", JenkinsResultsParserUtil.encodeURLParameterPart("a+b"));
-		testEquals(
-			"master",
-			JenkinsResultsParserUtil.encodeURLParameterPart("master"));
-	}
-
 	@Test(timeout = 30000)
 	public void testExecuteJenkinsScriptReadTimeout() throws Exception {
 		try (ServerSocket serverSocket = _createServerSocket()) {
@@ -1000,6 +979,11 @@ public class JenkinsResultsParserUtilTest
 		String normalizedURL = JenkinsResultsParserUtil.normalizeURL(
 			"http://test-1-1/job/x?tree=actions[parameters[name,value]]");
 
+		testEquals(
+			JenkinsResultsParserUtil.combine(
+				"http://test-1-1/job/x?tree=actions%5Bparameters%5Bname,",
+				"value%5D%5D"),
+			normalizedURL);
 		testEquals(
 			normalizedURL,
 			JenkinsResultsParserUtil.normalizeURL(normalizedURL));

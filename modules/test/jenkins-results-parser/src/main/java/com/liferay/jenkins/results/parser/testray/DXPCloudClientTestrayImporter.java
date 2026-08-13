@@ -253,7 +253,6 @@ public class DXPCloudClientTestrayImporter {
 
 		attachmentElement.addAttribute("name", "Poshi Log");
 		attachmentElement.addAttribute("url", uriBuilder.toString());
-
 		attachmentElement.addAttribute("value", key + "?authuser=0");
 
 		return attachmentElement;

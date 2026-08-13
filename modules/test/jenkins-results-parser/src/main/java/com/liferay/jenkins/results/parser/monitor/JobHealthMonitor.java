@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.utils.URIBuilder;
+
 import org.json.JSONObject;
 
 /**
@@ -167,12 +169,17 @@ public class JobHealthMonitor extends BaseMonitor {
 	}
 
 	private JSONObject _getJobJSONObject() throws IOException {
-		return JenkinsResultsParserUtil.toJSONObject(
+		URIBuilder uriBuilder = JenkinsResultsParserUtil.newURIBuilder(
+			_jobURL + "/api/json");
+
+		uriBuilder.addParameter(
+			"tree",
 			JenkinsResultsParserUtil.combine(
-				_jobURL, "/api/json?tree=",
 				"lastBuild[building,number,timestamp],",
-				"lastCompletedBuild[number,result,timestamp]"),
-			false, 1, null, null, _SECONDS_RETRY_PERIOD,
+				"lastCompletedBuild[number,result,timestamp]"));
+
+		return JenkinsResultsParserUtil.toJSONObject(
+			uriBuilder.toString(), false, 1, null, null, _SECONDS_RETRY_PERIOD,
 			getAttemptTimeoutMillis(), null);
 	}
 

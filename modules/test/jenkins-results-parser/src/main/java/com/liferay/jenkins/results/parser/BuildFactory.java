@@ -287,8 +287,8 @@ public class BuildFactory {
 	private static final String _BUILD_URL_SUFFIX_REGEX =
 		JenkinsResultsParserUtil.combine(
 			"((?<axisVariable>AXIS_VARIABLE=[^,/]+(,[^/]+)?)|)/?",
-			"((?<buildNumber>\\d+)|buildWithParameters\\?" +
-				"(?<queryString>.*))/?");
+			"((?<buildNumber>\\d+)|buildWithParameters(\\?" +
+				"(?<queryString>.*))?)/?");
 
 	private static final MultiPattern _buildURLMultiPattern = new MultiPattern(
 		JenkinsResultsParserUtil.combine(

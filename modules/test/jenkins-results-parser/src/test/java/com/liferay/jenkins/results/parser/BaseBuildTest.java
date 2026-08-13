@@ -99,6 +99,21 @@ public class BaseBuildTest extends com.liferay.jenkins.results.parser.Test {
 	}
 
 	@Test
+	public void testGetInvocationURLWithoutParametersIsRecognizedByBuildFactory()
+		throws Exception {
+
+		String invocationURL = _getInvocationURL(new HashMap<String, String>());
+
+		MultiPattern multiPattern = ReflectionTestUtil.getFieldValue(
+			BuildFactory.class, "_buildURLMultiPattern");
+
+		Assert.assertNotNull(
+			"BuildFactory must accept the same parameterless invocation URL " +
+				"that BaseBuild produces and reads back",
+			multiPattern.find(invocationURL));
+	}
+
+	@Test
 	public void testLoadParametersFromQueryString() {
 		Map<String, String> parameters = _loadParametersFromQueryString(
 			JenkinsResultsParserUtil.combine(
