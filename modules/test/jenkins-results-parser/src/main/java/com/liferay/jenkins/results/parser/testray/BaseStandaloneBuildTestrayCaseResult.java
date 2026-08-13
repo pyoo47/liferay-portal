@@ -252,7 +252,7 @@ public abstract class BaseStandaloneBuildTestrayCaseResult
 					attachmentFileElement.addAttribute(
 						"url", uriBuilder.toString());
 					attachmentFileElement.addAttribute(
-						"value", testrayAttachment.getKey() + "?authuser=0");
+						"value", testrayAttachment.getKey());
 				}
 
 				String errors = testrayCaseResult.getErrors();

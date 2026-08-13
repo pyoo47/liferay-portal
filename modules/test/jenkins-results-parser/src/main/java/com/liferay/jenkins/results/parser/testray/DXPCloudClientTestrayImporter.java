@@ -253,7 +253,7 @@ public class DXPCloudClientTestrayImporter {
 
 		attachmentElement.addAttribute("name", "Poshi Log");
 		attachmentElement.addAttribute("url", uriBuilder.toString());
-		attachmentElement.addAttribute("value", key + "?authuser=0");
+		attachmentElement.addAttribute("value", key);
 
 		return attachmentElement;
 	}
@@ -404,8 +404,7 @@ public class DXPCloudClientTestrayImporter {
 			attachmentElement.addAttribute("name", attachmentName);
 
 			attachmentElement.addAttribute("url", uriBuilder.toString());
-
-			attachmentElement.addAttribute("value", key + "?authuser=0");
+			attachmentElement.addAttribute("value", key);
 		}
 
 		if (_testType.equals("poshi")) {
