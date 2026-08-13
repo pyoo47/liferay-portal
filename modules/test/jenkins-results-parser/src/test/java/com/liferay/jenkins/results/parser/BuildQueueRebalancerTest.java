@@ -18,8 +18,6 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Test;
 
-import org.mockito.Mockito;
-
 /**
  * @author Calum Ragan
  */
@@ -58,7 +56,7 @@ public class BuildQueueRebalancerTest
 
 		JenkinsResultsParserUtil.setBuildProperties(buildProperties);
 
-		StreamUrlReader urlReader = mockUrlReader();
+		MockUrlReaders urlReaders = mockUrlReader();
 
 		JSONObject queueJSONObject = new JSONObject();
 
@@ -76,7 +74,7 @@ public class BuildQueueRebalancerTest
 		setUrlReaderOutput(
 			String.valueOf(queueJSONObject),
 			_BLACKLISTED_JENKINS_MASTER_NAME + ".liferay.com/queue/api/json",
-			urlReader);
+			urlReaders);
 
 		setUrlReaderOutput(
 			String.valueOf(
@@ -85,7 +83,7 @@ public class BuildQueueRebalancerTest
 					"mode", "NORMAL"
 				)),
 			_AVAILABLE_JENKINS_MASTER_NAME + ".liferay.com/api/json?tree=mode",
-			urlReader);
+			urlReaders);
 		setUrlReaderOutput(
 			String.valueOf(
 				new JSONObject(
@@ -93,7 +91,7 @@ public class BuildQueueRebalancerTest
 					"items", new JSONArray()
 				)),
 			_AVAILABLE_JENKINS_MASTER_NAME + ".liferay.com/queue/api/json",
-			urlReader);
+			urlReaders);
 
 		_setJenkinsMasterAWSFleetClouds(_AVAILABLE_JENKINS_MASTER_NAME);
 		_setJenkinsMasterAWSFleetClouds(_BLACKLISTED_JENKINS_MASTER_NAME);
@@ -155,22 +153,12 @@ public class BuildQueueRebalancerTest
 
 		JenkinsResultsParserUtil.setBuildProperties(buildProperties);
 
-		StreamUrlReader urlReader = mockUrlReader();
+		MockUrlReaders urlReaders = mockUrlReader();
 
-		Mockito.doThrow(
-			new IOException("Connection refused")
-		).when(
-			urlReader
-		).doRead(
-			Mockito.anyBoolean(), Mockito.any(), Mockito.any(),
-			Mockito.anyInt(), Mockito.any(), Mockito.anyInt(), Mockito.anyInt(),
-			Mockito.argThat(
-				readURL ->
-					(readURL != null) &&
-					readURL.contains(
-						_BLACKLISTED_JENKINS_MASTER_NAME +
-							".liferay.com/queue/api/json"))
-		);
+		setUrlReaderError(
+			new IOException("Connection refused"),
+			_BLACKLISTED_JENKINS_MASTER_NAME + ".liferay.com/queue/api/json",
+			urlReaders);
 
 		setUrlReaderOutput(
 			String.valueOf(
@@ -179,7 +167,7 @@ public class BuildQueueRebalancerTest
 					"mode", "NORMAL"
 				)),
 			_AVAILABLE_JENKINS_MASTER_NAME + ".liferay.com/api/json?tree=mode",
-			urlReader);
+			urlReaders);
 		setUrlReaderOutput(
 			String.valueOf(
 				new JSONObject(
@@ -187,7 +175,7 @@ public class BuildQueueRebalancerTest
 					"items", new JSONArray()
 				)),
 			_AVAILABLE_JENKINS_MASTER_NAME + ".liferay.com/queue/api/json",
-			urlReader);
+			urlReaders);
 
 		_setJenkinsMasterAWSFleetClouds(_AVAILABLE_JENKINS_MASTER_NAME);
 		_setJenkinsMasterAWSFleetClouds(_BLACKLISTED_JENKINS_MASTER_NAME);
