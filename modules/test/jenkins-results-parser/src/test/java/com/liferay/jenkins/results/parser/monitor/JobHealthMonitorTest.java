@@ -320,7 +320,7 @@ public class JobHealthMonitorTest
 
 	@Test
 	public void testExecuteJobMissingFromMaster() throws Exception {
-		MockUrlReaders urlReaders = mockUrlReaders();
+		MockUrlReaders mockUrlReaders = mockUrlReaders();
 
 		JSONObject jobsJSONObject = new JSONObject(
 		).put(
@@ -335,7 +335,7 @@ public class JobHealthMonitorTest
 		);
 
 		setUrlReaderOutput(
-			jobsJSONObject.toString(), _MASTER_API_URL, urlReaders);
+			jobsJSONObject.toString(), _MASTER_API_URL, mockUrlReaders);
 
 		MonitorResult monitorResult = _execute(_newMonitorProperties());
 
@@ -667,10 +667,10 @@ public class JobHealthMonitorTest
 
 	@Test
 	public void testExecuteUnreadableResponse() throws Exception {
-		MockUrlReaders urlReaders = mockUrlReaders();
+		MockUrlReaders mockUrlReaders = mockUrlReaders();
 
 		setUrlReaderOutput(
-			RandomTestUtil.randomString(), _MASTER_API_URL, urlReaders);
+			RandomTestUtil.randomString(), _MASTER_API_URL, mockUrlReaders);
 
 		MonitorResult monitorResult = _execute(_newMonitorProperties());
 
@@ -839,12 +839,12 @@ public class JobHealthMonitorTest
 	private void _setJobJSONObject(String configXML, JSONObject jobJSONObject)
 		throws Exception {
 
-		MockUrlReaders urlReaders = mockUrlReaders();
+		MockUrlReaders mockUrlReaders = mockUrlReaders();
 
 		String jobConfigURL =
 			"http://test-9-1/job/generate-reports-controller/config.xml";
 
-		setUrlReaderOutput(configXML, jobConfigURL, urlReaders);
+		setUrlReaderOutput(configXML, jobConfigURL, mockUrlReaders);
 
 		JSONObject jobsJSONObject = new JSONObject(
 		).put(
@@ -856,7 +856,7 @@ public class JobHealthMonitorTest
 		);
 
 		setUrlReaderOutput(
-			jobsJSONObject.toString(), _MASTER_API_URL, urlReaders);
+			jobsJSONObject.toString(), _MASTER_API_URL, mockUrlReaders);
 	}
 
 	private void _testJobHealthMonitorExpectedIllegalArgumentException(
