@@ -7,7 +7,7 @@ package com.liferay.jenkins.results.parser.monitor;
 
 import com.liferay.jenkins.results.parser.JenkinsMasterTestUtil;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.MockUrlReaders;
+import com.liferay.jenkins.results.parser.MockURLReaders;
 import com.liferay.jenkins.results.parser.RandomTestUtil;
 
 import java.util.Calendar;
@@ -320,7 +320,7 @@ public class JobHealthMonitorTest
 
 	@Test
 	public void testExecuteJobMissingFromMaster() throws Exception {
-		MockUrlReaders mockUrlReaders = mockUrlReaders();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		JSONObject jobsJSONObject = new JSONObject(
 		).put(
@@ -335,7 +335,7 @@ public class JobHealthMonitorTest
 		);
 
 		setUrlReaderOutput(
-			jobsJSONObject.toString(), _MASTER_API_URL, mockUrlReaders);
+			jobsJSONObject.toString(), _MASTER_API_URL, mockURLReaders);
 
 		MonitorResult monitorResult = _execute(_newMonitorProperties());
 
@@ -667,10 +667,10 @@ public class JobHealthMonitorTest
 
 	@Test
 	public void testExecuteUnreadableResponse() throws Exception {
-		MockUrlReaders mockUrlReaders = mockUrlReaders();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		setUrlReaderOutput(
-			RandomTestUtil.randomString(), _MASTER_API_URL, mockUrlReaders);
+			RandomTestUtil.randomString(), _MASTER_API_URL, mockURLReaders);
 
 		MonitorResult monitorResult = _execute(_newMonitorProperties());
 
@@ -839,12 +839,12 @@ public class JobHealthMonitorTest
 	private void _setJobJSONObject(String configXML, JSONObject jobJSONObject)
 		throws Exception {
 
-		MockUrlReaders mockUrlReaders = mockUrlReaders();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		String jobConfigURL =
 			"http://test-9-1/job/generate-reports-controller/config.xml";
 
-		setUrlReaderOutput(configXML, jobConfigURL, mockUrlReaders);
+		setUrlReaderOutput(configXML, jobConfigURL, mockURLReaders);
 
 		JSONObject jobsJSONObject = new JSONObject(
 		).put(
@@ -856,7 +856,7 @@ public class JobHealthMonitorTest
 		);
 
 		setUrlReaderOutput(
-			jobsJSONObject.toString(), _MASTER_API_URL, mockUrlReaders);
+			jobsJSONObject.toString(), _MASTER_API_URL, mockURLReaders);
 	}
 
 	private void _testJobHealthMonitorExpectedIllegalArgumentException(
