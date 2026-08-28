@@ -67,6 +67,9 @@ import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -113,6 +116,7 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -1012,6 +1016,50 @@ public class ObjectDefinitionResourceImpl
 
 		existingObjectDefinition.setObjectDefinitionSettings(
 			objectDefinition::getObjectDefinitionSettings);
+
+		if (objectDefinition.getObjectFields() != null) {
+			Map<String, ObjectField> existingObjectFields = new HashMap<>();
+			Map<String, ObjectField> existingObjectFieldsByName =
+				new HashMap<>();
+
+			for (ObjectField existingObjectField :
+					existingObjectDefinition.getObjectFields()) {
+
+				existingObjectFields.put(
+					existingObjectField.getExternalReferenceCode(),
+					existingObjectField);
+				existingObjectFieldsByName.put(
+					existingObjectField.getName(), existingObjectField);
+			}
+
+			existingObjectDefinition.setObjectFields(
+				() -> transformToArray(
+					ListUtil.fromArray(objectDefinition.getObjectFields()),
+					objectField -> {
+						ObjectField existingObjectField =
+							_getExistingObjectField(
+								existingObjectFields,
+								existingObjectFieldsByName, objectField);
+
+						if (existingObjectField == null) {
+							return objectField;
+						}
+
+						JSONObject jsonObject = JSONUtil.merge(
+							_jsonFactory.createJSONObject(
+								existingObjectField.toString()),
+							_jsonFactory.createJSONObject(
+								objectField.toString()));
+
+						ObjectField patchedObjectField =
+							ObjectField.unsafeToDTO(jsonObject.toString());
+
+						patchedObjectField.setId(existingObjectField::getId);
+
+						return patchedObjectField;
+					},
+					ObjectField.class));
+		}
 	}
 
 	private void _addListTypeDefinition(ObjectDefinition objectDefinition)
@@ -1414,6 +1462,18 @@ public class ObjectDefinitionResourceImpl
 		return accountEntryRestrictedObjectRelationshipsNames;
 	}
 
+	private ObjectField _getExistingObjectField(
+		Map<String, ObjectField> existingObjectFields,
+		Map<String, ObjectField> existingObjectFieldsByName,
+		ObjectField objectField) {
+
+		if (Validator.isNull(objectField.getExternalReferenceCode())) {
+			return existingObjectFieldsByName.get(objectField.getName());
+		}
+
+		return existingObjectFields.get(objectField.getExternalReferenceCode());
+	}
+
 	private long _getObjectFolderId(String objectFolderExternalReferenceCode)
 		throws Exception {
 
@@ -1607,6 +1667,9 @@ public class ObjectDefinitionResourceImpl
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private JSONFactory _jsonFactory;
 
 	@Reference
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
