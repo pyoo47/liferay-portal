@@ -1019,6 +1019,8 @@ public class ObjectDefinitionResourceImpl
 
 		if (objectDefinition.getObjectFields() != null) {
 			Map<String, ObjectField> existingObjectFields = new HashMap<>();
+			Map<String, ObjectField> existingObjectFieldsByName =
+				new HashMap<>();
 
 			for (ObjectField existingObjectField :
 					existingObjectDefinition.getObjectFields()) {
@@ -1026,6 +1028,8 @@ public class ObjectDefinitionResourceImpl
 				existingObjectFields.put(
 					existingObjectField.getExternalReferenceCode(),
 					existingObjectField);
+				existingObjectFieldsByName.put(
+					existingObjectField.getName(), existingObjectField);
 			}
 
 			existingObjectDefinition.setObjectFields(
@@ -1033,8 +1037,9 @@ public class ObjectDefinitionResourceImpl
 					ListUtil.fromArray(objectDefinition.getObjectFields()),
 					objectField -> {
 						ObjectField existingObjectField =
-							existingObjectFields.get(
-								objectField.getExternalReferenceCode());
+							_getExistingObjectField(
+								existingObjectFields,
+								existingObjectFieldsByName, objectField);
 
 						if (existingObjectField == null) {
 							return objectField;
@@ -1455,6 +1460,18 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		return accountEntryRestrictedObjectRelationshipsNames;
+	}
+
+	private ObjectField _getExistingObjectField(
+		Map<String, ObjectField> existingObjectFields,
+		Map<String, ObjectField> existingObjectFieldsByName,
+		ObjectField objectField) {
+
+		if (Validator.isNull(objectField.getExternalReferenceCode())) {
+			return existingObjectFieldsByName.get(objectField.getName());
+		}
+
+		return existingObjectFields.get(objectField.getExternalReferenceCode());
 	}
 
 	private long _getObjectFolderId(String objectFolderExternalReferenceCode)
