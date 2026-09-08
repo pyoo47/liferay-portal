@@ -55,10 +55,10 @@ public class MasterResourceReaderTest
 	public void testGetJobJSONObjects() throws Exception {
 		String jobName = RandomTestUtil.randomString();
 
-		UrlReader urlReader = mockUrlReader();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		setUrlReaderOutput(
-			_newJobsContent(jobName), "/api/json?tree=jobs", urlReader);
+			_newJobsContent(jobName), "/api/json?tree=jobs", mockURLReaders);
 
 		MasterResourceReader masterResourceReader =
 			MasterResourceReader.getInstance(
@@ -80,11 +80,11 @@ public class MasterResourceReaderTest
 
 	@Test
 	public void testGetJobJSONObjectsIsUnmodifiable() throws Exception {
-		UrlReader urlReader = mockUrlReader();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		setUrlReaderOutput(
 			_newJobsContent(RandomTestUtil.randomString()),
-			"/api/json?tree=jobs", urlReader);
+			"/api/json?tree=jobs", mockURLReaders);
 
 		MasterResourceReader masterResourceReader =
 			MasterResourceReader.getInstance(
@@ -104,11 +104,11 @@ public class MasterResourceReaderTest
 
 	@Test
 	public void testGetJobJSONObjectsWithReadFailure() throws Exception {
-		UrlReader urlReader = mockUrlReader();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		setUrlReaderException(
 			new IOException(RandomTestUtil.randomString()),
-			"/api/json?tree=jobs", urlReader);
+			"/api/json?tree=jobs", mockURLReaders);
 
 		MasterResourceReader masterResourceReader =
 			MasterResourceReader.getInstance(
@@ -125,7 +125,7 @@ public class MasterResourceReaderTest
 		String jobName = RandomTestUtil.randomString();
 
 		setUrlReaderOutput(
-			_newJobsContent(jobName), "/api/json?tree=jobs", urlReader);
+			_newJobsContent(jobName), "/api/json?tree=jobs", mockURLReaders);
 
 		Map<String, JSONObject> jobJSONObjects =
 			masterResourceReader.getJobJSONObjects(_MILLIS_TIMEOUT);
