@@ -390,7 +390,7 @@ public class Test {
 			"${dependencies.url}/" + path);
 	}
 
-	protected void verifyURLReaderAttemptCount(
+	protected void verifyURLReaderAttemptsCount(
 		int expectedCount, MockURLReaders mockURLReaders, String url) {
 
 		int count = 0;
