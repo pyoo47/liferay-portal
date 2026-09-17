@@ -313,10 +313,9 @@ public class SourceFormatter {
 					"Unable to run Source Formatter under Java " +
 						System.getProperty("java.specification.version"));
 				System.err.println(
-					"It loads classes compiled for a newer Java version. Set " +
-						"JAVA_HOME to a newer JDK and run again.");
+					"Set JAVA_HOME to a newer JDK and run again");
 				System.err.println(
-					"This is a toolchain failure, not a formatting violation.");
+					"This is a toolchain failure, not a formatting violation");
 				System.err.println(unsupportedClassVersionError.toString());
 
 				System.exit(2);
