@@ -10815,7 +10815,9 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	private String _getNoSuchAlgorithmExceptionMessage() {
-		if (JavaDetector.isJDK21()) {
+		String javaVersion = JavaDetector.getJavaVersion();
+
+		if (javaVersion.startsWith("21")) {
 			return ": Null or empty transformation";
 		}
 
