@@ -58,7 +58,7 @@ public abstract class BaseBundlePersistentResource
 			getBundleWorkspaceGitRepository();
 
 		sb.append("/");
-		sb.append(getType());
+		sb.append(getS3ObjectPathName());
 		sb.append("/");
 		sb.append(bundleWorkspaceGitRepository.getName());
 		sb.append("/");
@@ -99,6 +99,10 @@ public abstract class BaseBundlePersistentResource
 		return artifactNames;
 	}
 
+	protected String getAxisVariable() {
+		return String.valueOf(getType());
+	}
+
 	protected abstract WorkspaceGitRepository getBundleWorkspaceGitRepository();
 
 	@Override
@@ -108,6 +112,10 @@ public abstract class BaseBundlePersistentResource
 		}
 
 		return super.getCurrentTopLevelBuildURL();
+	}
+
+	protected String getS3ObjectPathName() {
+		return String.valueOf(getType());
 	}
 
 	@Override
@@ -403,10 +411,6 @@ public abstract class BaseBundlePersistentResource
 		}
 	}
 
-	private String _getAxisVariable() {
-		return String.valueOf(getType());
-	}
-
 	private String _getBaseInvocationURL() {
 		try {
 			String serverType = "production";
@@ -536,7 +540,7 @@ public abstract class BaseBundlePersistentResource
 
 		buildParameters.putAll(_getTopLevelJenkinsBuildParameters());
 
-		buildParameters.put("AXIS_VARIABLE", _getAxisVariable());
+		buildParameters.put("AXIS_VARIABLE", getAxisVariable());
 		buildParameters.put("BUILD_PRIORITY", _BUILD_PRIORITY);
 		buildParameters.put("JOB_VARIANT", _JOB_VARIANT);
 		buildParameters.put("PARENT_BUILD_URL", getCurrentTopLevelBuildURL());
