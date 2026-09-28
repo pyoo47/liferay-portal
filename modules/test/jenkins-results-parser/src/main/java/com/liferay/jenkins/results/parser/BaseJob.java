@@ -15,6 +15,7 @@ import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.BatchTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.FunctionalBatchTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.FunctionalSegmentTestClassGroup;
+import com.liferay.jenkins.results.parser.test.clazz.group.PlaywrightSegmentTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.SegmentTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.TestClassGroupFactory;
 
@@ -862,6 +863,32 @@ public abstract class BaseJob implements Job {
 	public int getTimeoutMinutes(JenkinsMaster jenkinsMaster) {
 		return JenkinsResultsParserUtil.getJobTimeoutMinutes(
 			jenkinsMaster, getJobName());
+	}
+
+	public Set<String> getWorkspaceBundleNames() {
+		Set<String> workspaceBundleNames = new TreeSet<>();
+
+		for (SegmentTestClassGroup segmentTestClassGroup :
+				getSegmentTestClassGroups()) {
+
+			if (!(segmentTestClassGroup instanceof
+					PlaywrightSegmentTestClassGroup)) {
+
+				continue;
+			}
+
+			PlaywrightSegmentTestClassGroup playwrightSegmentTestClassGroup =
+				(PlaywrightSegmentTestClassGroup)segmentTestClassGroup;
+
+			String workspaceBundleName =
+				playwrightSegmentTestClassGroup.getWorkspaceBundleName();
+
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(workspaceBundleName)) {
+				workspaceBundleNames.add(workspaceBundleName);
+			}
+		}
+
+		return workspaceBundleNames;
 	}
 
 	@Override

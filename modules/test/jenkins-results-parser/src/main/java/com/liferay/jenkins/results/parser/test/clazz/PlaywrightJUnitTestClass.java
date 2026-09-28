@@ -110,6 +110,8 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 			"minimum_slave_ram", _minimumSlaveRAM
 		).put(
 			"slave_label", _slaveLabel
+		).put(
+			"workspace_bundle_name", _workspaceBundleName
 		);
 
 		return jsonObject;
@@ -137,6 +139,10 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 		}
 
 		return matcher.group("specFilePath");
+	}
+
+	public String getWorkspaceBundleName() {
+		return _workspaceBundleName;
 	}
 
 	public boolean isAnalyticsCloudEnabled() {
@@ -190,11 +196,15 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 			}
 
 			_slaveLabel = slaveLabel;
+
+			_workspaceBundleName = JenkinsResultsParserUtil.getProperty(
+				testProperties, "workspace.bundle.name");
 		}
 		else {
 			_analyticsCloudEnabled = false;
 			_minimumSlaveRAM = null;
 			_slaveLabel = null;
+			_workspaceBundleName = null;
 		}
 	}
 
@@ -207,6 +217,8 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 			"analytics_cloud_enabled");
 		_minimumSlaveRAM = jsonObject.optInt("minimum_slave_ram");
 		_slaveLabel = jsonObject.optString("slave_label");
+		_workspaceBundleName = jsonObject.optString(
+			"workspace_bundle_name", null);
 	}
 
 	private Map<String, TestClassHistory> _getTestClassHistoriesMap() {
@@ -251,5 +263,6 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 	private final Integer _minimumSlaveRAM;
 	private final String _slaveLabel;
 	private Map<String, TestClassHistory> _testClassHistoriesMap;
+	private final String _workspaceBundleName;
 
 }
