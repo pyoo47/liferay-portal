@@ -15,15 +15,22 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
  * @author Kenji Heigel
  */
 public class PlaywrightJUnitTestClass extends JUnitTestClass {
+
+	public void addProjectName(String projectName) {
+		_projectNames.add(projectName);
+	}
 
 	@Override
 	public long getAverageDuration() {
@@ -109,6 +116,8 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 		).put(
 			"minimum_slave_ram", _minimumSlaveRAM
 		).put(
+			"project_names", _projectNames
+		).put(
 			"slave_label", _slaveLabel
 		);
 
@@ -122,6 +131,10 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 	@Override
 	public String getName() {
 		return getSpecFilePath();
+	}
+
+	public Set<String> getProjectNames() {
+		return _projectNames;
 	}
 
 	public String getSlaveLabel() {
@@ -206,6 +219,16 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 		_analyticsCloudEnabled = jsonObject.optBoolean(
 			"analytics_cloud_enabled");
 		_minimumSlaveRAM = jsonObject.optInt("minimum_slave_ram");
+
+		JSONArray projectNamesJSONArray = jsonObject.optJSONArray(
+			"project_names");
+
+		if (projectNamesJSONArray != null) {
+			for (int i = 0; i < projectNamesJSONArray.length(); i++) {
+				_projectNames.add(projectNamesJSONArray.getString(i));
+			}
+		}
+
 		_slaveLabel = jsonObject.optString("slave_label");
 	}
 
@@ -249,6 +272,7 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 	private Long _averageDuration;
 	private Long _averageOverheadDuration;
 	private final Integer _minimumSlaveRAM;
+	private final Set<String> _projectNames = new TreeSet<>();
 	private final String _slaveLabel;
 	private Map<String, TestClassHistory> _testClassHistoriesMap;
 

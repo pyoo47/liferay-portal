@@ -16,7 +16,10 @@ import com.liferay.jenkins.results.parser.test.clazz.PlaywrightTestClassMethod;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClassMethod;
 import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
+import com.liferay.jenkins.results.parser.test.clazz.group.PlaywrightSegmentTestClassGroup;
+import com.liferay.jenkins.results.parser.test.clazz.group.SegmentTestClassGroup;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.net.MalformedURLException;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -165,7 +169,23 @@ public class PlaywrightBatchBuildTestrayCaseResult
 		PlaywrightTestClassMethod playwrightTestClassMethod =
 			getTestClassMethod();
 
-		return playwrightTestClassMethod.getName();
+		Set<String> projectNames = playwrightJUnitTestClass.getProjectNames();
+
+		if (projectNames.size() <= 1) {
+			return playwrightTestClassMethod.getName();
+		}
+
+		String projectName = _getProjectName();
+
+		if (JenkinsResultsParserUtil.isNullOrEmpty(projectName)) {
+			return playwrightTestClassMethod.getName();
+		}
+
+		File testClassFile = playwrightJUnitTestClass.getTestClassFile();
+
+		return JenkinsResultsParserUtil.combine(
+			projectName.replace(".", "/"), "/", testClassFile.getName(), " > ",
+			playwrightTestClassMethod.getTestName());
 	}
 
 	@Override
@@ -233,7 +253,7 @@ public class PlaywrightBatchBuildTestrayCaseResult
 			String fullTestName = JenkinsResultsParserUtil.combine(
 				testReport.getTestClassName(), " > ", testReport.getTestName());
 
-			if (fullTestName.equals(getName())) {
+			if (fullTestName.equals(playwrightTestClassMethod.getName())) {
 				return testReport;
 			}
 		}
@@ -315,6 +335,24 @@ public class PlaywrightBatchBuildTestrayCaseResult
 		}
 
 		super.initBuildReport();
+	}
+
+	private String _getProjectName() {
+		AxisTestClassGroup axisTestClassGroup = getAxisTestClassGroup();
+
+		SegmentTestClassGroup segmentTestClassGroup =
+			axisTestClassGroup.getSegmentTestClassGroup();
+
+		if (!(segmentTestClassGroup instanceof
+				PlaywrightSegmentTestClassGroup)) {
+
+			return null;
+		}
+
+		PlaywrightSegmentTestClassGroup playwrightSegmentTestClassGroup =
+			(PlaywrightSegmentTestClassGroup)segmentTestClassGroup;
+
+		return playwrightSegmentTestClassGroup.getProjectName();
 	}
 
 	private static final Pattern _traceZipPattern = Pattern.compile(
