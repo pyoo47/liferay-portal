@@ -3609,18 +3609,26 @@ ${poshi.runner.testsuite.testcase.name}</echo>
 
 							<trycatch property="exception.message">
 								<try>
-									<exec executable="/bin/bash" failonerror="true" timeout="${test.class.playwright.setup.timeout}">
-										<arg value="modules/test/playwright/env/set_up.sh" />
-										<env key="APP_SERVER_TYPE" value="@{app.server.type}" />
-										<env if:set="ckeditor.dxp.license.key" key="CKEDITOR_DXP_LICENSE_KEY" unless:blank="${ckeditor.dxp.license.key}" value="${ckeditor.dxp.license.key}" />
-										<env key="DATABASE_TYPE" value="@{database.type}" />
-										<env key="JAVA_HOME" value="${java.jdk.home}" />
-										<env key="JAVA_OPTS" value="${java.jdk.opts}" />
-										<env key="LIFERAY_HOME" value="${liferay.home}" />
-										<env key="LIFERAY_PORTAL_URL" value="http://${env.NODE_NAME}:8080" />
-										<env key="PATH" value="${execute.path}" />
-										<env key="PLAYWRIGHT_PROJECT_NAME" value="${playwright.project.name}" />
-									</exec>
+									<if>
+										<isset property="env.PLAYWRIGHT_WORKSPACE_BUNDLE_NAME" />
+										<then>
+											<start-workspace-bundle playwright.project.name="${playwright.project.name}" workspace.bundle.name="${env.PLAYWRIGHT_WORKSPACE_BUNDLE_NAME}" />
+										</then>
+										<else>
+											<exec executable="/bin/bash" failonerror="true" timeout="${test.class.playwright.setup.timeout}">
+												<arg value="modules/test/playwright/env/set_up.sh" />
+												<env key="APP_SERVER_TYPE" value="@{app.server.type}" />
+												<env if:set="ckeditor.dxp.license.key" key="CKEDITOR_DXP_LICENSE_KEY" unless:blank="${ckeditor.dxp.license.key}" value="${ckeditor.dxp.license.key}" />
+												<env key="DATABASE_TYPE" value="@{database.type}" />
+												<env key="JAVA_HOME" value="${java.jdk.home}" />
+												<env key="JAVA_OPTS" value="${java.jdk.opts}" />
+												<env key="LIFERAY_HOME" value="${liferay.home}" />
+												<env key="LIFERAY_PORTAL_URL" value="http://${env.NODE_NAME}:8080" />
+												<env key="PATH" value="${execute.path}" />
+												<env key="PLAYWRIGHT_PROJECT_NAME" value="${playwright.project.name}" />
+											</exec>
+										</else>
+									</if>
 
 									<start-docker-playwright />
 
@@ -3674,17 +3682,25 @@ ${poshi.runner.testsuite.testcase.name}</echo>
 								<finally>
 									<stop-docker-playwright />
 
-									<exec executable="/bin/bash" timeout="${test.class.playwright.teardown.timeout}">
-										<arg value="modules/test/playwright/env/tear_down.sh" />
-										<env key="APP_SERVER_TYPE" value="@{app.server.type}" />
-										<env key="DATABASE_TYPE" value="@{database.type}" />
-										<env key="JAVA_HOME" value="${java.jdk.home}" />
-										<env key="JAVA_OPTS" value="${java.jdk.opts}" />
-										<env key="LIFERAY_HOME" value="${liferay.home}" />
-										<env key="LIFERAY_PORTAL_URL" value="http://${env.HOSTNAME}:8080" />
-										<env key="PATH" value="${execute.path}" />
-										<env key="PLAYWRIGHT_PROJECT_NAME" value="${playwright.project.name}" />
-									</exec>
+									<if>
+										<isset property="env.PLAYWRIGHT_WORKSPACE_BUNDLE_NAME" />
+										<then>
+											<stop-workspace-bundle workspace.bundle.name="${env.PLAYWRIGHT_WORKSPACE_BUNDLE_NAME}" />
+										</then>
+										<else>
+											<exec executable="/bin/bash" timeout="${test.class.playwright.teardown.timeout}">
+												<arg value="modules/test/playwright/env/tear_down.sh" />
+												<env key="APP_SERVER_TYPE" value="@{app.server.type}" />
+												<env key="DATABASE_TYPE" value="@{database.type}" />
+												<env key="JAVA_HOME" value="${java.jdk.home}" />
+												<env key="JAVA_OPTS" value="${java.jdk.opts}" />
+												<env key="LIFERAY_HOME" value="${liferay.home}" />
+												<env key="LIFERAY_PORTAL_URL" value="http://${env.HOSTNAME}:8080" />
+												<env key="PATH" value="${execute.path}" />
+												<env key="PLAYWRIGHT_PROJECT_NAME" value="${playwright.project.name}" />
+											</exec>
+										</else>
+									</if>
 
 									<split-testsuites-junit-report test.suites.report.filepath="${playwright.dir}/test-results/TEST-playwright.xml" />
 
@@ -5172,6 +5188,86 @@ ${poshi.runner.testsuite.testcase.name}</echo>
 		</sequential>
 	</macrodef>
 
+	<macrodef name="start-workspace-bundle">
+		<attribute name="playwright.project.name" />
+		<attribute name="workspace.bundle.name" />
+
+		<sequential>
+			<local name="playwright.project.dir.name" />
+
+			<propertyregex
+				global="true"
+				input="@{playwright.project.name}"
+				property="playwright.project.dir.name"
+				regexp="\."
+				replace="/"
+			/>
+
+			<local name="workspace.bundle.dir" />
+
+			<condition else="${project.dir}/workspaces/@{workspace.bundle.name}" property="workspace.bundle.dir" value="${liferay.portal.private.dir}/workspaces/@{workspace.bundle.name}">
+				<available file="${liferay.portal.private.dir}/workspaces/@{workspace.bundle.name}" type="dir" />
+			</condition>
+
+			<exec executable="docker" failonerror="true">
+				<arg value="load" />
+				<arg value="--input" />
+				<arg value="${project.dir}/dist/liferay-docker-@{workspace.bundle.name}.tar" />
+			</exec>
+
+			<exec executable="docker" failonerror="true">
+				<arg value="exec" />
+				<arg value="${database.postgresql.host}" />
+				<arg value="psql" />
+				<arg value="--command" />
+				<arg value="DROP DATABASE IF EXISTS lportal_workspace;" />
+				<arg value="--command" />
+				<arg value="CREATE DATABASE lportal_workspace;" />
+				<arg value="--dbname" />
+				<arg value="postgres" />
+				<arg value="--username" />
+				<arg value="${database.postgresql.username}" />
+			</exec>
+
+			<echo file="${workspace.bundle.dir}/docker-compose-ci.yaml"><![CDATA[services:
+    database:
+        profiles:
+            -   workspace-database
+    liferay:
+        depends_on: !reset {}
+        environment:
+            LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_DRIVER_UPPERCASEC_LASS_UPPERCASEN_AME: ${database.postgresql.driver}
+            LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_PASSWORD: "${database.postgresql.password}"
+            LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_URL: jdbc:postgresql://${database.postgresql.host}:5432/lportal_workspace
+            LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_USERNAME: ${database.postgresql.username}
+        network_mode: container:${env.NODE_NAME}
+        ports: !override []
+]]></echo>
+
+			<exec dir="${workspace.bundle.dir}" executable="docker" failonerror="true">
+				<arg value="compose" />
+				<arg value="--file" />
+				<arg value="docker-compose.yaml" />
+				<arg value="--file" />
+				<arg value="docker-compose-ci.yaml" />
+				<arg value="create" />
+				<arg value="liferay" />
+			</exec>
+
+			<exec executable="docker" failonerror="true">
+				<arg value="cp" />
+				<arg value="${project.dir}/modules/test/playwright/tests/${playwright.project.dir.name}/env/portal-ext.properties" />
+				<arg value="liferay:/opt/liferay/portal-setup-wizard.properties" />
+			</exec>
+
+			<exec dir="${workspace.bundle.dir}" executable="bash" failonerror="true" timeout="${test.class.playwright.setup.timeout}">
+				<arg value="scripts/bootstrap/start.sh" />
+
+				<env key="LIFERAY_COMPOSE_OVERRIDES" value="ci" />
+			</exec>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="stop-suite-search-engine">
 		<sequential>
 			<if>
@@ -5187,6 +5283,30 @@ ${poshi.runner.testsuite.testcase.name}</echo>
 					<ant antfile="build-test-opensearch2.xml" target="stop-opensearch" />
 				</then>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="stop-workspace-bundle">
+		<attribute name="workspace.bundle.name" />
+
+		<sequential>
+			<print-docker-logs container.name="liferay" />
+
+			<local name="workspace.bundle.dir" />
+
+			<condition else="${project.dir}/workspaces/@{workspace.bundle.name}" property="workspace.bundle.dir" value="${liferay.portal.private.dir}/workspaces/@{workspace.bundle.name}">
+				<available file="${liferay.portal.private.dir}/workspaces/@{workspace.bundle.name}" type="dir" />
+			</condition>
+
+			<exec dir="${workspace.bundle.dir}" executable="docker" failonerror="false">
+				<arg value="compose" />
+				<arg value="--file" />
+				<arg value="docker-compose.yaml" />
+				<arg value="--file" />
+				<arg value="docker-compose-ci.yaml" />
+				<arg value="down" />
+				<arg value="--volumes" />
+			</exec>
 		</sequential>
 	</macrodef>
 
