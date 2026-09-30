@@ -5232,7 +5232,7 @@ ${poshi.runner.testsuite.testcase.name}</echo>
 			<echo file="${workspace.bundle.dir}/docker-compose-ci.yaml"><![CDATA[services:
     database:
         profiles:
-            -   workspace-database
+            - workspace-database
     liferay:
         depends_on: !reset {}
         environment:
