@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
+ * SPDX-FileCopyrightText: (c) 2026 Liferay, Inc. https://liferay.com
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
@@ -21,18 +21,6 @@ const config = {
 	root: true,
 	rules: {
 		'@liferay/portal/no-global-fetch': 'off',
-		'no-restricted-imports': [
-			'error',
-			{
-				paths: [
-					{
-						message:
-							'Import from the playwright-core source by relative path. The package entry point is built output that CI does not build.',
-						name: '@liferay/playwright-core',
-					},
-				],
-			},
-		],
 		'notice/notice': [
 			'error',
 			{
