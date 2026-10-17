@@ -105,6 +105,11 @@ public abstract class BaseWorkspaceGitRepository
 	}
 
 	@Override
+	public String getBaseBranchUsername() {
+		return getString("base_branch_username");
+	}
+
+	@Override
 	public String getBranchName() {
 		if (_branchName != null) {
 			return _branchName;
@@ -163,8 +168,8 @@ public abstract class BaseWorkspaceGitRepository
 		}
 
 		return GitHubDevSyncUtil.getCacheBranchName(
-			_getBaseBranchUsername(), getSenderBranchUsername(),
-			senderBranchSHA, baseBranchSHA);
+			getBaseBranchUsername(), getSenderBranchUsername(), senderBranchSHA,
+			baseBranchSHA);
 	}
 
 	@Override
@@ -293,6 +298,24 @@ public abstract class BaseWorkspaceGitRepository
 	}
 
 	@Override
+	public void setBaseBranchUsername(String username) {
+		if (username.equals(getBaseBranchUsername())) {
+			return;
+		}
+
+		_setBaseBranchUsername(username);
+
+		setUsePullRequestBaseRepository(true);
+
+		_upstreamRemoteGitRef = null;
+
+		RemoteGitRef upstreamRemoteGitRef = _getUpstreamRemoteGitRef();
+
+		_setBaseBranchHeadSHA(upstreamRemoteGitRef.getSHA());
+		setBaseBranchSHA(upstreamRemoteGitRef.getSHA());
+	}
+
+	@Override
 	public void setCommitFileIsSHA(boolean commitFileIsSHA) {
 		_commitFileIsSHA = commitFileIsSHA;
 	}
@@ -315,17 +338,14 @@ public abstract class BaseWorkspaceGitRepository
 			PullRequest pullRequest = PullRequestFactory.newPullRequest(
 				gitHubURL);
 
-			if (_isUsePullRequestBaseRepository()) {
-				_upstreamRemoteGitRef = pullRequest.getBaseRemoteGitBranch();
-			}
-			else {
+			if (!_isUsePullRequestBaseRepository()) {
 				_upstreamRemoteGitRef =
 					pullRequest.getUpstreamRemoteGitBranch();
-			}
 
-			_setBaseBranchHeadSHA(_upstreamRemoteGitRef.getSHA());
-			setBaseBranchSHA(_upstreamRemoteGitRef.getSHA());
-			_setBaseBranchUsername(_upstreamRemoteGitRef.getUsername());
+				_setBaseBranchHeadSHA(_upstreamRemoteGitRef.getSHA());
+				setBaseBranchSHA(_upstreamRemoteGitRef.getSHA());
+				_setBaseBranchUsername(_upstreamRemoteGitRef.getUsername());
+			}
 
 			_senderRemoteGitRef = pullRequest.getSenderRemoteGitBranch();
 
@@ -1338,10 +1358,6 @@ public abstract class BaseWorkspaceGitRepository
 
 	private String _getBaseBranchHeadSHA() {
 		return getString("base_branch_head_sha");
-	}
-
-	private String _getBaseBranchUsername() {
-		return getString("base_branch_username");
 	}
 
 	private String _getDotGitArchiveName() {
