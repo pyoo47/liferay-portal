@@ -399,14 +399,14 @@ public class SourceFormatterReleaseUtilTest
 				"Bundle-Version: 1.0.1644", _PATH_BND,
 				"Bundle-Version: 1.0.1643"),
 			_getGitDiff(
-				"\t\t\t\t<version>1.0.1643</version>", _PATH_POM,
-				"\t\t\t\t<version>1.0.1642</version>"),
+				"\t<version>1.0.1643</version>", _PATH_PLUGIN,
+				"\t<version>1.0.1642</version>"),
 			_getGitDiff(
 				"\t<version>1.0.1643</version>", _PATH_PLUGIN_HELP,
 				"\t<version>1.0.1642</version>"),
 			_getGitDiff(
-				"\t<version>1.0.1643</version>", _PATH_PLUGIN,
-				"\t<version>1.0.1642</version>"));
+				"\t\t\t\t<version>1.0.1643</version>", _PATH_POM,
+				"\t\t\t\t<version>1.0.1642</version>"));
 	}
 
 	private boolean _isReleasedSourceMatch(int exitValue, String standardOut)
