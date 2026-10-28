@@ -144,11 +144,12 @@ public class SourceFormatterReleaseUtil {
 					_SOURCE_FORMATTER_PATH + "/samples/pom.xml",
 					JenkinsResultsParserUtil.combine(
 						_SOURCE_FORMATTER_PATH,
-						"/src/main/resources/META-INF/maven/com.liferay",
-						"/com.liferay.source.formatter/plugin-help.xml"),
+						"/src/main/resources/META-INF/maven",
+						"/com.liferay/com.liferay.source.formatter",
+						"/plugin-help.xml"),
 					JenkinsResultsParserUtil.combine(
 						_SOURCE_FORMATTER_PATH,
-						"/src/main/resources/META-INF/maven/", "plugin.xml"));
+						"/src/main/resources/META-INF/maven", "/plugin.xml"));
 
 				if (!documentation && !versionFilePaths.contains(filePath)) {
 					return false;
