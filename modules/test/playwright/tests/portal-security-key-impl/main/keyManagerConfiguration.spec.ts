@@ -11,7 +11,7 @@ import {systemSettingsPageTest} from '../../../fixtures/systemSettingsPageTest';
 
 const testWithFeatureFlag = mergeTests(
 	featureFlagsTest({
-		'LPD-88411': {enabled: true, system: true},
+		'LPD-88411': {enabled: true},
 	}),
 	loginTest(),
 	systemSettingsPageTest
@@ -19,7 +19,7 @@ const testWithFeatureFlag = mergeTests(
 
 const testWithoutFeatureFlag = mergeTests(
 	featureFlagsTest({
-		'LPD-88411': {enabled: false, system: true},
+		'LPD-88411': {enabled: false},
 	}),
 	loginTest(),
 	systemSettingsPageTest
