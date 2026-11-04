@@ -50,7 +50,7 @@ interface LoginOptions {
 	screenName: LoginScreenName | string;
 }
 
-export async function performLogin(
+async function performLogin(
 	page: Page,
 	screenName: LoginScreenName | string,
 	baseUrl = '/',
@@ -164,3 +164,5 @@ export async function performUserSwitchViaApi(
 
 	await performLoginViaApi({page, screenName});
 }
+
+export {performLogin};
