@@ -8,6 +8,7 @@ package com.liferay.jenkins.results.parser.testray;
 import com.liferay.jenkins.results.parser.BuildDatabase;
 import com.liferay.jenkins.results.parser.BuildReport;
 import com.liferay.jenkins.results.parser.Dom4JUtil;
+import com.liferay.jenkins.results.parser.DownstreamBuildReport;
 import com.liferay.jenkins.results.parser.Environment;
 import com.liferay.jenkins.results.parser.JenkinsMaster;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
@@ -16,6 +17,8 @@ import com.liferay.jenkins.results.parser.NotificationUtil;
 import com.liferay.jenkins.results.parser.ParallelExecutor;
 import com.liferay.jenkins.results.parser.PullRequest;
 import com.liferay.jenkins.results.parser.QAWebsitesGitRepositoryJob;
+import com.liferay.jenkins.results.parser.TestClassReport;
+import com.liferay.jenkins.results.parser.TestReport;
 import com.liferay.jenkins.results.parser.TestSuiteJob;
 import com.liferay.jenkins.results.parser.TopLevelBuildReport;
 import com.liferay.jenkins.results.parser.job.property.JobProperty;
@@ -30,6 +33,7 @@ import com.liferay.jenkins.results.parser.test.clazz.group.JUnitAxisTestClassGro
 import com.liferay.jenkins.results.parser.test.clazz.group.ModulesAxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.PlaywrightAxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.WorkspacesCompileAxisTestClassGroup;
+import com.liferay.poshi.core.util.GetterUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -669,6 +673,21 @@ public class TestrayImporter {
 		return null;
 	}
 
+	private boolean _isDownstreamTestResultsImported(
+		AxisTestClassGroup axisTestClassGroup) {
+
+		try {
+			return GetterUtil.getBoolean(
+				JenkinsResultsParserUtil.getProperty(
+					JenkinsResultsParserUtil.getBuildProperties(),
+					"testray.import.downstream.test.results", false,
+					axisTestClassGroup.getBatchName()));
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+	}
+
 	private boolean _isTestClassFileReported(TestClass testClass) {
 		if (!(testClass instanceof JSUnitJUnitTestClass)) {
 			return false;
@@ -867,6 +886,32 @@ public class TestrayImporter {
 					testClassMethodTestrayCaseResult.setTestrayRun(testrayRun);
 
 					testrayCaseResults.add(testClassMethodTestrayCaseResult);
+				}
+			}
+		}
+		else if (_isDownstreamTestResultsImported(axisTestClassGroup)) {
+			DownstreamBuildReport downstreamBuildReport =
+				_topLevelBuildReport.getDownstreamBuildReport(
+					axisTestClassGroup.getAxisName());
+
+			if (downstreamBuildReport != null) {
+				for (TestClassReport testClassReport :
+						downstreamBuildReport.getTestClassReports()) {
+
+					for (TestReport testReport :
+							testClassReport.getTestReports()) {
+
+						TestrayCaseResult testReportTestrayCaseResult =
+							TestrayFactory.newBuildTestrayCaseResult(
+								axisTestClassGroup, testReport, testrayBuild,
+								_topLevelBuildReport);
+
+						testReportTestrayCaseResult.setParentTestrayCaseResult(
+							buildTestrayCaseResult);
+						testReportTestrayCaseResult.setTestrayRun(testrayRun);
+
+						testrayCaseResults.add(testReportTestrayCaseResult);
+					}
 				}
 			}
 		}
