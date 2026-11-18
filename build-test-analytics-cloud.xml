@@ -282,6 +282,12 @@
 							return;
 						}
 
+						if (JenkinsResultsParserUtil.isCloudCINode()) {
+							System.out.println("WARNING: Skipping the rsync of " + imageTarFile.getName() + " on a cloud CI node");
+
+							return;
+						}
+
 						String distPath = getDistPath();
 
 						if (JenkinsResultsParserUtil.isNullOrEmpty(distPath)) {
@@ -295,6 +301,7 @@
 						long analyticsCloudRsyncTimeout = Long.valueOf(project.getProperty("analytics.cloud.rsync.timeout"));
 
 						int retryCount = 0;
+						long startTime = System.currentTimeMillis();
 
 						while (true) {
 							String distNode = getDistNode();
@@ -320,26 +327,31 @@
 							try {
 								Process process = JenkinsResultsParserUtil.executeBashCommands(false, new File("."), analyticsCloudRsyncTimeout, new String[] {sb.toString()});
 
-								if (process.exitValue() != 0) {
-									continue;
+								System.out.println(JenkinsResultsParserUtil.readInputStream(process.getInputStream()));
+
+								if (imageTarFile.exists()) {
+									break;
 								}
 
-								System.out.println(JenkinsResultsParserUtil.readInputStream(process.getInputStream()));
+								System.out.println("WARNING: Unable to download " + distNode + ":" + distPath + "/" + imageTarFile.getName());
+							}
+							catch (Exception exception) {
+								System.out.println("WARNING: Unable to download " + imageTarFile.getName() + " from " + distNode + ": " + exception.getMessage());
+							}
+
+							if ((System.currentTimeMillis() - startTime) >= analyticsCloudRsyncTimeout) {
+								System.out.println("WARNING: Unable to download " + imageTarFile.getName() + " within " + (analyticsCloudRsyncTimeout / 1000) + " seconds");
 
 								break;
 							}
-							catch (Exception exception) {
-								continue;
-							}
-							finally {
-								if (retryCount >= 2) {
-									System.out.println("WARNING: Unable to download " + imageTarFile.getName() + " after " + retryCount + " retries");
-								}
 
-								retryCount++;
+							if (retryCount >= 2) {
+								System.out.println("WARNING: Unable to download " + imageTarFile.getName() + " after " + retryCount + " retries");
+
+								break;
 							}
 
-							break;
+							retryCount++;
 						}
 					}
 
