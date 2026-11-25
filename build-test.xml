@@ -8354,7 +8354,7 @@ ${docker.start.error}</fail>
 				<elseif>
 					<contains string="${data.archive.type}" substring="partition-large" />
 					<then>
-						<var name="database.docker.database.options.new" value="${database.docker.database.options} --character-set-server=utf8mb4 --innodb_buffer_pool_size=4G --innodb_log_buffer_size=256M --innodb_log_file_size=1G --innodb_write_io_threads=16 --innodb_flush_log_at_trx_commit=0 --innodb-doublewrite=0" />
+						<var name="database.docker.database.options.new" value="${database.docker.database.options} --character-set-server=utf8mb4 --disable-log-bin --innodb_buffer_pool_size=4G --innodb_log_buffer_size=256M --innodb_log_file_size=256M --innodb_write_io_threads=16 --innodb_flush_log_at_trx_commit=0 --innodb-doublewrite=0" />
 					</then>
 				</elseif>
 				<else>
@@ -15473,6 +15473,13 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 					/>
 
 					<delete file="${liferay.home}/data-archive-portal-partition-large.zip" />
+
+					<echo>[DEV-ONLY] Disk use after the data archive expansion</echo>
+
+					<exec executable="/bin/bash">
+						<arg value="-c" />
+						<arg value="df --human-readable /; du --human-readable --max-depth=3 ${liferay.home} | sort --human-numeric-sort --reverse | head --lines=40" />
+					</exec>
 				</then>
 			</elseif>
 			<else>
@@ -15502,6 +15509,7 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 		</if>
 
 		<local name="create.bare.mysql.sql.file" />
+		<local name="import.database.stdin.enabled" />
 
 		<if>
 			<or>
@@ -15675,7 +15683,7 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								<![CDATA[
 									#!/bin/bash
 
-									mysql --password=${database.password} --user=${database.username} < /tmp/${database.type}.sql
+									mysql --password=${database.password} --user=${database.username}
 
 									if [[ ${mysql.upgrade} == "true" ]]
 									then
@@ -15684,8 +15692,75 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								]]>
 							</echo>
 
-							<property name="docker.database.dest.path" value="/tmp/${database.type}.sql" />
 							<property name="import.database.src.path" value="${liferay.home}/${database.type}.sql" />
+							<property name="import.database.stdin.enabled" value="true" />
+
+							<property location="defer-secondary-keys.awk" name="defer.secondary.keys.awk.file.path" />
+
+							<echo file="${defer.secondary.keys.awk.file.path}">
+								<![CDATA[
+									function addKeys() {
+										if (alterTable != "") {
+											print alterTable ";"
+
+											alterTable = ""
+										}
+									}
+
+									/^(CREATE DATABASE|DROP TABLE IF EXISTS|USE )/ {
+										addKeys()
+									}
+
+									/^CREATE TABLE `/ {
+										print
+
+										keys = ""
+										size = 0
+
+										while ((getline line) > 0) {
+											if (line ~ /^\) /) {
+												break
+											}
+
+											if (line ~ /^  (UNIQUE )?KEY `/) {
+												sub(/^  /, "", line)
+												sub(/,$/, "", line)
+
+												keys = keys (keys == "" ? "" : ", ") "ADD " line
+											}
+											else {
+												lines[++size] = line
+											}
+										}
+
+										sub(/,$/, "", lines[size])
+
+										for (i = 1; i <= size; i++) {
+											print lines[i]
+										}
+
+										print line
+
+										if (keys != "") {
+											alterTable = "ALTER TABLE " $3 " " keys
+										}
+
+										next
+									}
+
+									{
+										print
+									}
+
+									/^UNLOCK TABLES;/ {
+										addKeys()
+									}
+
+									END {
+										addKeys()
+									}
+								]]>
+							</echo>
 						</then>
 					</elseif>
 					<elseif>
@@ -15816,11 +15891,43 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 				<execute>
 					<![CDATA[
 						docker cp ${import.database.sh.file.path} ${database.host}:/tmp/import-database.sh
-						docker cp ${import.database.src.path} ${database.host}:${docker.database.dest.path}
-
-						docker exec ${database.host} /bin/bash /tmp/import-database.sh
 					]]>
 				</execute>
+
+				<if>
+					<isset property="import.database.stdin.enabled" />
+					<then>
+						<exec executable="gzip" failonerror="true">
+							<arg value="--fast" />
+							<arg value="${import.database.src.path}" />
+						</exec>
+
+						<exec executable="/bin/bash" failonerror="true">
+							<arg value="-c" />
+							<arg value="set -o pipefail; gzip --decompress --stdout ${import.database.src.path}.gz | LC_ALL=C awk -f ${defer.secondary.keys.awk.file.path} | docker exec --interactive ${database.host} /bin/bash /tmp/import-database.sh" />
+						</exec>
+
+						<delete file="${import.database.src.path}.gz" />
+
+						<delete file="${defer.secondary.keys.awk.file.path}" />
+
+						<echo>[DEV-ONLY] Disk use after the database import</echo>
+
+						<exec executable="/bin/bash">
+							<arg value="-c" />
+							<arg value="df --human-readable /; docker exec ${database.host} du --summarize --bytes /tmp /var/lib/mysql" />
+						</exec>
+					</then>
+					<else>
+						<execute>
+							<![CDATA[
+								docker cp ${import.database.src.path} ${database.host}:${docker.database.dest.path}
+
+								docker exec ${database.host} /bin/bash /tmp/import-database.sh
+							]]>
+						</execute>
+					</else>
+				</if>
 			</then>
 			<else>
 				<if>
