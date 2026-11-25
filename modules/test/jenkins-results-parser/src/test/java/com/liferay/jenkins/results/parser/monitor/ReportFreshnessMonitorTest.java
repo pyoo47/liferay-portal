@@ -12,6 +12,7 @@ import com.liferay.jenkins.results.parser.RandomTestUtil;
 import com.liferay.jenkins.results.parser.ReflectionTestUtil;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.Arrays;
@@ -344,6 +345,34 @@ public class ReportFreshnessMonitorTest
 		Map<String, String> metrics = monitorResult.getMetrics();
 
 		Assert.assertTrue(metrics.isEmpty());
+	}
+
+	@Test
+	public void testExecuteMissingJob() throws Exception {
+		mockURLReaders();
+
+		_setStaleReportData();
+
+		setURLReaderException(
+			new FileNotFoundException(),
+			"http://" + _MASTER_NAME_1 + "/job/generate-reports/api/json");
+
+		JSONObject buildJSONObject = _newBuildJSONObject(
+			false, _MASTER_NAME_2, _REPORT_NAME, "FAILURE", 1000);
+
+		_setBuildJSONObjects(_MASTER_NAME_2, buildJSONObject);
+
+		_testExecute(
+			Collections.singletonList(_getRemoteBuildURL(buildJSONObject)),
+			"The latest \"generate-reports\" build to run it ended in FAILURE");
+
+		_setBuildJSONObjects(_MASTER_NAME_2);
+
+		_testExecute(
+			null,
+			JenkinsResultsParserUtil.combine(
+				"No \"generate-reports\" build in cohort ", _COHORT_NAME,
+				" ran it among the newest 100 on each master"));
 	}
 
 	@Test
