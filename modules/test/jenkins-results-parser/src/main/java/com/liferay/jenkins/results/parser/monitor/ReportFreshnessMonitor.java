@@ -11,6 +11,7 @@ import com.liferay.jenkins.results.parser.JenkinsMaster;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.ParallelExecutor;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -186,6 +187,9 @@ public class ReportFreshnessMonitor extends BaseMonitor {
 					public JSONObject call() {
 						try {
 							return _getLatestBuildJSONObject(jenkinsMaster);
+						}
+						catch (FileNotFoundException fileNotFoundException) {
+							return null;
 						}
 						catch (Exception exception) {
 							unreadableJenkinsMasterNames.add(
