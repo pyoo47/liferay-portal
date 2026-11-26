@@ -6201,7 +6201,10 @@ ${custom.upgrade.properties}</echo>
 								</elseif>
 								<elseif>
 									<and>
-										<contains string="${database.version}" substring="11.8" />
+										<or>
+											<contains string="${database.version}" substring="11.8" />
+											<contains string="${database.version}" substring="12.3" />
+										</or>
 										<equals arg1="${database.type}" arg2="mariadb" />
 									</and>
 									<then>
@@ -8420,7 +8423,10 @@ ${docker.start.error}</fail>
 				</elseif>
 				<elseif>
 					<and>
-						<contains string="${database.version}" substring="11.8" />
+						<or>
+							<contains string="${database.version}" substring="11.8" />
+							<contains string="${database.version}" substring="12.3" />
+						</or>
 						<equals arg1="${database.type}" arg2="mariadb" />
 					</and>
 					<then>
