@@ -7195,6 +7195,10 @@ information. Make sure to commit in all format-javadoc results.
 		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="8.4" test.portal.log.assert="true" />
 	</target>
 
+	<target name="functional-smoke-tomcat101-mysql97">
+		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="9.7" test.portal.log.assert="true" />
+	</target>
+
 	<target name="functional-smoke-tomcat101-oracle">
 		<run-functional-test app.server.type="tomcat" database.type="oracle" test.portal.log.assert="true" />
 	</target>
@@ -7905,6 +7909,10 @@ information. Make sure to commit in all format-javadoc results.
 
 	<target name="functional-tomcat101-mysql84_stable">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="8.4" />
+	</target>
+
+	<target name="functional-tomcat101-mysql97">
+		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="9.7" />
 	</target>
 
 	<target name="functional-tomcat101-oracle">
